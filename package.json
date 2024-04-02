@@ -16,7 +16,7 @@
     "build-storybook": "storybook build",
     "prepare": "husky install",
     "commit": "git add . && ./node_modules/cz-customizable/standalone.js",
-    "pre-commit": "lint-staged"
+    "pre-commit": "git add . && lint-staged"
   },
   "dependencies": {
     "next": "14.1.4",
