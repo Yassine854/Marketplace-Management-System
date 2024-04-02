@@ -15,7 +15,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky install",
-    "commit": "git add . && git-cz",
+    "commit": "git add . && ./node_modules/cz-customizable/standalone.js",
     "pre-commit": "lint-staged"
   },
   "dependencies": {
@@ -44,12 +44,15 @@
     "@vitest/ui": "^1.4.0",
     "autoprefixer": "^10.0.1",
     "commitizen": "^4.3.0",
+    "commitlint": "^19.2.1",
+    "commitlint-config-gitmoji": "^2.3.1",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^8",
+    "cz-customizable": "^7.0.0",
+    "eslint": "^8.57.0",
     "eslint-config-next": "14.1.4",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-storybook": "^0.8.0",
-    "husky": "^8.0.0",
+    "husky": "^8.0.3",
     "jsdom": "^24.0.0",
     "lint-staged": "^15.2.2",
     "postcss": "^8",
@@ -62,7 +65,7 @@
   },
   "config": {
     "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
+      "path": "cz-customizable"
     }
   }
 }
