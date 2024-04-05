@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Metadata } from "next";
-import Switcher from "../../components/LanguageSwitcher";
+import Switcher from "../../../components/LanguageSwitcher";
 
 type Locale = "en" | "fr";
 type PageParamsType = {
@@ -13,7 +13,6 @@ export const metadata: Metadata = {
 };
 
 const HomePage = ({ params: { locale } }: PageParamsType) => {
-  console.log("🚀 ~ HomePage ~ locale:", locale);
   const t = useTranslations();
 
   return (
