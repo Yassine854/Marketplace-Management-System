@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Metadata } from "next";
-import Switcher from "../../../components/LanguageSwitcher";
+import Switcher from "../../components/SwitchLanguage";
 
 type Locale = "en" | "fr";
 type PageParamsType = {
