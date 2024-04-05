@@ -1,6 +1,5 @@
 import { useTranslations } from "next-intl";
 import { Metadata } from "next";
-import Switcher from "../../components/SwitchLanguage";
 
 type Locale = "en" | "fr";
 type PageParamsType = {
@@ -18,10 +17,7 @@ const HomePage = ({ params: { locale } }: PageParamsType) => {
   return (
     <div>
       <h1>{t("TITLE")}</h1>
-
-      <Switcher />
     </div>
   );
 };
-
 export default HomePage;

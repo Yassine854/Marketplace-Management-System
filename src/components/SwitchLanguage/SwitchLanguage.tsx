@@ -14,7 +14,7 @@ const SwitchLanguage = ({ isWhite }: { isWhite?: boolean }) => {
   const { open, ref, toggleOpen } = useDropdown();
 
   const onSelect = (lang: string) => {
-    router.push(pathName, { locale: lang });
+    if (lang != locale) router.push(pathName, { locale: lang });
   };
 
   return (

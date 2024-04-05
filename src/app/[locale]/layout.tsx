@@ -1,27 +1,12 @@
-import { NextIntlClientProvider, useMessages } from "next-intl";
+import TopNavBar from "@/components/TopNavBar";
 
-type PageParamsType = {
-  locale: string;
-};
-
-const RootLayout = ({
-  children,
-  params: { locale },
-}: {
-  children: React.ReactNode;
-  params: PageParamsType;
-}) => {
-  const messages = useMessages();
-
+const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang={locale}>
-      <body>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <div>
+      <TopNavBar />
+      {children}
+    </div>
   );
 };
 
-export default RootLayout;
+export default Layout;
