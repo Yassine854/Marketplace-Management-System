@@ -72,11 +72,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-input:checked+div {
+input:checked + div {
   @apply border-primary;
 }
 
-input:checked+div svg {
+input:checked + div svg {
   @apply block;
 }
 
@@ -93,7 +93,6 @@ input:checked+div svg {
 }
 
 @layer utilities {
-
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;

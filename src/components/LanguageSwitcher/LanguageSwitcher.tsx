@@ -1,12 +1,11 @@
-"use client";
-import useDropdown from "../../utils/useDropdown";
-import { IconChevronDown, IconWorld } from "@tabler/icons-react";
 import { useState } from "react";
 import { useLocale } from "next-intl";
-import ISO6391 from "iso-639-1";
 import { locales, usePathname, useRouter } from "../../navigation";
+import { IconChevronDown, IconWorld } from "@tabler/icons-react";
+import ISO6391 from "iso-639-1";
+import useDropdown from "../../utils/useDropdown";
 
-const SwitchLanguage = ({ isWhite }: { isWhite?: boolean }) => {
+const LanguageSwitcher = ({ isWhite }: { isWhite?: boolean }) => {
   const locale = useLocale();
   const router = useRouter();
   const pathName = usePathname();
@@ -16,7 +15,6 @@ const SwitchLanguage = ({ isWhite }: { isWhite?: boolean }) => {
   const onSelect = (lang: string) => {
     if (lang != locale) router.push(pathName, { locale: lang });
   };
-
   return (
     <div className="relative" ref={ref}>
       <button
@@ -39,11 +37,7 @@ const SwitchLanguage = ({ isWhite }: { isWhite?: boolean }) => {
           {locales.map((lang) => (
             <li
               key={lang}
-              onClick={() => {
-                setSelected(lang);
-                onSelect(lang);
-                toggleOpen();
-              }}
+              onClick={() => onSelect(lang)}
               className={`px-4 block py-2 rounded-md cursor-pointer duration-300 hover:text-primary ${
                 selected == lang && "bg-primary text-n0 hover:!text-n0"
               }`}
@@ -57,4 +51,4 @@ const SwitchLanguage = ({ isWhite }: { isWhite?: boolean }) => {
   );
 };
 
-export default SwitchLanguage;
+export default LanguageSwitcher;
