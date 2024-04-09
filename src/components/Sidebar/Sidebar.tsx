@@ -1,6 +1,6 @@
 "use client";
 import { sidebarData } from "../../../public/data/sidebarData";
-import useWindowSize from "@/utils/useWindowSize";
+import useWindowSize from "../../utils/useWindowSize";
 import { IconChevronRight, IconLogout, IconX } from "@tabler/icons-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
