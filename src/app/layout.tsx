@@ -5,7 +5,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Next13NProgress } from "nextjs13-progress";
 import "./globals.css";
-import "../../public/styles/style.scss";
 
 type PageParamsType = {
   locale: string;
