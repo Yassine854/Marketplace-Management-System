@@ -15,9 +15,11 @@ import Image from "next/image";
 import { Link } from "nextjs13-progress";
 import { sidebarData } from "../../../public/data/sidebarData";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import useWindowSize from "../../utils/useWindowSize";
 
 const SidebarVertical = () => {
+  const { push } = useRouter();
   const sidebarIsOpen = true;
   const setSidebar = () => {};
   const [activeMenu, setActiveMenu] = useState("");
@@ -168,7 +170,14 @@ const SidebarVertical = () => {
             <span className={`text-primary group-hover:text-n0 `}>
               <IconLogout className="w-5 h-5 lg:w-6 lg:h-6" />
             </span>
-            <span className="text-sm lg:text-base font-medium">Log Out</span>
+            <span
+              className="text-sm lg:text-base font-medium pointer cursor-pointer	"
+              onClick={() => {
+                push("/login");
+              }}
+            >
+              Log Out
+            </span>
           </span>
           {/* </Link> */}
         </div>

@@ -8,7 +8,7 @@ type PageParamsType = {
   };
 };
 
-const HomePage = ({ params: { locale } }: PageParamsType) => {
+const Dashboard = ({ params: { locale } }: PageParamsType) => {
   // Ensures static rendering at build time.
   unstable_setRequestLocale(locale);
 
@@ -20,4 +20,4 @@ const HomePage = ({ params: { locale } }: PageParamsType) => {
     </div>
   );
 };
-export default HomePage;
+export default Dashboard;
