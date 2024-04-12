@@ -13,10 +13,10 @@ import React, {
 import AnimateHeight from "react-animate-height";
 import Image from "next/image";
 import { Link } from "nextjs13-progress";
-import { sidebarData } from "../../../public/data/sidebarData";
+import { sidebarData } from "../../../../public/data/sidebarData";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import useWindowSize from "../../utils/useWindowSize";
+import useWindowSize from "../../../utils/useWindowSize";
 
 const SidebarVertical = () => {
   const { push } = useRouter();

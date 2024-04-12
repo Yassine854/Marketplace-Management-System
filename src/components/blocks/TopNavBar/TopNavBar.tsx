@@ -1,7 +1,7 @@
-import LanguageSwitcher from "../LanguageSwitcher";
-import ModeSwitcher from "../ModeSwitcher";
-import Notification from "../Notification";
-import Profile from "../Profile";
+import LanguageSwitcher from "@elements/LanguageSwitcher";
+import ModeSwitcher from "@elements/ModeSwitcher";
+import Notification from "@elements/Notification";
+import Profile from "@elements/Profile";
 
 const TopNav = () => {
   return (

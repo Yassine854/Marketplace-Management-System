@@ -1,6 +1,6 @@
 "use client";
 
-import SystemError from "@/components/SystemError";
+import SystemError from "@blocks/SystemError";
 
 const NotFound = () => <SystemError />;
 

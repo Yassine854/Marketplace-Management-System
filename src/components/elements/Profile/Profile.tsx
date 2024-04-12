@@ -10,7 +10,8 @@ import {
 
 import Image from "next/image";
 import Link from "next/link";
-import useDropdown from "../../utils/useDropdown";
+import useDropdown from "@/utils/useDropdown";
+
 const profileLinks = [
   {
     icon: <IconUser size={18} />,

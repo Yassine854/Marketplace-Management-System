@@ -25,7 +25,7 @@ import {
 export const sidebarData = [
   {
     id: 1,
-    // title: "Dashboard",
+    title: "",
     items: [
       {
         id: 1,

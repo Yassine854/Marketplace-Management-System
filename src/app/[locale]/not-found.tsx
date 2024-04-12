@@ -1,4 +1,4 @@
-import PageNotFoundError from "@/components/PageNotFoundError";
+import PageNotFoundError from "@blocks/PageNotFoundError";
 
 const NotFound = () => <PageNotFoundError />;
 

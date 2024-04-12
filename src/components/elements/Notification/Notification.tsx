@@ -3,7 +3,7 @@
 import { IconBell } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
-import useDropdown from "../../utils/useDropdown";
+import useDropdown from "@/utils/useDropdown";
 const notifications = [
   {
     id: 1,
