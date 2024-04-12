@@ -1,5 +1,5 @@
+import { unstable_setRequestLocale } from "next-intl/server";
 import { useTranslations } from "next-intl";
-import { Metadata } from "next";
 
 type Locale = "en" | "fr";
 type PageParamsType = {
@@ -7,16 +7,16 @@ type PageParamsType = {
     locale: Locale;
   };
 };
-export const metadata: Metadata = {
-  title: "Next.js App Router i18n localization",
-};
 
 const HomePage = ({ params: { locale } }: PageParamsType) => {
+  // Ensures static rendering at build time.
+  unstable_setRequestLocale(locale);
+
   const t = useTranslations();
 
   return (
-    <div>
-      <h1>{t("TITLE")}</h1>
+    <div className="flex flex-grow items-center justify-center bg-red-700">
+      <p className="text-red text-4xl "> {t("TITLE")}</p>
     </div>
   );
 };

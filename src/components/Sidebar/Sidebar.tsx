@@ -1,10 +1,6 @@
 "use client";
-import { sidebarData } from "../../../public/data/sidebarData";
-import useWindowSize from "../../utils/useWindowSize";
+
 import { IconChevronRight, IconLogout, IconX } from "@tabler/icons-react";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { Link } from "nextjs13-progress";
 import React, {
   Dispatch,
   SetStateAction,
@@ -13,7 +9,13 @@ import React, {
   useRef,
   useState,
 } from "react";
+
 import AnimateHeight from "react-animate-height";
+import Image from "next/image";
+import { Link } from "nextjs13-progress";
+import { sidebarData } from "../../../public/data/sidebarData";
+import { usePathname } from "next/navigation";
+import useWindowSize from "../../utils/useWindowSize";
 
 const SidebarVertical = () => {
   const sidebarIsOpen = true;
@@ -32,7 +34,7 @@ const SidebarVertical = () => {
         !sidebarRef.current.contains(event.target as Node)
       ) {
         if (currentWindowSize < 1400) {
-          setSidebar(false);
+          //setSidebar(false);
         }
       }
     },
@@ -68,15 +70,15 @@ const SidebarVertical = () => {
     >
       <div className={`p-4 xxl:p-6 xxxl:p-[30px]`}>
         <div className="flex justify-between items-center">
-          <Link href="/">
-            <Image
-              width={174}
-              height={38}
-              src="/images/logo-with-text.png"
-              alt="logo"
-            />
-          </Link>
-          <button onClick={() => setSidebar(false)} className="xxl:hidden">
+          {/* <Link href="/"> */}
+          <Image
+            width={174}
+            height={38}
+            src="/images/logo-with-text.png"
+            alt="logo"
+          />
+          {/* </Link> */}
+          <button onClick={() => {}} className="xxl:hidden">
             <IconX />
           </button>
         </div>
@@ -133,19 +135,19 @@ const SidebarVertical = () => {
                               <li
                                 onClick={() => {
                                   setActiveMenu(name);
-                                  windowSize! < 1400 &&
-                                    setSidebar(!sidebarIsOpen);
+                                  // windowSize! < 1400 &&
+                                  //  setSidebar(!sidebarIsOpen)
                                 }}
                                 key={title}
                               >
-                                <Link
+                                {/* <Link
                                   className={`font-medium block py-2.5 md:py-3 text-sm lg:text-base hover:text-primary duration-300 capitalize px-3 xxxl:px-6 ${
-                                    path == url && "text-primary"
+                                    path == url && 'text-primary'
                                   }`}
                                   href={url}
-                                >
-                                  <span className="pr-1">•</span> {title}
-                                </Link>
+                                > */}
+                                <span className="pr-1">•</span> {title}
+                                {/* </Link> */}
                               </li>
                             ))}
                           </ul>
@@ -158,17 +160,17 @@ const SidebarVertical = () => {
           ))}
         </div>
         <div className="px-4 xxl:px-6 xxxl:px-8 pb-28">
-          <Link
+          {/* <Link
             href="/login-1"
             className={`px-4 w-full group flex justify-between items-center xxxl:px-6 py-2.5 lg:py-3 rounded-2xl hover:bg-primary hover:text-n0 duration-300 `}
-          >
-            <span className="flex items-center gap-2">
-              <span className={`text-primary group-hover:text-n0 `}>
-                <IconLogout className="w-5 h-5 lg:w-6 lg:h-6" />
-              </span>
-              <span className="text-sm lg:text-base font-medium">Log Out</span>
+          > */}
+          <span className="flex items-center gap-2">
+            <span className={`text-primary group-hover:text-n0 `}>
+              <IconLogout className="w-5 h-5 lg:w-6 lg:h-6" />
             </span>
-          </Link>
+            <span className="text-sm lg:text-base font-medium">Log Out</span>
+          </span>
+          {/* </Link> */}
         </div>
       </div>
     </aside>
