@@ -10,7 +10,6 @@ import { useLocale } from "next-intl";
 import { useState } from "react";
 
 const LanguageSwitcher = ({ isWhite }: { isWhite?: boolean }) => {
-  console.log("🚀 ~ AllLocales:", AllLocales);
   const locale = useLocale();
   const router = useRouter();
   const pathName = usePathname();

@@ -1,4 +1,5 @@
 import "./globals.css";
+import "@/public/styles/style.scss";
 
 import { Inter } from "next/font/google";
 import { LayoutProvider } from "@/utils/LayoutContext";
@@ -28,7 +29,7 @@ const RootLayout = ({
   return (
     <html lang={locale} className="!scroll-smooth">
       <body
-        className={`${inter.className} text-n500 dark:text-n30  flex h-screen w-screen`}
+        className={`${inter.className} text-n500 dark:text-n30 flex h-screen w-screen `}
       >
         <ThemeProvider>
           <Next13NProgress color="#5D69F4" height={3} />
