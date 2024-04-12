@@ -2,18 +2,12 @@ import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
 import { unstable_setRequestLocale } from "next-intl/server";
 
-const locales = ["en", "fr"];
-
 type Props = {
   children: React.ReactNode;
   params: {
     locale: string;
   };
 };
-
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
-}
 
 const Layout = ({ children, params: { locale } }: Props) => {
   // Ensures static rendering at build time.
