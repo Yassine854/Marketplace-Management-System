@@ -1,12 +1,16 @@
 "use client";
-import { useState } from "react";
-import { useLocale } from "next-intl";
-import { locales, usePathname, useRouter } from "../../navigation";
+
 import { IconChevronDown, IconWorld } from "@tabler/icons-react";
+import { usePathname, useRouter } from "../../libs/i18nNavigation";
+
+import { AllLocales } from "../../utils/AppConfig";
 import ISO6391 from "iso-639-1";
 import useDropdown from "../../utils/useDropdown";
+import { useLocale } from "next-intl";
+import { useState } from "react";
 
 const LanguageSwitcher = ({ isWhite }: { isWhite?: boolean }) => {
+  console.log("🚀 ~ AllLocales:", AllLocales);
   const locale = useLocale();
   const router = useRouter();
   const pathName = usePathname();
@@ -35,15 +39,15 @@ const LanguageSwitcher = ({ isWhite }: { isWhite?: boolean }) => {
         }`}
       >
         <ul className="flex flex-col w-32 bg-n0 p-1 rounded-md dark:bg-bg4">
-          {locales.map((lang) => (
+          {AllLocales.map((locale) => (
             <li
-              key={lang}
-              onClick={() => onSelect(lang)}
+              key={locale}
+              onClick={() => onSelect(locale)}
               className={`px-4 block py-2 rounded-md cursor-pointer duration-300 hover:text-primary ${
-                selected == lang && "bg-primary text-n0 hover:!text-n0"
+                selected == locale && "bg-primary text-n0 hover:!text-n0"
               }`}
             >
-              {ISO6391.getNativeName(lang)}
+              {ISO6391.getNativeName(locale)}
             </li>
           ))}
         </ul>
