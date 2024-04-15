@@ -23,8 +23,6 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/public/*": ["./public/*"],
-      "@/blocks/*": ["./src/components/blocks/*"],
-      "@/elements/*": ["./src/components/elements/*"],
       "@/utils*": ["./src/utils/*"]
     }
   },
