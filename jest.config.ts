@@ -12,12 +12,11 @@ const config: Config = {
   testEnvironment: "jsdom",
   // Add more setup options before each test is run
   // setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  moduleDirectories: ["node_modules", "src", "src/components", "public"],
   moduleNameMapper: {
     // ...
     "^@/public/(.*)$": "<rootDir>/public/$1",
     "^@/components/(.*)$": "<rootDir>/src/components/$1",
-    "^@/blocks/(.*)$": "<rootDir>/src/components/blocks/$1",
-    "^@/elements/(.*)$": "<rootDir>/src/components/elements/$1",
     "^@/utils/(.*)$": "<rootDir>/src/utils/$1",
   },
 };
