@@ -23,8 +23,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/public/*": ["./public/*"],
-      "@blocks/*": ["./src/components/blocks/*"],
-      "@elements/*": ["./src/components/elements/*"]
+      "@/blocks/*": ["./src/components/blocks/*"],
+      "@/elements/*": ["./src/components/elements/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

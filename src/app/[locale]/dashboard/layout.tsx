@@ -1,5 +1,5 @@
-import Sidebar from "@blocks/Sidebar";
-import TopNavBar from "@blocks/TopNavBar";
+import Sidebar from "@/blocks/Sidebar";
+import TopNavBar from "@/blocks/TopNavBar";
 import { unstable_setRequestLocale } from "next-intl/server";
 
 type Props = {
