@@ -1,9 +1,13 @@
-const withNextIntl = require("next-intl/plugin")();
+const withNextIntl = require("next-intl/plugin")("./src/libs/i18n.ts");
 
 /** @type {import('next').NextConfig} */
+
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig = {
   reactStrictMode: true,
 };
 
-module.exports = withNextIntl(nextConfig);
+module.exports = withNextIntl(withBundleAnalyzer(nextConfig));
