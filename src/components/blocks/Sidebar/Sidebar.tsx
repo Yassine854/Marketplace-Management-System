@@ -5,9 +5,10 @@ import { IconLogout, IconX } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import SidebarElement from "@/components/elements/SidebarElement";
-import { sidebarData } from "@/public/data/sidebarData";
+import { sidebarData } from "./sidebarData";
 import { useRouter } from "next/navigation";
 
+///
 const Sidebar = () => {
   const { push } = useRouter();
 
@@ -18,6 +19,7 @@ const Sidebar = () => {
           
     duration-300 sidebar fixed ltr:left-0 rtl:right-0 h-full bg-n0 dark:bg-bg4 top-0`}
     >
+      .
       <div className={`p-4 xxl:p-6 xxxl:p-[30px]`}>
         <div className="flex justify-between items-center">
           <Link href="/">

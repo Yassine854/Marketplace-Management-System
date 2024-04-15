@@ -1,6 +1,5 @@
-import { it } from "vitest";
-import { render } from "@testing-library/react";
 import Index from "./index";
+import { render } from "@testing-library/react";
 
 it("Render", () => {
   render(<Index />);

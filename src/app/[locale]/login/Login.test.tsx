@@ -1,6 +1,6 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import Index from "./index";
+import Index from "./page";
 import { render } from "@testing-library/react";
 
 jest.mock("next/navigation");
