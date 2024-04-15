@@ -1,3 +1,4 @@
+import Footer from "@/components/blocks/Footer";
 import Sidebar from "@/components/blocks/Sidebar";
 import TopNavBar from "@/components/blocks/TopNavBar";
 import { unstable_setRequestLocale } from "next-intl/server";
@@ -16,8 +17,9 @@ const Layout = ({ children, params: { locale } }: Props) => {
   return (
     <>
       <TopNavBar />
-      <div className=" pt-[90px]  ml-[280px] xxxl:ml-[336px]  flex flex-grow justify-center items-center bg-primary/5 dark:bg-bg3  ">
+      <div className=" pt-[120px]  ml-[280px] xxxl:ml-[336px]   w-full bg-primary/5 dark:bg-bg3  flex-col px-8">
         {children}
+        <Footer />
       </div>
       <Sidebar />
     </>

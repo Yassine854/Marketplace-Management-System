@@ -57,7 +57,7 @@ const OrdersTable = () => {
 
   return (
     <div className="box">
-      <div className="flex flex-wrap gap-3 justify-between items-center bb-dashed mb-6 pb-6">
+      <div className="flex flex-wrap gap-3 justify-between items-center bb-dashed mb-6 pb-6 w-full">
         <p className="font-medium">Table List View</p>
         <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
           <SearchBar handleSearch={search} />
