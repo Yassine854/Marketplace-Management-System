@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./LanguageSwitcher";
 
 const meta = {
-  title: "Components/LanguageSwticher",
+  title: "Components/Elements/LanguageSwticher",
   component: Index,
   decorators: [],
   parameters: {

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./index";
 
 const meta = {
-  title: "Components/Elements/ModeSwitcher",
+  title: "Components/Elements/SidebarElement",
   component: Index,
   parameters: {
     layout: "centered",
@@ -13,4 +13,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {};
+export const Primary: Story = {
+  args: {
+    handleSearch: () => {},
+  },
+};
