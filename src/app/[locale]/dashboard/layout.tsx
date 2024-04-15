@@ -1,5 +1,5 @@
-import Sidebar from "@/blocks/Sidebar";
-import TopNavBar from "@/blocks/TopNavBar";
+import Sidebar from "@/components/blocks/Sidebar";
+import TopNavBar from "@/components/blocks/TopNavBar";
 import { unstable_setRequestLocale } from "next-intl/server";
 
 type Props = {
@@ -14,13 +14,13 @@ const Layout = ({ children, params: { locale } }: Props) => {
   unstable_setRequestLocale(locale);
 
   return (
-    <div className="flex flex-grow bg-green-500  ">
+    <>
       <TopNavBar />
-      <div className="flex flex-grow mt-34 ml-80 bg-blue-400 mt-[90px]  ml-[280px] xxxl:ml-[336px]">
+      <div className=" pt-[90px]  ml-[280px] xxxl:ml-[336px]  flex flex-grow justify-center items-center bg-primary/5 dark:bg-bg3  ">
         {children}
       </div>
       <Sidebar />
-    </div>
+    </>
   );
 };
 

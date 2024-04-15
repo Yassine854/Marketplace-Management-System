@@ -1,22 +1,9 @@
-import { unstable_setRequestLocale } from "next-intl/server";
-import { useTranslations } from "next-intl";
+import OrdersTable from "@/components/blocks/OrdersTable";
 
-type Locale = "en" | "fr";
-type PageParamsType = {
-  params: {
-    locale: Locale;
-  };
-};
-
-const Dashboard = ({ params: { locale } }: PageParamsType) => {
-  // Ensures static rendering at build time.
-  unstable_setRequestLocale(locale);
-
-  const t = useTranslations();
-
+const Dashboard = () => {
   return (
-    <div className="flex flex-grow items-center justify-center bg-red-700">
-      <p className="text-red text-4xl "> {t("TITLE")}</p>
+    <div className=" flex flex-grow justify-center items-center ">
+      <OrdersTable />
     </div>
   );
 };
