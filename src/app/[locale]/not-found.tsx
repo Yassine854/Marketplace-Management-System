@@ -1,10 +1,5 @@
-import React from "react";
-import { useTranslations } from "next-intl";
+import PageNotFoundError from "@/blocks/PageNotFoundError";
 
-const NotFoundPage = () => {
-  const t = useTranslations();
+const NotFound = () => <PageNotFoundError />;
 
-  return <p>{t("NOT_FOUND")}</p>;
-};
-
-export default NotFoundPage;
+export default NotFound;
