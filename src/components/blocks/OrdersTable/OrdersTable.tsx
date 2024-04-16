@@ -2,14 +2,11 @@
 
 import { IconSearch, IconSelector } from "@tabler/icons-react";
 
-import CheckboxCustom from "@/components/elements/Checkbox";
 import Dropdown from "@/components/elements/Dropdown";
-import Image from "next/image";
 import Pagination from "@/components/elements/Pagination";
 import SearchBar from "@/components/elements/SearchBar";
-import TableActions from "@/components/elements/TableActions";
+import TableRow from "@/components/elements/TableRow";
 import { faker } from "@faker-js/faker";
-import { timeAgo } from "@/utils/timeAgo";
 import { useState } from "react";
 import useTable from "@/utils/useTable";
 
@@ -31,7 +28,7 @@ const list = Array.from({ length: 40 }).map((_, i) => {
       1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
     ])}.png`,
     type: faker.person.jobDescriptor(),
-    size: `${faker.number.float({ max: 9, min: 2, precision: 0.1 })}MB`,
+    size: `${faker.number.float({ multipleOf: 8 })}MB`,
     version: "1.0.0",
     time: faker.date.recent(),
   };
@@ -98,53 +95,16 @@ const OrdersTable = () => {
           <tbody>
             {tableData.map(
               ({ id, img, name, icon, size, time, type, version }, index) => (
-                <tr key={id} className="even:bg-primary/5 dark:even:bg-bg3">
-                  <td className="py-2 px-3">
-                    <CheckboxCustom />
-                  </td>
-                  <td className="py-1 px-3">
-                    <div className="flex items-center gap-3">
-                      <Image
-                        width={32}
-                        height={32}
-                        className="rounded-full shrink-0"
-                        src={icon}
-                        alt="img"
-                      />
-                      <span className="font-medium inline-block">{type}</span>
-                    </div>
-                  </td>
-                  <td className="py-2 px-3">{size}</td>
-                  <td className="py-2 px-3">{version}</td>
-                  <td className="py-2 px-3">
-                    <div className="flex items-center gap-3">
-                      <Image
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                        src={img}
-                        alt="img"
-                      />
-                      <div className="flex flex-col">
-                        <span className="font-medium inline-block mb-1">
-                          {name}
-                        </span>
-                        <span className="text-xs">{timeAgo(time)}</span>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td className="py-2 px-3">
-                    <div className="flex justify-center items-center h-full">
-                      <TableActions
-                        fromBottom={
-                          index == tableData.length - 1 ||
-                          index == tableData.length - 2
-                        }
-                      />
-                    </div>
-                  </td>
-                </tr>
+                <TableRow
+                  key={id}
+                  img={img}
+                  icon={icon}
+                  size={size}
+                  time={time}
+                  type={type}
+                  version={version}
+                  index={index}
+                />
               )
             )}
           </tbody>
