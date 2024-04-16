@@ -1,30 +1,31 @@
 "use client";
 
-import Dropdown from "@/components/elements/Dropdown";
-import { Props } from "./OrdersTableHead.types";
-import SearchBar from "@/components/elements/SearchBar";
-import { useState } from "react";
+import { IconSelector } from "@tabler/icons-react";
 
-const options = ["Name", "Price", "Rating"];
-
-const OrdersTableHead = ({ search }: any) => {
-  const [selected, setSelected] = useState(options[0]);
-
+const OrdersTableHead = ({ sortData }: any) => {
   return (
-    <div className="flex flex-wrap gap-3 justify-between items-center bb-dashed mb-6 pb-6 w-full">
-      <p className="font-medium">Table List View</p>
-      <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
-        <SearchBar handleSearch={search} />
-        <div className="flex items-center shrink-0 gap-2">
-          <p className="text-xs sm:text-sm">Sort By : </p>
-          <Dropdown
-            selected={selected}
-            setSelected={setSelected}
-            items={options}
-          />
-        </div>
-      </div>
-    </div>
+    <thead>
+      <tr className="bg-primary/5 dark:bg-bg3 font-semibold">
+        <td className="p-5">#</td>
+        <td onClick={() => sortData("type")} className="p-5">
+          <div className="flex items-center gap-1 cursor-pointer select-none">
+            Type <IconSelector size={18} />
+          </div>
+        </td>
+        <td onClick={() => sortData("size")} className="p-5 w-[16%]">
+          <div className="flex items-center gap-1 cursor-pointer select-none">
+            Size <IconSelector size={18} />
+          </div>
+        </td>
+        <td className="p-5 w-[16%]">Version</td>
+        <td onClick={() => sortData("name")} className="p-5">
+          <div className="flex items-center gap-1 cursor-pointer select-none">
+            Last Updated <IconSelector size={18} />
+          </div>
+        </td>
+        <td className="p-5 text-center">Action</td>
+      </tr>
+    </thead>
   );
 };
 
