@@ -7,7 +7,7 @@ import syetemErrorImg from "@/public/images/404.jpeg";
 const PageNotFoundError = () => {
   return (
     <div className="flex flex-grow items-center justify-center py-10 md:py-20 lg:py-28">
-      <div className="flex flex-col items-center justify-center text-center max-w-[640px] mx-auto">
+      <div className="mx-auto flex max-w-[640px] flex-col items-center justify-center text-center">
         <Image
           src={syetemErrorImg}
           alt="confirm illustration"

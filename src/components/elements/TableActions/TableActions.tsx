@@ -11,24 +11,24 @@ const TableActions = ({ fromBottom }: { fromBottom?: boolean }) => {
         <ul
           className={`${
             open
-              ? "opacity-100 scale-100 visible"
-              : "opacity-0 scale-0 invisible"
+              ? "visible scale-100 opacity-100"
+              : "invisible scale-0 opacity-0"
           } absolute ${
             fromBottom ? "bottom-0" : "top-0"
-          } ltr:right-5 rtl:left-5 border z-30 dark:border-n500 min-w-max p-1.5 rounded-md bg-n0 dark:bg-bg4`}
+          } z-30 min-w-max rounded-md border bg-n0 p-1.5 dark:border-n500 dark:bg-bg4 ltr:right-5 rtl:left-5`}
         >
           <li>
-            <button className="py-1.5 hover:bg-primary rounded-md hover:text-n30 duration-300 block px-3">
+            <button className="block rounded-md px-3 py-1.5 duration-300 hover:bg-primary hover:text-n30">
               Edit
             </button>
           </li>
           <li>
-            <button className="py-1.5 hover:bg-primary rounded-md hover:text-n30 duration-300 block px-3">
+            <button className="block rounded-md px-3 py-1.5 duration-300 hover:bg-primary hover:text-n30">
               Delete
             </button>
           </li>
           <li>
-            <button className="py-1.5 hover:bg-primary rounded-md hover:text-n30 duration-300 block px-3">
+            <button className="block rounded-md px-3 py-1.5 duration-300 hover:bg-primary hover:text-n30">
               Block
             </button>
           </li>

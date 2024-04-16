@@ -43,7 +43,7 @@ const Profile = () => {
   const { open, ref, toggleOpen } = useDropdown();
   return (
     <div className="relative shrink-0" ref={ref}>
-      <div className="cursor-pointer w-10 sm:w-12" onClick={toggleOpen}>
+      <div className="w-10 cursor-pointer sm:w-12" onClick={toggleOpen}>
         <Image
           src="/images/user.png"
           className="rounded-full"
@@ -53,11 +53,11 @@ const Profile = () => {
         />
       </div>
       <div
-        className={`bg-n0 border z-20 dark:border-n500 dark:bg-n800 rounded-md ltr:origin-top-right rtl:origin-top-left ltr:right-0 rtl:left-0 shadow-lg absolute top-full duration-300 ${
-          open ? "opacity-100 scale-100 visible" : "opacity-0 scale-0 invisible"
+        className={`absolute top-full z-20 rounded-md border bg-n0 shadow-lg duration-300 dark:border-n500 dark:bg-n800 ltr:right-0 ltr:origin-top-right rtl:left-0 rtl:origin-top-left ${
+          open ? "visible scale-100 opacity-100" : "invisible scale-0 opacity-0"
         }`}
       >
-        <div className="flex flex-col text-center items-center lg:p-4 p-3 border-b dark:border-n500">
+        <div className="flex flex-col items-center border-b p-3 text-center dark:border-n500 lg:p-4">
           <Image
             src="/images/user.png"
             width={60}
@@ -68,12 +68,12 @@ const Profile = () => {
           <h6 className="h6 mt-2">William James</h6>
           <span className="text-sm">james@mail.com</span>
         </div>
-        <ul className="flex flex-col w-[250px] p-4">
+        <ul className="flex w-[250px] flex-col p-4">
           {profileLinks.map(({ icon, title, url }) => (
             <li key={title}>
               <Link
                 href={url}
-                className="flex items-center gap-2 p-2 rounded-md duration-300 hover:bg-primary hover:text-n0"
+                className="flex items-center gap-2 rounded-md p-2 duration-300 hover:bg-primary hover:text-n0"
               >
                 <span>{icon}</span>
                 {title}

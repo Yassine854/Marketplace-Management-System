@@ -4,7 +4,7 @@ import { Props } from "./Checkbox.types";
 
 const Checkbox = ({ label, img, checked, onChange }: Props) => {
   return (
-    <div className="flex items-center relative">
+    <div className="relative flex items-center">
       <input
         type="checkbox"
         id={label}
@@ -12,11 +12,11 @@ const Checkbox = ({ label, img, checked, onChange }: Props) => {
         value={label}
         onChange={onChange}
         defaultChecked={checked}
-        className="opacity-0 absolute h-8 w-8"
+        className="absolute h-8 w-8 opacity-0"
       />
-      <div className="bg-n0 dark:bg-bg4 border border-gray-400 rounded-full w-5 h-5 flex shrink-0 justify-center items-center rtl:ml-2 ltr:mr-2 focus-within:border-primary">
+      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-400 bg-n0 focus-within:border-primary dark:bg-bg4 ltr:mr-2 rtl:ml-2">
         <svg
-          className="fill-current hidden w-[10px] h-[10px] text-primary pointer-events-none"
+          className="pointer-events-none hidden h-[10px] w-[10px] fill-current text-primary"
           version="1.1"
           viewBox="0 0 17 12"
           xmlns="http://www.w3.org/2000/svg"
@@ -31,7 +31,7 @@ const Checkbox = ({ label, img, checked, onChange }: Props) => {
       {label && (
         <label
           htmlFor={label}
-          className="select-none text-sm flex gap-2 cursor-pointer items-center"
+          className="flex cursor-pointer select-none items-center gap-2 text-sm"
         >
           {img && <span>{img}</span>}
           {label}

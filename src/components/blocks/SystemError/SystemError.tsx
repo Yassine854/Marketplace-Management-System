@@ -10,7 +10,7 @@ const SystemError = () => {
   const { theme } = useTheme();
   return (
     <div className="flex items-center justify-center py-10 md:py-20 lg:py-28">
-      <div className="flex flex-col items-center justify-center text-center max-w-[640px] mx-auto">
+      <div className="mx-auto flex max-w-[640px] flex-col items-center justify-center text-center">
         <Image
           src={theme == "dark" ? syetemErrorImgDark : syetemErrorImg}
           alt="confirm illustration"

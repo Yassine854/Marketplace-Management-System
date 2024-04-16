@@ -28,9 +28,7 @@ const RootLayout = ({
 }) => {
   return (
     <html lang={locale} className="!scroll-smooth">
-      <body
-        className={`${inter.className} text-n500 dark:text-n30 flex flex-grow `}
-      >
+      <body className={`${inter.className}   text-n500  dark:text-n30 `}>
         <ThemeProvider>
           <Next13NProgress color="#5D69F4" height={3} />
           <LayoutProvider>{children}</LayoutProvider>

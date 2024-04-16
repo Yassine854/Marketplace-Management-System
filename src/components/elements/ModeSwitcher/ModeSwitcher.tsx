@@ -22,12 +22,12 @@ const ModeSwitcher = ({ isBlue, isWhite }: Props) => {
     <button
       aria-label="dark mode switch"
       onClick={handleThemeSwitch}
-      className={`p-2 sm:p-3 rounded-full  ${
+      className={`rounded-full p-2 sm:p-3  ${
         isBlue &&
-        "text-primary border border-primary bg-transparent dark:bg-transparent !p-1.5 sm:!p-2 xxl:!p-3"
+        "border border-primary bg-transparent !p-1.5 text-primary dark:bg-transparent sm:!p-2 xxl:!p-3"
       } ${
         isWhite
-          ? "bg-n0 dark:bg-bg4 border border-n30 dark:border-n500"
+          ? "border border-n30 bg-n0 dark:border-n500 dark:bg-bg4"
           : "bg-primary/5 dark:bg-bg3"
       }`}
     >

@@ -14,7 +14,7 @@ const SidebarElement = ({ items }: any) => {
 
   return (
     <div>
-      <p className="text-xs font-semibold py-4 lg:py-6 border-t-2 border-dashed border-primary/20"></p>
+      <p className="border-t-2 border-dashed border-primary/20 py-4 text-xs font-semibold lg:py-6"></p>
       <ul className="mb-5 flex flex-col gap-2 ">
         {items.map(
           ({ id, icon, name, submenus }: any) =>
@@ -27,7 +27,7 @@ const SidebarElement = ({ items }: any) => {
               >
                 <button
                   onClick={() => setActiveMenu((p) => (p == name ? "" : name))}
-                  className={`px-4 w-full group flex justify-between items-center xxxl:px-6 py-2.5 lg:py-3 rounded-xl xxxl:rounded-2xl hover:bg-primary hover:text-n0 duration-300 ${
+                  className={`group flex w-full items-center justify-between rounded-xl px-4 py-2.5 duration-300 hover:bg-primary hover:text-n0 lg:py-3 xxxl:rounded-2xl xxxl:px-6 ${
                     activeMenu == name && "bg-primary text-n0"
                   } ${path == name && "bg-primary text-n0"} ${
                     isActive(submenus) && "bg-primary text-n0"
@@ -41,18 +41,18 @@ const SidebarElement = ({ items }: any) => {
                     >
                       {icon}
                     </span>
-                    <span className="text-sm lg:text-base font-medium">
+                    <span className="text-sm font-medium lg:text-base">
                       {name}
                     </span>
                   </span>
                   <IconChevronRight
-                    className={`duration-300 w-5 h-5 lg:w-6 lg:h-6 rtl:rotate-180 transition-transform ${
+                    className={`h-5 w-5 transition-transform duration-300 lg:h-6 lg:w-6 rtl:rotate-180 ${
                       activeMenu == name && "ltr:rotate-90 rtl:rotate-90"
                     }`}
                   />
                 </button>
                 <AnimateHeight height={activeMenu == name ? "auto" : 0}>
-                  <ul className={`px-3 4xl:px-5 py-3`}>
+                  <ul className={`px-3 py-3 4xl:px-5`}>
                     {submenus.map(({ title, url }: any) => (
                       <li
                         onClick={() => {
@@ -61,7 +61,7 @@ const SidebarElement = ({ items }: any) => {
                         key={title}
                       >
                         <div
-                          className={`cursor-pointer font-medium block py-2.5 md:py-3 text-sm lg:text-base hover:text-primary duration-300 capitalize px-3 xxxl:px-6 ${
+                          className={`block cursor-pointer px-3 py-2.5 text-sm font-medium capitalize duration-300 hover:text-primary md:py-3 lg:text-base xxxl:px-6 ${
                             path == url && "text-primary"
                           }`}
                         >
@@ -72,7 +72,7 @@ const SidebarElement = ({ items }: any) => {
                   </ul>
                 </AnimateHeight>
               </li>
-            )
+            ),
         )}
       </ul>
     </div>

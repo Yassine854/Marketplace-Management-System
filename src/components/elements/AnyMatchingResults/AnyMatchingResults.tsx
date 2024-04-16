@@ -4,9 +4,9 @@ import { IconSearch } from "@tabler/icons-react";
 
 const AnyMatchingResults = () => {
   return (
-    <div className="text-center py-10">
-      <div className="text-center mx-auto max-w-[500px] max-md:flex flex-col items-center">
-        <div className="flex justify-center mb-5">
+    <div className="py-10 text-center">
+      <div className="mx-auto max-w-[500px] flex-col items-center text-center max-md:flex">
+        <div className="mb-5 flex justify-center">
           <IconSearch size={60} className="text-primary" />
         </div>
         <h3 className="h3 mb-3 lg:mb-6">No matching results</h3>

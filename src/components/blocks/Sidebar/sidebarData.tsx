@@ -30,7 +30,7 @@ export const sidebarData = [
       {
         id: 1,
         name: "Warehouse : Tunis ",
-        icon: <IconHome2 className="w-5 h-5 lg:w-6 lg:h-6" />,
+        icon: <IconHome2 className="h-5 w-5 lg:h-6 lg:w-6" />,
         submenus: [
           { title: "All", url: "/dashboards/personal-1" },
           { title: "Tunis", url: "/dashboards/personal-1" },
@@ -73,13 +73,13 @@ export const sidebarData = [
       {
         id: 5,
         name: "Home",
-        icon: <IconApiApp className="w-5 h-5 lg:w-6 lg:h-6" />,
+        icon: <IconApiApp className="h-5 w-5 lg:h-6 lg:w-6" />,
         submenus: [{ title: "Ecommerce", url: "/dashboards/ecommerce" }],
       },
       {
         id: 9,
         name: "Orders",
-        icon: <IconShoppingBag className="w-5 h-5 lg:w-6 lg:h-6" />,
+        icon: <IconShoppingBag className="h-5 w-5 lg:h-6 lg:w-6" />,
         submenus: [{ title: "Ecommerce", url: "/dashboards/ecommerce" }],
       },
       // {
@@ -97,7 +97,7 @@ export const sidebarData = [
       {
         id: 7,
         name: "Analytics",
-        icon: <IconChartPie className="w-5 h-5 lg:w-6 lg:h-6" />,
+        icon: <IconChartPie className="h-5 w-5 lg:h-6 lg:w-6" />,
         submenus: [{ title: "Apex Charts", url: "/apex-charts" }],
       },
       // {

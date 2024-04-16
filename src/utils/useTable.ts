@@ -25,7 +25,7 @@ interface SortableTableHook<T> {
 
 const useTable = <T extends Record<string, any>>(
   initialData: T[],
-  initialItemsPerPage: number = 10
+  initialItemsPerPage: number = 10,
 ): SortableTableHook<T> => {
   const [tableData, setTableData] = useState<T[]>(initialData);
   const [order, setOrder] = useState<Order>("ASC");
@@ -90,8 +90,8 @@ const useTable = <T extends Record<string, any>>(
   const search: SearchFunction<T> = (term) => {
     const filteredData = initialData.filter((item) =>
       Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(term.toLowerCase())
-      )
+        String(value).toLowerCase().includes(term.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
     setCurrentPage(1);
@@ -104,7 +104,7 @@ const useTable = <T extends Record<string, any>>(
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(
     startIndex + itemsPerPage - 1,
-    tableData.length - 1
+    tableData.length - 1,
   );
   const totalData = tableData.length;
   return {

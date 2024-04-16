@@ -20,24 +20,24 @@ const TableRow = ({
 }: any) => {
   return (
     <tr className="even:bg-primary/5 dark:even:bg-bg3">
-      <td className="py-2 px-3">
+      <td className="px-3 py-2">
         <CheckboxCustom />
       </td>
-      <td className="py-1 px-3">
+      <td className="px-3 py-1">
         <div className="flex items-center gap-3">
           <Image
             width={32}
             height={32}
-            className="rounded-full shrink-0"
+            className="shrink-0 rounded-full"
             src={icon}
             alt="img"
           />
-          <span className="font-medium inline-block">{type}</span>
+          <span className="inline-block font-medium">{type}</span>
         </div>
       </td>
-      <td className="py-2 px-3">{size}</td>
-      <td className="py-2 px-3">{version}</td>
-      <td className="py-2 px-3">
+      <td className="px-3 py-2">{size}</td>
+      <td className="px-3 py-2">{version}</td>
+      <td className="px-3 py-2">
         <div className="flex items-center gap-3">
           <Image
             width={32}
@@ -47,15 +47,15 @@ const TableRow = ({
             alt="img"
           />
           <div className="flex flex-col">
-            <span className="font-medium inline-block mb-1">{name}</span>
+            <span className="mb-1 inline-block font-medium">{name}</span>
             {/* <span className="text-xs">{timeAgo(time)}</span> */}
             <span className="text-xs">3h</span>
           </div>
         </div>
       </td>
 
-      <td className="py-2 px-3">
-        <div className="flex justify-center items-center h-full">
+      <td className="px-3 py-2">
+        <div className="flex h-full items-center justify-center">
           <TableActions
             fromBottom={
               index == numberOfItems - 1 || index == numberOfItems - 2

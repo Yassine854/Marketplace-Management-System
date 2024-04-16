@@ -11,7 +11,7 @@ const Dropdown = ({ items, selected, setSelected, width, bg }: Props) => {
     <div className="relative" ref={ref}>
       <div
         onClick={toggleOpen}
-        className={`border text-xs select-none cursor-pointer border-n30 dark:border-n500 flex gap-2 justify-between items-center rounded-[30px] px-3 py-1.5 sm:px-4 sm:py-2  ${
+        className={`flex cursor-pointer select-none items-center justify-between gap-2 rounded-[30px] border border-n30 px-3 py-1.5 text-xs dark:border-n500 sm:px-4 sm:py-2  ${
           width ? width : "min-w-max sm:min-w-[140px]"
         } ${bg ? bg : "bg-primary/5 dark:bg-bg3 "}`}
       >
@@ -22,12 +22,12 @@ const Dropdown = ({ items, selected, setSelected, width, bg }: Props) => {
         />
       </div>
       <ul
-        className={`absolute flex-col z-20 rounded-md ${
+        className={`absolute z-20 flex-col rounded-md ${
           width ? width : "min-w-max sm:min-w-[140px]"
-        } top-full max-h-40 overflow-y-auto ltr:right-0 rtl:left-0 border duration-300 origin-top bg-n0 dark:bg-bg4 shadow-md border-n30 p-1 rounded-md dark:border-n500 ${
+        } top-full max-h-40 origin-top overflow-y-auto rounded-md border border-n30 bg-n0 p-1 shadow-md duration-300 dark:border-n500 dark:bg-bg4 ltr:right-0 rtl:left-0 ${
           open
-            ? "opacity-100 scale-100 visible flex"
-            : "opacity-0 scale-0 invisible"
+            ? "visible flex scale-100 opacity-100"
+            : "invisible scale-0 opacity-0"
         }`}
       >
         {items.map((item) => (
@@ -37,7 +37,7 @@ const Dropdown = ({ items, selected, setSelected, width, bg }: Props) => {
               toggleOpen();
             }}
             key={item}
-            className={`px-4 py-2 text-xs cursor-pointer hover:text-primary rounded-md duration-300 ${
+            className={`cursor-pointer rounded-md px-4 py-2 text-xs duration-300 hover:text-primary ${
               selected == item && "bg-primary text-n0 hover:!text-n0"
             }`}
           >

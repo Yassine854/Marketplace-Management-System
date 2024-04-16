@@ -4,35 +4,35 @@
 
 @layer components {
   .container {
-    @apply mx-auto px-3 sm:px-0 sm:max-w-[540px] md:max-w-[720px] lg:max-w-[960px] xl:max-w-[1140px] xxl:max-w-[1296px];
+    @apply mx-auto px-3 sm:max-w-[540px] sm:px-0 md:max-w-[720px] lg:max-w-[960px] xl:max-w-[1140px] xxl:max-w-[1296px];
   }
 
   .display-3 {
-    @apply text-3xl md:text-5xl lg:text-[56px] xl:text-[64px] !leading-tight font-semibold;
+    @apply text-3xl font-semibold !leading-tight md:text-5xl lg:text-[56px] xl:text-[64px];
   }
 
   .display-4 {
-    @apply text-3xl md:text-4xl lg:text-[48px] xl:text-[56px] !leading-tight font-semibold;
+    @apply text-3xl font-semibold !leading-tight md:text-4xl lg:text-[48px] xl:text-[56px];
   }
 
   .h1 {
-    @apply text-3xl md:text-4xl lg:text-[48px] !leading-tight font-semibold;
+    @apply text-3xl font-semibold !leading-tight md:text-4xl lg:text-[48px];
   }
 
   .h2 {
-    @apply text-xl sm:text-2xl lg:text-3xl xxxl:text-[40px] font-semibold !leading-tight;
+    @apply text-xl font-semibold !leading-tight sm:text-2xl lg:text-3xl xxxl:text-[40px];
   }
 
   .h3 {
-    @apply text-xl lg:text-2xl xxxl:text-[32px] leading-tight font-medium sm:font-semibold;
+    @apply text-xl font-medium leading-tight sm:font-semibold lg:text-2xl xxxl:text-[32px];
   }
 
   .h4 {
-    @apply text-lg md:text-xl xxxl:text-2xl font-medium md:font-semibold;
+    @apply text-lg font-medium md:text-xl md:font-semibold xxxl:text-2xl;
   }
 
   .h5 {
-    @apply text-base md:text-xl font-medium md:font-semibold;
+    @apply text-base font-medium md:text-xl md:font-semibold;
   }
 
   .h6 {
@@ -40,31 +40,31 @@
   }
 
   .btn {
-    @apply inline-flex border border-primary hover:bg-transparent hover:text-primary text-sm md:text-base font-medium duration-300 gap-2 py-1.5 sm:py-2 px-3 sm:px-4 xxl:py-2.5 lg:px-6 xxl:px-8 rounded-[32px] bg-primary items-center text-n0 shadow-lg dark:shadow-none hover:shadow-none;
+    @apply inline-flex items-center gap-2 rounded-[32px] border border-primary bg-primary px-3 py-1.5 text-sm font-medium text-n0 shadow-lg duration-300 hover:bg-transparent hover:text-primary hover:shadow-none dark:shadow-none sm:px-4 sm:py-2 md:text-base lg:px-6 xxl:px-8 xxl:py-2.5;
   }
 
   .btn-outline {
-    @apply btn bg-transparent text-primary hover:bg-primary hover:text-n0 shadow-none;
+    @apply btn bg-transparent text-primary shadow-none hover:bg-primary hover:text-n0;
   }
 
   .btn-white {
-    @apply btn bg-white border-white text-primary hover:bg-white;
+    @apply btn border-white bg-white text-primary hover:bg-white;
   }
 
   .box {
-    @apply p-3 bg-n0 rounded-2xl dark:bg-bg4 sm:p-4 xl:p-6 xxxl:px-8 border border-n30 dark:border-n500;
+    @apply rounded-2xl border border-n30 bg-n0 p-3 dark:border-n500 dark:bg-bg4 sm:p-4 xl:p-6 xxxl:px-8;
   }
 
   .arrow-top {
-    @apply after:absolute after:top-[-12px] ltr:after:left-4 rtl:after:right-4 after:border-l-[12px] after:border-l-transparent after:border-r-[12px] after:border-r-transparent after:border-b-[12px] after:border-b-n0 dark:after:border-b-bg4;
+    @apply after:absolute after:top-[-12px] after:border-b-[12px] after:border-l-[12px] after:border-r-[12px] after:border-b-n0 after:border-l-transparent after:border-r-transparent dark:after:border-b-bg4 ltr:after:left-4 rtl:after:right-4;
   }
 
   .arrow-bottom {
-    @apply after:absolute after:bottom-[-12px] ltr:after:right-4 rtl:after:left-4 after:border-l-[12px] after:border-l-transparent after:border-r-[12px] after:border-r-transparent after:border-t-[12px] after:border-t-primary;
+    @apply after:absolute after:bottom-[-12px] after:border-l-[12px] after:border-r-[12px] after:border-t-[12px] after:border-l-transparent after:border-r-transparent after:border-t-primary ltr:after:right-4 rtl:after:left-4;
   }
 
   .bb-dashed {
-    @apply border-b border-primary/20 border-dashed;
+    @apply border-b border-dashed border-primary/20;
   }
 }
 

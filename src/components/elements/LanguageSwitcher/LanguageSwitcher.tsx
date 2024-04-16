@@ -23,9 +23,9 @@ const LanguageSwitcher = ({ isWhite }: { isWhite?: boolean }) => {
     <div className="relative" ref={ref}>
       <button
         onClick={toggleOpen}
-        className={`flex gap-1 p-2 sm:p-3 rounded-full ${
+        className={`flex gap-1 rounded-full p-2 sm:p-3 ${
           isWhite
-            ? "bg-n0 dark:bg-bg4 border border-n30 dark:border-n500"
+            ? "border border-n30 bg-n0 dark:border-n500 dark:bg-bg4"
             : "bg-primary/5 dark:bg-bg3"
         }`}
       >
@@ -33,16 +33,16 @@ const LanguageSwitcher = ({ isWhite }: { isWhite?: boolean }) => {
         <IconChevronDown size={22} />
       </button>
       <div
-        className={`bg-n0 border dark:border-n500 ltr:origin-top-right rtl:origin-top-left dark:bg-n800 rounded-md ltr:right-0 rtl:left-0 shadow-lg absolute top-full duration-300 ${
-          open ? "opacity-100 scale-100 visible" : "opacity-0 scale-0 invisible"
+        className={`absolute top-full rounded-md border bg-n0 shadow-lg duration-300 dark:border-n500 dark:bg-n800 ltr:right-0 ltr:origin-top-right rtl:left-0 rtl:origin-top-left ${
+          open ? "visible scale-100 opacity-100" : "invisible scale-0 opacity-0"
         }`}
       >
-        <ul className="flex flex-col w-32 bg-n0 p-1 rounded-md dark:bg-bg4">
+        <ul className="flex w-32 flex-col rounded-md bg-n0 p-1 dark:bg-bg4">
           {AllLocales.map((locale) => (
             <li
               key={locale}
               onClick={() => onSelect(locale)}
-              className={`px-4 block py-2 rounded-md cursor-pointer duration-300 hover:text-primary ${
+              className={`block cursor-pointer rounded-md px-4 py-2 duration-300 hover:text-primary ${
                 selected == locale && "bg-primary text-n0 hover:!text-n0"
               }`}
             >

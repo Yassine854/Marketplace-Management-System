@@ -47,34 +47,34 @@ const Notification = ({ isWhite }: { isWhite?: boolean }) => {
     <div className="relative" ref={ref}>
       <button
         onClick={toggleOpen}
-        className={` p-2 sm:p-3 rounded-full ${
+        className={` rounded-full p-2 sm:p-3 ${
           isWhite
-            ? "bg-n0 dark:bg-bg4 border border-n30 dark:border-n500"
+            ? "border border-n30 bg-n0 dark:border-n500 dark:bg-bg4"
             : "bg-primary/5 dark:bg-bg3"
         }`}
       >
         <IconBell />
       </button>
       <div
-        className={`bg-n0 border dark:border-n500 dark:bg-n800 rounded-md max-sm:origin-top ltr:sm:origin-top-right rtl:sm:origin-top-left rtl:max-sm:-left-[142px] ltr:max-sm:-right-[142px] ltr:sm:right-0 rtl:sm:left-0 shadow-lg absolute top-full duration-300 ${
-          open ? "opacity-100 scale-100 visible" : "opacity-0 scale-0 invisible"
+        className={`absolute top-full rounded-md border bg-n0 shadow-lg duration-300 dark:border-n500 dark:bg-n800 max-sm:origin-top ltr:max-sm:-right-[142px] ltr:sm:right-0 ltr:sm:origin-top-right rtl:max-sm:-left-[142px] rtl:sm:left-0 rtl:sm:origin-top-left ${
+          open ? "visible scale-100 opacity-100" : "invisible scale-0 opacity-0"
         }`}
       >
-        <div className="flex justify-between items-center lg:px-4 p-3 border-b dark:border-n500">
+        <div className="flex items-center justify-between border-b p-3 dark:border-n500 lg:px-4">
           <h5 className="h5">Notifications</h5>
           <Link
             href="/notifications"
             onClick={toggleOpen}
-            className="text-primary text-sm"
+            className="text-sm text-primary"
           >
             View All
           </Link>
         </div>
-        <ul className="flex flex-col w-[310px] p-4">
+        <ul className="flex w-[310px] flex-col p-4">
           {notifications.map(({ id, activity, img, name, time }) => (
             <div
               key={id}
-              className="flex gap-2 cursor-pointer p-2 rounded-md hover:bg-primary/10 duration-300"
+              className="flex cursor-pointer gap-2 rounded-md p-2 duration-300 hover:bg-primary/10"
             >
               <Image
                 src={img}
@@ -88,7 +88,7 @@ const Notification = ({ isWhite }: { isWhite?: boolean }) => {
                   <span className="font-medium">{name}</span>
                   <span>{activity}</span>
                 </div>
-                <span className="text-n100 dark:text-n50 text-xs">{time}</span>
+                <span className="text-xs text-n100 dark:text-n50">{time}</span>
               </div>
             </div>
           ))}

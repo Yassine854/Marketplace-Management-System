@@ -48,7 +48,7 @@ const OrdersTable = () => {
   return (
     <div className="box">
       <OrdersTableHeader search={search} />
-      <div className="overflow-x-auto mb-6 pb-6 bb-dashed">
+      <div className="bb-dashed mb-6 overflow-x-auto pb-6">
         <table className="w-full whitespace-nowrap">
           <OrdersTableHead sortData={sortData} />
           <tbody>
@@ -64,7 +64,7 @@ const OrdersTable = () => {
                   version={version}
                   index={index}
                 />
-              )
+              ),
             )}
           </tbody>
         </table>

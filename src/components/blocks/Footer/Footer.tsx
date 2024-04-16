@@ -1,25 +1,20 @@
-"use client";
-
 import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="footer  w-full h-16 mt-12 ">
+    <div className=" p2 flex h-8 w-full items-center justify-center ">
+      <p className="max text-sm max-md:text-center lg:text-base">
+        Copyright ©{new Date().getFullYear()}{" "}
+        <Link className="text-primary" href="/">
+          Kamioun
+        </Link>
+      </p>
       <div
         className={
-          "flex flex-col justify-center items-center gap-4 h-16 bg-n0 dark:bg-bg4   "
+          "m-h m-w-[80%] flex h-16 flex-col items-center justify-center gap-4 bg-red-500  dark:bg-bg4  "
         }
-      >
-        <p className="text-sm lg:text-base max-md:text-center max-md:w-full">
-          Copyright ©{new Date().getFullYear()}{" "}
-          <Link className="text-primary" href="/">
-            Kamioun
-          </Link>
-        </p>
-
-        <ul className="flex gap-3 lg:gap-4 text-sm lg:text-base max-lg:justify-center max-lg:w-full"></ul>
-      </div>
-    </footer>
+      ></div>
+    </div>
   );
 };
 

@@ -16,18 +16,18 @@ const Pagination = ({
 }: Props) => {
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
   return (
-    <div className="flex col-span-12 gap-4 sm:justify-between justify-center items-center flex-wrap">
+    <div className="col-span-12 flex flex-wrap items-center justify-center gap-4 sm:justify-between">
       <p>
         Showing {startIndex + 1} to {endIndex + 1} of {total} entries
       </p>
 
-      <ul className="flex gap-2 md:gap-3 flex-wrap md:font-semibold items-center">
+      <ul className="flex flex-wrap items-center gap-2 md:gap-3 md:font-semibold">
         <li>
           <button
             onClick={prevPage}
             disabled={currentPage == 1}
             className={cn(
-              "hover:bg-primary disabled:hover:bg-transparent disabled:hover:text-primary text-primary rtl:rotate-180 disabled:cursor-not-allowed hover:text-n0 border md:w-10 duration-300 md:h-10 w-8 h-8 flex items-center rounded-full justify-center border-primary"
+              "flex h-8 w-8 items-center justify-center rounded-full border border-primary text-primary duration-300 hover:bg-primary hover:text-n0 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-primary md:h-10 md:w-10 rtl:rotate-180",
             )}
           >
             <IconChevronLeft />
@@ -38,10 +38,10 @@ const Pagination = ({
             <button
               onClick={() => goToPage(page)}
               className={cn(
-                "hover:bg-primary text-primary hover:text-n0 border md:w-10 duration-300 md:h-10 w-8 h-8 flex items-center rounded-full justify-center border-primary",
+                "flex h-8 w-8 items-center justify-center rounded-full border border-primary text-primary duration-300 hover:bg-primary hover:text-n0 md:h-10 md:w-10",
                 {
                   "bg-primary text-n0": currentPage == page,
-                }
+                },
               )}
             >
               {page}
@@ -53,7 +53,7 @@ const Pagination = ({
             onClick={nextPage}
             disabled={currentPage == totalPages}
             className={cn(
-              "hover:bg-primary disabled:hover:bg-transparent disabled:hover:text-primary rtl:rotate-180 text-primary disabled:cursor-not-allowed hover:text-n0 border md:w-10 duration-300 md:h-10 w-8 h-8 flex items-center rounded-full justify-center border-primary"
+              "flex h-8 w-8 items-center justify-center rounded-full border border-primary text-primary duration-300 hover:bg-primary hover:text-n0 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-primary md:h-10 md:w-10 rtl:rotate-180",
             )}
           >
             <IconChevronRight />

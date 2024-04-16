@@ -14,14 +14,18 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`w-[280px] xxxl:w-[336px] shadow-sm z-[21] 
-          translate-x-0 visible
+      className={`
+      
+      sidebar visible fixed 
+      
+      left-0 top-0 top-0 z-[21] 
+          h-full w-[280px]
           
-    duration-300 sidebar fixed ltr:left-0 rtl:right-0 h-full bg-n0 dark:bg-bg4 top-0`}
+    translate-x-0 bg-n0  shadow-sm duration-300 dark:bg-bg4 xxxl:w-[336px] ltr:left-0 rtl:right-0`}
     >
       .
       <div className={`p-4 xxl:p-6 xxxl:p-[30px]`}>
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <Link href="/">
             <Image
               width={174}
@@ -35,22 +39,22 @@ const Sidebar = () => {
           </button>
         </div>
       </div>
-      <div className="overflow-y-auto fixed right-0 left-0 h-full">
-        <div className="px-4 xxl:px-6 xxxl:px-8 pb-24">
+      <div className="fixed left-0 right-0 h-full overflow-y-auto">
+        <div className="px-4 pb-24 xxl:px-6 xxxl:px-8">
           {sidebarData.map(({ id, items, title }) => (
             <SidebarElement items={items} key={id} />
           ))}
         </div>
-        <div className="px-4 xxl:px-6 xxxl:px-8 pb-28">
+        <div className="px-4 pb-28 xxl:px-6 xxxl:px-8">
           <div
-            className={`px-4 w-full group flex justify-between items-center xxxl:px-6 py-2.5 lg:py-3 rounded-2xl hover:bg-primary hover:text-n0 duration-300 `}
+            className={`group flex w-full items-center justify-between rounded-2xl px-4 py-2.5 duration-300 hover:bg-primary hover:text-n0 lg:py-3 xxxl:px-6 `}
           >
             <span className="flex items-center gap-2">
               <span className={`text-primary group-hover:text-n0 `}>
-                <IconLogout className="w-5 h-5 lg:w-6 lg:h-6" />
+                <IconLogout className="h-5 w-5 lg:h-6 lg:w-6" />
               </span>
               <span
-                className="text-sm lg:text-base font-medium pointer cursor-pointer	"
+                className="pointer cursor-pointer text-sm font-medium lg:text-base	"
                 onClick={() => {
                   push("/login");
                 }}
