@@ -1,13 +1,11 @@
 "use client";
 
 import AnyMatchingResults from "@/components/elements/AnyMatchingResults";
-import Dropdown from "@/components/elements/Dropdown";
-import { IconSelector } from "@tabler/icons-react";
+import OrdersTableHead from "@/components/elements/OrdersTableHead";
 import OrdersTableHeader from "@/components/elements/OrdersTableHeader";
 import Pagination from "@/components/elements/Pagination";
 import TableRow from "@/components/elements/TableRow";
 import { faker } from "@faker-js/faker";
-import { useState } from "react";
 import useTable from "@/utils/useTable";
 
 const list = Array.from({ length: 40 }).map((_, i) => {
@@ -30,33 +28,6 @@ const list = Array.from({ length: 40 }).map((_, i) => {
     time: faker.date.recent(),
   };
 });
-
-const OrdersTableHead = ({ sortData }: any) => {
-  return (
-    <thead>
-      <tr className="bg-primary/5 dark:bg-bg3 font-semibold">
-        <td className="p-5">#</td>
-        <td onClick={() => sortData("type")} className="p-5">
-          <div className="flex items-center gap-1 cursor-pointer select-none">
-            Type <IconSelector size={18} />
-          </div>
-        </td>
-        <td onClick={() => sortData("size")} className="p-5 w-[16%]">
-          <div className="flex items-center gap-1 cursor-pointer select-none">
-            Size <IconSelector size={18} />
-          </div>
-        </td>
-        <td className="p-5 w-[16%]">Version</td>
-        <td onClick={() => sortData("name")} className="p-5">
-          <div className="flex items-center gap-1 cursor-pointer select-none">
-            Last Updated <IconSelector size={18} />
-          </div>
-        </td>
-        <td className="p-5 text-center">Action</td>
-      </tr>
-    </thead>
-  );
-};
 
 const OrdersTable = () => {
   const {
