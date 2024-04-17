@@ -1,13 +1,11 @@
 "use client";
 
-import { IconLogout, IconX } from "@tabler/icons-react";
+import { IconHome, IconList, IconUsers, IconX } from "@tabler/icons-react";
 
 import Image from "next/image";
 import Link from "next/link";
 import SidebarButton from "@/components/elements/SidebarElements/SidebarButton";
-import SidebarElement from "@/components/elements/SidebarElement";
 import SidebarOrders from "@/components/elements/SidebarElements/SidebarOrders";
-import { sidebarData } from "./sidebarData";
 import { useRouter } from "next/navigation";
 
 const Sidebar = () => {
@@ -38,13 +36,18 @@ const Sidebar = () => {
       <div className="fixed left-0 right-0 h-full overflow-y-auto">
         <div className="  px-4 xxl:px-6 xxxl:px-8">
           <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
-          <SidebarButton isActive={false} name={"Home"} />
+          <SidebarButton isActive={false} name={"Home"} icon={<IconHome />} />
           <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
           <SidebarOrders isActive={true} />
           <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
-          <SidebarButton isActive={false} name={"Logs"} />
+
+          <SidebarButton
+            isActive={false}
+            name={"Members"}
+            icon={<IconUsers />}
+          />
           <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
-          <SidebarButton isActive={false} name={"Members"} />
+          <SidebarButton isActive={false} name={"Logs"} icon={<IconList />} />
           <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
         </div>
       </div>
