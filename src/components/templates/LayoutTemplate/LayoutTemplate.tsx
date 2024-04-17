@@ -4,7 +4,7 @@ import Sidebar from "@/components/blocks/Sidebar";
 import TopNavBar from "@/components/blocks/TopNavBar";
 
 type Props = {
-  children: ReactNode;
+  children?: ReactNode;
 };
 
 const LayoutTemplate = ({ children }: Props) => {
@@ -15,7 +15,9 @@ const LayoutTemplate = ({ children }: Props) => {
       <div className="h-full w-[320px] xxxl:w-[410px] " />
       <div className="  h-full w-full ">
         <div className="  flex h-full w-full flex-col">
-          <div className=" h-full w-full  px-4 py-4 pt-[120px]">{children}</div>
+          <div className=" h-full w-full  bg-n20 px-4 py-4  pt-[120px]">
+            {children}
+          </div>
           <Footer />
         </div>
       </div>
