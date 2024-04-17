@@ -7,7 +7,9 @@ import { Props } from "./SidebarButton.types";
 const SidebarButton = ({ isActive, name, onClick, icon }: Props) => {
   return (
     <button
-      onClick={onClick}
+      onClick={() => {
+        onClick();
+      }}
       className={`group flex w-full items-center justify-between rounded-xl px-4 py-2.5 duration-300 hover:bg-primary hover:text-n0 lg:py-3 xxxl:rounded-2xl xxxl:px-6 
       ${isActive && "bg-primary text-n0"}
  

@@ -9,7 +9,7 @@ import SidebarOrders from "@/components/elements/SidebarElements/SidebarOrders";
 import { useRouter } from "next/navigation";
 
 const Sidebar = () => {
-  //  const { push } = useRouter();
+  const { push, replace } = useRouter();
 
   return (
     <aside
@@ -36,7 +36,14 @@ const Sidebar = () => {
       <div className="fixed left-0 right-0 h-full overflow-y-auto">
         <div className="  px-4 xxl:px-6 xxxl:px-8">
           <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
-          <SidebarButton isActive={false} name={"Home"} icon={<IconHome />} />
+          <SidebarButton
+            isActive={false}
+            name={"Home"}
+            icon={<IconHome />}
+            onClick={() => {
+              push("/dashboard");
+            }}
+          />
           <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
           <SidebarOrders isActive={true} />
           <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
@@ -45,9 +52,19 @@ const Sidebar = () => {
             isActive={false}
             name={"Members"}
             icon={<IconUsers />}
+            onClick={() => {
+              push("/dashboard/members");
+            }}
           />
           <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
-          <SidebarButton isActive={false} name={"Logs"} icon={<IconList />} />
+          <SidebarButton
+            isActive={false}
+            name={"Logs"}
+            icon={<IconList />}
+            onClick={() => {
+              push("/dashboard/logs");
+            }}
+          />
           <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
         </div>
       </div>

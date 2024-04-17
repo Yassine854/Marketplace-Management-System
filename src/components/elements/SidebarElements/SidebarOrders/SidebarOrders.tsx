@@ -1,8 +1,10 @@
 import SidebarButton from "../SidebarButton";
 import SidebarSubMenuItem from "../SidebarSubMenuItem";
 import { orderStatus } from "./orderStatus";
+import { useRouter } from "next/navigation";
 
 const SidebarOrders = ({ isActive, onClick }: any) => {
+  const { push } = useRouter();
   return (
     <ul className=" flex flex-col gap-2 ">
       <li
@@ -10,15 +12,22 @@ const SidebarOrders = ({ isActive, onClick }: any) => {
           isActive && "bg-primary/5 dark:bg-bg3 "
         }`}
       >
-        <SidebarButton isActive={isActive} />
+        <SidebarButton
+          isActive={isActive}
+          onClick={() => {
+            push("/dashboard/orders/open");
+          }}
+        />
 
         <ul className={`px-3 py-3 4xl:px-5`}>
-          <li onClick={() => onclick()}>
+          <li>
             {orderStatus.map((item, index: number) => (
               <SidebarSubMenuItem
                 isActive={false}
                 key={index}
-                onClick={() => {}}
+                onClick={() => {
+                  push(item.path);
+                }}
                 name={item.name}
               />
             ))}

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 export type Props = {
   name?: string;
-  onClick?: () => void;
+  onClick: () => void;
   icon?: ReactNode;
   isActive?: boolean;
 };
