@@ -2,7 +2,7 @@
 
 import { FocusEvent, useState } from "react";
 
-import Dropdown from "@/components/elements/Dropdown";
+import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import { IconSearch } from "@tabler/icons-react";
 
 //import Location from "./Location";

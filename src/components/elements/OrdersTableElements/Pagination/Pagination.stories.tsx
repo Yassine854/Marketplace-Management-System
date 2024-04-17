@@ -1,10 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import Index from "./LanguageSwitcher";
-
+import Index from "./index";
+import { defaultProps } from "./Pagination.defaultProps";
 const meta = {
-  title: "Components/Elements/LanguageSwticher",
+  title: "Components/Elements/OrdersTableElements/Pagination",
   component: Index,
-  decorators: [],
   parameters: {
     layout: "centered",
   },
@@ -14,4 +13,4 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {};
+export const Primary: Story = { args: defaultProps };

@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import Index from "./index";
-import { defaultProps } from "./Dropdown.defaultProps";
+import Index from "./LanguageSwitcher";
+
 const meta = {
-  title: "Components/Elements/Dropdown",
+  title: "Components/Elements/TopNavBarElements/LanguageSwticher",
   component: Index,
+  decorators: [],
   parameters: {
     layout: "centered",
   },
@@ -13,4 +14,4 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = { args: defaultProps };
+export const Primary: Story = {};

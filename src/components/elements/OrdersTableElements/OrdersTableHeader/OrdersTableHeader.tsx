@@ -1,8 +1,8 @@
 "use client";
 
-import Dropdown from "@/components/elements/Dropdown";
+import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import { Props } from "./OrdersTableHeader.types";
-import SearchBar from "@/components/elements/SearchBar";
+import SearchBar from "@/components/elements/OrdersTableElements/SearchBar";
 import { useState } from "react";
 
 const options = ["Name", "Price", "Rating"];

@@ -1,10 +1,10 @@
 "use client";
 
-import AnyMatchingResults from "@/components/elements/AnyMatchingResults";
-import OrdersTableHead from "@/components/elements/OrdersTableHead";
-import OrdersTableHeader from "@/components/elements/OrdersTableHeader";
-import Pagination from "@/components/elements/Pagination";
-import TableRow from "@/components/elements/TableRow";
+import AnyMatchingResults from "@/components/elements/OrdersTableElements/AnyMatchingResults";
+import OrdersTableHead from "@/components/elements/OrdersTableElements/OrdersTableHead";
+import OrdersTableHeader from "@/components/elements/OrdersTableElements/OrdersTableHeader";
+import Pagination from "@/components/elements/OrdersTableElements/Pagination";
+import TableRow from "@/components/elements/OrdersTableElements/TableRow";
 import { faker } from "@faker-js/faker";
 import useTable from "@/utils/useTable";
 

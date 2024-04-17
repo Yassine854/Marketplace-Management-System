@@ -1,9 +1,9 @@
 "use client";
 
-import CheckboxCustom from "@/components/elements/Checkbox";
+import CheckboxCustom from "@/components/elements/OrdersTableElements/Checkbox";
 import Image from "next/image";
 import { Props } from "./TableRow.types";
-import TableActions from "@/components/elements/TableActions";
+import TableActions from "@/components/elements/OrdersTableElements/TableActions";
 import { defaultProps } from "./TableRow.defaultProps";
 //import { timeAgo } from "@/utils/timeAgo";
 

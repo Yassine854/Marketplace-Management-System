@@ -1,7 +1,7 @@
-import LanguageSwitcher from "@/components/elements/LanguageSwitcher";
-import ModeSwitcher from "@/components/elements/ModeSwitcher";
-import Notification from "@/components/elements/Notification";
-import Profile from "@/components/elements/Profile";
+import LanguageSwitcher from "@/components/elements/TopNavBarElements/LanguageSwitcher";
+import ModeSwitcher from "@/components/elements/TopNavBarElements/ModeSwitcher";
+import Notification from "@/components/elements/TopNavBarElements/Notification";
+import Profile from "@/components/elements/TopNavBarElements/Profile";
 
 const TopNavBar = () => {
   return (

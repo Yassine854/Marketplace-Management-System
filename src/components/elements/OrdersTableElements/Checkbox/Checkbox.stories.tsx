@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./index";
-import { defaultProps } from "./TableRow.defaultProps";
+
 const meta = {
-  title: "Components/Elements/TableRow",
+  title: "Components/Elements/OrdersTableElements/Checkbox",
   component: Index,
   parameters: {
     layout: "centered",
@@ -13,4 +13,4 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = { args: defaultProps };
+export const Primary: Story = {};
