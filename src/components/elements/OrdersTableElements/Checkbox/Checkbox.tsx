@@ -2,19 +2,20 @@
 
 import { Props } from "./Checkbox.types";
 
-const Checkbox = ({ label, img, checked, onChange }: Props) => {
+const Checkbox = ({ label, img, isChecked, onChange }: Props) => {
   return (
-    <div className="relative flex items-center">
+    <div className="relative flex  items-center ">
       <input
         type="checkbox"
         id={label}
         name="A3-confirmation"
         value={label}
         onChange={onChange}
-        defaultChecked={checked}
-        className="absolute h-8 w-8 opacity-0"
+        defaultChecked={isChecked}
+        className="absolute h-8 w-8 cursor-pointer opacity-0"
+        //checked={isChecked}
       />
-      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-400 bg-n0 focus-within:border-primary dark:bg-bg4 ltr:mr-2 rtl:ml-2">
+      <div className=" flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-400 bg-n0 focus-within:border-primary dark:bg-bg4 ltr:mr-2 rtl:ml-2">
         <svg
           className="pointer-events-none hidden h-[10px] w-[10px] fill-current text-primary"
           version="1.1"

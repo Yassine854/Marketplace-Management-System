@@ -1,29 +1,37 @@
 "use client";
 
+import Checkbox from "../Checkbox";
 import { IconSelector } from "@tabler/icons-react";
 
-const OrdersTableHead = ({ sortData }: any) => {
+const rows = [
+  { name: "ID", isSortable: false },
+  { name: "Customer", isSortable: false },
+  { name: "Total", isSortable: true },
+  { name: "Delivery Date", isSortable: true },
+  { name: "Actions", isSortable: false },
+];
+
+const OrdersTableHead = ({ onSortClick }: any) => {
   return (
     <thead>
       <tr className="bg-primary/5 font-semibold dark:bg-bg3">
-        <td className="p-5">#</td>
-        <td onClick={() => sortData("type")} className="p-5">
-          <div className="flex cursor-pointer select-none items-center gap-1">
-            Type <IconSelector size={18} />
-          </div>
+        <td className="p-5">
+          <Checkbox isChecked={false} />
         </td>
-        <td onClick={() => sortData("size")} className="w-[16%] p-5">
-          <div className="flex cursor-pointer select-none items-center gap-1">
-            Size <IconSelector size={18} />
-          </div>
-        </td>
-        <td className="w-[16%] p-5">Version</td>
-        <td onClick={() => sortData("name")} className="p-5">
-          <div className="flex cursor-pointer select-none items-center gap-1">
-            Last Updated <IconSelector size={18} />
-          </div>
-        </td>
-        <td className="p-5 text-center">Action</td>
+
+        {rows.map((item, index) => (
+          <td
+            key={index}
+            onClick={() => {
+              item.isSortable && onSortClick("type");
+            }}
+            className="p-5"
+          >
+            <div className="flex cursor-pointer select-none items-center gap-1">
+              {item.name} {item.isSortable && <IconSelector size={18} />}
+            </div>
+          </td>
+        ))}
       </tr>
     </thead>
   );
