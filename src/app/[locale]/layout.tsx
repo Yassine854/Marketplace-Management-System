@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import { LayoutProvider } from "@/utils/LayoutContext";
 import type { Metadata } from "next";
 import { Next13NProgress } from "nextjs13-progress";
+import { ReactQueryClientProvider } from "@/utils/ReactQueryClientProvider";
 import ThemeProvider from "@/utils/ThemeProvider";
 
 type PageParamsType = {
@@ -27,14 +28,16 @@ const RootLayout = ({
   params: PageParamsType;
 }) => {
   return (
-    <html lang={locale} className="!scroll-smooth">
-      <body className={`${inter.className}   text-n500  dark:text-n30 `}>
-        <ThemeProvider>
-          <Next13NProgress color="#5D69F4" height={3} />
-          <LayoutProvider>{children}</LayoutProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+    <ReactQueryClientProvider>
+      <html lang={locale} className="!scroll-smooth">
+        <body className={`${inter.className}   text-n500  dark:text-n30 `}>
+          <ThemeProvider>
+            <Next13NProgress color="#5D69F4" height={3} />
+            <LayoutProvider>{children}</LayoutProvider>
+          </ThemeProvider>
+        </body>
+      </html>
+    </ReactQueryClientProvider>
   );
 };
 
