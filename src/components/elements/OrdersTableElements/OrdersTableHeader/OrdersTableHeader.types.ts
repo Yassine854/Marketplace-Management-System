@@ -1,3 +1,3 @@
-import { ReactNode } from "react";
-
-export type Props = {};
+export type Props = {
+  handleSearch?: ((term: string) => void) | undefined;
+};
