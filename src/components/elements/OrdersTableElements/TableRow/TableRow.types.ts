@@ -1,7 +1,6 @@
+import { Order } from "@/types/order";
+
 export type Props = {
-  id: number;
-  customer: string;
-  total: number;
-  deliveryDate: string;
-  onClick: (id: number) => void;
+  order: Order;
+  onClick: (id: string) => void;
 };

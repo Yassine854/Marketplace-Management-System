@@ -2,10 +2,10 @@
 
 import OrdersTable from "@/components/blocks/OrdersTable";
 
-const OpenOrdersTemplate = () => {
+const OpenOrdersTemplate = ({ orders, total }: any) => {
   return (
     <div className="h-ful w-full">
-      <OrdersTable />
+      <OrdersTable orders={orders} total={total} />
     </div>
   );
 };

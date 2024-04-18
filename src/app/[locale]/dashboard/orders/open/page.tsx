@@ -1,30 +1,17 @@
 "use client";
 
 import OpenOrdersTemplate from "@/components/templates/OpenOrdersTemplate";
-import { typesenseClient } from "@/libs/typesenseClient";
 import { useEffect } from "react";
+import { useGetOrders } from "@/hooks/queries/useGetOrders";
 
-const searchParameters = {
-  q: "ali",
-  query_by: "customer_firstname",
-  sort_by: "customer_id:desc",
+const OpenOrdersPage = () => {
+  const { data, isLoading, error } = useGetOrders({
+    status: "open",
+    page: 1,
+    perPage: 10,
+  });
+
+  return <OpenOrdersTemplate orders={data?.orders} total={data?.total} />;
 };
 
-const OrdersPage = () => {
-  useEffect(() => {
-    typesenseClient
-      .collections("orders")
-      .documents()
-      .search(searchParameters)
-      .then((res) => {
-        console.log("🚀 ~ .then ~ res:", res);
-      })
-      .catch((err) => {
-        console.log("🚀 ~ .then ~ err:", err);
-      });
-  }, []);
-
-  return <OpenOrdersTemplate />;
-};
-
-export default OrdersPage;
+export default OpenOrdersPage;

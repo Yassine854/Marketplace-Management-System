@@ -24,7 +24,8 @@
       "@/*": ["./src/*"],
       "@/public/*": ["./public/*"],
       "@/utils*": ["./src/utils/*"],
-      "@/hooks*": ["./src/hooks/*"]
+      "@/hooks*": ["./src/hooks/*"],
+      "@/types*": ["./src/types/*"]
     }
   },
   "include": [
@@ -33,7 +34,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/components/blocks/Sidebar/Sidebar.test.jsx",
-    "src/libs/typesenseClient.ts"
+    "src/libs/typesenseClient.ts",
+    "src/hooks/queries/useGetOrders/useGetOrders.ts"
   ],
   "exclude": ["node_modules"]
 }

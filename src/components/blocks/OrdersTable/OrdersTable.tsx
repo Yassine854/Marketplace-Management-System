@@ -1,6 +1,7 @@
 "use client";
 
 import AnyMatchingResults from "@/components/elements/OrdersTableElements/AnyMatchingResults";
+import { Order } from "@/types/order";
 import OrdersTableHead from "@/components/elements/OrdersTableElements/OrdersTableHead";
 import OrdersTableHeader from "@/components/elements/OrdersTableElements/OrdersTableHeader";
 import Pagination from "@/components/elements/OrdersTableElements/Pagination";
@@ -29,7 +30,7 @@ const list = Array.from({ length: 40 }).map((_, i) => {
   };
 });
 
-const OrdersTable = () => {
+const OrdersTable = ({ orders, total }: any) => {
   const {
     currentPage,
     deleteItem,
@@ -52,27 +53,16 @@ const OrdersTable = () => {
         <table className="w-full whitespace-nowrap">
           <OrdersTableHead sortData={sortData} />
           <tbody>
-            {tableData.map(
-              ({ id, img, name, icon, size, time, type, version }, index) => (
-                <TableRow
-                  key={id}
-                  img={img}
-                  icon={icon}
-                  size={size}
-                  time={time}
-                  type={type}
-                  version={version}
-                  index={index}
-                />
-              ),
-            )}
+            {orders?.map((order: Order) => (
+              <TableRow order={order} key={order.id} onClick={() => {}} />
+            ))}
           </tbody>
         </table>
       </div>
       {tableData.length > 0 && (
         <Pagination
           endIndex={endIndex}
-          total={totalData}
+          total={total}
           totalPages={totalPages}
           currentPage={currentPage}
           goToPage={paginate}

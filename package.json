@@ -35,7 +35,8 @@
     "sass": "^1.74.1",
     "sweetalert2": "^11.10.7",
     "tailwind-merge": "^2.2.2",
-    "typesense": "^1.8.2"
+    "typesense": "^1.8.2",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^1.2.25",
