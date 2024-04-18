@@ -19,7 +19,7 @@ const Sidebar = () => {
     translate-x-0 bg-n0  shadow-sm duration-300 dark:bg-bg4 xxxl:w-[336px] ltr:left-0 rtl:right-0`}
     >
       <div className={`p-4 xxl:p-6 xxxl:p-[30px]`}>
-        <div className="flex items-center justify-between">
+        <div className="flex  items-center justify-between">
           <Link href="/">
             <Image
               width={174}

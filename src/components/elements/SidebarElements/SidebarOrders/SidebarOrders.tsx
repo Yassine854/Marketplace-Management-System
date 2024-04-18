@@ -3,11 +3,11 @@ import SidebarSubMenuItem from "../SidebarSubMenuItem";
 import { orderStatus } from "./orderStatus";
 import { useRouter } from "next/navigation";
 
-const SidebarOrders = ({ isActive, onClick }: any) => {
+const SidebarOrders = ({ isActive = false, onClick }: any) => {
   const { push } = useRouter();
   return (
-    <ul className=" flex flex-col gap-2 ">
-      <li
+    <div className=" flex flex-col gap-2 ">
+      <div
         className={`relative rounded-xl duration-300 ${
           isActive && "bg-primary/5 dark:bg-bg3 "
         }`}
@@ -33,12 +33,9 @@ const SidebarOrders = ({ isActive, onClick }: any) => {
             ))}
           </li>
         </ul>
-      </li>
-    </ul>
+      </div>
+    </div>
   );
 };
 
-SidebarOrders.defaultProps = {
-  isActive: false,
-};
 export default SidebarOrders;

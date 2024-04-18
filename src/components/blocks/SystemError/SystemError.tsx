@@ -10,11 +10,13 @@ const SystemError = () => {
   const { theme } = useTheme();
   return (
     <div className="flex items-center justify-center py-10 md:py-20 lg:py-28">
-      <div className="mx-auto flex max-w-[640px] flex-col items-center justify-center text-center">
+      <div className="mx-auto flex  max-w-[640px] flex-col items-center justify-center text-center">
         <Image
           src={theme == "dark" ? syetemErrorImgDark : syetemErrorImg}
           alt="confirm illustration"
           className="mb-10 lg:mb-14"
+          height={30}
+          width={30}
         />
         <h2 className="h2 mb-4 lg:mb-6">Oops... Something went wrong</h2>
         <p className="mb-6 md:mb-8 lg:mb-10">

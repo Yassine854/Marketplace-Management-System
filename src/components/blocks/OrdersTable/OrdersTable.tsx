@@ -48,7 +48,7 @@ const OrdersTable = ({ orders, total }: any) => {
 
   return (
     <div className="box">
-      <OrdersTableHeader search={search} />
+      <OrdersTableHeader />
       <div className="bb-dashed mb-6 overflow-x-auto pb-6">
         <table className="w-full whitespace-nowrap">
           <OrdersTableHead sortData={sortData} />

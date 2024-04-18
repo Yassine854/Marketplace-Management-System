@@ -5,14 +5,14 @@ import cn from "@/utils/cn";
 import { defaultProps } from "./Pagination.defaultProps";
 
 const Pagination = ({
-  totalPages,
-  currentPage,
-  goToPage,
-  total,
-  startIndex,
-  endIndex,
-  nextPage,
-  prevPage,
+  totalPages = defaultProps.totalPages,
+  currentPage = defaultProps.currentPage,
+  goToPage = defaultProps.goToPage,
+  total = defaultProps.total,
+  startIndex = defaultProps.startIndex,
+  endIndex = defaultProps.endIndex,
+  nextPage = defaultProps.nextPage,
+  prevPage = defaultProps.prevPage,
 }: Props) => {
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
   return (
@@ -64,5 +64,4 @@ const Pagination = ({
   );
 };
 
-Pagination.defaultProps = defaultProps;
 export default Pagination;

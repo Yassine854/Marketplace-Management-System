@@ -1,21 +1,22 @@
 "use client";
 
-import { IconChevronRight, IconPackage } from "@tabler/icons-react";
-
+import { IconChevronRight } from "@tabler/icons-react";
 import { Props } from "./SidebarButton.types";
+import { defaultProps } from "./SidebarButton.defaultProps";
 
-const SidebarButton = ({ isActive, name, onClick, icon }: Props) => {
+const SidebarButton = ({
+  isActive = defaultProps.isActive,
+  name = defaultProps.name,
+  onClick = defaultProps.onClick,
+  icon = defaultProps.icon,
+}: Props) => {
   return (
     <button
       onClick={() => {
         onClick();
       }}
       className={`group flex w-full items-center justify-between rounded-xl px-4 py-2.5 duration-300 hover:bg-primary hover:text-n0 lg:py-3 xxxl:rounded-2xl xxxl:px-6 
-      ${isActive && "bg-primary text-n0"}
- 
-      
-      
-      `}
+      ${isActive && "bg-primary text-n0"}  `}
     >
       <span className="flex items-center gap-2">
         <span
@@ -34,13 +35,6 @@ const SidebarButton = ({ isActive, name, onClick, icon }: Props) => {
       />
     </button>
   );
-};
-
-SidebarButton.defaultProps = {
-  isActive: false,
-  name: "Orders",
-  onclick: () => {},
-  icon: <IconPackage className="h-5 w-5 lg:h-6 lg:w-6" />,
 };
 
 export default SidebarButton;

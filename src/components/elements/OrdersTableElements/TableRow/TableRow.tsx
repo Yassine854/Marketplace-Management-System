@@ -3,7 +3,10 @@ import { Props } from "./TableRow.types";
 import TableActions from "@/components/elements/OrdersTableElements/TableActions";
 import { defaultProps } from "./TableRow.defaultProps";
 
-const TableRow = ({ order, onClick }: Props) => {
+const TableRow = ({
+  order = defaultProps.order,
+  onClick = defaultProps.onClick,
+}: Props) => {
   return (
     <tr
       className="cursor-pointer even:bg-primary/5 hover:bg-n30 dark:even:bg-bg3"
@@ -32,5 +35,4 @@ const TableRow = ({ order, onClick }: Props) => {
     </tr>
   );
 };
-TableRow.defaultProps = defaultProps;
 export default TableRow;

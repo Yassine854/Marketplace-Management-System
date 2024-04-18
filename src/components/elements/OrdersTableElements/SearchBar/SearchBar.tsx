@@ -3,7 +3,7 @@ import { IconSearch } from "@tabler/icons-react";
 const SearchBar = ({
   handleSearch,
 }: {
-  handleSearch: (term: string) => void;
+  handleSearch?: (term: string) => void;
 }) => {
   return (
     <form
@@ -12,7 +12,7 @@ const SearchBar = ({
     >
       <input
         type="text"
-        onChange={(e) => handleSearch(e.target.value)}
+        //  onChange=
         placeholder="Search"
         className="w-full bg-transparent py-2 text-sm focus:outline-none"
       />
@@ -22,7 +22,5 @@ const SearchBar = ({
     </form>
   );
 };
-SearchBar.defaultProps = {
-  handleSearch: () => {},
-};
+
 export default SearchBar;

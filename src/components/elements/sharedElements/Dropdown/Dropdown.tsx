@@ -4,8 +4,13 @@ import { IconChevronDown } from "@tabler/icons-react";
 import { Props } from "./Dropdown.types";
 import { defaultProps } from "./Dropdown.defaultProps";
 import useDropdown from "@/hooks/useDropdown";
-
-const Dropdown = ({ items, selected, setSelected, width, bg }: Props) => {
+const Dropdown = ({
+  items = defaultProps.items,
+  selected = defaultProps.selected,
+  setSelected = defaultProps.setSelected,
+  width = defaultProps.width,
+  bg = defaultProps.bg,
+}: Props) => {
   const { open, ref, toggleOpen } = useDropdown();
   return (
     <div className="relative" ref={ref}>
@@ -48,5 +53,4 @@ const Dropdown = ({ items, selected, setSelected, width, bg }: Props) => {
     </div>
   );
 };
-Dropdown.defaultProps = defaultProps;
 export default Dropdown;

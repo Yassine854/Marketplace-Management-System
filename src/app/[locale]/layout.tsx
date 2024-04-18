@@ -28,16 +28,16 @@ const RootLayout = ({
   params: PageParamsType;
 }) => {
   return (
-    <ReactQueryClientProvider>
-      <html lang={locale} className="!scroll-smooth">
-        <body className={`${inter.className}   text-n500  dark:text-n30 `}>
+    <html suppressHydrationWarning lang={locale} className="!scroll-smooth">
+      <body className={`${inter.className}   text-n500  dark:text-n30 `}>
+        <ReactQueryClientProvider>
           <ThemeProvider>
             <Next13NProgress color="#5D69F4" height={3} />
             <LayoutProvider>{children}</LayoutProvider>
           </ThemeProvider>
-        </body>
-      </html>
-    </ReactQueryClientProvider>
+        </ReactQueryClientProvider>
+      </body>
+    </html>
   );
 };
 

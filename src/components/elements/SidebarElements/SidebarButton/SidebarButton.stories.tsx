@@ -13,5 +13,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {};
-export const Active: Story = { args: { isActive: true } };
+export const Primary: Story = {
+  args: { icon: <div />, isActive: false, name: "Test", onClick: () => {} },
+};
