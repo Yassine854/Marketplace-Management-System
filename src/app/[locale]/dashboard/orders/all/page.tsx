@@ -1,5 +1,5 @@
-import OpenOrdersTemplate from "@/components/templates/OpenOrdersTemplate";
+const AllOrdersPage = () => {
+  return <div></div>;
+};
 
-const OrdersPage = () => <OpenOrdersTemplate />;
-
-export default OrdersPage;
+export default AllOrdersPage;

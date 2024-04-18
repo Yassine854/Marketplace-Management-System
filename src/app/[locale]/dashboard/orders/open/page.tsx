@@ -1,7 +1,6 @@
 "use client";
 
-import OpenOrdersTemplate from "@/components/templates/OpenOrdersTemplate";
-import { useEffect } from "react";
+import OrdersTable from "@/components/blocks/OrdersTable";
 import { useGetOrders } from "@/hooks/queries/useGetOrders";
 
 const OpenOrdersPage = () => {
@@ -11,7 +10,10 @@ const OpenOrdersPage = () => {
     perPage: 100,
   });
 
-  return <OpenOrdersTemplate orders={data?.orders} total={data?.total} />;
+  return (
+    <div className="h-ful w-full">
+      <OrdersTable orders={data?.orders} total={data?.total} />
+    </div>
+  );
 };
-
 export default OpenOrdersPage;

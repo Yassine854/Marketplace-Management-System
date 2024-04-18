@@ -1,8 +1,11 @@
 "use client";
+
 import { IconMoon, IconSunHigh } from "@tabler/icons-react";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+
 import { Props } from "./types";
+import { useTheme } from "next-themes";
+
 const ModeSwitcher = ({ isBlue, isWhite }: Props) => {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
