@@ -6,7 +6,7 @@ import OrdersTableHeader from "@/components/elements/OrdersTableElements/OrdersT
 import Pagination from "@/components/elements/OrdersTableElements/Pagination";
 import TableRow from "@/components/elements/OrdersTableElements/TableRow";
 import { faker } from "@faker-js/faker";
-import useTable from "@/utils/useTable";
+import useTable from "@/hooks/useTable";
 
 const list = Array.from({ length: 40 }).map((_, i) => {
   return {

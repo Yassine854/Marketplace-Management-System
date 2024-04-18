@@ -5,7 +5,7 @@ import { Inter } from "next/font/google";
 import { LayoutProvider } from "@/utils/LayoutContext";
 import type { Metadata } from "next";
 import { Next13NProgress } from "nextjs13-progress";
-import { ReactQueryClientProvider } from "@/utils/ReactQueryClientProvider";
+import { ReactQueryClientProvider } from "@/libs/ReactQueryClientProvider";
 import ThemeProvider from "@/utils/ThemeProvider";
 
 type PageParamsType = {

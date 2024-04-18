@@ -10,7 +10,7 @@ import {
 
 import Image from "next/image";
 import Link from "next/link";
-import useDropdown from "@/utils/useDropdown";
+import useDropdown from "@/hooks/useDropdown";
 
 const profileLinks = [
   {

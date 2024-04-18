@@ -1,5 +1,5 @@
 import { IconDotsVertical } from "@tabler/icons-react";
-import useDropdown from "@/utils/useDropdown";
+import useDropdown from "@/hooks/useDropdown";
 
 const TableActions = ({ fromBottom }: { fromBottom?: boolean }) => {
   const { open, ref, toggleOpen } = useDropdown();

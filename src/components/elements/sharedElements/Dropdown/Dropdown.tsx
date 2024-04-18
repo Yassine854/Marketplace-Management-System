@@ -3,7 +3,7 @@
 import { IconChevronDown } from "@tabler/icons-react";
 import { Props } from "./Dropdown.types";
 import { defaultProps } from "./Dropdown.defaultProps";
-import useDropdown from "@/utils/useDropdown";
+import useDropdown from "@/hooks/useDropdown";
 
 const Dropdown = ({ items, selected, setSelected, width, bg }: Props) => {
   const { open, ref, toggleOpen } = useDropdown();
