@@ -8,7 +8,7 @@ const OpenOrdersPage = () => {
   const { data, isLoading, error } = useGetOrders({
     status: "open",
     page: 1,
-    perPage: 10,
+    perPage: 100,
   });
 
   return <OpenOrdersTemplate orders={data?.orders} total={data?.total} />;

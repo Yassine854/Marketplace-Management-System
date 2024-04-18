@@ -1,5 +1,4 @@
 import { Order } from "@/types/order";
-import { searchSchema } from "./responseSchema";
 import { transformResponse } from "./transformResponse";
 import { typesenseClient } from "@/libs/typesenseClient";
 
@@ -25,8 +24,6 @@ export const getOrders = async ({
       .collections("orders")
       .documents()
       .search(searchParameters);
-
-    searchSchema.parse(res);
 
     const orders: Order[] = transformResponse(res.hits);
 
