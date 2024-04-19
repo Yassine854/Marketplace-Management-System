@@ -35,7 +35,7 @@
     ".next/types/**/*.ts",
     "src/components/blocks/Sidebar/Sidebar.test.jsx",
     "src/libs/typesenseClient.ts",
-    "src/hooks/queries/useGetOrders/useGetOrders.ts"
+    "src/hooks/queries/useGetOrders.ts"
   ],
   "exclude": ["node_modules"]
 }

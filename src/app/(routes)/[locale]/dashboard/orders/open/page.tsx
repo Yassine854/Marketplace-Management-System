@@ -1,33 +1,14 @@
 "use client";
 
-import { gql, useQuery } from "@apollo/client";
-
 import OrdersTable from "@/components/blocks/OrdersTable";
 import { useEffect } from "react";
-
-const QUERY = gql`
-  query GetOpenOrders($status: String!, $page: Int!, $perPage: Int!) {
-    getOrders(status: $status, page: $page, perPage: $perPage) {
-      orders {
-        id
-        deliveryDate
-        customer {
-          id
-          name
-        }
-      }
-      total
-    }
-  }
-`;
+import { useGetOrders } from "@/hooks/queries/useGetOrders";
 
 const OpenOrdersPage = () => {
-  const { data, loading } = useQuery(QUERY, {
-    variables: {
-      status: "open",
-      page: 1,
-      perPage: 10,
-    },
+  const { data, isLoading } = useGetOrders({
+    status: "open",
+    page: 1,
+    perPage: 10,
   });
 
   useEffect(() => {
@@ -36,13 +17,10 @@ const OpenOrdersPage = () => {
 
   return (
     <div className="h-full w-full">
-      {loading ? (
+      {isLoading ? (
         <p>Loading...</p>
       ) : (
-        <OrdersTable
-          orders={data?.getOrders.orders}
-          total={data?.getOrders.total}
-        />
+        <OrdersTable orders={data?.orders} total={data?.total} />
       )}
     </div>
   );
