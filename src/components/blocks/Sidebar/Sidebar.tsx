@@ -1,32 +1,30 @@
 "use client";
 
-import { IconLogout, IconX } from "@tabler/icons-react";
+import { IconHome, IconList, IconUsers, IconX } from "@tabler/icons-react";
 
 import Image from "next/image";
 import Link from "next/link";
-import SidebarElement from "@/components/elements/SidebarElement";
-import { sidebarData } from "./sidebarData";
+import SidebarButton from "@/components/elements/SidebarElements/SidebarButton";
+import SidebarOrders from "@/components/elements/SidebarElements/SidebarOrders";
 import { useRouter } from "next/navigation";
 
-///
 const Sidebar = () => {
-  const { push } = useRouter();
+  const { push, replace } = useRouter();
 
   return (
     <aside
-      className={`w-[280px] xxxl:w-[336px] shadow-sm z-[21] 
-          translate-x-0 visible
-          
-    duration-300 sidebar fixed ltr:left-0 rtl:right-0 h-full bg-n0 dark:bg-bg4 top-0`}
+      className={`
+      sidebar visible fixed 
+      left-0 z-[21] h-full w-[280px]
+    translate-x-0 bg-n0  shadow-sm duration-300 dark:bg-bg4 xxxl:w-[336px] ltr:left-0 rtl:right-0`}
     >
-      .
       <div className={`p-4 xxl:p-6 xxxl:p-[30px]`}>
-        <div className="flex justify-between items-center">
+        <div className="flex  items-center justify-center">
           <Link href="/">
             <Image
-              width={174}
-              height={38}
-              src="/images/logo-with-text.png"
+              width={260}
+              height={18}
+              src="/images/kamioun-logo.png"
               alt="logo"
             />
           </Link>
@@ -35,30 +33,39 @@ const Sidebar = () => {
           </button>
         </div>
       </div>
-      <div className="overflow-y-auto fixed right-0 left-0 h-full">
-        <div className="px-4 xxl:px-6 xxxl:px-8 pb-24">
-          {sidebarData.map(({ id, items, title }) => (
-            <SidebarElement items={items} key={id} />
-          ))}
-        </div>
-        <div className="px-4 xxl:px-6 xxxl:px-8 pb-28">
-          <div
-            className={`px-4 w-full group flex justify-between items-center xxxl:px-6 py-2.5 lg:py-3 rounded-2xl hover:bg-primary hover:text-n0 duration-300 `}
-          >
-            <span className="flex items-center gap-2">
-              <span className={`text-primary group-hover:text-n0 `}>
-                <IconLogout className="w-5 h-5 lg:w-6 lg:h-6" />
-              </span>
-              <span
-                className="text-sm lg:text-base font-medium pointer cursor-pointer	"
-                onClick={() => {
-                  push("/login");
-                }}
-              >
-                Log Out
-              </span>
-            </span>
-          </div>
+      <div className="fixed left-0 right-0 h-full overflow-y-auto">
+        <div className="  px-4 xxl:px-6 xxxl:px-8">
+          <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
+          <SidebarButton
+            isActive={false}
+            name={"Home"}
+            icon={<IconHome />}
+            onClick={() => {
+              push("/dashboard");
+            }}
+          />
+          <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
+          <SidebarOrders isActive={true} />
+          <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
+
+          <SidebarButton
+            isActive={false}
+            name={"Members"}
+            icon={<IconUsers />}
+            onClick={() => {
+              push("/dashboard/members");
+            }}
+          />
+          <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
+          <SidebarButton
+            isActive={false}
+            name={"Logs"}
+            icon={<IconList />}
+            onClick={() => {
+              push("/dashboard/logs");
+            }}
+          />
+          <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
         </div>
       </div>
     </aside>
