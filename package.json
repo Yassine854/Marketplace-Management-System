@@ -18,11 +18,15 @@
     "pre-commit": "git add . && lint-staged"
   },
   "dependencies": {
+    "@apollo/server": "^4.10.4",
+    "@as-integrations/next": "^3.0.0",
     "@faker-js/faker": "^8.4.1",
     "@next/bundle-analyzer": "^14.2.0",
     "@tabler/icons-react": "^2.47.0",
     "@tanstack/react-query": "^5.29.2",
     "clsx": "^2.1.0",
+    "graphql-tag": "^2.12.6",
+    "install": "^0.13.0",
     "iso-639-1": "^3.1.2",
     "next": "14.1.4",
     "next-intl": "^3.11.0",

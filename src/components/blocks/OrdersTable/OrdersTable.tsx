@@ -31,27 +31,27 @@ const list = Array.from({ length: 40 }).map((_, i) => {
 });
 
 const OrdersTable = ({ orders, total }: any) => {
-  const {
-    currentPage,
-    deleteItem,
-    paginate,
-    search,
-    sortData,
-    tableData,
-    totalPages,
-    nextPage,
-    prevPage,
-    startIndex,
-    endIndex,
-    totalData,
-  } = useTable(list, 10);
+  // const {
+  //   currentPage,
+  //   deleteItem,
+  //   paginate,
+  //   search,
+  //   sortData,
+  //   tableData,
+  //   totalPages,
+  //   nextPage,
+  //   prevPage,
+  //   startIndex,
+  //   endIndex,
+  //   totalData,
+  // } = useTable(list, 10);
 
   return (
     <div className="box">
-      <OrdersTableHeader />
+      {/* <OrdersTableHeader /> */}
       <div className="bb-dashed mb-6 overflow-x-auto pb-6">
         <table className="w-full whitespace-nowrap">
-          <OrdersTableHead sortData={sortData} />
+          {/* <OrdersTableHead sortData={sortData} /> */}
           <tbody>
             {orders?.map((order: Order) => (
               <TableRow order={order} key={order.id} onClick={() => {}} />
@@ -59,7 +59,7 @@ const OrdersTable = ({ orders, total }: any) => {
           </tbody>
         </table>
       </div>
-      {tableData.length > 0 && (
+      {/* {tableData.length > 0 && (
         <Pagination
           endIndex={endIndex}
           total={total}
@@ -71,7 +71,7 @@ const OrdersTable = ({ orders, total }: any) => {
           startIndex={startIndex}
         />
       )}
-      {!tableData.length && <AnyMatchingResults />}
+      {!tableData.length && <AnyMatchingResults />} */}
     </div>
   );
 };
