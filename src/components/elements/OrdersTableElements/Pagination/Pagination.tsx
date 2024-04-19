@@ -1,22 +1,40 @@
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 
+import Dropdown from "../../sharedElements/Dropdown";
 import { Props } from "./Pagination.types";
 import cn from "@/utils/cn";
-import { defaultProps } from "./Pagination.defaultProps";
+
+const options = ["10", "25", "50", "100"];
 
 const Pagination = ({
-  totalPages = defaultProps.totalPages,
-  currentPage = defaultProps.currentPage,
-  goToPage = defaultProps.goToPage,
-  total = defaultProps.total,
-  startIndex = defaultProps.startIndex,
-  endIndex = defaultProps.endIndex,
-  nextPage = defaultProps.nextPage,
-  prevPage = defaultProps.prevPage,
+  totalPages,
+  currentPage,
+  goToPage,
+  total,
+  startIndex,
+  endIndex,
+  nextPage,
+  prevPage,
+  itemsPerPage,
+  setItemsPerPage,
 }: Props) => {
-  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+  let pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+
+  if (currentPage < 5) {
+    pages = pages.slice(0, 5);
+  } else {
+    pages = pages.slice(currentPage - 4, currentPage + 1);
+  }
+
   return (
     <div className="col-span-12 flex flex-wrap items-center justify-center gap-4 sm:justify-between">
+      <Dropdown
+        selected={itemsPerPage.toString()}
+        setSelected={(item) => {
+          setItemsPerPage(Number(item));
+        }}
+        items={options}
+      />
       <p>
         Showing {startIndex + 1} to {endIndex + 1} of {total} entries
       </p>

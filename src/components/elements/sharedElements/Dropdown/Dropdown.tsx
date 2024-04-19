@@ -4,6 +4,7 @@ import { IconChevronDown } from "@tabler/icons-react";
 import { Props } from "./Dropdown.types";
 import { defaultProps } from "./Dropdown.defaultProps";
 import useDropdown from "@/hooks/useDropdown";
+
 const Dropdown = ({
   items = defaultProps.items,
   selected = defaultProps.selected,

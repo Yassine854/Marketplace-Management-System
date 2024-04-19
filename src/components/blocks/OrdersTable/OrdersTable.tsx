@@ -6,72 +6,64 @@ import OrdersTableHead from "@/components/elements/OrdersTableElements/OrdersTab
 import OrdersTableHeader from "@/components/elements/OrdersTableElements/OrdersTableHeader";
 import Pagination from "@/components/elements/OrdersTableElements/Pagination";
 import TableRow from "@/components/elements/OrdersTableElements/TableRow";
-import { faker } from "@faker-js/faker";
-import useTable from "@/hooks/useTable";
+import TableRowSkeleton from "@/components/elements/OrdersTableElements/TableRowSkeleton";
+import { useOrdersTable } from "@/hooks/useOrdersTable";
 
-const list = Array.from({ length: 40 }).map((_, i) => {
-  return {
-    id: i + 1,
-    name: faker.person.firstName(),
-    icon: `/images/files/${faker.helpers.arrayElement([
-      "mp4",
-      "html",
-      "gif",
-      "wma",
-      "pdf",
-    ])}.png`,
-    img: `/images/user-${faker.helpers.arrayElement([
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-    ])}.png`,
-    type: faker.person.jobDescriptor(),
-    size: `${faker.number.float({ multipleOf: 8 })}MB`,
-    version: "1.0.0",
-    time: faker.date.recent(),
-  };
-});
+const OrdersTable = ({ status = "open" }: { status?: string }) => {
+  const {
+    currentPage,
+    paginate,
+    total,
+    totalPages,
+    nextPage,
+    prevPage,
+    startIndex,
+    endIndex,
+    orders,
+    isLoading,
+    itemsPerPage,
+    setItemsPerPage,
+  } = useOrdersTable(status);
 
-const OrdersTable = ({ orders, total }: any) => {
-  // const {
-  //   currentPage,
-  //   deleteItem,
-  //   paginate,
-  //   search,
-  //   sortData,
-  //   tableData,
-  //   totalPages,
-  //   nextPage,
-  //   prevPage,
-  //   startIndex,
-  //   endIndex,
-  //   totalData,
-  // } = useTable(list, 10);
+  const skeleton = Array.apply(null, Array(itemsPerPage)).map((e, i) => {
+    i: i;
+  });
 
   return (
-    <div className="box">
-      {/* <OrdersTableHeader /> */}
+    <div className="box  min-h-full ">
+      <OrdersTableHeader />
       <div className="bb-dashed mb-6 overflow-x-auto pb-6">
         <table className="w-full whitespace-nowrap">
-          {/* <OrdersTableHead sortData={sortData} /> */}
-          <tbody>
-            {orders?.map((order: Order) => (
-              <TableRow order={order} key={order.id} onClick={() => {}} />
-            ))}
-          </tbody>
+          <OrdersTableHead />
+          {!isLoading && (
+            <tbody>
+              {orders?.map((order: Order) => (
+                <TableRow order={order} key={order.id} onClick={() => {}} />
+              ))}
+            </tbody>
+          )}
+          {isLoading && (
+            <tbody>
+              {skeleton.map((e, i) => (
+                <TableRowSkeleton key={i} />
+              ))}
+            </tbody>
+          )}
         </table>
       </div>
-      {/* {tableData.length > 0 && (
-        <Pagination
-          endIndex={endIndex}
-          total={total}
-          totalPages={totalPages}
-          currentPage={currentPage}
-          goToPage={paginate}
-          nextPage={nextPage}
-          prevPage={prevPage}
-          startIndex={startIndex}
-        />
-      )}
-      {!tableData.length && <AnyMatchingResults />} */}
+      {!isLoading && !orders?.length && <AnyMatchingResults />}
+      <Pagination
+        endIndex={endIndex}
+        total={total}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        goToPage={paginate}
+        nextPage={nextPage}
+        prevPage={prevPage}
+        startIndex={startIndex}
+        itemsPerPage={itemsPerPage}
+        setItemsPerPage={setItemsPerPage}
+      />
     </div>
   );
 };
