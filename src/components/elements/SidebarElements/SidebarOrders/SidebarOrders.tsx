@@ -1,10 +1,13 @@
+import { usePathname, useRouter } from "@/libs/i18nNavigation";
+
 import SidebarButton from "../SidebarButton";
 import SidebarSubMenuItem from "../SidebarSubMenuItem";
 import { orderStatus } from "./orderStatus";
-import { useRouter } from "next/navigation";
 
 const SidebarOrders = ({ isActive = false, onClick }: any) => {
   const { push } = useRouter();
+  const pathname = usePathname();
+
   return (
     <div className=" flex flex-col gap-2 ">
       <div
@@ -15,7 +18,7 @@ const SidebarOrders = ({ isActive = false, onClick }: any) => {
         <SidebarButton
           isActive={isActive}
           onClick={() => {
-            push("/dashboard/orders/open");
+            push("/orders/open");
           }}
         />
 
@@ -23,7 +26,7 @@ const SidebarOrders = ({ isActive = false, onClick }: any) => {
           <li>
             {orderStatus.map((item, index: number) => (
               <SidebarSubMenuItem
-                isActive={false}
+                isActive={pathname?.includes(item.path)}
                 key={index}
                 onClick={() => {
                   push(item.path);

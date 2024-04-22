@@ -1,15 +1,22 @@
 "use client";
 
-import { IconHome, IconList, IconUsers, IconX } from "@tabler/icons-react";
+import { IconDashboard, IconList, IconUsers, IconX } from "@tabler/icons-react";
+import { usePathname, useRouter } from "@/libs/i18nNavigation";
 
 import Image from "next/image";
 import Link from "next/link";
 import SidebarButton from "@/components/elements/SidebarElements/SidebarButton";
 import SidebarOrders from "@/components/elements/SidebarElements/SidebarOrders";
-import { useRouter } from "next/navigation";
+import path from "path";
+import { useEffect } from "react";
 
 const Sidebar = () => {
-  const { push, replace } = useRouter();
+  const { push } = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    console.log("🚀 ~ Sidebar ~ pathname:", pathname);
+  }, [pathname]);
 
   return (
     <aside
@@ -37,32 +44,32 @@ const Sidebar = () => {
         <div className="  px-4 xxl:px-6 xxxl:px-8">
           <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
           <SidebarButton
-            isActive={false}
-            name={"Home"}
-            icon={<IconHome />}
+            isActive={pathname?.includes("dashboard")}
+            name={"Dashboard"}
+            icon={<IconDashboard />}
             onClick={() => {
               push("/dashboard");
             }}
           />
           <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
-          <SidebarOrders isActive={true} />
+          <SidebarOrders isActive={pathname?.includes("orders")} />
           <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
 
           <SidebarButton
-            isActive={false}
+            isActive={pathname?.includes("members")}
             name={"Members"}
             icon={<IconUsers />}
             onClick={() => {
-              push("/dashboard/members");
+              push("/members");
             }}
           />
           <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
           <SidebarButton
-            isActive={false}
+            isActive={pathname?.includes("logs")}
             name={"Logs"}
             icon={<IconList />}
             onClick={() => {
-              push("/dashboard/logs");
+              push("/logs");
             }}
           />
           <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
