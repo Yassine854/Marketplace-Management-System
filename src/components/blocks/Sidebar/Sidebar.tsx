@@ -14,10 +14,6 @@ const Sidebar = () => {
   const { push } = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    console.log("🚀 ~ Sidebar ~ pathname:", pathname);
-  }, [pathname]);
-
   return (
     <aside
       className={`

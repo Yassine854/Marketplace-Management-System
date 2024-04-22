@@ -14,22 +14,28 @@ const TableRow = ({
         onClick(order.id);
       }}
     >
-      <td className="px-3 py-2">
+      <td className="flex justify-center px-3 py-2">
         <CheckboxCustom />
       </td>
 
-      <td className="px-3 py-2">{order.id}</td>
-      <td className="px-3 py-2">{order.customer.name}</td>
-      <td className="px-3 py-2">{order.total}</td>
-      <td className="px-3 py-2">{order.deliveryDate}</td>
+      <td className="px-3 py-2">
+        <div className="flex justify-center">{order.id}</div>
+      </td>
+      <td className="px-3 py-2">
+        <div className="flex justify-center">{order.customer.name}</div>
+      </td>
+      <td className="px-3 py-2">
+        <div className="flex justify-center">{order.total}</div>
+      </td>
+      <td className="px-3 py-2">
+        <div className="flex justify-center">{order.deliveryDate}</div>
+      </td>
 
       <td className="px-3 py-2">
         <div className="flex h-full items-center justify-center">
-          <TableActions
-          // fromBottom={
-          //   // index == numberOfItems - 1 || index == numberOfItems - 2
-          // }
-          />
+          <div className="flex justify-center">
+            <TableActions />
+          </div>
         </div>
       </td>
     </tr>

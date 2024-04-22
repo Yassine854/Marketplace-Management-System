@@ -7,22 +7,17 @@ type Props = {
   children?: ReactNode;
 };
 
-const LayoutTemplate = ({ children }: Props) => {
+const PagesLayout = ({ children }: Props) => {
   return (
-    <div className="   flex h-screen  w-screen">
+    <>
       <TopNavBar />
       <Sidebar />
-      <div className="h-full w-[320px] xxxl:w-[410px] " />
-      <div className="  h-full w-full ">
-        <div className="  flex h-full w-full flex-col">
-          <div className=" h-full w-full  bg-n20 px-4 py-4  pt-[120px]">
-            {children}
-          </div>
-          <Footer />
-        </div>
+      <div className="flex h-screen w-screen flex-col bg-n20 pl-[280px] pt-[90px]  dark:bg-bg3 xxxl:pl-[336px]  ">
+        <div className=" flex flex-grow overflow-x-hidden  ">{children}</div>
+        <Footer />
       </div>
-    </div>
+    </>
   );
 };
 
-export default LayoutTemplate;
+export default PagesLayout;
