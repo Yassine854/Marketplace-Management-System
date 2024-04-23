@@ -25,9 +25,9 @@ const Sidebar = () => {
         <div className="flex  items-center justify-center">
           <Link href="/">
             <Image
-              width={260}
-              height={18}
-              src="/images/kamioun-logo.png"
+              width={250}
+              height={12}
+              src="/images/Kamioun-logo-text.png"
               alt="logo"
             />
           </Link>
