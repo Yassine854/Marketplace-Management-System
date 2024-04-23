@@ -2,7 +2,7 @@
 //import ModeSwitcher from "@/components/elements/TopNavBarElements/ModeSwitcher";
 import Notification from "@/components/elements/TopNavBarElements/Notification";
 import Profile from "@/components/elements/TopNavBarElements/Profile";
-
+import WarehouseSelector from "@/components/elements/TopNavBarElements/WarehouseSelector";
 const TopNavBar = () => {
   return (
     <nav
@@ -15,6 +15,7 @@ const TopNavBar = () => {
       rtl:xxl:mr-[280px] rtl:xxxl:mr-[336px]"
     >
       <div className="flex items-center gap-3 sm:gap-4 xxl:gap-6">
+        <WarehouseSelector />
         {/* <ModeSwitcher /> */}
         <Notification />
         {/* <LanguageSwitcher /> */}
