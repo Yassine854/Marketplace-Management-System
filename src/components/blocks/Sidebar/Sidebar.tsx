@@ -36,7 +36,7 @@ const Sidebar = () => {
       className={`
       sidebar visible fixed 
       left-0 z-[21] h-full w-[280px]
-    translate-x-0 bg-n10  shadow-sm duration-300 dark:bg-bg4 xxxl:w-[336px] ltr:left-0 rtl:right-0`}
+    translate-x-0 bg-n10  shadow-sm duration-300 dark:bg-bg4  ltr:left-0 rtl:right-0`}
     >
       <div className=" p-6">
         <div className="flex  items-center justify-center">

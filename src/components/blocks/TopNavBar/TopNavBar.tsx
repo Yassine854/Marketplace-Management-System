@@ -11,8 +11,8 @@ const TopNavBar = () => {
       h-[90px] w-full items-center justify-end 
       gap-2 bg-n10 px-4 py-3 shadow-sm duration-300 dark:border-b
     dark:border-n700 dark:bg-bg4 md:py-4 xxl:w-[calc(100%-280px)] 
-      xxl:px-6 xxl:py-6 xxxl:w-[calc(100%-336px)] ltr:xxl:ml-[280px] ltr:xxxl:ml-[336px]
-      rtl:xxl:mr-[280px] rtl:xxxl:mr-[336px]"
+      xxl:px-6 xxl:py-6  ltr:ml-[280px] 
+      rtl:mr-[280px] "
     >
       <div className="flex items-center gap-3 sm:gap-4 xxl:gap-6">
         <WarehouseSelector />
