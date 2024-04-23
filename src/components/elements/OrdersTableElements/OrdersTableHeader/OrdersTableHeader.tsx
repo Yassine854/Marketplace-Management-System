@@ -15,7 +15,7 @@ const OrdersTableHeader = ({ handleSearch, title }: Props) => {
       <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
         <SearchBar handleSearch={() => {}} />
         <div className="flex items-center gap-2">
-          <p className="whitespace-nowrap">Sort By : </p>Flex List View
+          <p className="whitespace-nowrap">Sort By : </p>
           <Dropdown
             selected={selected}
             setSelected={setSelected}
