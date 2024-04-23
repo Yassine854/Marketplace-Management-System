@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <div className=" p2  flex  h-12 items-center justify-center   ">
+    <div className=" flex  h-8  items-center justify-center bg-n0 p-2   ">
       <p className="max text-sm max-md:text-center lg:text-base">
         Copyright ©{new Date().getFullYear()}{" "}
         <Link className="text-primary" href="/">

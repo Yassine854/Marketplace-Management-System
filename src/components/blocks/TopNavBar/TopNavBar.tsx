@@ -9,7 +9,7 @@ const TopNavBar = () => {
       className="
       navbar-top fixed top-0 z-20 flex
       h-[90px] w-full items-center justify-end 
-      gap-3 bg-n0 px-4 py-3 shadow-sm duration-300 dark:border-b
+      gap-2 bg-n10 px-4 py-3 shadow-sm duration-300 dark:border-b
     dark:border-n700 dark:bg-bg4 md:py-4 xxl:w-[calc(100%-280px)] 
       xxl:px-6 xxl:py-6 xxxl:w-[calc(100%-336px)] ltr:xxl:ml-[280px] ltr:xxxl:ml-[336px]
       rtl:xxl:mr-[280px] rtl:xxxl:mr-[336px]"

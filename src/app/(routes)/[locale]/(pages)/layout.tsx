@@ -12,7 +12,7 @@ const PagesLayout = ({ children }: Props) => {
     <>
       <TopNavBar />
       <Sidebar />
-      <div className="flex h-screen w-screen flex-col bg-n20 pl-[280px] pt-[90px]  dark:bg-bg3 xxxl:pl-[336px]  ">
+      <div className="flex h-screen w-screen flex-col bg-n30 pl-[280px] pt-[90px]  dark:bg-bg3 xxxl:pl-[336px]  ">
         <div className=" flex flex-grow flex-col overflow-x-hidden p-4 ">
           {children}
         </div>

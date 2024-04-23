@@ -108,7 +108,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
     i: i;
   });
   return (
-    <div className="box   m-4   flex flex-grow flex-col  ">
+    <div className="box     flex flex-grow flex-col  ">
       <OrdersTableHeader title={title} />
       <div className="mb-6 overflow-x-auto rounded-2xl bg-primary/5  dark:bg-bg3 ">
         <div className="min-w-min rounded-xl bg-n0 px-3 dark:bg-bg4">
