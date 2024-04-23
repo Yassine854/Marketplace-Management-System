@@ -1,6 +1,12 @@
 "use client";
 
-import { IconDashboard, IconList, IconUsers, IconX } from "@tabler/icons-react";
+import {
+  IconBell,
+  IconDashboard,
+  IconList,
+  IconUsers,
+  IconX,
+} from "@tabler/icons-react";
 import { usePathname, useRouter } from "@/libs/i18nNavigation";
 
 import Image from "next/image";
@@ -49,6 +55,15 @@ const Sidebar = () => {
           />
           <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
           <SidebarOrders isActive={pathname?.includes("orders")} />
+          <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
+          <SidebarButton
+            isActive={pathname?.includes("notifications")}
+            name={"Notifications"}
+            icon={<IconBell />}
+            onClick={() => {
+              push("/notifications");
+            }}
+          />
           <p className="mb-2 mt-2 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
 
           <SidebarButton
