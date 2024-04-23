@@ -133,18 +133,7 @@ const Notifications = () => {
                     !read && "bg-primary/5 dark:bg-bg3"
                   } mb-4 flex flex-wrap items-start gap-4 border border-n30 last:mb-0 dark:border-n500 md:gap-6`}
                 >
-                  <Image
-                    src={img}
-                    width={48}
-                    className="rounded-full"
-                    height={48}
-                    alt="img"
-                  />
                   <div className="grow">
-                    <div className="mb-3 flex flex-wrap items-center gap-2 md:gap-4">
-                      <p className="text-xl font-medium">{name}</p>
-                      <span className="text-sm">{timePast}</span>
-                    </div>
                     <div className="bb-dashed mb-5 flex gap-1 pb-5">
                       <IconMessageDots />
                       <div className="flex flex-wrap items-center gap-1 text-sm">

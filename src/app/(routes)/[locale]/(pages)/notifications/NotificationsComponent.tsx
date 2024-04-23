@@ -1,8 +1,8 @@
 import { IconClock, IconMessageDots } from "@tabler/icons-react";
 
+import Box from "@/components/blocks/Box";
 import Image from "next/image";
 
-//import OptionsVertical from "../shared/OptionsVertical";
 type Notification = {
   id: number;
   name: string;
@@ -105,11 +105,7 @@ const notificationsData: NotificationsData = {
 };
 const Notifications = () => {
   return (
-    <div className="box w-full  overflow-y-scroll  xl:p-8">
-      <div className="bb-dashed mb-4 flex items-center  justify-between">
-        <p className="text-xl font-bold">Notifications</p>
-      </div>
-
+    <Box title="Notifications">
       {Object.keys(notificationsData).map((key) => (
         <div key={key}>
           <p className="px-6 py-4 font-semibold">{key}</p>
@@ -165,7 +161,7 @@ const Notifications = () => {
           </div>
         </div>
       ))}
-    </div>
+    </Box>
   );
 };
 
