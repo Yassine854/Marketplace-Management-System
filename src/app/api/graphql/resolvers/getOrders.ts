@@ -7,26 +7,18 @@ export type GetOrdersParams = {
   perPage: number;
 };
 
-const transformResponse = (res: any): Order[] => {
-  return res.hits.map((element: any) => {
-    const {
-      entity_id,
-      customer_firstname,
-      customer_lastname,
-      customer_id,
-      subtotal,
-      extension_attributes,
-    } = element.document;
-
-    const customerName = `${customer_firstname} ${customer_lastname}`;
-    return {
-      id: entity_id,
-      customer: { name: customerName, id: customer_id },
-      total: subtotal,
-      deliveryDate: extension_attributes.delivery_date,
-    };
-  });
-};
+const createOrdersList = (typesenseHits: any): Order[] =>
+  typesenseHits.map(
+    ({ document }: any): Order => ({
+      id: document.entity_id,
+      customer: {
+        id: document.customer_id,
+        name: document.customer_firstname + " " + document.customer_lastname,
+      },
+      total: document.subtotal,
+      deliveryDate: document.extension_attributes.delivery_date,
+    }),
+  );
 
 export const getOrders = async ({
   status,
@@ -42,13 +34,18 @@ export const getOrders = async ({
       page: page,
       per_page: perPage,
     };
-    const res = await typesenseClient
+    const typesenseResponse = await typesenseClient
       .collections("orders")
       .documents()
       .search(searchParameters);
 
-    const orders: Order[] = transformResponse(res);
+    const orders: Order[] = createOrdersList(typesenseResponse?.hits);
 
-    return { orders, total: res.found };
-  } catch (error) {}
+    return {
+      orders,
+      total: typesenseResponse.found,
+    };
+  } catch (error) {
+    console.error("🚀 ~  getOrders error:", error);
+  }
 };
