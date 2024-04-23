@@ -671,19 +671,6 @@ const SalesStatistics = () => {
 const Dashboard = () => {
   return (
     <>
-      <Banner
-        title="Analytics "
-        links={
-          <div className="flex gap-4 xl:gap-6">
-            {/* <Link href="#" className="btn-outline">
-              View Reports
-            </Link>
-            <Link href="#" className="btn">
-              Transactions
-            </Link> */}
-          </div>
-        }
-      />
       <div className="grid grid-cols-12 gap-4 xxxl:gap-6">
         <States />
         <SalesStatistics />

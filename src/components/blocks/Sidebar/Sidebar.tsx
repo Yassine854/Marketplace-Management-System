@@ -38,11 +38,11 @@ const Sidebar = () => {
       left-0 z-[21] h-full w-[280px]
     translate-x-0 bg-n10  shadow-sm duration-300 dark:bg-bg4  ltr:left-0 rtl:right-0`}
     >
-      <div className=" p-6">
+      <div className=" pb-8 pt-4">
         <div className="flex  items-center justify-center">
           <Link href="/">
             <Image
-              width={210}
+              width={260}
               height={12}
               src="/images/Kamioun-logo-text.png"
               alt="logo"
@@ -53,7 +53,7 @@ const Sidebar = () => {
           </button>
         </div>
       </div>
-      <div className="fixed left-0 right-0 h-full overflow-y-auto">
+      <div className="fixed left-0 right-0 mt-6 h-full overflow-y-auto">
         <div className="  px-4 xxl:px-6 xxxl:px-8">
           <Divider />
           <SidebarButton
