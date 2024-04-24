@@ -11,5 +11,6 @@ const intlMiddleware = createMiddleware({
 export default intlMiddleware;
 
 export const config = {
-  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+  // Skip paths that should not be internationalized
+  matcher: ["/((?!api|_next|.*\\..*).*)"],
 };
