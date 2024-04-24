@@ -5,4 +5,5 @@ export type Props = {
   onClick?: () => void;
   icon?: ReactNode;
   isActive?: boolean;
+  withSubMenu?: boolean;
 };

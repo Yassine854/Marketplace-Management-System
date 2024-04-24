@@ -1,5 +1,5 @@
 export const defaultProps = {
-  items: ["Edit", "Delete", "Block"],
+  items: ["Edit", ""],
   selected: "test",
   setSelected: (items: string) => {},
   width: "10",

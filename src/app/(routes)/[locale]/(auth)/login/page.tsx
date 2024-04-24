@@ -2,6 +2,7 @@
 
 import { IconArrowLeft, IconEye, IconEyeOff } from "@tabler/icons-react";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,7 +20,16 @@ const LoginThreeContent = () => {
             className="flex items-center gap-2">
             <IconArrowLeft size={20} /> Back To Home
           </Link> */}
-          <h3 className="h3 my-4">Welcome Back!</h3>
+          <div className="flex flex-grow items-center justify-center ">
+            <Image
+              src={"/images/kamioun-logo.png"}
+              alt="logo"
+              width={320}
+              height={280}
+            />
+          </div>
+
+          {/* <h3 className="h3 my-4">Welcome Back!</h3> */}
           <p className="bb-dashed mb-4 pb-4 text-sm md:mb-6 md:pb-6 md:text-base"></p>
           <label htmlFor="email" className="mb-4 block font-medium md:text-lg">
             Enter Your Email

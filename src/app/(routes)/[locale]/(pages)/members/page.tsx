@@ -1,6 +1,6 @@
 import OrdersTable from "@/components/blocks/OrdersTable";
 
-const Dashboard = () => {
+const Members = () => {
   return (
     <div></div>
     // <div className=" flex flex-grow justify-center items-center w-full bg-red-400">
@@ -8,4 +8,4 @@ const Dashboard = () => {
     // </div>
   );
 };
-export default Dashboard;
+export default Members;

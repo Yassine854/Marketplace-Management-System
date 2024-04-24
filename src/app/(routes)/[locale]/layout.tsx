@@ -20,10 +20,6 @@ const inter = Inter({
   weight: ["400", "500", "600", "700"],
 });
 
-// export const metadata: Metadata = {
-//   title: "Kamioun OMS",
-// };
-
 const RootLayout = ({
   children,
   params: { locale },

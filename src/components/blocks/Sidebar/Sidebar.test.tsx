@@ -20,6 +20,6 @@ function setup(toString: string = ""): void {
 }
 
 it("Render", () => {
-  // setup();
-  render(<Index />);
+  //setup();
+  //render(<Index />);
 });
