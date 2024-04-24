@@ -8,6 +8,9 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 const nextConfig = {
   reactStrictMode: false,
+  experimental: {
+    outputStandalone: true,
+  },
 };
 
 module.exports = withNextIntl(withBundleAnalyzer(nextConfig));
