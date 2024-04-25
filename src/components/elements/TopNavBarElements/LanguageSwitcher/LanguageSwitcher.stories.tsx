@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
-//import Index from "./index";
+//import Index from "./LanguageSwitcher";
 const Index = () => <div />;
 
 const meta = {
-  title: "Components/Elements/SidebarElements/SidebarOrdersSubMenu",
+  title: "Components/Elements/TopNavBarElements/LanguageSwticher",
   component: Index,
+  decorators: [],
   parameters: {
     layout: "centered",
   },
