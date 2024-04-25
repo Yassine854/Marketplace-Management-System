@@ -10,7 +10,6 @@ const SidebarButton = ({
   onClick = defaultProps.onClick,
   icon = defaultProps.icon,
   withSubMenu = false,
-  isOpen,
 }: Props) => {
   return (
     <button
@@ -30,7 +29,7 @@ const SidebarButton = ({
       </span>
       <IconChevronRight
         className={`h-5 w-5 transition-transform duration-300 lg:h-6 lg:w-6 rtl:rotate-180 ${
-          withSubMenu && isActive && isOpen && "ltr:rotate-90 rtl:rotate-90"
+          withSubMenu && isActive && "ltr:rotate-90 rtl:rotate-90"
         }`}
       />
     </button>
