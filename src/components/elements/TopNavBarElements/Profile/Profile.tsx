@@ -13,21 +13,21 @@ import Link from "next/link";
 import useDropdown from "@/hooks/useDropdown";
 
 const profileLinks = [
-  {
-    icon: <IconUser size={18} />,
-    url: "/profile",
-    title: "My Profile",
-  },
-  {
-    icon: <IconMessage size={18} />,
-    url: "/messaging",
-    title: "Meassages",
-  },
-  {
-    icon: <IconLifebuoy size={18} />,
-    url: "#",
-    title: "Help",
-  },
+  // {
+  //   icon: <IconUser size={18} />,
+  //   url: "/profile",
+  //   title: "My Profile",
+  // },
+  // {
+  //   icon: <IconMessage size={18} />,
+  //   url: "/messaging",
+  //   title: "Meassages",
+  // },
+  // {
+  //   icon: <IconLifebuoy size={18} />,
+  //   url: "#",
+  //   title: "Help",
+  // },
   {
     icon: <IconSettings size={18} />,
     url: "/settings",
