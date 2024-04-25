@@ -104,11 +104,11 @@ const notificationsData: NotificationsData = {
     },
   ],
 };
-const ActivitiesLogs = () => {
+const Notifications = () => {
   return (
     <Box>
       <div className="bb-dashed sticky top-0   flex h-16 items-center justify-between bg-n0">
-        <p className="text-3xl font-bold">Activities Logs</p>
+        <p className="text-3xl font-bold">Logs</p>
       </div>
 
       {Object.keys(notificationsData).map((key) => (
@@ -159,4 +159,4 @@ const ActivitiesLogs = () => {
   );
 };
 
-export default ActivitiesLogs;
+export default Notifications;

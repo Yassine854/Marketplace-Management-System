@@ -103,7 +103,6 @@ const notificationsData: NotificationsData = {
     },
   ],
 };
-
 const Notifications = () => {
   return (
     <Box title="Notifications">

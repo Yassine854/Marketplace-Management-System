@@ -5,7 +5,7 @@ import { IconSelector } from "@tabler/icons-react";
 
 const rows = [
   { name: "ID", isSortable: false },
-  { name: "Customer", isSortable: true },
+  { name: "Customer", isSortable: false },
   { name: "Total", isSortable: true },
   { name: "Delivery Date", isSortable: true },
   { name: "Actions", isSortable: false },
@@ -13,7 +13,7 @@ const rows = [
 
 const OrdersTableHead = ({ onSortClick }: any) => {
   return (
-    <thead className="">
+    <thead>
       <tr className=" font-semibold ">
         <td className="w-14">
           <div className="flex cursor-pointer select-none items-center justify-center gap-1 bg-primary/5 px-3 py-5 dark:bg-bg3">
@@ -40,3 +40,44 @@ const OrdersTableHead = ({ onSortClick }: any) => {
 };
 
 export default OrdersTableHead;
+{
+  /* <thead>
+              <tr className="font-semibold">
+                <td onClick={() => sortData("id")} className="w-14">
+                  <div className="flex cursor-pointer select-none items-center gap-1 rounded-s-xl bg-primary/5 px-3 py-5 pl-6 dark:bg-bg3">
+                    Serial No <IconSelector size={18} />
+                  </div>
+                </td>
+                <td onClick={() => sortData("name")}>
+                  <div className="flex cursor-pointer select-none items-center gap-1 bg-primary/5 px-3 py-5 dark:bg-bg3">
+                    User <IconSelector size={18} />
+                  </div>
+                </td>
+                <td onClick={() => sortData("country")}>
+                  <div className="flex cursor-pointer select-none items-center gap-1 bg-primary/5 px-3 py-5 dark:bg-bg3">
+                    Location <IconSelector size={18} />
+                  </div>
+                </td>
+                <td onClick={() => sortData("industry")}>
+                  <div className="flex cursor-pointer select-none items-center gap-1 bg-primary/5 px-3 py-5 dark:bg-bg3">
+                    Industry <IconSelector size={18} />
+                  </div>
+                </td>
+                <td onClick={() => sortData("status")}>
+                  <div className="flex cursor-pointer select-none items-center gap-1 bg-primary/5 px-3 py-5 dark:bg-bg3">
+                    Status <IconSelector size={18} />
+                  </div>
+                </td>
+                <td>
+                  <div className="bg-primary/5 px-3 py-5 dark:bg-bg3">
+                    Relations
+                  </div>
+                </td>
+                <td>
+                  <div className="rounded-e-xl bg-primary/5 px-3 py-5 text-center dark:bg-bg3">
+                    Action
+                  </div>
+                </td>
+              </tr>
+            </thead> */
+}
