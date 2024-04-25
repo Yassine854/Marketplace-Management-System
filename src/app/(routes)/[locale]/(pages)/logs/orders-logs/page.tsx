@@ -108,7 +108,7 @@ const OrdersLogs = () => {
   return (
     <Box>
       <div className="bb-dashed sticky top-0   flex h-16 items-center justify-between bg-n0">
-        <p className="text-3xl font-bold">Logs</p>
+        <p className="text-3xl font-bold">Orders Logs</p>
       </div>
 
       {Object.keys(notificationsData).map((key) => (
