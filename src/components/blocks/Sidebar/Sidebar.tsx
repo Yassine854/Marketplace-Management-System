@@ -15,6 +15,7 @@ import Link from "next/link";
 import SidebarButton from "@/components/elements/SidebarElements/SidebarButton";
 import SidebarOrdersSubMenu from "@/components/elements/SidebarElements/SidebarOrdersSubMenu";
 import SidebarSubMenu from "@/components/elements/SidebarElements/SidebarSubMenu";
+import { useGetOrders } from "@/hooks/queries/useGetOrders";
 
 const orderStatus = [
   { name: "Open", path: "/orders/open" },

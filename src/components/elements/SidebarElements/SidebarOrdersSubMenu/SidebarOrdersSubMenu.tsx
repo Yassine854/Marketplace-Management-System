@@ -7,11 +7,31 @@ import AnimateHeight from "react-animate-height";
 import Divider from "@/components/elements/SidebarElements/Divider";
 import SidebarButton from "../SidebarButton";
 import SidebarSubMenuItem from "../SidebarSubMenuItem";
+import { read } from "fs";
+import { useGetOrders } from "@/hooks/queries/useGetOrders";
 
 const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
   const pathname = usePathname();
   const { push } = useRouter();
   const [isOpen, setIsOpen] = useState(isActive);
+
+  const { data: openOrders } = useGetOrders({
+    status: "open",
+    page: 1,
+    perPage: 10,
+  });
+
+  const { data: validOrders } = useGetOrders({
+    status: "valid",
+    page: 1,
+    perPage: 10,
+  });
+
+  const { data: readyOrders } = useGetOrders({
+    status: "ready",
+    page: 1,
+    perPage: 10,
+  });
 
   useEffect(() => {
     setIsOpen(isActive);
@@ -41,10 +61,18 @@ const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
               if (name == "div") {
                 return <Divider key={name} />;
               } else {
+                console.log(name);
+                let nameAndCount;
+                if (openOrders && name == "Open")
+                  nameAndCount = name + " : " + openOrders?.total;
+                if (validOrders && name == "Valid")
+                  nameAndCount = name + " : " + validOrders?.total;
+                if (readyOrders && name == "Ready")
+                  nameAndCount = name + " : " + readyOrders?.total;
                 return (
                   <SidebarSubMenuItem
                     key={name}
-                    name={name}
+                    name={nameAndCount ? nameAndCount : name}
                     onClick={() => push(path)}
                     isActive={pathname?.includes(path)}
                   />
