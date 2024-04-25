@@ -54,6 +54,7 @@ const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
           }}
           isActive={isActive}
           withSubMenu
+          isOpen={isOpen}
         />
         <AnimateHeight height={isOpen ? "auto" : 0}>
           <ul className={`px-3 py-3 4xl:px-5`}>

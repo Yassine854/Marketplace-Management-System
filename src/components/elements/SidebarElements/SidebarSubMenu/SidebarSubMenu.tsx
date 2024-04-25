@@ -7,9 +7,18 @@ import AnimateHeight from "react-animate-height";
 import SidebarButton from "../SidebarButton";
 import SidebarSubMenuItem from "../SidebarSubMenuItem";
 
-const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
+const SidebarSubMenu = ({
+  isActive = false,
+  onClick,
+  items,
+  name,
+  icon,
+}: any) => {
+  console.log("🚀 ~ items:", items);
   const pathname = usePathname();
   const { push } = useRouter();
+
+  console.log(pathname?.includes(items[1].path));
   const [isOpen, setIsOpen] = useState(isActive);
 
   useEffect(() => {
@@ -24,6 +33,7 @@ const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
         }`}
       >
         <SidebarButton
+          icon={icon}
           onClick={() => {
             if (!isActive) {
               onClick();
@@ -33,6 +43,8 @@ const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
           }}
           isActive={isActive}
           withSubMenu
+          name={name}
+          isOpen={isOpen}
         />
         <AnimateHeight height={isOpen ? "auto" : 0}>
           <ul className={`px-3 py-3 4xl:px-5`}>

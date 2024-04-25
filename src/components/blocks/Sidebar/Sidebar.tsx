@@ -5,7 +5,6 @@ import {
   IconDashboard,
   IconList,
   IconUsers,
-  IconX,
 } from "@tabler/icons-react";
 import { usePathname, useRouter } from "@/libs/i18nNavigation";
 
@@ -15,7 +14,6 @@ import Link from "next/link";
 import SidebarButton from "@/components/elements/SidebarElements/SidebarButton";
 import SidebarOrdersSubMenu from "@/components/elements/SidebarElements/SidebarOrdersSubMenu";
 import SidebarSubMenu from "@/components/elements/SidebarElements/SidebarSubMenu";
-import { useGetOrders } from "@/hooks/queries/useGetOrders";
 
 const orderStatus = [
   { name: "Open", path: "/orders/open" },
@@ -60,7 +58,7 @@ const Sidebar = () => {
         <Divider />
         <SidebarOrdersSubMenu
           items={orderStatus}
-          isActive={pathname?.includes("orders")}
+          isActive={pathname?.includes("orders") && !pathname?.includes("logs")}
           onClick={() => {
             push("/orders/open");
           }}
@@ -75,23 +73,33 @@ const Sidebar = () => {
           }}
         />
         <Divider />
-        <SidebarButton
-          isActive={pathname?.includes("members")}
-          name={"Members"}
+        <SidebarSubMenu
+          isActive={pathname?.includes("access")}
+          name="Access Control"
           icon={<IconUsers />}
+          items={[
+            { name: "Users", path: "/access/users" },
+            { name: "Roles", path: "/access/roles" },
+          ]}
           onClick={() => {
-            push("/members");
+            push("/access/users");
           }}
         />
+
         <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
-        <SidebarButton
+        <SidebarSubMenu
           isActive={pathname?.includes("logs")}
-          name={"Logs"}
+          name="Logs"
           icon={<IconList />}
+          items={[
+            { name: "Orders", path: "/logs/orders-logs" },
+            { name: "Activities", path: "/logs/activities-logs" },
+          ]}
           onClick={() => {
-            push("/logs");
+            push("/logs/orders-logs");
           }}
         />
+
         <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
       </div>
     </aside>
