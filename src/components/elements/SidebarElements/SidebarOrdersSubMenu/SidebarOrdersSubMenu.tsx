@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "@/libs/i18nNavigation";
 
 import AnimateHeight from "react-animate-height";
+import Divider from "@/components/elements/SidebarElements/Divider";
 import SidebarButton from "../SidebarButton";
 import SidebarSubMenuItem from "../SidebarSubMenuItem";
 
@@ -36,14 +37,20 @@ const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
         />
         <AnimateHeight height={isOpen ? "auto" : 0}>
           <ul className={`px-3 py-3 4xl:px-5`}>
-            {items.map(({ name, path }: any) => (
-              <SidebarSubMenuItem
-                key={name}
-                name={name}
-                onClick={() => push(path)}
-                isActive={pathname?.includes(path)}
-              />
-            ))}
+            {items.map(({ name, path }: any) => {
+              if (name == "div") {
+                return <Divider key={name} />;
+              } else {
+                return (
+                  <SidebarSubMenuItem
+                    key={name}
+                    name={name}
+                    onClick={() => push(path)}
+                    isActive={pathname?.includes(path)}
+                  />
+                );
+              }
+            })}
           </ul>
         </AnimateHeight>
       </div>
