@@ -6,4 +6,5 @@ export type Props = {
   icon?: ReactNode;
   isActive?: boolean;
   withSubMenu?: boolean;
+  isOpen?: boolean;
 };

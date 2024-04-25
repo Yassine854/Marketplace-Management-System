@@ -107,6 +107,16 @@ input:checked + div svg {
   input[type="date"]::-webkit-calendar-picker-indicator {
     display: none;
   }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }
 
 table thead tr th:first-of-type {
