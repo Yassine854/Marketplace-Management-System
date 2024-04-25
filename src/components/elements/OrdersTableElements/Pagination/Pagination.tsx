@@ -27,7 +27,7 @@ const Pagination = ({
   }
 
   return (
-    <div className="col-span-12 flex flex-wrap items-center justify-center gap-4 sm:justify-between">
+    <div className="sticky bottom-0 z-10 col-span-12 flex h-16 flex-wrap items-center justify-center gap-4 bg-n10 sm:justify-between">
       <Dropdown
         selected={itemsPerPage.toString()}
         setSelected={(item) => {

@@ -70,6 +70,8 @@ export const useOrdersTable = (status: string): any => {
   const endIndex = Math.min(startIndex + itemsPerPage - 1, data?.total - 1);
 
   useEffect(() => {
+    console.log("🚀 ~ useOrdersTable ~ data:", data);
+
     setOrders(data?.orders);
   }, [data]);
 
