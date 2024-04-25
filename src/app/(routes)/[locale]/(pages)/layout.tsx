@@ -1,4 +1,3 @@
-import Footer from "@/components/blocks/Footer";
 import { ReactNode } from "react";
 import Sidebar from "@/components/blocks/Sidebar";
 import TopNavBar from "@/components/blocks/TopNavBar";
@@ -13,10 +12,9 @@ const PagesLayout = ({ children }: Props) => {
       <TopNavBar />
       <Sidebar />
       <div className="flex h-screen w-screen flex-col bg-n30 pl-[280px] pt-[70px]  dark:bg-bg3   ">
-        <div className=" flex flex-grow flex-col overflow-x-hidden p-4 ">
+        <div className=" flex flex-grow flex-col overflow-x-hidden p-3 ">
           {children}
         </div>
-        <Footer />
       </div>
     </>
   );
