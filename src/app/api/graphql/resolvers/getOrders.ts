@@ -25,7 +25,7 @@ export const getOrders = async ({
   page,
   perPage,
 }: GetOrdersParams): Promise<
-  { orders: Order[]; total: number } | undefined
+  { orders: Order[]; totalOrders: number } | undefined
 > => {
   try {
     const searchParameters = {
@@ -43,7 +43,7 @@ export const getOrders = async ({
 
     return {
       orders,
-      total: typesenseResponse.found,
+      totalOrders: typesenseResponse.found,
     };
   } catch (error) {
     console.error("🚀 ~  getOrders error:", error);

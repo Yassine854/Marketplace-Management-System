@@ -13,7 +13,7 @@ const rows = [
 
 const OrdersTableHead = ({ onSortClick }: any) => {
   return (
-    <thead className=" sticky top-0 z-10 bg-n30">
+    <thead className=" sticky top-0 z-10 rounded-xl bg-n30">
       <tr className=" font-semibold ">
         <td className="w-14">
           <div className="flex cursor-pointer select-none items-center justify-center gap-1 bg-primary/5 px-3 py-5 dark:bg-bg3">

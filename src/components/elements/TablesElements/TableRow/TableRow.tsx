@@ -5,9 +5,8 @@ import { defaultProps } from "./TableRow.defaultProps";
 
 const TableRow = ({
   order = defaultProps.order,
-  onClick = defaultProps.onClick,
+  onClick = defaultProps.onClick, //key,
 }: Props) => {
-  console.log("🚀 ~ order:", order);
   return (
     <tr
       className="cursor-pointer even:bg-primary/5 hover:bg-n30 dark:even:bg-bg3"

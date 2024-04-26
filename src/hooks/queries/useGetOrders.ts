@@ -1,9 +1,23 @@
 import { gql, useQuery } from "@apollo/client";
 
+import { ApolloError } from "@apollo/client";
+import { Order } from "@/types/order";
+
 export type Params = {
   status: string;
   page: number;
   perPage: number;
+};
+
+type Orders = {
+  orders: Order[];
+  total: number;
+};
+
+type Res = {
+  data: Orders;
+  error: ApolloError | undefined;
+  isLoading: boolean;
 };
 
 const QUERY = gql`
@@ -12,12 +26,13 @@ const QUERY = gql`
       orders {
         id
         deliveryDate
+        total
         customer {
           id
           name
         }
       }
-      total
+      totalOrders
     }
   }
 `;
@@ -31,5 +46,9 @@ export const useGetOrders = ({ status, page, perPage }: Params) => {
     },
   });
 
-  return { data: data?.getOrders, isLoading: loading, error };
+  return {
+    data: data?.getOrders,
+    isLoading: loading,
+    error,
+  };
 };

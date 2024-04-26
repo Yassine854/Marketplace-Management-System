@@ -14,11 +14,9 @@ const SidebarSubMenu = ({
   name,
   icon,
 }: any) => {
-  console.log("🚀 ~ items:", items);
   const pathname = usePathname();
   const { push } = useRouter();
 
-  console.log(pathname?.includes(items[1].path));
   const [isOpen, setIsOpen] = useState(isActive);
 
   useEffect(() => {

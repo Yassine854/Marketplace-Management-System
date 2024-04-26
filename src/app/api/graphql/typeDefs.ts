@@ -2,7 +2,7 @@ import { gql } from "graphql-tag";
 
 export const typeDefs = gql`
   type Query {
-    getOrders(status: String!, page: Int!, perPage: Int!): OrderList
+    getOrders(status: String!, page: Int!, perPage: Int!): OrderList!
   }
 
   type Order {
@@ -19,6 +19,6 @@ export const typeDefs = gql`
 
   type OrderList {
     orders: [Order]!
-    total: Int!
+    totalOrders: Int!
   }
 `;
