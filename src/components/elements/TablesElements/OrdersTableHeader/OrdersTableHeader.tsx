@@ -2,7 +2,7 @@
 
 import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import { Props } from "./OrdersTableHeader.types";
-import SearchBar from "@/components/elements/OrdersTableElements/SearchBar";
+import SearchBar from "@/components/elements/TablesElements/SearchBar";
 import { useState } from "react";
 const options = ["Customer", "Total", "Delivery Date"];
 

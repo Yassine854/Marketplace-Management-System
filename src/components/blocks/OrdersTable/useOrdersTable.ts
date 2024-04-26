@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useGetOrders } from "./queries/useGetOrders";
+import { useGetOrders } from "@/hooks/queries/useGetOrders";
 
 type Order = "ASC" | "DSC";
 
@@ -68,12 +68,6 @@ export const useOrdersTable = (status: string): any => {
   const totalPages = Math.ceil(data?.total / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage - 1, data?.total - 1);
-
-  useEffect(() => {
-    console.log("🚀 ~ useOrdersTable ~ data:", data);
-
-    setOrders(data?.orders);
-  }, [data]);
 
   return {
     orders,

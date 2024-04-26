@@ -1,6 +1,6 @@
-import CheckboxCustom from "@/components/elements/OrdersTableElements/Checkbox";
+import CheckboxCustom from "@/components/elements/TablesElements/Checkbox";
 import { Props } from "./TableRow.types";
-import TableActions from "@/components/elements/OrdersTableElements/TableActions";
+import TableActions from "@/components/elements/TablesElements/TableActions";
 import { defaultProps } from "./TableRow.defaultProps";
 
 const TableRow = ({

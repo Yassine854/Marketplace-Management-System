@@ -1,14 +1,15 @@
 "use client";
 
-import AnyMatchingResults from "@/components/elements/OrdersTableElements/AnyMatchingResults";
+import AnyMatchingResults from "@/components/elements/TablesElements/AnyMatchingResults";
 import Box from "../Box";
 import { Order } from "@/types/order";
-import OrdersTableHead from "@/components/elements/OrdersTableElements/OrdersTableHead";
-import OrdersTableHeader from "@/components/elements/OrdersTableElements/OrdersTableHeader";
-import Pagination from "@/components/elements/OrdersTableElements/Pagination";
-import TableRow from "@/components/elements/OrdersTableElements/TableRow";
-import TableRowSkeleton from "@/components/elements/OrdersTableElements/TableRowSkeleton";
-import { useOrdersTable } from "@/hooks/useOrdersTable";
+import OrdersTableHead from "@/components/elements/TablesElements/OrdersTableHead";
+import OrdersTableHeader from "@/components/elements/TablesElements/OrdersTableHeader";
+import Pagination from "@/components/elements/TablesElements/Pagination";
+import TableRow from "@/components/elements/TablesElements/TableRow";
+import TableRowSkeleton from "@/components/elements/TablesElements/TableRowSkeleton";
+import { useOrdersTable } from "./useOrdersTable";
+
 const OrdersTable = ({ status = "open" }: { status?: string }) => {
   const title = status.toString() + " " + "Orders";
   const {
@@ -25,7 +26,6 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
     itemsPerPage,
     setItemsPerPage,
   } = useOrdersTable(status);
-  console.log("🚀 ~ OrdersTable ~ orders:", orders);
 
   const skeleton = Array.apply(null, Array(itemsPerPage)).map((e, i) => {
     i: i;
