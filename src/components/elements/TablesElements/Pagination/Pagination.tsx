@@ -1,6 +1,6 @@
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 
-import Dropdown from "../../sharedElements/Dropdown";
+import ItemsPerPageSelector from "@/components/elements/TablesElements/ItemsPerPageSelector";
 import { Props } from "./Pagination.types";
 import cn from "@/utils/cn";
 
@@ -27,13 +27,12 @@ const Pagination = ({
   }
 
   return (
-    <div className="sticky bottom-0 z-10 col-span-12 flex h-16 flex-wrap items-center justify-center gap-4 bg-n10 sm:justify-between">
-      <Dropdown
+    <div className=" col-span-12 flex h-20 flex-wrap items-center justify-center gap-4 bg-n10 p-4 sm:justify-between">
+      <ItemsPerPageSelector
         selected={itemsPerPage.toString()}
-        setSelected={(item) => {
-          setItemsPerPage(Number(item));
+        setSelected={(item: number) => {
+          setItemsPerPage(item);
         }}
-        items={options}
       />
       <p>
         Showing {startIndex + 1} to {endIndex + 1} of {total} entries

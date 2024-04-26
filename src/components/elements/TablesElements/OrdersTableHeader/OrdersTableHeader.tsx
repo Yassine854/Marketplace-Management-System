@@ -10,7 +10,7 @@ const OrdersTableHeader = ({ handleSearch, title }: Props) => {
   const [selected, setSelected] = useState(options[0]);
 
   return (
-    <div className="bb-dashed sticky top-0 z-10 mb-6 flex w-full flex-wrap items-center justify-between gap-3 bg-n10 p-4 pb-6">
+    <div className="bb-dashed sticky top-0 z-10 mb-6 flex h-20 w-full flex-wrap items-center justify-between gap-3 bg-n10 p-4 pb-6">
       <p className="text-xl font-bold capitalize">{title}</p>
       <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
         <SearchBar handleSearch={() => {}} />
