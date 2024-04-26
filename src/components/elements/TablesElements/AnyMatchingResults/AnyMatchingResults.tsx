@@ -4,7 +4,7 @@ import { IconSearch } from "@tabler/icons-react";
 
 const AnyMatchingResults = () => {
   return (
-    <div className="py-10 text-center">
+    <div className="flex flex-grow items-center  justify-center  py-10 text-center">
       <div className="mx-auto max-w-[500px] flex-col items-center text-center max-md:flex">
         <div className="mb-5 flex justify-center">
           <IconSearch size={60} className="text-primary" />

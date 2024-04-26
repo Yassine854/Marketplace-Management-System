@@ -4,8 +4,6 @@ import ItemsPerPageSelector from "@/components/elements/TablesElements/ItemsPerP
 import { Props } from "./Pagination.types";
 import cn from "@/utils/cn";
 
-const options = ["10", "25", "50", "100"];
-
 const Pagination = ({
   totalPages,
   currentPage,
@@ -27,12 +25,10 @@ const Pagination = ({
   }
 
   return (
-    <div className=" col-span-12 flex h-20 flex-wrap items-center justify-center gap-4 bg-n10 p-4 sm:justify-between">
+    <div className="  col-span-12 flex h-20 flex-wrap items-center justify-center gap-4 bg-n10  p-4 sm:justify-between">
       <ItemsPerPageSelector
-        selected={itemsPerPage.toString()}
-        setSelected={(item: number) => {
-          setItemsPerPage(item);
-        }}
+        selected={itemsPerPage}
+        setSelected={setItemsPerPage}
       />
       <p>
         Showing {startIndex + 1} to {endIndex + 1} of {total} entries

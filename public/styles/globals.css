@@ -64,7 +64,10 @@
   }
 
   .bb-dashed {
-    @apply border-b border-dashed border-primary/20;
+    @apply border-b-4  border-dashed border-primary/20;
+  }
+  .bt-dashed {
+    @apply border-t-4 border-dashed border-primary/20;
   }
 }
 
