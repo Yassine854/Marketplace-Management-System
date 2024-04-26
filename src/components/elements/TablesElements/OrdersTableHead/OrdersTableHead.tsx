@@ -4,11 +4,13 @@ import Checkbox from "../Checkbox";
 import { IconSelector } from "@tabler/icons-react";
 
 const rows = [
-  { name: "ID", isSortable: false },
-  { name: "Customer", isSortable: true },
-  { name: "Total", isSortable: true },
-  { name: "Delivery Date", isSortable: true },
-  { name: "Actions", isSortable: false },
+  { name: "ID", key: "id", isSortable: false },
+  { name: "Customer", key: "customer", isSortable: true },
+  { name: "Total", key: "total", isSortable: true },
+  { name: "Delivery Date", key: "deliveryDate", isSortable: true },
+  { name: "Print", key: "print", isSortable: false },
+  { name: "From Mobile", key: "mobile", isSortable: false },
+  { name: "Actions", key: "actions", isSortable: false },
 ];
 
 const OrdersTableHead = ({ onSortClick }: any) => {

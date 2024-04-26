@@ -10,7 +10,7 @@ export type GetOrdersParams = {
 const createOrdersList = (typesenseHits: any): Order[] =>
   typesenseHits.map(
     ({ document }: any): Order => ({
-      id: document.entity_id,
+      id: document.extension_attributes.kamioun_order_id,
       customer: {
         id: document.customer_id,
         name: document.customer_firstname + " " + document.customer_lastname,
