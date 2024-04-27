@@ -21,7 +21,7 @@ export const useSidebarOrdersSubMenu = (isActive: boolean) => {
   });
 
   const { data: readyOrders } = useGetOrders({
-    status: "ready",
+    status: "shipped",
     page: 1,
     perPage: 10,
   });
@@ -31,9 +31,9 @@ export const useSidebarOrdersSubMenu = (isActive: boolean) => {
   }, [isActive]);
 
   return {
-    openOrdersCount: openOrders?.total,
-    validOrdersCount: validOrders?.total,
-    readyOrdersCount: readyOrders?.total,
+    openOrdersCount: openOrders?.totalOrders,
+    validOrdersCount: validOrders?.totalOrders,
+    readyOrdersCount: readyOrders?.totalOrders,
     isOpen,
     setIsOpen,
     push,

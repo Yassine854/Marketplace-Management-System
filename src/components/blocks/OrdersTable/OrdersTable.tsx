@@ -10,10 +10,22 @@ import { useOrdersTable } from "./useOrdersTable";
 
 const OrdersTable = ({ status = "open" }: { status?: string }) => {
   const title = status.toString() + " " + "Orders";
+
+  const setStatus = (status: string): string => {
+    if (status == "ready") {
+      return "shipped";
+    }
+    if (status == "all") {
+      return "";
+    }
+
+    return status;
+  };
+
   const {
     currentPage,
     paginate,
-    total,
+    totalOrders,
     totalPages,
     nextPage,
     prevPage,
@@ -23,11 +35,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
     isLoading,
     itemsPerPage,
     setItemsPerPage,
-  } = useOrdersTable(status);
-
-  useEffect(() => {
-    console.log("🚀 ~ OrdersTable ~ orders:", orders);
-  }, [orders]);
+  } = useOrdersTable(setStatus(status));
 
   return (
     <Box>
@@ -39,10 +47,10 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
         <OrdersTableBody isLoading={isLoading} orders={orders} error={""} />
       </div>
       <div className={tailwind.footer}>
-        {orders?.length > 0 && (
+        {orders?.length !== 0 && (
           <Pagination
             endIndex={endIndex}
-            total={total}
+            totalOrders={totalOrders}
             totalPages={totalPages}
             currentPage={currentPage}
             goToPage={paginate}

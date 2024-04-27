@@ -1,11 +1,15 @@
+import { useEffect, useState } from "react";
+
 import { useGetOrders } from "@/hooks/queries/useGetOrders";
-import { useState } from "react";
 
 type PaginateFunction = (page: number) => void;
 
 export const useOrdersTable = (status: string): any => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [startIndex, setStartIndex] = useState<number>(0);
+  const [endIndex, setEndIndex] = useState<number>(0);
 
   const { data, isLoading } = useGetOrders({
     status: status,
@@ -28,9 +32,35 @@ export const useOrdersTable = (status: string): any => {
     }
   };
 
-  const totalPages = Math.ceil(data?.total / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage - 1, data?.total - 1);
+  useEffect(() => {
+    const newTotalPages = Math.ceil(data?.totalOrders / itemsPerPage);
+    const newStartIndex = (currentPage - 1) * itemsPerPage;
+    const newEndIndex = Math.min(
+      startIndex + itemsPerPage - 1,
+      data?.totalOrders - 1,
+    );
+
+    if (data && newTotalPages !== totalPages) {
+      setTotalPages(newTotalPages);
+    }
+
+    if (data && newStartIndex !== startIndex) {
+      setStartIndex(newStartIndex);
+    }
+
+    if (data && newEndIndex !== endIndex) {
+      setEndIndex(newEndIndex);
+    }
+  }, [
+    data,
+    itemsPerPage,
+    totalPages,
+    currentPage,
+    setStartIndex,
+    startIndex,
+    endIndex,
+    setEndIndex,
+  ]);
 
   return {
     orders: data?.orders,
@@ -42,8 +72,12 @@ export const useOrdersTable = (status: string): any => {
     prevPage,
     startIndex,
     endIndex,
-    total: data?.totalOrders,
+    totalOrders: data?.totalOrders,
     isLoading,
-    setItemsPerPage,
+    setItemsPerPage: (numberOfItems: number) => {
+      const newCurrentPage = Math.ceil(startIndex / numberOfItems);
+      setCurrentPage(newCurrentPage + 1);
+      setItemsPerPage(numberOfItems);
+    },
   };
 };

@@ -6,7 +6,7 @@ export type Props = {
   prevPage: () => void;
   startIndex: number;
   endIndex: number;
-  total: number;
+  totalOrders: number;
   itemsPerPage: number;
   setItemsPerPage: (num: number) => void;
 };

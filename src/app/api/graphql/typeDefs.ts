@@ -6,15 +6,15 @@ export const typeDefs = gql`
   }
 
   type Order {
-    id: String!
-    customer: Customer!
-    total: Float!
+    id: String
+    customer: Customer
+    total: Float
     deliveryDate: String
   }
 
   type Customer {
     name: String!
-    id: String!
+    id: String
   }
 
   type OrderList {

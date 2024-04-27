@@ -8,7 +8,7 @@ const Pagination = ({
   totalPages,
   currentPage,
   goToPage,
-  total,
+  totalOrders,
   startIndex,
   endIndex,
   nextPage,
@@ -30,9 +30,11 @@ const Pagination = ({
         selected={itemsPerPage}
         setSelected={setItemsPerPage}
       />
-      <p>
-        Showing {startIndex + 1} to {endIndex + 1} of {total} entries
-      </p>
+      {!!totalOrders && (
+        <p>
+          Showing {startIndex + 1} to {endIndex + 1} of {totalOrders} entries
+        </p>
+      )}
 
       <ul className="flex flex-wrap items-center gap-2 md:gap-3 md:font-semibold">
         <li>
