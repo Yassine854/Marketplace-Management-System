@@ -1,13 +1,9 @@
 "use client";
 
-import AnyMatchingResults from "@/components/elements/TablesElements/AnyMatchingResults";
 import Box from "../Box";
-import { Order } from "@/types/order";
-import OrdersTableHead from "@/components/elements/TablesElements/OrdersTableHead";
+import OrdersTableBody from "@/components/elements/TablesElements/OrdersTableBody";
 import OrdersTableHeader from "@/components/elements/TablesElements/OrdersTableHeader";
 import Pagination from "@/components/elements/TablesElements/Pagination";
-import TableRow from "@/components/elements/TablesElements/TableRow";
-import TableRowSkeleton from "@/components/elements/TablesElements/TableRowSkeleton";
 import { tailwind } from "./OrdersTable.styles";
 import { useEffect } from "react";
 import { useOrdersTable } from "./useOrdersTable";
@@ -40,51 +36,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
       </div>
 
       <div className={tailwind.main}>
-        <>
-          {!isLoading && !!orders?.length && (
-            <table
-              border={0}
-              cellPadding={0}
-              cellSpacing={0}
-              className="w-full border-separate overflow-x-scroll whitespace-nowrap border-none pb-16 pt-2 "
-            >
-              <OrdersTableHead />
-
-              {!isLoading && (
-                <tbody>
-                  {orders?.map((order: Order) => (
-                    <TableRow order={order} key={order.id} onClick={() => {}} />
-                  ))}
-                </tbody>
-              )}
-              {isLoading && (
-                <tbody>
-                  {[...Array(10)].map((_, i) => (
-                    <TableRowSkeleton key={i} number={6} />
-                  ))}
-                </tbody>
-              )}
-            </table>
-          )}
-        </>
-        <>
-          {isLoading && (
-            <table
-              border={0}
-              cellPadding={0}
-              cellSpacing={0}
-              className="w-full border-separate overflow-x-scroll whitespace-nowrap border-none pb-16 pt-2 "
-            >
-              <OrdersTableHead />
-              <tbody>
-                {[...Array(10)].map((_, i) => (
-                  <TableRowSkeleton key={i} number={6} />
-                ))}
-              </tbody>
-            </table>
-          )}
-        </>
-        <> {!isLoading && !orders?.length && <AnyMatchingResults />}</>
+        <OrdersTableBody isLoading={isLoading} orders={orders} error={""} />
       </div>
       <div className={tailwind.footer}>
         {orders?.length > 0 && (
