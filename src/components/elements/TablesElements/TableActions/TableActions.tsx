@@ -1,11 +1,15 @@
 import { IconDotsVertical } from "@tabler/icons-react";
 import useDropdown from "@/hooks/useDropdown";
-const actions = [
-  { name: "Generate Pick List", key: "picklist" },
-  { name: "Print BL's", key: "bl" },
-  { name: "Manage Milk-Runs", key: "mr" },
-];
-const TableActions = ({ fromBottom }: { fromBottom?: boolean }) => {
+
+const TableActions = ({
+  fromBottom,
+  actions,
+  orderId,
+}: {
+  fromBottom?: boolean;
+  actions: any;
+  orderId: any;
+}) => {
   const { open, ref, toggleOpen } = useDropdown();
 
   return (
@@ -27,7 +31,12 @@ const TableActions = ({ fromBottom }: { fromBottom?: boolean }) => {
       >
         {actions.map((e: any, i: number) => {
           return (
-            <li key={i}>
+            <li
+              key={i}
+              onClick={() => {
+                e.action(orderId);
+              }}
+            >
               <button className="block rounded-md px-3 py-1.5 duration-300 hover:bg-primary hover:text-n30">
                 {e.name}
               </button>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 import { useGetOrders } from "@/hooks/queries/useGetOrders";
-import { useRouter } from "next/navigation";
 
 type PaginateFunction = (page: number) => void;
 
@@ -12,6 +12,8 @@ const sortOptions = [
 
 export const useOrdersTable = (status: string): any => {
   const { push } = useRouter();
+  const pathname = usePathname();
+  console.log("🚀 ~ useOrdersTable ~ pathname:", pathname);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
@@ -23,7 +25,18 @@ export const useOrdersTable = (status: string): any => {
   const [search, setSearch] = useState("");
   const [orders, setOrders] = useState([]);
   const [selectedOrders, setSelectedOrders] = useState([]);
-
+  const actions = [
+    {
+      name: "Edit",
+      key: "edit",
+      action: (id: any) => {
+        push("/order/" + id);
+      },
+    },
+    { name: "Generate Pick List", key: "picklist", action: () => {} },
+    { name: "Print BL's", key: "bl", action: () => {} },
+    { name: "Manage Milk-Runs", key: "mr", action: () => {} },
+  ];
   const { data, isLoading } = useGetOrders({
     status: status,
     page: currentPage,
@@ -33,7 +46,7 @@ export const useOrdersTable = (status: string): any => {
   });
 
   const onRowClick = (id: any) => {
-    push("/orders/" + status + "/" + id);
+    push("/order/" + id);
   };
   const paginate: PaginateFunction = (page) => {
     setCurrentPage(page);
@@ -151,6 +164,7 @@ export const useOrdersTable = (status: string): any => {
     selectOrder,
     unSelectOrder,
     selectedOrders,
+    actions,
     onRowClick,
     setItemsPerPage: (numberOfItems: number) => {
       const newCurrentPage = Math.ceil(startIndex / numberOfItems);

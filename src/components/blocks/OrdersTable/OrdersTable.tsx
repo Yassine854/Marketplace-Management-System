@@ -47,6 +47,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
     selectOrder,
     unSelectOrder,
     onRowClick,
+    actions,
   } = useOrdersTable(setStatus(status));
 
   return (
@@ -75,6 +76,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
           unSelectAllOrders={unSelectAllOrders}
           selectOrder={selectOrder}
           unSelectOrder={unSelectOrder}
+          actions={actions}
         />
       </div>
       <div className={tailwind.footer}>

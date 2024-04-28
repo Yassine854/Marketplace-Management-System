@@ -17,6 +17,7 @@ const OrdersTableBody = ({
   selectOrder,
   unSelectOrder,
   onRowClick,
+  actions,
 }: any) => {
   return (
     <>
@@ -40,6 +41,7 @@ const OrdersTableBody = ({
             {!isLoading &&
               orders?.map((order: Order, i: number) => (
                 <TableRow
+                  actions={actions}
                   order={order}
                   key={order.id}
                   onClick={() => onRowClick(order.id)}

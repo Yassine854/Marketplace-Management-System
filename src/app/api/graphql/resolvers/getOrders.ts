@@ -1,6 +1,5 @@
 import { Order } from "@/types/order";
 import { typesenseClient } from "@/libs/typesenseClient";
-import { useSearchParams } from "next/navigation";
 
 export type GetOrdersParams = {
   status: string;
