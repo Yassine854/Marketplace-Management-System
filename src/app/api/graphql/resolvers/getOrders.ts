@@ -1,5 +1,6 @@
 import { Order } from "@/types/order";
 import { typesenseClient } from "@/libs/typesenseClient";
+import { useSearchParams } from "next/navigation";
 
 export type GetOrdersParams = {
   status: string;
@@ -33,19 +34,28 @@ export const getOrders = async ({
   { orders: Order[]; totalOrders: number } | undefined
 > => {
   try {
-    const searchParameters = {
+    let searchParams;
+    const searchParamsWithoutFilter = {
       q: search,
       query_by: "customer_firstname",
-      filter_by: `status:= ${status}`,
       page: page,
       per_page: perPage,
       sort_by: sortBy,
     };
 
+    if (status) {
+      const filter = {
+        filter_by: "status:= " + status,
+      };
+      searchParams = Object.assign(searchParamsWithoutFilter, filter);
+    } else {
+      searchParams = searchParamsWithoutFilter;
+    }
+
     const typesenseResponse = await typesenseClient
       .collections("orders")
       .documents()
-      .search(searchParameters);
+      .search(searchParams);
 
     const orders: Order[] = createOrdersList(typesenseResponse?.hits);
 
@@ -54,6 +64,6 @@ export const getOrders = async ({
       totalOrders: typesenseResponse.found,
     };
   } catch (error) {
-    console.error("🚀 ~  getOrders error:", error);
+    console.error(error);
   }
 };

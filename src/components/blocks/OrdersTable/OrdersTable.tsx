@@ -16,7 +16,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
       return "shipped";
     }
     if (status == "all") {
-      return " ";
+      return "";
     }
 
     return status;
