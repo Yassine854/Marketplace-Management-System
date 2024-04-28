@@ -19,6 +19,7 @@ const createOrdersList = (typesenseHits: any): Order[] =>
       },
       total: document.subtotal,
       deliveryDate: document.extension_attributes.delivery_date,
+      isSelected: false,
     }),
   );
 

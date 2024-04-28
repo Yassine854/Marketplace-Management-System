@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useGetOrders } from "@/hooks/queries/useGetOrders";
+import { useRouter } from "next/navigation";
 
 type PaginateFunction = (page: number) => void;
 
@@ -10,6 +11,8 @@ const sortOptions = [
 ];
 
 export const useOrdersTable = (status: string): any => {
+  const { push } = useRouter();
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -29,6 +32,9 @@ export const useOrdersTable = (status: string): any => {
     search: search,
   });
 
+  const onRowClick = (id: any) => {
+    push("/orders/" + status + "/" + id);
+  };
   const paginate: PaginateFunction = (page) => {
     setCurrentPage(page);
   };
@@ -51,6 +57,7 @@ export const useOrdersTable = (status: string): any => {
     });
     setOrders(orders);
     orders.forEach((order: any) => {
+      //@ts-ignore
       setSelectedOrders((e) => [...e, order.id]);
     });
   };
@@ -58,11 +65,14 @@ export const useOrdersTable = (status: string): any => {
     const orders = data.orders.map((order: any) => {
       return { ...order, isSelected: false };
     });
+    //@ts-ignore
     setOrders([...orders]);
     setSelectedOrders([]);
   };
 
   const selectOrder = (id: any) => {
+    //@ts-ignore
+
     setSelectedOrders((list) => [...list, id]);
   };
   const unSelectOrder = (id: any) => {
@@ -104,12 +114,16 @@ export const useOrdersTable = (status: string): any => {
   useEffect(() => {
     if (data) {
       const orders = data.orders.map((order: any, i: number) => {
+        //@ts-ignore
+
         if (selectedOrders.includes(order.id)) {
           return { ...order, isSelected: true };
         } else {
           return { ...order, isSelected: false };
         }
       });
+      //@ts-ignore
+
       setOrders([...orders]);
     }
   }, [data, selectedOrders]);
@@ -137,6 +151,7 @@ export const useOrdersTable = (status: string): any => {
     selectOrder,
     unSelectOrder,
     selectedOrders,
+    onRowClick,
     setItemsPerPage: (numberOfItems: number) => {
       const newCurrentPage = Math.ceil(startIndex / numberOfItems);
       setCurrentPage(newCurrentPage + 1);

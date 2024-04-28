@@ -1,10 +1,7 @@
 import { IconPdf, IconTruck } from "@tabler/icons-react";
 
 import CheckboxCustom from "@/components/elements/TablesElements/Checkbox";
-import { Props } from "./TableRow.types";
 import TableActions from "@/components/elements/TablesElements/TableActions";
-import { defaultProps } from "./TableRow.defaultProps";
-import { useEffect } from "react";
 
 const RowItem = ({ content }: any) => (
   <td>
@@ -13,15 +10,10 @@ const RowItem = ({ content }: any) => (
 );
 
 const TableRow = ({ order, onClick, onCheckClick }: any) => {
-  useEffect(() => {
-    console.log("🚀 ~ TableRow ~ order:", order.isSelected);
-  }, [order]);
   return (
     <tr
       className="cursor-pointer even:bg-primary/5 hover:bg-n30 dark:even:bg-bg3"
-      onClick={() => {
-        //onClick(order.id);
-      }}
+      onClick={onClick}
     >
       <RowItem
         content={

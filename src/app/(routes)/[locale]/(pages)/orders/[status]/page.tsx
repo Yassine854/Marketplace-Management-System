@@ -1,8 +1,9 @@
 import OrdersTable from "@/components/blocks/OrdersTable";
-const OrdersPage = ({ params }: { params: { order: string } }) => {
+
+const OrdersPage = ({ params }: { params: { status: string } }) => {
   return (
     <>
-      <OrdersTable status={params.order} />
+      <OrdersTable status={params.status} />
     </>
   );
 };

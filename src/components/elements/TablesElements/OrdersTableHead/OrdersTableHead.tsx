@@ -36,7 +36,7 @@ const OrdersTableHead = ({
               {isSelected ? "Unselect All" : "Select All"}
             </div>
             <Checkbox
-              onClick={(isChecked) => {
+              onClick={(isChecked: boolean) => {
                 isChecked ? selectAllOrders() : unSelectAllOrders();
                 setIsSelected(isChecked);
               }}

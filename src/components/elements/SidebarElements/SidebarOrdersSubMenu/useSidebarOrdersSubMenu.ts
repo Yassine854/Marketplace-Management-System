@@ -12,18 +12,24 @@ export const useSidebarOrdersSubMenu = (isActive: boolean) => {
     status: "open",
     page: 1,
     perPage: 10,
+    search: "",
+    sortBy: "",
   });
 
   const { data: validOrders } = useGetOrders({
     status: "valid",
     page: 1,
     perPage: 10,
+    sortBy: "",
+    search: "",
   });
 
   const { data: readyOrders } = useGetOrders({
     status: "shipped",
     page: 1,
     perPage: 10,
+    search: "",
+    sortBy: "",
   });
 
   useEffect(() => {

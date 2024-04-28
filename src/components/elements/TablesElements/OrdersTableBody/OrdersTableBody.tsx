@@ -16,6 +16,7 @@ const OrdersTableBody = ({
   unSelectAllOrders,
   selectOrder,
   unSelectOrder,
+  onRowClick,
 }: any) => {
   return (
     <>
@@ -41,6 +42,7 @@ const OrdersTableBody = ({
                 <TableRow
                   order={order}
                   key={order.id}
+                  onClick={() => onRowClick(order.id)}
                   onCheckClick={(isChecked: boolean) => {
                     if (isChecked) {
                       selectOrder(order.id);

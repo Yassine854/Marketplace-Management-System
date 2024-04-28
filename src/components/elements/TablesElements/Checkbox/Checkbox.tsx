@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Props } from "./Checkbox.types";
 
-const Checkbox = ({ label, img, isChecked = false, onClick }: Props) => {
+const Checkbox = ({ label, img, isChecked = false, onClick }: any) => {
   const [checked, setChecked] = useState(isChecked);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const Checkbox = ({ label, img, isChecked = false, onClick }: Props) => {
         value={label}
         defaultChecked={checked}
         onChange={() => {
-          setChecked((e) => !e);
+          setChecked((e: boolean) => !e);
         }}
         className="absolute  h-8 w-8 cursor-pointer bg-blue-500 opacity-0"
         checked={checked}

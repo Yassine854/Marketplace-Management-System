@@ -16,7 +16,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
       return "shipped";
     }
     if (status == "all") {
-      return "";
+      return " ";
     }
 
     return status;
@@ -46,6 +46,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
     unSelectAllOrders,
     selectOrder,
     unSelectOrder,
+    onRowClick,
   } = useOrdersTable(setStatus(status));
 
   return (
@@ -63,6 +64,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
 
       <div className={tailwind.main}>
         <OrdersTableBody
+          onRowClick={onRowClick}
           isLoading={isLoading}
           orders={orders}
           error={""}

@@ -8,7 +8,7 @@ export const defaultProps: Props = {
   prevPage: () => {},
   startIndex: 1,
   endIndex: 50,
-  total: 10,
+  totalOrders: 10,
   itemsPerPage: 10,
   setItemsPerPage: () => {},
 };
