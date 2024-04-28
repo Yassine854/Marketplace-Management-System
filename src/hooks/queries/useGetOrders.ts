@@ -8,6 +8,7 @@ export type Params = {
   page: number;
   perPage: number;
   sortBy: string;
+  search: string;
 };
 
 type Orders = {
@@ -27,12 +28,14 @@ const QUERY = gql`
     $page: Int!
     $perPage: Int!
     $sortBy: String!
+    $search: String!
   ) {
     getOrders(
       status: $status
       page: $page
       perPage: $perPage
       sortBy: $sortBy
+      search: $search
     ) {
       orders {
         id
@@ -48,13 +51,20 @@ const QUERY = gql`
   }
 `;
 
-export const useGetOrders = ({ status, page, perPage, sortBy }: Params) => {
+export const useGetOrders = ({
+  status,
+  page,
+  perPage,
+  sortBy,
+  search,
+}: Params) => {
   const { data, loading, error } = useQuery(QUERY, {
     variables: {
       status,
       page,
       perPage,
       sortBy,
+      search,
     },
   });
 

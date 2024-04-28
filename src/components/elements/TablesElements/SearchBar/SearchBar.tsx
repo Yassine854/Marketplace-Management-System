@@ -1,10 +1,15 @@
+import { useEffect, useState } from "react";
+
 import { IconSearch } from "@tabler/icons-react";
 
-const SearchBar = ({
-  handleSearch,
-}: {
-  handleSearch?: (term: string) => void;
-}) => {
+const SearchBar = ({ handleSearch }: any) => {
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    setTimeout(() => {
+      handleSearch(text);
+    }, 500);
+  }, [text, handleSearch]);
   return (
     <form
       onSubmit={(e) => e.preventDefault()}
@@ -12,7 +17,9 @@ const SearchBar = ({
     >
       <input
         type="text"
-        //  onChange=
+        onChange={(e: any) => {
+          setText(e.target.value);
+        }}
         placeholder="Search"
         className="w-full bg-transparent py-2 text-sm focus:outline-none"
       />

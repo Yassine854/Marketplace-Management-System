@@ -17,12 +17,14 @@ export const useOrdersTable = (status: string): any => {
   const [endIndex, setEndIndex] = useState<number>(0);
   const [sortBy, setSortBy] = useState({ name: "Total", key: "subtotal" });
   const [sortOrder, setSortOrder] = useState<string>("asc");
+  const [search, setSearch] = useState("");
 
   const { data, isLoading } = useGetOrders({
     status: status,
     page: currentPage,
     perPage: itemsPerPage,
     sortBy: sortBy.key + ":" + sortOrder,
+    search: search,
   });
 
   const paginate: PaginateFunction = (page) => {
@@ -84,6 +86,7 @@ export const useOrdersTable = (status: string): any => {
     isLoading,
     sortBy,
     sortOptions,
+    setSearch,
     sortOrder,
     setSortBy,
     setSortOrder,

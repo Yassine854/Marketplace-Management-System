@@ -12,8 +12,9 @@ const AnyMatchingResults = () => {
         <h3 className="h3 mb-3 lg:mb-6">No matching results</h3>
         <p>
           Looks like we couldn&nbsp;t find any matching results for your search
-          terms. Try other search terms.
+          terms.
         </p>
+        <p>Try other search terms.</p>
       </div>
     </div>
   );

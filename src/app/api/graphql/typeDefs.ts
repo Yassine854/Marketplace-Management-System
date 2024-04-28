@@ -7,6 +7,7 @@ export const typeDefs = gql`
       page: Int!
       perPage: Int!
       sortBy: String!
+      search: String!
     ): OrderList!
   }
 

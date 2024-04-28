@@ -6,6 +6,7 @@ export type GetOrdersParams = {
   page: number;
   perPage: number;
   sortBy: string;
+  search: string;
 };
 
 const createOrdersList = (typesenseHits: any): Order[] =>
@@ -26,12 +27,13 @@ export const getOrders = async ({
   sortBy,
   page,
   perPage,
+  search,
 }: GetOrdersParams): Promise<
   { orders: Order[]; totalOrders: number } | undefined
 > => {
   try {
     const searchParameters = {
-      q: "mohamed",
+      q: search,
       query_by: "customer_firstname",
       filter_by: `status:= ${status}`,
       page: page,

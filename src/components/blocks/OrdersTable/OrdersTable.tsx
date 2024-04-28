@@ -39,6 +39,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
     sortBy,
     setSortBy,
     setSortOrder,
+    setSearch,
   } = useOrdersTable(setStatus(status));
 
   return (
@@ -49,6 +50,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
           sortOptions={sortOptions}
           sortBy={sortBy}
           setSortBy={setSortBy}
+          setSearch={setSearch}
         />
       </div>
 
