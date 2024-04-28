@@ -9,7 +9,7 @@ const RowItem = ({ content }: any) => (
   </td>
 );
 
-const TableRow = ({ order, onClick, onCheckClick }: any) => {
+const TableRow = ({ order, onClick, onCheckClick, actions }: any) => {
   return (
     <tr
       className="cursor-pointer even:bg-primary/5 hover:bg-n30 dark:even:bg-bg3"
@@ -31,14 +31,21 @@ const TableRow = ({ order, onClick, onCheckClick }: any) => {
 
       <RowItem
         content={
-          <div className="rounded-full p-2 hover:bg-n10">
+          <div
+            className="rounded-full p-2 hover:bg-n10"
+            onClick={(event: any) => {
+              event.stopPropagation();
+            }}
+          >
             <IconPdf />
           </div>
         }
       />
 
       <RowItem content={<IconTruck color="red" />} />
-      <RowItem content={<TableActions />} />
+      <RowItem
+        content={<TableActions actions={actions} orderId={order.id} />}
+      />
     </tr>
   );
 };
