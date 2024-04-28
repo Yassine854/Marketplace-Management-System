@@ -4,6 +4,7 @@ import CheckboxCustom from "@/components/elements/TablesElements/Checkbox";
 import { Props } from "./TableRow.types";
 import TableActions from "@/components/elements/TablesElements/TableActions";
 import { defaultProps } from "./TableRow.defaultProps";
+import { useEffect } from "react";
 
 const RowItem = ({ content }: any) => (
   <td>
@@ -11,18 +12,22 @@ const RowItem = ({ content }: any) => (
   </td>
 );
 
-const TableRow = ({
-  order = defaultProps.order,
-  onClick = defaultProps.onClick, //key,
-}: Props) => {
+const TableRow = ({ order, onClick, onCheckClick }: any) => {
+  useEffect(() => {
+    console.log("🚀 ~ TableRow ~ order:", order.isSelected);
+  }, [order]);
   return (
     <tr
       className="cursor-pointer even:bg-primary/5 hover:bg-n30 dark:even:bg-bg3"
       onClick={() => {
-        onClick(order.id);
+        //onClick(order.id);
       }}
     >
-      <RowItem content={<CheckboxCustom />} />
+      <RowItem
+        content={
+          <CheckboxCustom isChecked={order.isSelected} onClick={onCheckClick} />
+        }
+      />
 
       <RowItem content={order.id} />
 
@@ -40,13 +45,7 @@ const TableRow = ({
         }
       />
 
-      <RowItem
-        content={
-          <div className="rounded-full p-2 hover:bg-n10">
-            <IconTruck color="red" />
-          </div>
-        }
-      />
+      <RowItem content={<IconTruck color="red" />} />
       <RowItem content={<TableActions />} />
     </tr>
   );

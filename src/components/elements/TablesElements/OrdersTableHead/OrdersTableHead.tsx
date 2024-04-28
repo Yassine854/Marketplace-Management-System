@@ -14,14 +14,34 @@ const rows = [
   { name: "Actions", key: "actions", isSortable: false },
 ];
 
-const OrdersTableHead = ({ onSortClick }: any) => {
+const OrdersTableHead = ({
+  onSortClick,
+  selectAllOrders,
+  unSelectAllOrders,
+}: any) => {
   const [sortOrder, setSortOrder] = useState("asc");
+  const [isSelected, setIsSelected] = useState(false);
   return (
     <thead className=" sticky top-0 z-10 rounded-xl bg-n30">
       <tr className=" font-semibold ">
         <td className="w-14">
-          <div className="flex cursor-pointer select-none items-center justify-center gap-1 bg-primary/5 px-3 py-5 dark:bg-bg3">
-            <Checkbox isChecked={false} />
+          <div className="group relative flex cursor-pointer select-none items-center justify-center gap-1 bg-primary/5 px-3 py-5 dark:bg-bg3">
+            <div
+              onClick={() => {
+                isSelected ? unSelectAllOrders() : selectAllOrders();
+                setIsSelected(!isSelected);
+              }}
+              className="absolute bottom-12 left-16 z-40 hidden  h-8 w-24 items-center justify-center rounded-lg bg-n10 p-2 text-center group-hover:flex"
+            >
+              {isSelected ? "Unselect All" : "Select All"}
+            </div>
+            <Checkbox
+              onClick={(isChecked) => {
+                isChecked ? selectAllOrders() : unSelectAllOrders();
+                setIsSelected(isChecked);
+              }}
+              isChecked={isSelected}
+            />
           </div>
         </td>
 

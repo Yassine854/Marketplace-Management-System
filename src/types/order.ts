@@ -6,6 +6,7 @@ const orderSchema = z.object({
   customer: customerSchema,
   total: z.number(),
   deliveryDate: z.string(),
+  isSelected: z.boolean(),
 });
 
 export type Order = z.infer<typeof orderSchema>;

@@ -12,6 +12,10 @@ const OrdersTableBody = ({
   error,
   setSortOrder,
   setSortBy,
+  selectAllOrders,
+  unSelectAllOrders,
+  selectOrder,
+  unSelectOrder,
 }: any) => {
   return (
     <>
@@ -26,13 +30,25 @@ const OrdersTableBody = ({
             setSortBy(sortBy);
             setSortOrder(sortOrder);
           }}
+          selectAllOrders={selectAllOrders}
+          unSelectAllOrders={unSelectAllOrders}
         />
 
         <tbody>
           <>
             {!isLoading &&
-              orders?.map((order: Order) => (
-                <TableRow order={order} key={order.id} onClick={() => {}} />
+              orders?.map((order: Order, i: number) => (
+                <TableRow
+                  order={order}
+                  key={order.id}
+                  onCheckClick={(isChecked: boolean) => {
+                    if (isChecked) {
+                      selectOrder(order.id);
+                    } else {
+                      unSelectOrder(order.id);
+                    }
+                  }}
+                />
               ))}
           </>
           <>

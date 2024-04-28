@@ -1,19 +1,33 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { Props } from "./Checkbox.types";
 
-const Checkbox = ({ label, img, isChecked, onChange }: Props) => {
+const Checkbox = ({ label, img, isChecked = false, onClick }: Props) => {
+  const [checked, setChecked] = useState(isChecked);
+
+  useEffect(() => {
+    setChecked(isChecked);
+  }, [isChecked]);
   return (
-    <div className="relative flex  items-center ">
+    <div
+      className="flex h-8 w-8 items-center justify-center rounded-full  pl-2 hover:bg-n70"
+      onClick={() => {
+        onClick(!checked);
+      }}
+    >
       <input
         type="checkbox"
         id={label}
         name="A3-confirmation"
         value={label}
-        onChange={onChange}
-        defaultChecked={isChecked}
-        className="absolute h-8 w-8 cursor-pointer opacity-0"
-        //checked={isChecked}
+        defaultChecked={checked}
+        onChange={() => {
+          setChecked((e) => !e);
+        }}
+        className="absolute  h-8 w-8 cursor-pointer bg-blue-500 opacity-0"
+        checked={checked}
       />
       <div className=" flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-400 bg-n0 focus-within:border-primary dark:bg-bg4 ltr:mr-2 rtl:ml-2">
         <svg
@@ -29,15 +43,6 @@ const Checkbox = ({ label, img, isChecked, onChange }: Props) => {
           </g>
         </svg>
       </div>
-      {label && (
-        <label
-          htmlFor={label}
-          className="flex cursor-pointer select-none items-center gap-2 text-sm"
-        >
-          {img && <span>{img}</span>}
-          {label}
-        </label>
-      )}
     </div>
   );
 };

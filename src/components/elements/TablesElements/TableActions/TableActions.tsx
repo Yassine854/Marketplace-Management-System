@@ -1,6 +1,10 @@
 import { IconDotsVertical } from "@tabler/icons-react";
 import useDropdown from "@/hooks/useDropdown";
-
+const actions = [
+  { name: "Generate Pick List", key: "picklist" },
+  { name: "Print BL's", key: "bl" },
+  { name: "Manage Milk-Runs", key: "mr" },
+];
 const TableActions = ({ fromBottom }: { fromBottom?: boolean }) => {
   const { open, ref, toggleOpen } = useDropdown();
 
@@ -18,21 +22,15 @@ const TableActions = ({ fromBottom }: { fromBottom?: boolean }) => {
           fromBottom ? "bottom-0" : "top-0"
         } z-30 min-w-max rounded-md border bg-n0 p-1.5 dark:border-n500 dark:bg-bg4 ltr:right-5 rtl:left-5`}
       >
-        <li>
-          <button className="block rounded-md px-3 py-1.5 duration-300 hover:bg-primary hover:text-n30">
-            Edit
-          </button>
-        </li>
-        <li>
-          <button className="block rounded-md px-3 py-1.5 duration-300 hover:bg-primary hover:text-n30">
-            Delete
-          </button>
-        </li>
-        <li>
-          <button className="block rounded-md px-3 py-1.5 duration-300 hover:bg-primary hover:text-n30">
-            Block
-          </button>
-        </li>
+        {actions.map((e: any, i: number) => {
+          return (
+            <li key={i}>
+              <button className="block rounded-md px-3 py-1.5 duration-300 hover:bg-primary hover:text-n30">
+                {e.name}
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

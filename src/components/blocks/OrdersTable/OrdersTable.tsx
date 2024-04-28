@@ -40,6 +40,12 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
     setSortBy,
     setSortOrder,
     setSearch,
+    setSelectedOrders,
+    selectAllOrders,
+    selectedOrders,
+    unSelectAllOrders,
+    selectOrder,
+    unSelectOrder,
   } = useOrdersTable(setStatus(status));
 
   return (
@@ -51,6 +57,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
           sortBy={sortBy}
           setSortBy={setSortBy}
           setSearch={setSearch}
+          selectedOrders={selectedOrders}
         />
       </div>
 
@@ -61,6 +68,11 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
           error={""}
           setSortOrder={setSortOrder}
           setSortBy={setSortBy}
+          setSelectedOrders={setSelectedOrders}
+          selectAllOrders={selectAllOrders}
+          unSelectAllOrders={unSelectAllOrders}
+          selectOrder={selectOrder}
+          unSelectOrder={unSelectOrder}
         />
       </div>
       <div className={tailwind.footer}>

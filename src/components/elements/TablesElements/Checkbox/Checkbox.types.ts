@@ -4,5 +4,5 @@ export type Props = {
   label?: string;
   img?: ReactNode;
   isChecked?: boolean;
-  onChange?: () => void;
+  onClick: (isChecked: boolean) => void;
 };

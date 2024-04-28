@@ -18,6 +18,8 @@ export const useOrdersTable = (status: string): any => {
   const [sortBy, setSortBy] = useState({ name: "Total", key: "subtotal" });
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [search, setSearch] = useState("");
+  const [orders, setOrders] = useState([]);
+  const [selectedOrders, setSelectedOrders] = useState([]);
 
   const { data, isLoading } = useGetOrders({
     status: status,
@@ -30,6 +32,7 @@ export const useOrdersTable = (status: string): any => {
   const paginate: PaginateFunction = (page) => {
     setCurrentPage(page);
   };
+
   const nextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage((prevPage) => prevPage + 1);
@@ -40,6 +43,32 @@ export const useOrdersTable = (status: string): any => {
     if (currentPage > 1) {
       setCurrentPage((prevPage) => prevPage - 1);
     }
+  };
+
+  const selectAllOrders = () => {
+    const orders = data.orders.map((order: any) => {
+      return { ...order, isSelected: true };
+    });
+    setOrders(orders);
+    orders.forEach((order: any) => {
+      setSelectedOrders((e) => [...e, order.id]);
+    });
+  };
+  const unSelectAllOrders = () => {
+    const orders = data.orders.map((order: any) => {
+      return { ...order, isSelected: false };
+    });
+    setOrders([...orders]);
+    setSelectedOrders([]);
+  };
+
+  const selectOrder = (id: any) => {
+    setSelectedOrders((list) => [...list, id]);
+  };
+  const unSelectOrder = (id: any) => {
+    const list = selectedOrders.filter((item) => item !== id);
+
+    setSelectedOrders(list);
   };
 
   useEffect(() => {
@@ -72,8 +101,20 @@ export const useOrdersTable = (status: string): any => {
     setEndIndex,
   ]);
 
+  useEffect(() => {
+    if (data) {
+      const orders = data.orders.map((order: any, i: number) => {
+        if (selectedOrders.includes(order.id)) {
+          return { ...order, isSelected: true };
+        } else {
+          return { ...order, isSelected: false };
+        }
+      });
+      setOrders([...orders]);
+    }
+  }, [data, selectedOrders]);
   return {
-    orders: data?.orders,
+    orders: orders,
     currentPage,
     itemsPerPage,
     totalPages,
@@ -89,7 +130,13 @@ export const useOrdersTable = (status: string): any => {
     setSearch,
     sortOrder,
     setSortBy,
+    setSelectedOrders,
+    unSelectAllOrders,
+    selectAllOrders,
     setSortOrder,
+    selectOrder,
+    unSelectOrder,
+    selectedOrders,
     setItemsPerPage: (numberOfItems: number) => {
       const newCurrentPage = Math.ceil(startIndex / numberOfItems);
       setCurrentPage(newCurrentPage + 1);
