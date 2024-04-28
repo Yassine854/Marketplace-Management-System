@@ -2,18 +2,20 @@
 
 import Checkbox from "../Checkbox";
 import { IconSelector } from "@tabler/icons-react";
+import { useState } from "react";
 
 const rows = [
   { name: "ID", key: "id", isSortable: false },
-  { name: "Customer", key: "customer", isSortable: true },
-  { name: "Total", key: "total", isSortable: true },
-  { name: "Delivery Date", key: "deliveryDate", isSortable: true },
+  { name: "Customer", key: "customer", isSortable: false },
+  { name: "Total", key: "subtotal", isSortable: true },
+  { name: "Delivery Date", key: "deliveryDate", isSortable: false },
   { name: "Print", key: "print", isSortable: false },
-  { name: "From Mobile", key: "mobile", isSortable: false },
+  { name: "Source", key: "source", isSortable: false },
   { name: "Actions", key: "actions", isSortable: false },
 ];
 
 const OrdersTableHead = ({ onSortClick }: any) => {
+  const [sortOrder, setSortOrder] = useState("asc");
   return (
     <thead className=" sticky top-0 z-10 rounded-xl bg-n30">
       <tr className=" font-semibold ">
@@ -27,7 +29,11 @@ const OrdersTableHead = ({ onSortClick }: any) => {
           <td
             key={index}
             onClick={() => {
-              item.isSortable && onSortClick("type");
+              if (item.isSortable) {
+                const newSortOrder = sortOrder == "asc" ? "desc" : "asc";
+                onSortClick({ name: item.name, key: item.key }, newSortOrder);
+                setSortOrder(newSortOrder);
+              }
             }}
             className="w-14"
           >

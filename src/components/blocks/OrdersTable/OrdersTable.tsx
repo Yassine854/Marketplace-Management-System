@@ -35,16 +35,31 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
     isLoading,
     itemsPerPage,
     setItemsPerPage,
+    sortOptions,
+    sortBy,
+    setSortBy,
+    setSortOrder,
   } = useOrdersTable(setStatus(status));
 
   return (
     <Box>
       <div className={tailwind.header}>
-        <OrdersTableHeader title={title} />
+        <OrdersTableHeader
+          title={title}
+          sortOptions={sortOptions}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+        />
       </div>
 
       <div className={tailwind.main}>
-        <OrdersTableBody isLoading={isLoading} orders={orders} error={""} />
+        <OrdersTableBody
+          isLoading={isLoading}
+          orders={orders}
+          error={""}
+          setSortOrder={setSortOrder}
+          setSortBy={setSortBy}
+        />
       </div>
       <div className={tailwind.footer}>
         {orders?.length !== 0 && (

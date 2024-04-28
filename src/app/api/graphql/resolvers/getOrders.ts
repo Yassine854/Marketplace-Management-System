@@ -5,6 +5,7 @@ export type GetOrdersParams = {
   status: string;
   page: number;
   perPage: number;
+  sortBy: string;
 };
 
 const createOrdersList = (typesenseHits: any): Order[] =>
@@ -22,6 +23,7 @@ const createOrdersList = (typesenseHits: any): Order[] =>
 
 export const getOrders = async ({
   status,
+  sortBy,
   page,
   perPage,
 }: GetOrdersParams): Promise<
@@ -29,11 +31,14 @@ export const getOrders = async ({
 > => {
   try {
     const searchParameters = {
-      q: status,
-      query_by: "status",
+      q: "mohamed",
+      query_by: "customer_firstname",
+      filter_by: `status:= ${status}`,
       page: page,
       per_page: perPage,
+      sort_by: sortBy,
     };
+
     const typesenseResponse = await typesenseClient
       .collections("orders")
       .documents()

@@ -1,7 +1,15 @@
+import { IconPdf, IconTruck } from "@tabler/icons-react";
+
 import CheckboxCustom from "@/components/elements/TablesElements/Checkbox";
 import { Props } from "./TableRow.types";
 import TableActions from "@/components/elements/TablesElements/TableActions";
 import { defaultProps } from "./TableRow.defaultProps";
+
+const RowItem = ({ content }: any) => (
+  <td>
+    <div className=" flex h-20 items-center  justify-center  ">{content}</div>
+  </td>
+);
 
 const TableRow = ({
   order = defaultProps.order,
@@ -14,35 +22,32 @@ const TableRow = ({
         onClick(order.id);
       }}
     >
-      <td className="flex justify-center px-3 py-2">
-        <CheckboxCustom />
-      </td>
+      <RowItem content={<CheckboxCustom />} />
 
-      <td className="px-3 py-2">
-        <div className="flex justify-center">{order.id}</div>
-      </td>
-      <td className="px-3 py-2">
-        <div className="flex justify-center">{order.customer.name}</div>
-      </td>
-      <td className="px-3 py-2">
-        <div className="flex justify-center">{order.total}</div>
-      </td>
-      <td className="px-3 py-2">
-        <div className="flex justify-center">{order.deliveryDate}</div>
-      </td>
-      <td className="px-3 py-2">
-        <div className="flex justify-center">{order.deliveryDate}</div>
-      </td>
-      <td className="px-3 py-2">
-        <div className="flex justify-center">{order.deliveryDate}</div>
-      </td>
-      <td className="px-3 py-2">
-        <div className="flex h-full items-center justify-center">
-          <div className="flex justify-center">
-            <TableActions />
+      <RowItem content={order.id} />
+
+      <RowItem content={order.customer.name} />
+
+      <RowItem content={order.total} />
+
+      <RowItem content={order.deliveryDate} />
+
+      <RowItem
+        content={
+          <div className="rounded-full p-2 hover:bg-n10">
+            <IconPdf />
           </div>
-        </div>
-      </td>
+        }
+      />
+
+      <RowItem
+        content={
+          <div className="rounded-full p-2 hover:bg-n10">
+            <IconTruck color="red" />
+          </div>
+        }
+      />
+      <RowItem content={<TableActions />} />
     </tr>
   );
 };

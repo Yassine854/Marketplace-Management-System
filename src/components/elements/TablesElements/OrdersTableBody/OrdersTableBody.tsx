@@ -6,7 +6,13 @@ import OrdersTableHead from "../OrdersTableHead";
 import TableRow from "../TableRow";
 import TableRowSkeleton from "../TableRowSkeleton";
 
-const OrdersTableBody = ({ orders, isLoading, error }: any) => {
+const OrdersTableBody = ({
+  orders,
+  isLoading,
+  error,
+  setSortOrder,
+  setSortBy,
+}: any) => {
   return (
     <>
       <table
@@ -15,7 +21,12 @@ const OrdersTableBody = ({ orders, isLoading, error }: any) => {
         cellSpacing={0}
         className="w-full border-separate overflow-x-scroll whitespace-nowrap border-none pb-16 pt-2 "
       >
-        <OrdersTableHead />
+        <OrdersTableHead
+          onSortClick={(sortBy: any, sortOrder: any) => {
+            setSortBy(sortBy);
+            setSortOrder(sortOrder);
+          }}
+        />
 
         <tbody>
           <>

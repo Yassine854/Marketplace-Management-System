@@ -4,11 +4,14 @@ import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import { Props } from "./OrdersTableHeader.types";
 import SearchBar from "@/components/elements/TablesElements/SearchBar";
 import { useState } from "react";
-const options = ["Customer", "Total", "Delivery Date"];
 
-const OrdersTableHeader = ({ handleSearch, title }: Props) => {
-  const [selected, setSelected] = useState(options[0]);
-
+const OrdersTableHeader = ({
+  handleSearch,
+  title,
+  sortOptions,
+  sortBy,
+  setSortBy,
+}: any) => {
   return (
     <div className="bb-dashed flex h-20 w-full flex-wrap items-center justify-between gap-3 bg-n10 p-4">
       <p className="text-xl font-bold capitalize">{title}</p>
@@ -17,9 +20,9 @@ const OrdersTableHeader = ({ handleSearch, title }: Props) => {
         <div className="flex items-center gap-2">
           <p className="whitespace-nowrap">Sort By : </p>
           <Dropdown
-            selected={selected}
-            setSelected={setSelected}
-            items={options}
+            selected={sortBy}
+            setSelected={setSortBy}
+            items={sortOptions}
           />
         </div>
       </div>

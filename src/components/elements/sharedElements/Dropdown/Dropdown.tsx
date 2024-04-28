@@ -6,36 +6,30 @@ import { defaultProps } from "./Dropdown.defaultProps";
 import { tailwind } from "./Dropdown.styles";
 import useDropdown from "@/hooks/useDropdown";
 
-const Dropdown = ({
-  items = defaultProps.items,
-  selected = defaultProps.selected,
-  setSelected = defaultProps.setSelected,
-  width = defaultProps.width,
-  bg = defaultProps.bg,
-}: Props) => {
+const Dropdown = ({ items, selected, setSelected, width, bg }: any) => {
   const { open, ref, toggleOpen } = useDropdown();
   return (
     <div className="relative" ref={ref}>
       <div onClick={toggleOpen} className={tailwind.container(width, bg)}>
-        {selected}
+        {selected.name}
         <IconChevronDown
           size={20}
           className={`duration-300 ${open && "rotate-180"}`}
         />
       </div>
       <ul className={tailwind.list(width, open)}>
-        {items.map((item) => (
+        {items.map(({ name, key }: any, i: number) => (
           <li
             onClick={() => {
-              setSelected(item);
+              setSelected(items[i]);
               toggleOpen();
             }}
-            key={item}
+            key={key}
             className={`cursor-pointer rounded-md px-4 py-2 text-xs duration-300 hover:text-primary ${
-              selected == item && "bg-primary text-n0 hover:!text-n0"
+              selected.key == key && "bg-primary text-n0 hover:!text-n0"
             }`}
           >
-            {item}
+            {name}
           </li>
         ))}
       </ul>

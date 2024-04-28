@@ -4,17 +4,25 @@ import { useGetOrders } from "@/hooks/queries/useGetOrders";
 
 type PaginateFunction = (page: number) => void;
 
+const sortOptions = [
+  { name: "ID", key: "customer_id" },
+  { name: "Total", key: "subtotal" },
+];
+
 export const useOrdersTable = (status: string): any => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [startIndex, setStartIndex] = useState<number>(0);
   const [endIndex, setEndIndex] = useState<number>(0);
+  const [sortBy, setSortBy] = useState({ name: "Total", key: "subtotal" });
+  const [sortOrder, setSortOrder] = useState<string>("asc");
 
   const { data, isLoading } = useGetOrders({
     status: status,
     page: currentPage,
     perPage: itemsPerPage,
+    sortBy: sortBy.key + ":" + sortOrder,
   });
 
   const paginate: PaginateFunction = (page) => {
@@ -74,6 +82,11 @@ export const useOrdersTable = (status: string): any => {
     endIndex,
     totalOrders: data?.totalOrders,
     isLoading,
+    sortBy,
+    sortOptions,
+    sortOrder,
+    setSortBy,
+    setSortOrder,
     setItemsPerPage: (numberOfItems: number) => {
       const newCurrentPage = Math.ceil(startIndex / numberOfItems);
       setCurrentPage(newCurrentPage + 1);
