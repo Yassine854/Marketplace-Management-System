@@ -10,7 +10,10 @@ const TableActions = ({ fromBottom }: { fromBottom?: boolean }) => {
 
   return (
     <div
-      onClick={toggleOpen}
+      onClick={(event: any) => {
+        event.stopPropagation();
+        toggleOpen();
+      }}
       className="relative top-0 rounded-full p-2 hover:bg-n10 "
       ref={ref}
     >

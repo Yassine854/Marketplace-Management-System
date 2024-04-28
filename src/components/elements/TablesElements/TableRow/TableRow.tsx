@@ -31,7 +31,12 @@ const TableRow = ({ order, onClick, onCheckClick }: any) => {
 
       <RowItem
         content={
-          <div className="rounded-full p-2 hover:bg-n10">
+          <div
+            className="rounded-full p-2 hover:bg-n10"
+            onClick={(event: any) => {
+              event.stopPropagation();
+            }}
+          >
             <IconPdf />
           </div>
         }

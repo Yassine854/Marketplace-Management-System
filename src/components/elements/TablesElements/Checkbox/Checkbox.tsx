@@ -13,7 +13,8 @@ const Checkbox = ({ label, img, isChecked = false, onClick }: any) => {
   return (
     <div
       className="flex h-8 w-8 items-center justify-center rounded-full  pl-2 hover:bg-n70"
-      onClick={() => {
+      onClick={(event: any) => {
+        event.stopPropagation();
         onClick(!checked);
       }}
     >
