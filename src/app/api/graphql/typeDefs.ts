@@ -2,23 +2,29 @@ import { gql } from "graphql-tag";
 
 export const typeDefs = gql`
   type Query {
-    getOrders(status: String!, page: Int!, perPage: Int!): OrderList
+    getOrders(
+      status: String!
+      page: Int!
+      perPage: Int!
+      sortBy: String!
+      search: String!
+    ): OrderList!
   }
 
   type Order {
-    id: String!
-    customer: Customer!
-    total: Float!
+    id: String
+    customer: Customer
+    total: Float
     deliveryDate: String
   }
 
   type Customer {
     name: String!
-    id: String!
+    id: String
   }
 
   type OrderList {
     orders: [Order]!
-    total: Int!
+    totalOrders: Int!
   }
 `;

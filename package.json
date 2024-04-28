@@ -53,7 +53,9 @@
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "typesense": "^1.8.2",
-    "zod": "^3.22.4"
+    "usehooks-ts": "^3.1.0",
+    "zod": "^3.22.4",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^1.2.25",
@@ -65,7 +67,7 @@
     "@storybook/addon-onboarding": "^8.0.5",
     "@storybook/addon-storysource": "^8.0.6",
     "@storybook/blocks": "^8.0.5",
-    "@storybook/nextjs": "^8.0.5",
+    "@storybook/nextjs": "^8.0.6",
     "@storybook/react": "^8.0.5",
     "@storybook/test": "^8.0.5",
     "@testing-library/jest-dom": "^6.4.2",
@@ -94,6 +96,8 @@
     "prettier": "3.0.0",
     "prettier-plugin-tailwindcss": "^0.5.13",
     "storybook": "^8.0.5",
+    "storybook-addon-next": "^1.8.0",
+    "storybook-addon-next-router": "^4.0.2",
     "tailwindcss": "^3.3.0",
     "ts-node": "^10.9.2",
     "typescript": "5.3.3"

@@ -5,35 +5,43 @@ export type GetOrdersParams = {
   status: string;
   page: number;
   perPage: number;
+  sortBy: string;
+  search: string;
 };
 
 const createOrdersList = (typesenseHits: any): Order[] =>
   typesenseHits.map(
     ({ document }: any): Order => ({
-      id: document.entity_id,
+      id: document.extension_attributes.kamioun_order_id,
       customer: {
         id: document.customer_id,
         name: document.customer_firstname + " " + document.customer_lastname,
       },
       total: document.subtotal,
       deliveryDate: document.extension_attributes.delivery_date,
+      isSelected: false,
     }),
   );
 
 export const getOrders = async ({
   status,
+  sortBy,
   page,
   perPage,
+  search,
 }: GetOrdersParams): Promise<
-  { orders: Order[]; total: number } | undefined
+  { orders: Order[]; totalOrders: number } | undefined
 > => {
   try {
     const searchParameters = {
-      q: status,
-      query_by: "status",
+      q: search,
+      query_by: "customer_firstname",
+      filter_by: `status:= ${status}`,
       page: page,
       per_page: perPage,
+      sort_by: sortBy,
     };
+
     const typesenseResponse = await typesenseClient
       .collections("orders")
       .documents()
@@ -43,7 +51,7 @@ export const getOrders = async ({
 
     return {
       orders,
-      total: typesenseResponse.found,
+      totalOrders: typesenseResponse.found,
     };
   } catch (error) {
     console.error("🚀 ~  getOrders error:", error);

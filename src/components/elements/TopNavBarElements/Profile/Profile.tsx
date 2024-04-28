@@ -65,8 +65,8 @@ const Profile = () => {
             className="rounded-full"
             alt="profile img"
           />
-          <h6 className="h6 mt-2">William James</h6>
-          <span className="text-sm">james@mail.com</span>
+          <h6 className="h6 mt-2">Mohamed Jrad</h6>
+          <span className="text-sm">mjrad@kamioun.tn</span>
         </div>
         <ul className="flex w-[250px] flex-col p-4">
           {profileLinks.map(({ icon, title, url }) => (

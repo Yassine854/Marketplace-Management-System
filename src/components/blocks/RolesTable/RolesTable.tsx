@@ -2,7 +2,7 @@
 
 import Banner from "../Banner";
 import Box from "../Box";
-import Checkbox from "@/components/elements/OrdersTableElements/Checkbox";
+import Checkbox from "@/components/elements/TablesElements/Checkbox";
 
 const roles = ["manager", "ops", " customer service", "sales", "Finance"];
 
