@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import { IconArrowNarrowLeft } from "@tabler/icons-react";
 import SearchBar from "@/components/elements/TablesElements/SearchBar";
+import { useNavigation } from "@/hooks/useNavigation";
 import { useRouter } from "next/navigation";
 
 const actions = [
@@ -22,6 +23,7 @@ const OrdersTableHeader = ({
 }: any) => {
   const { push } = useRouter();
   const [selected, setSelected] = useState({ name: "Actions", key: "a" });
+  const { navigateBack } = useNavigation();
 
   useEffect(() => {
     setSelected({ name: "Actions", key: "a" });
@@ -30,7 +32,10 @@ const OrdersTableHeader = ({
   return (
     <>
       <div className="flex  w-full  flex-grow       bg-n10">
-        <div className="m-2 flex h-12 w-36 items-center justify-start ">
+        <div
+          className="m-2 flex h-12 w-36 cursor-pointer items-center justify-start "
+          onClick={() => navigateBack()}
+        >
           <IconArrowNarrowLeft size={64} />
         </div>
         <div className=" m-2 flex h-12  w-full items-center  justify-center  ">
