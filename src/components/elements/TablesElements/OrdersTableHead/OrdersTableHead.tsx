@@ -22,7 +22,7 @@ const OrdersTableHead = ({
   const [sortOrder, setSortOrder] = useState("asc");
   const [isSelected, setIsSelected] = useState(false);
   return (
-    <thead className=" sticky top-0 z-10 rounded-xl bg-n40">
+    <thead className=" sticky top-[70px] z-10 rounded-xl bg-n40">
       <tr className=" font-semibold ">
         <td className="group w-24 bg-primary/5 ">
           <div className="flex items-center justify-center">

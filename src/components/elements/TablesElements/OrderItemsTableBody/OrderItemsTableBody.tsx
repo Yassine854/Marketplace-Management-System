@@ -2,8 +2,8 @@
 
 import AnyMatchingResults from "../AnyMatchingResults";
 import { Order } from "@/types/order";
-import OrdersTableHead from "../OrdersTableHead";
-import TableRow from "../TableRow";
+import OrdersTableHead from "../OrderItemsTableHead";
+import TableRow from "../OrderItemsTableRow";
 import TableRowSkeleton from "../TableRowSkeleton";
 
 const OrdersTableBody = ({
@@ -25,7 +25,7 @@ const OrdersTableBody = ({
         border={0}
         cellPadding={0}
         cellSpacing={0}
-        className="w-full border-separate overflow-x-scroll whitespace-nowrap border-none pb-16  "
+        className="w-full border-separate overflow-x-scroll whitespace-nowrap border-none pb-16 pt-8 "
       >
         <OrdersTableHead
           onSortClick={(sortBy: any, sortOrder: any) => {

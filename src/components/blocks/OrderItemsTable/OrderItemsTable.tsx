@@ -1,7 +1,8 @@
 "use client";
 
 import Box from "../Box";
-import OrdersTableBody from "@/components/elements/TablesElements/OrdersTableBody";
+import OrderItemsTableHeader from "@/components/elements/TablesElements/OrderItemsTableHeader";
+import OrdersTableBody from "@/components/elements/TablesElements/OrderItemsTableBody";
 import OrdersTableHeader from "@/components/elements/TablesElements/OrdersTableHeader";
 import Pagination from "@/components/elements/TablesElements/Pagination";
 import { tailwind } from "./OrderItemsTable.styles";
@@ -53,7 +54,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
   return (
     <Box>
       <div className={tailwind.header}>
-        <OrdersTableHeader
+        <OrderItemsTableHeader
           title={title}
           sortOptions={sortOptions}
           sortBy={sortBy}
@@ -79,22 +80,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
           actions={actions}
         />
       </div>
-      <div className={tailwind.footer}>
-        {orders?.length !== 0 && (
-          <Pagination
-            endIndex={endIndex}
-            totalOrders={totalOrders}
-            totalPages={totalPages}
-            currentPage={currentPage}
-            goToPage={paginate}
-            nextPage={nextPage}
-            prevPage={prevPage}
-            startIndex={startIndex}
-            itemsPerPage={itemsPerPage}
-            setItemsPerPage={setItemsPerPage}
-          />
-        )}
-      </div>
+      <div className={tailwind.footer} />
     </Box>
   );
 };

@@ -18,7 +18,7 @@ const TableActions = ({
         event.stopPropagation();
         toggleOpen();
       }}
-      className="relative top-0 rounded-full p-2 hover:bg-n10 "
+      className="relative top-0 z-0 rounded-full p-2 hover:bg-n10 "
       ref={ref}
     >
       <IconDotsVertical className="cursor-pointer" />
