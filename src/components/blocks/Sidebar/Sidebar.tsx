@@ -33,8 +33,8 @@ const Sidebar = () => {
   const pathname = usePathname();
 
   return (
-    <aside className="sidebar  no-scrollbar fixed bottom-0 left-0  top-0 z-20 h-screen w-64 overflow-hidden overflow-y-scroll ">
-      <div className="fixed  left-0 top-0 z-30 flex h-16 w-64 items-center justify-center bg-n10 p-3">
+    <aside className="sidebar  no-scrollbar fixed bottom-0 left-0  top-0 z-20 h-screen w-64 overflow-hidden overflow-y-scroll bg-n10">
+      <div className="fixed  left-0 top-0 z-30 flex h-16 w-64 items-center justify-center  bg-n10 p-3">
         <Link href="/">
           <Image
             width={260}

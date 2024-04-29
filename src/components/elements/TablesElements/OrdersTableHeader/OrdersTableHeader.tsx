@@ -23,12 +23,10 @@ const OrdersTableHeader = ({
 
   useEffect(() => {
     setSelected({ name: "Actions", key: "a" });
-
-    console.log("🚀 ~ selectedOrders:", selectedOrders);
   }, [selectedOrders]);
 
   return (
-    <div className="bb-dashed flex h-20 w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">
+    <div className=" flex h-20 w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">
       <div className="flex items-center justify-center">
         <p className="m-4 text-xl font-bold capitalize ">{title}</p>
         {!!selectedOrders.length && (
@@ -40,7 +38,7 @@ const OrdersTableHeader = ({
             />
             {selected.name !== "Actions" && (
               <button
-                className="btn flex h-4 items-center justify-center bg-green-500 p-4"
+                className="btn m-4 flex h-4 items-center  justify-center p-4"
                 onClick={() => setSelected({ name: "Actions", key: "a" })}
               >
                 Confirm

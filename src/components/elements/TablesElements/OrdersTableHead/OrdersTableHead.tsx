@@ -22,26 +22,28 @@ const OrdersTableHead = ({
   const [sortOrder, setSortOrder] = useState("asc");
   const [isSelected, setIsSelected] = useState(false);
   return (
-    <thead className=" sticky top-0 z-10 rounded-xl bg-n30">
+    <thead className=" sticky top-0 z-10 rounded-xl bg-n40">
       <tr className=" font-semibold ">
-        <td className="w-14">
-          <div className="group relative flex cursor-pointer select-none items-center justify-center gap-1 bg-primary/5 px-3 py-5 dark:bg-bg3">
-            <div
+        <td className="group w-24 bg-primary/5 ">
+          <div className="flex items-center justify-center">
+            <button
               onClick={() => {
                 isSelected ? unSelectAllOrders() : selectAllOrders();
                 setIsSelected(!isSelected);
               }}
-              className="absolute bottom-12 left-16 z-40 hidden  h-8 w-24 items-center justify-center rounded-lg bg-n10 p-2 text-center group-hover:flex"
+              className=" btn size  m-0 hidden h-8 p-2 text-center text-xs font-bold group-hover:block"
             >
               {isSelected ? "Unselect All" : "Select All"}
+            </button>
+            <div className="group-hover:hidden">
+              <Checkbox
+                onClick={(isChecked: boolean) => {
+                  isChecked ? selectAllOrders() : unSelectAllOrders();
+                  setIsSelected(isChecked);
+                }}
+                isChecked={isSelected}
+              />
             </div>
-            <Checkbox
-              onClick={(isChecked: boolean) => {
-                isChecked ? selectAllOrders() : unSelectAllOrders();
-                setIsSelected(isChecked);
-              }}
-              isChecked={isSelected}
-            />
           </div>
         </td>
 
