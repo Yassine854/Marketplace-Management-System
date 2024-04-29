@@ -5,11 +5,12 @@ import { useEffect, useState } from "react";
 import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import { Props } from "./OrdersTableHeader.types";
 import SearchBar from "@/components/elements/TablesElements/SearchBar";
+import { useRouter } from "next/navigation";
 
 const actions = [
   { name: "Generate Pick List", key: "picklist" },
   { name: "Print BL's", key: "bl" },
-  { name: "Manage Milk-Runs", key: "mr" },
+  { name: "Manage Milk-Runs", key: "milk-run" },
 ];
 const OrdersTableHeader = ({
   title,
@@ -19,7 +20,14 @@ const OrdersTableHeader = ({
   setSearch,
   selectedOrders,
 }: any) => {
+  const { push } = useRouter();
   const [selected, setSelected] = useState({ name: "Actions", key: "a" });
+
+  useEffect(() => {
+    if (selected?.key == "milk-run") {
+      push("/milk-run");
+    }
+  }, [selected, push]);
 
   useEffect(() => {
     setSelected({ name: "Actions", key: "a" });

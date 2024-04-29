@@ -33,9 +33,19 @@ export const useOrdersTable = (status: string): any => {
         push("/order/" + id);
       },
     },
-    { name: "Generate Pick List", key: "picklist", action: () => {} },
+    {
+      name: "Generate Pick List",
+      key: "picklist",
+      action: () => {},
+    },
     { name: "Print BL's", key: "bl", action: () => {} },
-    { name: "Manage Milk-Runs", key: "mr", action: () => {} },
+    {
+      name: "Manage Milk-Runs",
+      key: "mr",
+      action: () => {
+        push("/milk-run");
+      },
+    },
   ];
   const { data, isLoading } = useGetOrders({
     status: status,

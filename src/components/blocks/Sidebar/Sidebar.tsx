@@ -4,6 +4,7 @@ import {
   IconBell,
   IconDashboard,
   IconList,
+  IconMap2,
   IconUsers,
 } from "@tabler/icons-react";
 import { usePathname, useRouter } from "@/libs/i18nNavigation";
@@ -61,6 +62,15 @@ const Sidebar = () => {
           isActive={pathname?.includes("orders") && !pathname?.includes("logs")}
           onClick={() => {
             push("/orders/open");
+          }}
+        />
+        <Divider />
+        <SidebarButton
+          isActive={pathname?.includes("milk-run")}
+          name={"Milk Run"}
+          icon={<IconMap2 />}
+          onClick={() => {
+            push("/milk-run");
           }}
         />
         <Divider />
