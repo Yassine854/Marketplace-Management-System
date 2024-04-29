@@ -24,12 +24,6 @@ const OrdersTableHeader = ({
   const [selected, setSelected] = useState({ name: "Actions", key: "a" });
 
   useEffect(() => {
-    if (selected?.key == "milk-run") {
-      push("/milk-run");
-    }
-  }, [selected, push]);
-
-  useEffect(() => {
     setSelected({ name: "Actions", key: "a" });
   }, [selectedOrders]);
 
@@ -47,7 +41,12 @@ const OrdersTableHeader = ({
             {selected.name !== "Actions" && (
               <button
                 className="btn m-4 flex h-4 items-center  justify-center p-4"
-                onClick={() => setSelected({ name: "Actions", key: "a" })}
+                onClick={() => {
+                  if (selected?.key == "milk-run") {
+                    push("/milk-run");
+                  }
+                  setSelected({ name: "Actions", key: "a" });
+                }}
               >
                 Confirm
               </button>

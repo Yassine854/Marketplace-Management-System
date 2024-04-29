@@ -1,8 +1,9 @@
+import Banner from "../Banner";
 import Box from "../Box";
-
 const OrderDetails = () => {
   return (
     <Box>
+      <Banner title="Manage Milk Run" />
       <div className="col-span-12 flex flex-grow lg:col-span-7 xl:col-span-8">
         <div className="box h-full w-full overflow-hidden ">
           {/* <div className="bb-dashed mb-6 flex items-center justify-between pb-6">
