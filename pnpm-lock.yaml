@@ -110,6 +110,9 @@ dependencies:
   usehooks-ts:
     specifier: ^3.1.0
     version: 3.1.0(react@18.2.0)
+  whatsapp:
+    specifier: 0.0.5-Alpha
+    version: 0.0.5-Alpha
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -4636,6 +4639,10 @@ packages:
 
   /@types/node@10.17.60:
     resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
+    dev: false
+
+  /@types/node@18.11.19:
+    resolution: {integrity: sha512-YUgMWAQBWLObABqrvx8qKO1enAvBUdjZOAWQ5grBAkp5LQv45jBvYKZ3oFS9iKRCQyFjqw6iuEa1vmFqtxYLZw==}
     dev: false
 
   /@types/node@18.19.31:
@@ -14314,6 +14321,13 @@ packages:
       - esbuild
       - uglify-js
     dev: true
+
+  /whatsapp@0.0.5-Alpha:
+    resolution: {integrity: sha512-xVDC305rzh51oPqm2dnJJTRdB7/yU8ZM3VJJH9U3qCi0wRjsXghQ9WrSIBJik1FCfiIqQzlmckItYlxBtCvvMQ==}
+    engines: {node: '>=16.19.1'}
+    dependencies:
+      '@types/node': 18.11.19
+    dev: false
 
   /whatwg-encoding@2.0.0:
     resolution: {integrity: sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==}

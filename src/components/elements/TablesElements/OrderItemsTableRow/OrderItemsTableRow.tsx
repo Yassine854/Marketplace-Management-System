@@ -4,18 +4,24 @@ const RowItem = ({ content }: any) => (
   </td>
 );
 
-const OrderItemsTableRow = ({ order, onClick, onCheckClick, actions }: any) => {
+const OrderItemsTableRow = ({
+  order,
+  onClick,
+  onCheckClick,
+  actions,
+  line,
+}: any) => {
   return (
     <tr
       className="cursor-pointer even:bg-primary/5 hover:bg-n30 dark:even:bg-bg3"
       onClick={onClick}
     >
-      <RowItem content={order.id} />
-      <RowItem content={order.id} />
-      <RowItem content={order.customer.name} />
-      <RowItem content={order.customer.name} />
-      <RowItem content={order.deliveryDate} />
-      <RowItem content={order.total} />
+      <RowItem content={line.sku} />
+      <RowItem content={line.productName} />
+      <RowItem content={"true"} />
+      <RowItem content={line.productPrice} />
+      <RowItem content={line.quantity} />
+      <RowItem content={line.totalPrice} />
     </tr>
   );
 };

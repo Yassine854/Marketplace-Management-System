@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
+import { useGetOrder } from "@/hooks/queries/useGetOrder";
 import { useGetOrders } from "@/hooks/queries/useGetOrders";
 
 type PaginateFunction = (page: number) => void;
@@ -54,7 +55,9 @@ export const useOrdersTable = (status: string): any => {
     sortBy: sortBy.key + ":" + sortOrder,
     search: search,
   });
-
+  const { data: order } = useGetOrder({
+    orderId: status,
+  });
   const onRowClick = (id: any) => {
     push("/order/" + id);
   };
@@ -103,6 +106,9 @@ export const useOrdersTable = (status: string): any => {
 
     setSelectedOrders(list);
   };
+  useEffect(() => {
+    console.log("🚀 ~ useOrdersTable ~ order:", order);
+  }, [order]);
 
   useEffect(() => {
     const newTotalPages = Math.ceil(data?.totalOrders / itemsPerPage);
@@ -150,7 +156,12 @@ export const useOrdersTable = (status: string): any => {
       setOrders([...orders]);
     }
   }, [data, selectedOrders]);
+
+  useEffect(() => {
+    console.log("🚀 ~ useOrdersTable ~ order:", order?.getOrder);
+  }, [order]);
   return {
+    order: order,
     orders: orders,
     currentPage,
     itemsPerPage,

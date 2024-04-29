@@ -1,12 +1,14 @@
 "use client";
 
 import AnyMatchingResults from "../AnyMatchingResults";
-import { Order } from "@/types/order";
+import { OrderLine } from "../../../../types/OrderLine";
 import OrdersTableHead from "../OrderItemsTableHead";
 import TableRow from "../OrderItemsTableRow";
 import TableRowSkeleton from "../TableRowSkeleton";
+import { useEffect } from "react";
 
 const OrdersTableBody = ({
+  order,
   orders,
   isLoading,
   error,
@@ -19,6 +21,9 @@ const OrdersTableBody = ({
   onRowClick,
   actions,
 }: any) => {
+  useEffect(() => {
+    console.log("🚀 ~ order:", order);
+  }, [order]);
   return (
     <>
       <table
@@ -39,19 +44,20 @@ const OrdersTableBody = ({
         <tbody>
           <>
             {!isLoading &&
-              orders?.map((order: Order, i: number) => (
+              order?.lines?.map((line: OrderLine, i: number) => (
                 <TableRow
                   actions={actions}
                   order={order}
-                  key={order.id}
-                  onClick={() => onRowClick(order.id)}
-                  onCheckClick={(isChecked: boolean) => {
-                    if (isChecked) {
-                      selectOrder(order.id);
-                    } else {
-                      unSelectOrder(order.id);
-                    }
-                  }}
+                  line={line}
+                  key={line.id}
+                  // onClick={() => onRowClick(order.id)}
+                  // onCheckClick={(isChecked: boolean) => {
+                  //   if (isChecked) {
+                  //     selectOrder(order.id);
+                  //   } else {
+                  //     unSelectOrder(order.id);
+                  //   }
+                  // }}
                 />
               ))}
           </>

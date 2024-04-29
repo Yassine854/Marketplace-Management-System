@@ -2,9 +2,8 @@
 
 import Box from "../Box";
 import OrderItemsTableHeader from "@/components/elements/TablesElements/OrderItemsTableHeader";
-import OrdersTableBody from "@/components/elements/TablesElements/OrderItemsTableBody";
-import OrdersTableHeader from "@/components/elements/TablesElements/OrdersTableHeader";
 import Pagination from "@/components/elements/TablesElements/Pagination";
+import TableBody from "@/components/elements/TablesElements/OrderItemsTableBody";
 import { tailwind } from "./OrderItemsTable.styles";
 import { useEffect } from "react";
 import { useOrdersTable } from "./useOrderDetailsTable";
@@ -24,6 +23,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
   };
 
   const {
+    order,
     currentPage,
     paginate,
     totalOrders,
@@ -65,7 +65,8 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
       </div>
 
       <div className={tailwind.main}>
-        <OrdersTableBody
+        <TableBody
+          order={order}
           onRowClick={onRowClick}
           isLoading={isLoading}
           orders={orders}
