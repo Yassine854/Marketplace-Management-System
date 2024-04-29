@@ -1,6 +1,7 @@
 import Box from "../Box";
+import OrderItemsTable from "../OrderItemsTable";
 
 const OrderDetails = () => {
-  return <Box></Box>;
+  return <OrderItemsTable />;
 };
 export default OrderDetails;
