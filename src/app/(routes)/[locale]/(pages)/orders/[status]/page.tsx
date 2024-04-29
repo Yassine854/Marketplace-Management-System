@@ -1,9 +1,11 @@
+import AdvancedSearch from "@/components/blocks/AdvancedSearch";
 import OrdersTable from "@/components/blocks/OrdersTable";
 
 const OrdersPage = ({ params }: { params: { status: string } }) => {
   return (
     <>
-      <OrdersTable status={params.status} />
+      {/* {"all" == "all" && <AdvancedSearch />} */}
+      <OrdersTable status={"all"} />
     </>
   );
 };
