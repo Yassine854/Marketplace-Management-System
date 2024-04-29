@@ -5,11 +5,12 @@ import { useEffect, useState } from "react";
 import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import { Props } from "./OrdersTableHeader.types";
 import SearchBar from "@/components/elements/TablesElements/SearchBar";
+import { useRouter } from "next/navigation";
 
 const actions = [
   { name: "Generate Pick List", key: "picklist" },
   { name: "Print BL's", key: "bl" },
-  { name: "Manage Milk-Runs", key: "mr" },
+  { name: "Manage Milk-Runs", key: "milk-run" },
 ];
 const OrdersTableHeader = ({
   title,
@@ -19,16 +20,15 @@ const OrdersTableHeader = ({
   setSearch,
   selectedOrders,
 }: any) => {
+  const { push } = useRouter();
   const [selected, setSelected] = useState({ name: "Actions", key: "a" });
 
   useEffect(() => {
     setSelected({ name: "Actions", key: "a" });
-
-    console.log("🚀 ~ selectedOrders:", selectedOrders);
   }, [selectedOrders]);
 
   return (
-    <div className="bb-dashed flex h-20 w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">
+    <div className=" flex h-20 w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">
       <div className="flex items-center justify-center">
         <p className="m-4 text-xl font-bold capitalize ">{title}</p>
         {!!selectedOrders.length && (
@@ -40,8 +40,13 @@ const OrdersTableHeader = ({
             />
             {selected.name !== "Actions" && (
               <button
-                className="btn flex h-4 items-center justify-center bg-green-500 p-4"
-                onClick={() => setSelected({ name: "Actions", key: "a" })}
+                className="btn m-4 flex h-4 items-center  justify-center p-4"
+                onClick={() => {
+                  if (selected?.key == "milk-run") {
+                    push("/milk-run");
+                  }
+                  setSelected({ name: "Actions", key: "a" });
+                }}
               >
                 Confirm
               </button>

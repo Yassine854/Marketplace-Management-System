@@ -4,6 +4,7 @@ import {
   IconBell,
   IconDashboard,
   IconList,
+  IconMap2,
   IconUsers,
 } from "@tabler/icons-react";
 import { usePathname, useRouter } from "@/libs/i18nNavigation";
@@ -33,8 +34,8 @@ const Sidebar = () => {
   const pathname = usePathname();
 
   return (
-    <aside className="sidebar  no-scrollbar fixed bottom-0 left-0  top-0 z-20 h-screen w-64 overflow-hidden overflow-y-scroll ">
-      <div className="fixed  left-0 top-0 z-30 flex h-16 w-64 items-center justify-center bg-n10 p-3">
+    <aside className="sidebar  no-scrollbar fixed bottom-0 left-0  top-0 z-20 h-screen w-64 overflow-hidden overflow-y-scroll bg-n10">
+      <div className="fixed  left-0 top-0 z-30 flex h-16 w-64 items-center justify-center  bg-n10 p-3">
         <Link href="/">
           <Image
             width={260}
@@ -61,6 +62,15 @@ const Sidebar = () => {
           isActive={pathname?.includes("orders") && !pathname?.includes("logs")}
           onClick={() => {
             push("/orders/open");
+          }}
+        />
+        <Divider />
+        <SidebarButton
+          isActive={pathname?.includes("milk-run")}
+          name={"Milk Run"}
+          icon={<IconMap2 />}
+          onClick={() => {
+            push("/milk-run");
           }}
         />
         <Divider />

@@ -1,30 +1,43 @@
 import { gql } from "graphql-tag";
 
 export const typeDefs = gql`
-  type Query {
-    getOrders(
-      status: String!
-      page: Int!
-      perPage: Int!
-      sortBy: String!
-      search: String!
-    ): OrderList!
+  type OrderLine {
+    id: ID
+    orderId: ID
+    productId: ID
+    productName: String
+    quantity: Float
+    productPrice: Float
+    totalPrice: Float
+    sku: String
   }
 
   type Order {
-    id: String
+    id: ID
     customer: Customer
     total: Float
     deliveryDate: String
+    lines: [OrderLine]
   }
 
   type Customer {
-    name: String!
-    id: String
+    id: ID
+    name: String
   }
 
   type OrderList {
-    orders: [Order]!
-    totalOrders: Int!
+    orders: [Order]
+    totalOrders: Int
+  }
+
+  type Query {
+    getOrder(orderId: ID!): Order
+    getOrders(
+      status: String
+      page: Int
+      perPage: Int
+      sortBy: String
+      search: String
+    ): OrderList
   }
 `;
