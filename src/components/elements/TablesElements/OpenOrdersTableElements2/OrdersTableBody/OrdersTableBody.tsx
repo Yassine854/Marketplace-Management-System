@@ -1,10 +1,10 @@
 "use client";
 
-import AnyMatchingResults from "../AnyMatchingResults";
+import AnyMatchingResults from "../../AnyMatchingResults";
 import { Order } from "@/types/order";
 import OrdersTableHead from "../OrdersTableHead";
 import TableRow from "../TableRow";
-import TableRowSkeleton from "../TableRowSkeleton";
+import TableRowSkeleton from "../../TableRowSkeleton";
 
 const OrdersTableBody = ({
   orders,
@@ -57,8 +57,8 @@ const OrdersTableBody = ({
           </>
           <>
             {isLoading &&
-              [...Array(10)].map((_, i) => (
-                <TableRowSkeleton key={i} number={8} />
+              [...Array(15)].map((_, i) => (
+                <TableRowSkeleton key={i} number={10} />
               ))}
           </>
           <> {!isLoading && !orders?.length && <AnyMatchingResults />}</>

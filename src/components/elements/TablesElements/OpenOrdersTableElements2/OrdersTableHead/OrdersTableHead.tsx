@@ -1,6 +1,6 @@
 "use client";
 
-import Checkbox from "../Checkbox";
+import Checkbox from "../../Checkbox";
 import { IconSelector } from "@tabler/icons-react";
 import { useState } from "react";
 
@@ -9,6 +9,8 @@ const rows = [
   { name: "Customer", key: "customer", isSortable: false },
   { name: "Total", key: "subtotal", isSortable: true },
   { name: "Delivery Date", key: "deliveryDate", isSortable: false },
+  { name: "Delivery Agent", key: "deliveryAgent", isSortable: false },
+  { name: "Delivery Status", key: "deliveryStatus", isSortable: false },
   { name: "Print", key: "print", isSortable: false },
   { name: "Source", key: "source", isSortable: false },
   { name: "Actions", key: "actions", isSortable: false },

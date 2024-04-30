@@ -1,14 +1,22 @@
 "use client";
 
 import Box from "../Box";
-import OrdersTableBody from "@/components/elements/TablesElements/OpenOrdersTableElements/OrdersTableBody";
-import OrdersTableHeader from "@/components/elements/TablesElements/OpenOrdersTableElements/OrdersTableHeader";
+import OrdersTableBody from "@/components/elements/TablesElements/OpenOrdersTableElements2/OrdersTableBody";
+import OrdersTableHeader from "@/components/elements/TablesElements/OpenOrdersTableElements2/OrdersTableHeader";
 import Pagination from "@/components/elements/TablesElements/Pagination";
 import { tailwind } from "./OrdersTable.styles";
 import { useEffect } from "react";
 import { useOrdersTable } from "./useOrdersTable";
 
-const OrdersTable = ({ status = "open" }: { status?: string }) => {
+const OrdersTable = ({
+  status = "open",
+  isAdvanced,
+  setAdvanced,
+}: {
+  status?: string;
+  isAdvanced: any;
+  setAdvanced: any;
+}) => {
   const title = status.toString() + " " + "Orders";
 
   const setStatus = (status: string): string => {
@@ -60,6 +68,8 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
           setSortBy={setSortBy}
           setSearch={setSearch}
           selectedOrders={selectedOrders}
+          isAdvanced={isAdvanced}
+          setAdvanced={setAdvanced}
         />
       </div>
 

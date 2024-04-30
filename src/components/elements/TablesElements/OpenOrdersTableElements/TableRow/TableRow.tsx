@@ -1,7 +1,7 @@
 import { IconPdf, IconTruck } from "@tabler/icons-react";
 
 import CheckboxCustom from "@/components/elements/TablesElements/Checkbox";
-import TableActions from "@/components/elements/TablesElements/TableActions";
+import TableActions from "../TableActions";
 
 const RowItem = ({ content }: any) => (
   <td>

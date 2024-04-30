@@ -9,9 +9,12 @@ const SidebarSubMenuItem = ({
   return (
     <div onClick={onClick}>
       <div
-        className={` flex cursor-pointer px-3 py-2.5 text-sm font-medium capitalize duration-300 hover:text-primary md:py-3 lg:text-base xxxl:px-6 ${
-          isActive && "text-primary"
-        }`}
+        className={` flex cursor-pointer px-3 py-2.5 text-sm font-medium capitalize duration-300 hover:text-primary md:py-3 lg:text-base xxxl:px-6 
+        
+        
+        ${isActive && "text-3xl font-extrabold text-primary"}
+        
+        `}
       >
         <IconArrowNarrowRight />
         <p className="ml-2">{name}</p>
