@@ -13,7 +13,6 @@ const sortOptions = [
 export const useOrdersTable = (status: string): any => {
   const { push } = useRouter();
   const pathname = usePathname();
-  console.log("🚀 ~ useOrdersTable ~ pathname:", pathname);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);

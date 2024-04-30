@@ -19,6 +19,7 @@ const OrdersTableHeader = ({
   setSortBy,
   setSearch,
   selectedOrders,
+  setAdvanced,
 }: any) => {
   const { push } = useRouter();
   const [selected, setSelected] = useState({ name: "Actions", key: "a" });
@@ -56,6 +57,9 @@ const OrdersTableHeader = ({
       </div>
 
       <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
+        <button className="btn" onClick={() => setAdvanced(true)}>
+          Advanced Search
+        </button>
         <SearchBar handleSearch={setSearch} />
         <div className="flex items-center gap-2">
           <p className="whitespace-nowrap">Sort By : </p>

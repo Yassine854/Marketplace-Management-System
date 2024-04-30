@@ -14,7 +14,6 @@ const sortOptions = [
 export const useOrdersTable = (status: string): any => {
   const { push } = useRouter();
   const pathname = usePathname();
-  console.log("🚀 ~ useOrdersTable ~ pathname:", pathname);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
@@ -106,9 +105,6 @@ export const useOrdersTable = (status: string): any => {
 
     setSelectedOrders(list);
   };
-  useEffect(() => {
-    console.log("🚀 ~ useOrdersTable ~ order:", order);
-  }, [order]);
 
   useEffect(() => {
     const newTotalPages = Math.ceil(data?.totalOrders / itemsPerPage);
@@ -157,9 +153,6 @@ export const useOrdersTable = (status: string): any => {
     }
   }, [data, selectedOrders]);
 
-  useEffect(() => {
-    console.log("🚀 ~ useOrdersTable ~ order:", order?.getOrder);
-  }, [order]);
   return {
     order: order,
     orders: orders,

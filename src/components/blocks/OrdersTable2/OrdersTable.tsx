@@ -8,7 +8,15 @@ import { tailwind } from "./OrdersTable.styles";
 import { useEffect } from "react";
 import { useOrdersTable } from "./useOrdersTable";
 
-const OrdersTable = ({ status = "open" }: { status?: string }) => {
+const OrdersTable = ({
+  status = "open",
+  isAdvanced,
+  setAdvanced,
+}: {
+  status?: string;
+  isAdvanced: any;
+  setAdvanced: any;
+}) => {
   const title = status.toString() + " " + "Orders";
 
   const setStatus = (status: string): string => {
@@ -60,6 +68,8 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
           setSortBy={setSortBy}
           setSearch={setSearch}
           selectedOrders={selectedOrders}
+          isAdvanced={isAdvanced}
+          setAdvanced={setAdvanced}
         />
       </div>
 

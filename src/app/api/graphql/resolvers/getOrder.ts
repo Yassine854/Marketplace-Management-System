@@ -45,7 +45,6 @@ export const getOrder = async (
       .search(searchParams);
 
     const order: Order = formatOrder(typesenseResponse?.hits);
-    console.log("🚀 ~ order:", order);
 
     return order;
   } catch (error) {

@@ -21,9 +21,6 @@ const OrdersTableBody = ({
   onRowClick,
   actions,
 }: any) => {
-  useEffect(() => {
-    console.log("🚀 ~ order:", order);
-  }, [order]);
   return (
     <>
       <table
@@ -64,7 +61,7 @@ const OrdersTableBody = ({
           <>
             {isLoading &&
               [...Array(10)].map((_, i) => (
-                <TableRowSkeleton key={i} number={8} />
+                <TableRowSkeleton key={i} number={6} />
               ))}
           </>
           <> {!isLoading && !orders?.length && <AnyMatchingResults />}</>
