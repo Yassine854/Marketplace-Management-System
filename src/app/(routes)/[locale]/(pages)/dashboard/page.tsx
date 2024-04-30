@@ -235,7 +235,7 @@ const RevenueOverview = () => {
     },
   ];
   return (
-    <div className="box col-span-12 overflow-x-hidden lg:col-span-6">
+    <div className="box col-span-12 lg:col-span-6">
       <div className="bb-dashed mb-4 flex flex-wrap items-center justify-between gap-3 pb-4 lg:mb-6 lg:pb-6">
         <p className="font-medium">Revenue Overview</p>
         <div className="flex items-center gap-2">
@@ -670,15 +670,15 @@ const SalesStatistics = () => {
 
 const Dashboard = () => {
   return (
-    <>
-      <div className="grid grid-cols-12 gap-4 xxxl:gap-6">
+    <div className="flex h-full  flex-grow overflow-x-scroll">
+      <div className="no-scrollbar grid grid-cols-12 gap-4  overflow-x-scroll xxxl:gap-6 ">
         <States />
         <SalesStatistics />
         <ShowcaseInfo />
         <ProjectsOverview />
         <RevenueOverview />
       </div>
-    </>
+    </div>
   );
 };
 
