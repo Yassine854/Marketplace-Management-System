@@ -11,7 +11,7 @@ const PagesLayout = ({ children }: Props) => {
     <div className="h-screen w-screen bg-n10 ">
       <TopNavBar />
       <Sidebar />
-      <div className="fixed bottom-0 left-64 right-0  top-16 z-10   rounded-xl bg-n30 p-1.5">
+      <div className="fixed bottom-0 left-64 right-0  top-16 z-10  rounded-xl bg-n30 p-1.5">
         {children}
       </div>
     </div>
