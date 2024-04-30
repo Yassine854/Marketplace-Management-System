@@ -1,14 +1,14 @@
 const Banner = ({
-  title = "Dashboard",
-  links,
+  title,
+  children,
 }: {
   title?: string;
-  links?: React.ReactNode;
+  children?: React.ReactNode;
 }) => {
   return (
-    <div className="mb-6 flex flex-wrap items-center justify-between gap-4 lg:mb-8">
+    <div className="m-2 flex flex-wrap items-center justify-between gap-4 ">
       <h2 className="h2 capitalize">{title}</h2>
-      {links}
+      {children}
     </div>
   );
 };

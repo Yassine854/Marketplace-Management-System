@@ -13,21 +13,21 @@ import Link from "next/link";
 import useDropdown from "@/hooks/useDropdown";
 
 const profileLinks = [
-  {
-    icon: <IconUser size={18} />,
-    url: "/profile",
-    title: "My Profile",
-  },
-  {
-    icon: <IconMessage size={18} />,
-    url: "/messaging",
-    title: "Meassages",
-  },
-  {
-    icon: <IconLifebuoy size={18} />,
-    url: "#",
-    title: "Help",
-  },
+  // {
+  //   icon: <IconUser size={18} />,
+  //   url: "/profile",
+  //   title: "My Profile",
+  // },
+  // {
+  //   icon: <IconMessage size={18} />,
+  //   url: "/messaging",
+  //   title: "Meassages",
+  // },
+  // {
+  //   icon: <IconLifebuoy size={18} />,
+  //   url: "#",
+  //   title: "Help",
+  // },
   {
     icon: <IconSettings size={18} />,
     url: "/settings",
@@ -45,7 +45,7 @@ const Profile = () => {
     <div className="relative shrink-0" ref={ref}>
       <div className="w-10 cursor-pointer sm:w-12" onClick={toggleOpen}>
         <Image
-          src="/images/user.png"
+          src="/images/unnamed.png"
           className="rounded-full"
           width={48}
           height={48}
@@ -59,7 +59,7 @@ const Profile = () => {
       >
         <div className="flex flex-col items-center border-b p-3 text-center dark:border-n500 lg:p-4">
           <Image
-            src="/images/user.png"
+            src="/images/unnamed.png"
             width={60}
             height={60}
             className="rounded-full"
