@@ -1,8 +1,8 @@
 "use client";
 
 import Box from "../Box";
-import OrdersTableBody from "@/components/elements/TablesElements/OpenOrdersTableElements/OrdersTableBody";
-import OrdersTableHeader from "@/components/elements/TablesElements/OpenOrdersTableElements/OrdersTableHeader";
+import OrdersTableBody from "@/components/elements/TablesElements/OpenOrdersTableElements2/OrdersTableBody";
+import OrdersTableHeader from "@/components/elements/TablesElements/OpenOrdersTableElements2/OrdersTableHeader";
 import Pagination from "@/components/elements/TablesElements/Pagination";
 import { tailwind } from "./OrdersTable.styles";
 import { useEffect } from "react";
