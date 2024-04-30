@@ -670,7 +670,7 @@ const SalesStatistics = () => {
 
 const Dashboard = () => {
   return (
-    <div className="flex h-full  flex-grow overflow-x-scroll">
+    <div className="flex h-full   flex-grow   justify-center overflow-x-scroll  p-4">
       <div className="no-scrollbar grid grid-cols-12 gap-4  overflow-x-scroll xxxl:gap-6 ">
         <States />
         <SalesStatistics />
