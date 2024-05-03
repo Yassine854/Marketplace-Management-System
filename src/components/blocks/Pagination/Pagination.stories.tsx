@@ -4,7 +4,7 @@ import Index from "./index";
 import { defaultProps } from "./Pagination.defaultProps";
 
 const meta = {
-  title: "Components/Elements/OrdersTableElements/Pagination",
+  title: "Components/Blocks/Pagination",
   component: Index,
   parameters: {
     layout: "centered",

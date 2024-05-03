@@ -3,33 +3,25 @@ import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import ItemsPerPageSelector from "@/components/elements/TablesElements/ItemsPerPageSelector";
 import { Props } from "./Pagination.types";
 import cn from "@/utils/cn";
+import { usePagination } from "./usePagination";
 
-const Pagination = ({
-  totalPages,
-  currentPage,
-  goToPage,
-  totalOrders,
-  startIndex,
-  endIndex,
-  nextPage,
-  prevPage,
-  itemsPerPage,
-  setItemsPerPage,
-}: Props) => {
-  let pages = Array.from({ length: totalPages }, (_, index) => index + 1);
-
-  if (currentPage < 5) {
-    pages = pages.slice(0, 5);
-  } else {
-    pages = pages.slice(currentPage - 4, currentPage + 1);
-  }
+const Pagination = ({ totalOrders = 1000 }: any) => {
+  const {
+    startIndex,
+    endIndex,
+    totalPages,
+    onItemsPerPageChanged,
+    showedNumbers,
+    currentPage,
+    nextPage,
+    prevPage,
+    paginate,
+    itemsPerPage,
+  } = usePagination(totalOrders);
 
   return (
     <div className="  col-span-12 flex h-20 flex-wrap items-center justify-center gap-4 bg-n10  p-4 sm:justify-between">
-      <ItemsPerPageSelector
-        selected={itemsPerPage}
-        setSelected={setItemsPerPage}
-      />
+      <ItemsPerPageSelector onChange={onItemsPerPageChanged} />
       {!!totalOrders && (
         <p>
           Showing {startIndex + 1} to {endIndex + 1} of {totalOrders} entries
@@ -48,10 +40,10 @@ const Pagination = ({
             <IconChevronLeft />
           </button>
         </li>
-        {pages.map((page, i) => (
+        {showedNumbers?.map((page, i) => (
           <li key={i}>
             <button
-              onClick={() => goToPage(page)}
+              onClick={() => paginate(page)}
               className={cn(
                 "flex h-8 w-8 items-center justify-center rounded-full border border-primary text-primary duration-300 hover:bg-primary hover:text-n0 md:h-10 md:w-10",
                 {

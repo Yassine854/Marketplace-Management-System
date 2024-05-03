@@ -3,7 +3,7 @@
 import Box from "../Box";
 import OrdersTableBody from "@/components/elements/TablesElements/OpenOrdersTableElements2/OrdersTableBody";
 import OrdersTableHeader from "@/components/elements/TablesElements/OpenOrdersTableElements2/OrdersTableHeader";
-import Pagination from "@/components/elements/TablesElements/Pagination";
+import Pagination from "@/components/blocks/Pagination";
 import { tailwind } from "./OrdersTable.styles";
 import { useEffect } from "react";
 import { useOrdersTable } from "./useOrdersTable";

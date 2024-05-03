@@ -2,7 +2,7 @@
 
 import Box from "../Box";
 import OrderItemsTableHeader from "@/components/elements/TablesElements/OrderLinesTableElements/OrderItemsTableHeader";
-import Pagination from "@/components/elements/TablesElements/Pagination";
+import Pagination from "@/components/blocks/Pagination";
 import TableBody from "@/components/elements/TablesElements/OrderLinesTableElements/OrderItemsTableBody";
 import { tailwind } from "./OrderItemsTable.styles";
 import { useEffect } from "react";
