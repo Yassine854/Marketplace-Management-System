@@ -1,4 +1,4 @@
-const TableRowSkeleton = ({ number }: { number: number }) => {
+const TableRowsSkeleton = ({ number = 5 }: { number?: number }) => {
   return (
     <tr
       className=" m-8 mx-auto  h-24  w-[20%]
@@ -13,4 +13,4 @@ const TableRowSkeleton = ({ number }: { number: number }) => {
   );
 };
 
-export default TableRowSkeleton;
+export default TableRowsSkeleton;

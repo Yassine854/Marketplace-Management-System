@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./index";
-
 const meta = {
-  title: "Components/Blocks/Footer",
+  title: "Components/Elements/TableElements/TableRowsSkeleton",
   component: Index,
   parameters: {
     layout: "centered",
