@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import { Props } from "./OrdersTableHeader.types";
-import SearchBar from "@/components/elements/TablesElements/SearchBar";
+import SearchBar from "@/components/elements/sharedElements/SearchBar";
 import { useRouter } from "next/navigation";
 
 const actions = [
