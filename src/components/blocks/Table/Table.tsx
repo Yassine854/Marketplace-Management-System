@@ -3,6 +3,7 @@ import Box from "../Box";
 import OrdersTableBody from "@/components/elements/TablesElements/OpenOrdersTableElements/OrdersTableBody";
 import OrdersTableHeader from "@/components/elements/TablesElements/OpenOrdersTableElements/OrdersTableHeader";
 import Pagination from "@/components/blocks/Pagination";
+import TableHead from "@/components/elements/TablesElements/TableHead";
 import TableRow from "@/components/elements/TablesElements/TableRow";
 import TableRowSkeleton from "@/components/elements/TablesElements/TableRowSkeleton";
 import { tailwind } from "./Table.styles";
@@ -59,6 +60,7 @@ const Table = () => {
       cellSpacing={0}
       className="w-full border-separate overflow-x-scroll whitespace-nowrap border-none pb-16  "
     >
+      <TableHead />
       {/* <OrdersTableHead
         onSortClick={(sortBy: any, sortOrder: any) => {
           setSortBy(sortBy);

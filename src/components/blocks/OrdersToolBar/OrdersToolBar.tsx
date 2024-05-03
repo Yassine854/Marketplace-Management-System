@@ -11,7 +11,7 @@ const actions = [
   { name: "Manage Milk-Runs", key: "milk-run" },
 ];
 const OrdersTableHeader = ({
-  title,
+  title = "Products Table",
   sortOptions,
   sortBy,
   setSortBy,

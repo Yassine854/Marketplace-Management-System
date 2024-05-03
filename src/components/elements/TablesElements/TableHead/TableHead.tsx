@@ -13,11 +13,10 @@ const rows = [
   { name: "Actions", key: "actions", isSortable: false },
 ];
 
-const TableHead = ({
-  onSortClick, // selectAllOrders,
-} // unSelectAllOrders,
+const TableHead = ({} //onSortClick, // selectAllOrders,
+// unSelectAllOrders,
 : any) => {
-  const [sortOrder, setSortOrder] = useState("asc");
+  //  const [sortOrder, setSortOrder] = useState("asc");
 
   return (
     <thead className=" sticky top-[70px] z-10 rounded-xl bg-n40">
@@ -27,9 +26,9 @@ const TableHead = ({
             key={index}
             onClick={() => {
               if (item.isSortable) {
-                const newSortOrder = sortOrder == "asc" ? "desc" : "asc";
-                onSortClick({ name: item.name, key: item.key }, newSortOrder);
-                setSortOrder(newSortOrder);
+                // const newSortOrder = sortOrder == "asc" ? "desc" : "asc";
+                // onSortClick({ name: item.name, key: item.key }, newSortOrder);
+                // setSortOrder(newSortOrder);
               }
             }}
             className="w-14"

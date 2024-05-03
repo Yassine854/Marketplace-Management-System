@@ -4,7 +4,7 @@ const meta = {
   title: "Components/Templates/OrdersTemplate",
   component: Index,
   parameters: {
-    layout: "centered",
+    //  layout: "centered",
   },
   tags: ["autodocs"],
 } satisfies Meta<typeof Index>;
