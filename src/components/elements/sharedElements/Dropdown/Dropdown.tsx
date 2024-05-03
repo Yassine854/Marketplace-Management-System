@@ -1,5 +1,3 @@
-"use client";
-
 import { IconChevronDown } from "@tabler/icons-react";
 import { Props } from "./Dropdown.types";
 import { defaultProps } from "./Dropdown.defaultProps";

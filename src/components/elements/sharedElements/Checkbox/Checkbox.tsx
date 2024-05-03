@@ -1,10 +1,11 @@
-"use client";
-
 import { useEffect, useState } from "react";
 
 import { Props } from "./Checkbox.types";
 
-const Checkbox = ({ label, img, isChecked = false, onClick }: any) => {
+const Checkbox = ({
+  isChecked = false,
+  onClick = (isChecked: boolean) => console.log("is checked", isChecked),
+}: Props) => {
   const [checked, setChecked] = useState(isChecked);
 
   useEffect(() => {
@@ -12,7 +13,7 @@ const Checkbox = ({ label, img, isChecked = false, onClick }: any) => {
   }, [isChecked]);
   return (
     <div
-      className="flex h-8 w-8 items-center justify-center rounded-full  pl-2 hover:bg-n70"
+      className="flex h-8 w-8 items-center justify-center rounded-full   hover:bg-n70"
       onClick={(event: any) => {
         event.stopPropagation();
         onClick(!checked);
@@ -20,14 +21,11 @@ const Checkbox = ({ label, img, isChecked = false, onClick }: any) => {
     >
       <input
         type="checkbox"
-        id={label}
-        name="A3-confirmation"
-        value={label}
         defaultChecked={checked}
         onChange={() => {
           setChecked((e: boolean) => !e);
         }}
-        className="absolute  h-8 w-8 cursor-pointer bg-blue-500 opacity-0"
+        className="absolute  flex h-8 w-8 cursor-pointer items-center justify-center bg-blue-500 opacity-0"
         checked={checked}
       />
       <div className=" flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-400 bg-n0 focus-within:border-primary dark:bg-bg4 ltr:mr-2 rtl:ml-2">
