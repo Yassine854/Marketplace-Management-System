@@ -1,12 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import SearchBar from "./index"; // Assuming you have a SearchBar component
+import SearchBar from "./index";
 
 describe("SearchBar", () => {
   test("search bar updates value on input change", () => {
     render(<SearchBar />);
 
-    const searchInput = screen.getByRole("textbox") as HTMLInputElement; // Assuming your input has role="textbox"
+    const searchInput = screen.getByRole("textbox") as HTMLInputElement;
 
     fireEvent.change(searchInput, { target: { value: "Test query" } });
 
@@ -18,7 +18,7 @@ describe("SearchBar", () => {
     render(<SearchBar onSearch={searchFunctionMock} />);
 
     const searchInput = screen.getByRole("textbox") as HTMLInputElement;
-    const submitButton = screen.getByRole("button") as HTMLButtonElement; // Assuming your submit button has role="button"
+    const submitButton = screen.getByRole("button") as HTMLButtonElement;
 
     fireEvent.change(searchInput, { target: { value: "Test query" } });
     fireEvent.click(submitButton);
