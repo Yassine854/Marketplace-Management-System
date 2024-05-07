@@ -4,6 +4,7 @@ import { IconArrowLeft, IconEye, IconEyeOff } from "@tabler/icons-react";
 
 import Image from "next/image";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -68,7 +69,12 @@ const LoginThreeContent = () => {
             <button
               className="btn w-64 items-center justify-center px-5 "
               onClick={() => {
-                push("/dashboard");
+                signIn(
+                  "credentials",
+                  { callbackUrl: "/dashboard" },
+                  { username: "test", password: "test" },
+                );
+                //  push("/dashboard");
               }}
             >
               Login
