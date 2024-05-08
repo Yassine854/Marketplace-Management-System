@@ -1,8 +1,15 @@
 import { AllLocales, AppConfig } from "./utils/AppConfig";
 
 import { NextResponse } from "next/server";
-import { auth } from "@/libs/auth";
+import { auth } from "@/libs/next-auth";
 import createIntlMiddleware from "next-intl/middleware";
+
+const adminRoutes = [
+  "/logs/orders-logs",
+  "/access/roles",
+  "/access/users",
+  "/logs/activities-logs",
+];
 
 const intlMiddleware = createIntlMiddleware({
   locales: AllLocales,
@@ -14,6 +21,7 @@ const middleware = auth((req: any) => {
   const isAuthPage = req.nextUrl.pathname !== "/login";
   //testPathnameRegex(authPages, req.nextUrl.pathname);
   const session = req?.auth;
+  const isAdmin = session?.user?.role === "ADMIN";
 
   // Redirect to sign-in page if not authenticated
   if (!session && isAuthPage) {
@@ -22,6 +30,10 @@ const middleware = auth((req: any) => {
 
   // Redirect to home page if authenticated and trying to access auth pages
   if (session && !isAuthPage) {
+    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+  }
+
+  if (session && !isAdmin && adminRoutes.includes(req.nextUrl.pathname)) {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
 

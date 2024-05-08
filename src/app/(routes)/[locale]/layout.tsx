@@ -1,15 +1,15 @@
 "use client";
 
 import { ApolloProviderWrapper } from "@/libs/apollo-provider-wrapper";
-
-// import NextAuthSessionProvider from "@/libs/SessionProvider";
+import { Toaster } from "react-hot-toast";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
-      {/* <NextAuthSessionProvider> */}
-      <ApolloProviderWrapper>{children}</ApolloProviderWrapper>
-      {/* </NextAuthSessionProvider> */}
+      <ApolloProviderWrapper>
+        <Toaster />
+        {children}
+      </ApolloProviderWrapper>
     </>
   );
 };

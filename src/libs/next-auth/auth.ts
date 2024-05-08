@@ -11,11 +11,27 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        return await handleAuthentication(
+        const user = await handleAuthentication(
           credentials?.username as string,
           credentials?.password as string,
         );
+        return user;
       },
     }),
   ],
+
+  secret: process.env.SECRET,
+  debug: process.env.NODE_ENV === "development",
+  callbacks: {
+    async jwt({ token, user }) {
+      //@ts-ignore
+      if (user) token.role = user?.role;
+      return token;
+    },
+    async session({ session, token }) {
+      //@ts-ignore
+      if (session?.user) session.user.role = token.role;
+      return session;
+    },
+  },
 });
