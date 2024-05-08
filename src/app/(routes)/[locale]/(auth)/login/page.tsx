@@ -71,9 +71,18 @@ const LoginThreeContent = () => {
               onClick={() => {
                 signIn(
                   "credentials",
+                  {
+                    username: "m.jrad",
+                    password: "test123",
+                    redirect: true,
+                  },
                   { callbackUrl: "/dashboard" },
-                  { username: "test", password: "test" },
                 );
+                // (
+                //   "credentials",
+                //   { callbackUrl: "/dashboard" },
+                //   { username: "test", password: "test" },
+                // );
                 //  push("/dashboard");
               }}
             >
