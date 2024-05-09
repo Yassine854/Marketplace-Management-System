@@ -6,7 +6,7 @@ export const changePassword = async (username: string, newPassword: string) => {
     const hashedPassword = await hashPassword(newPassword);
 
     const res = await dynamodbClient.update({
-      TableName: process.env.AUTH_DYNAMODB_TABLE_NAME,
+      TableName: process.env.NEXT_PUBLIC_AUTH_DYNAMODB_TABLE_NAME,
       Key: {
         username,
       },

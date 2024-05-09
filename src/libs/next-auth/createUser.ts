@@ -9,7 +9,7 @@ export const createUser = async (
   try {
     const hashedPassword = await hashPassword(password);
     const res = await dynamodbClient.put({
-      TableName: process.env.AUTH_DYNAMODB_TABLE_NAME,
+      TableName: process.env.NEXT_PUBLIC_AUTH_DYNAMODB_TABLE_NAME,
       Item: {
         username,
         role,
