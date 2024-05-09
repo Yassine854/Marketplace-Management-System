@@ -20,7 +20,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }),
   ],
 
-  secret: process.env.SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
   callbacks: {
     async jwt({ token, user }) {
