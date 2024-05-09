@@ -20,7 +20,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }),
   ],
   trustHost: true,
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.NEXT_PUBLIC_NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, user }) {
       //@ts-ignore
