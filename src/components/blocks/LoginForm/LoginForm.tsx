@@ -41,12 +41,8 @@ const LoginForm = () => {
       const { username, password } = data;
 
       const res = await login(username, password);
-      console.log("🚀 ~ constonSubmit:SubmitHandler<any>= ~ res:", res);
-      if (res?.error) {
-        toast.error("You did it!");
-      } else {
-        navigateToDashboard();
-      }
+
+      res?.error ? toast.error("Error") : navigateToDashboard();
     } catch (error: any) {
       console.error(error);
     }
