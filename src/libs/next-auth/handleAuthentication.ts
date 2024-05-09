@@ -7,7 +7,7 @@ export const handleAuthentication = async (
 ): Promise<any> => {
   try {
     const res = await dynamodbClient.get({
-      TableName: process.env.AUTH_DYNAMODB_TABLE_NAME,
+      TableName: process.env.NEXT_PUBLIC_AUTH_DYNAMODB_TABLE_NAME,
       Key: {
         username: username,
       },
