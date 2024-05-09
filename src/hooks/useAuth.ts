@@ -7,7 +7,6 @@ const login = async (username: string, password: string) =>
     redirect: false,
   });
 
-const getSession = async () => await auth();
 export const useAuth = () => {
-  return { login, getSession };
+  return { login, getSession: auth };
 };
