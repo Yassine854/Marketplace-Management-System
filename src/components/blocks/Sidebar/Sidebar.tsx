@@ -15,6 +15,7 @@ import Link from "next/link";
 import SidebarButton from "@/components/elements/SidebarElements/SidebarButton";
 import SidebarOrdersSubMenu from "@/components/elements/SidebarElements/SidebarOrdersSubMenu";
 import SidebarSubMenu from "@/components/elements/SidebarElements/SidebarSubMenu";
+import { useAuth } from "@/hooks/useAuth";
 
 const orderStatus = [
   { name: "Open", path: "/orders/open" },
@@ -29,9 +30,11 @@ const orderStatus = [
   { name: "All", path: "/orders/all" },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ isAdmin }: any) => {
   const { push } = useRouter();
   const pathname = usePathname();
+  //const { getSession } = useAuth();
+  // const session = await getSession();
 
   return (
     <aside className="sidebar  no-scrollbar fixed bottom-0 left-0  top-0 z-20 h-screen w-64 overflow-hidden overflow-y-scroll bg-n10">
@@ -83,34 +86,43 @@ const Sidebar = () => {
           }}
         />
         <Divider />
-        <SidebarSubMenu
-          isActive={pathname?.includes("access")}
-          name="Access Control"
-          icon={<IconUsers />}
-          items={[
-            { name: "Users", path: "/access/users" },
-            { name: "Roles", path: "/access/roles" },
-          ]}
-          onClick={() => {
-            push("/access/users");
-          }}
-        />
+        {isAdmin && (
+          <>
+            <SidebarSubMenu
+              isActive={pathname?.includes("access")}
+              name="Access Control"
+              icon={<IconUsers />}
+              items={[
+                { name: "Users", path: "/access/users" },
+                { name: "Roles", path: "/access/roles" },
+              ]}
+              onClick={() => {
+                push("/access/users");
+              }}
+            />
 
-        <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
-        <SidebarSubMenu
-          isActive={pathname?.includes("logs")}
-          name="Logs"
-          icon={<IconList />}
-          items={[
-            { name: "Orders", path: "/logs/orders-logs" },
-            { name: "Activities", path: "/logs/activities-logs" },
-          ]}
-          onClick={() => {
-            push("/logs/orders-logs");
-          }}
-        />
+            <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
+          </>
+        )}
 
-        <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
+        {isAdmin && (
+          <>
+            <SidebarSubMenu
+              isActive={pathname?.includes("logs")}
+              name="Logs"
+              icon={<IconList />}
+              items={[
+                { name: "Orders", path: "/logs/orders-logs" },
+                { name: "Activities", path: "/logs/activities-logs" },
+              ]}
+              onClick={() => {
+                push("/logs/orders-logs");
+              }}
+            />
+
+            <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
+          </>
+        )}
       </div>
     </aside>
   );
