@@ -10,6 +10,7 @@ import {
 
 import Image from "next/image";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 import useDropdown from "@/hooks/useDropdown";
 
 const profileLinks = [
@@ -71,13 +72,15 @@ const Profile = () => {
         <ul className="flex w-[250px] flex-col p-4">
           {profileLinks.map(({ icon, title, url }) => (
             <li key={title}>
-              <Link
-                href={url}
+              <div
+                onClick={() => {
+                  signOut({ callbackUrl: "/login", redirect: true });
+                }}
                 className="flex items-center gap-2 rounded-md p-2 duration-300 hover:bg-primary hover:text-n0"
               >
                 <span>{icon}</span>
                 {title}
-              </Link>
+              </div>
             </li>
           ))}
         </ul>

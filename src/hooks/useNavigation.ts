@@ -15,10 +15,14 @@ export const useNavigation = () => {
     push("/order/" + orderId);
   };
 
+  const navigateToDashboard = () => {
+    push("/dashboard");
+  };
   return {
     navigateBack,
+    navigateToOrderDetails,
+    navigateToDashboard,
     status: String(status),
     locale: String(locale),
-    navigateToOrderDetails,
   };
 };
