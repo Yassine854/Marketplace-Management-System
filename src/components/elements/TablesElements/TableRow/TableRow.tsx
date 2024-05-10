@@ -9,7 +9,7 @@ const TableRow = ({
     >
       {cells?.map(({ cell }: any, index: number) => (
         <td key={index}>
-          <div className=" flex items-center justify-center ">{cell}</div>
+          <div className=" flex h-16 items-center justify-center ">{cell}</div>
         </td>
       ))}
     </tr>

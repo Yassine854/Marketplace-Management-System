@@ -22,7 +22,7 @@ const OrdersTableHeader = ({
   const [selected, setSelected] = useState({ name: "Actions", key: "a" });
 
   useEffect(() => {
-    setSelected({ name: "Actions", key: "a" });
+    // setSelected({ name: "Actions", key: "a" });
   }, [selectedOrders]);
 
   return (
@@ -54,7 +54,7 @@ const OrdersTableHeader = ({
       </div>
 
       <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
-        <SearchBar handleSearch={setSearch} />
+        <SearchBar />
         <div className="flex items-center gap-2">
           <p className="whitespace-nowrap">Sort By : </p>
           <Dropdown

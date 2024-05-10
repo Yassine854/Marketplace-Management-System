@@ -5,7 +5,7 @@ import { Props } from "./Pagination.types";
 import cn from "@/utils/cn";
 import { usePagination } from "./usePagination";
 
-const Pagination = ({ totalOrders = 1000 }: any) => {
+const Pagination = ({ totalItems = 1000 }: any) => {
   const {
     startIndex,
     endIndex,
@@ -17,14 +17,14 @@ const Pagination = ({ totalOrders = 1000 }: any) => {
     prevPage,
     paginate,
     itemsPerPage,
-  } = usePagination(totalOrders);
+  } = usePagination(totalItems);
 
   return (
     <div className=" col-span-12 flex h-14  flex-wrap items-center justify-center gap-4 bg-n10  px-2 sm:justify-between">
       <ItemsPerPageSelector onChange={onItemsPerPageChanged} />
-      {!!totalOrders && (
+      {!!totalItems && (
         <p>
-          Showing {startIndex + 1} to {endIndex + 1} of {totalOrders} entries
+          Showing {startIndex + 1} to {endIndex + 1} of {totalItems} entries
         </p>
       )}
 
