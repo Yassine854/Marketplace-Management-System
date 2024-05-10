@@ -1,7 +1,7 @@
-import Box from "@/components/blocks/Box";
-import OrdersToolBar from "@/components/blocks/OrdersToolBar";
-import Pagination from "@/components/blocks/Pagination";
-import Table from "@/components/blocks/Table";
+import Box from "@/components/widgets/Box";
+import OrdersToolBar from "@/components/widgets/OrdersToolBar";
+import Pagination from "@/components/widgets/Pagination";
+import Table from "@/components/widgets/Table";
 
 const OrdersTemplate = () => {
   return (

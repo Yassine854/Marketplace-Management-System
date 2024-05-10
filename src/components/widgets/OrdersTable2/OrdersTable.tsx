@@ -1,14 +1,22 @@
 "use client";
 
 import Box from "../Box";
-import OrderItemsTableHeader from "@/components/elements/TablesElements/OrderLinesTableElements/OrderItemsTableHeader";
-import Pagination from "@/components/blocks/Pagination";
-import TableBody from "@/components/elements/TablesElements/OrderLinesTableElements/OrderItemsTableBody";
-import { tailwind } from "./OrderItemsTable.styles";
+import OrdersTableBody from "@/components/elements/TablesElements/OpenOrdersTableElements2/OrdersTableBody";
+import OrdersTableHeader from "@/components/elements/TablesElements/OpenOrdersTableElements2/OrdersTableHeader";
+import Pagination from "@/components/widgets/Pagination";
+import { tailwind } from "./OrdersTable.styles";
 import { useEffect } from "react";
-import { useOrdersTable } from "./useOrderDetailsTable";
+import { useOrdersTable } from "./useOrdersTable";
 
-const OrdersTable = ({ status = "open" }: { status?: string }) => {
+const OrdersTable = ({
+  status = "open",
+  isAdvanced,
+  setAdvanced,
+}: {
+  status?: string;
+  isAdvanced: any;
+  setAdvanced: any;
+}) => {
   const title = status.toString() + " " + "Orders";
 
   const setStatus = (status: string): string => {
@@ -23,7 +31,6 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
   };
 
   const {
-    order,
     currentPage,
     paginate,
     totalOrders,
@@ -54,19 +61,20 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
   return (
     <Box>
       <div className={tailwind.header}>
-        <OrderItemsTableHeader
+        <OrdersTableHeader
           title={title}
           sortOptions={sortOptions}
           sortBy={sortBy}
           setSortBy={setSortBy}
           setSearch={setSearch}
           selectedOrders={selectedOrders}
+          isAdvanced={isAdvanced}
+          setAdvanced={setAdvanced}
         />
       </div>
 
       <div className={tailwind.main}>
-        <TableBody
-          order={order}
+        <OrdersTableBody
           onRowClick={onRowClick}
           isLoading={isLoading}
           orders={orders}
@@ -81,7 +89,22 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
           actions={actions}
         />
       </div>
-      <div className={tailwind.footer} />
+      <div className={tailwind.footer}>
+        {orders?.length !== 0 && (
+          <Pagination
+            endIndex={endIndex}
+            totalOrders={totalOrders}
+            totalPages={totalPages}
+            currentPage={currentPage}
+            goToPage={paginate}
+            nextPage={nextPage}
+            prevPage={prevPage}
+            startIndex={startIndex}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
+        )}
+      </div>
     </Box>
   );
 };

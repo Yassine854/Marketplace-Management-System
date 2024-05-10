@@ -1,12 +1,12 @@
 "use client";
 
 import Box from "../Box";
-import OrdersTableBody from "@/components/elements/TablesElements/OpenOrdersTableElements/OrdersTableBody";
-import OrdersTableHeader from "@/components/elements/TablesElements/OpenOrdersTableElements/OrdersTableHeader";
-import Pagination from "@/components/blocks/Pagination";
-import { tailwind } from "./OrdersTable.styles";
+import OrderItemsTableHeader from "@/components/elements/TablesElements/OrderLinesTableElements/OrderItemsTableHeader";
+import Pagination from "@/components/widgets/Pagination";
+import TableBody from "@/components/elements/TablesElements/OrderLinesTableElements/OrderItemsTableBody";
+import { tailwind } from "./OrderItemsTable.styles";
 import { useEffect } from "react";
-import { useOrdersTable } from "./useOrdersTable";
+import { useOrdersTable } from "./useOrderDetailsTable";
 
 const OrdersTable = ({ status = "open" }: { status?: string }) => {
   const title = status.toString() + " " + "Orders";
@@ -23,6 +23,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
   };
 
   const {
+    order,
     currentPage,
     paginate,
     totalOrders,
@@ -53,7 +54,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
   return (
     <Box>
       <div className={tailwind.header}>
-        <OrdersTableHeader
+        <OrderItemsTableHeader
           title={title}
           sortOptions={sortOptions}
           sortBy={sortBy}
@@ -64,7 +65,8 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
       </div>
 
       <div className={tailwind.main}>
-        <OrdersTableBody
+        <TableBody
+          order={order}
           onRowClick={onRowClick}
           isLoading={isLoading}
           orders={orders}
@@ -79,22 +81,7 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
           actions={actions}
         />
       </div>
-      <div className={tailwind.footer}>
-        {orders?.length !== 0 && (
-          <Pagination
-            endIndex={endIndex}
-            totalOrders={totalOrders}
-            totalPages={totalPages}
-            currentPage={currentPage}
-            goToPage={paginate}
-            nextPage={nextPage}
-            prevPage={prevPage}
-            startIndex={startIndex}
-            itemsPerPage={itemsPerPage}
-            setItemsPerPage={setItemsPerPage}
-          />
-        )}
-      </div>
+      <div className={tailwind.footer} />
     </Box>
   );
 };

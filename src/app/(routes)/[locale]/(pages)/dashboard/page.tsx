@@ -3,7 +3,7 @@
 import { IconArrowUpRight, IconPlus } from "@tabler/icons-react";
 
 import { ApexOptions } from "apexcharts";
-import Banner from "@/components/blocks/Banner";
+import Banner from "@/components/widgets/Banner";
 import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import { IconSelector } from "@tabler/icons-react";
 import Image from "next/image";

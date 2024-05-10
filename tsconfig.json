@@ -36,7 +36,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/components/blocks/Sidebar/Sidebar.test.jsx",
+    "src/components/widgets/Sidebar/Sidebar.test.jsx",
     "src/libs/typesenseClient.ts",
     "src/hooks/queries/useGetOrders.ts"
   ],

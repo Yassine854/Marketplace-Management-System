@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import Sidebar from "@/components/blocks/Sidebar";
-import TopNavBar from "@/components/blocks/TopNavBar";
+import Sidebar from "@/components/widgets/Sidebar";
+import TopNavBar from "@/components/widgets/TopNavBar";
 
 type Props = {
   children?: ReactNode;
