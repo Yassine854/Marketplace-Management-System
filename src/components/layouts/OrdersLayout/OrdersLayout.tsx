@@ -3,7 +3,7 @@ import OrdersToolBar from "@/components/widgets/OrdersToolBar";
 import Pagination from "@/components/widgets/Pagination";
 import Table from "@/components/widgets/Table";
 
-const OrdersTemplate = () => {
+const OrdersLayout = () => {
   return (
     <Box>
       <OrdersToolBar />
@@ -13,4 +13,4 @@ const OrdersTemplate = () => {
   );
 };
 
-export default OrdersTemplate;
+export default OrdersLayout;

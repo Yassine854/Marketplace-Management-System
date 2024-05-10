@@ -6,7 +6,7 @@ import AdvancedSearch from "@/components/widgets/AdvancedSearch";
 import Box from "@/components/widgets/Box";
 import OrdersTable from "@/components/widgets/OrdersTable";
 import OrdersTable2 from "@/components/widgets/OrdersTable2";
-import OrdersTemplate from "@/components/templates/OrdersTemplate";
+import OrdersTemplate from "@/components/layouts/OrdersLayout";
 import { useNavigation } from "@/hooks/useNavigation";
 
 const OrdersPage = () => {

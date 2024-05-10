@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./index";
 const meta = {
-  title: "Components/Templates/OrdersTemplate",
+  title: "Components/Layouts/OrdersLayout",
   component: Index,
   parameters: {
     //  layout: "centered",
