@@ -1,29 +1,11 @@
-import { IconSelector } from "@tabler/icons-react";
-import { useState } from "react";
-
-const TableHead = ({
-  cells, //onSortClick, // selectAllOrders,
-} // unSelectAllOrders,
-: any) => {
-  //  const [sortOrder, setSortOrder] = useState("asc");
-
+const TableHead = ({ cells }: any) => {
   return (
-    <thead className=" sticky top-0 z-10 rounded-xl bg-n40">
-      <tr className=" font-semibold ">
-        {cells.map(({ cell }: any, index: number) => (
-          <td
-            key={index}
-            onClick={() => {
-              if (cell.isSortable) {
-                // const newSortOrder = sortOrder == "asc" ? "desc" : "asc";
-                // onSortClick({ name: item.name, key: item.key }, newSortOrder);
-                // setSortOrder(newSortOrder);
-              }
-            }}
-            className="w-14"
-          >
+    // <div className="min-h-12 w-full bg-red-500"></div>
+    <thead>
+      <tr className="sticky top-0  z-10 h-12 min-h-12  w-full    border bg-n40   font-semibold">
+        {cells?.map(({ cell }: any, index: number) => (
+          <td key={index} className="w-14">
             <div className="flex cursor-pointer select-none items-center justify-center gap-1 bg-primary/5 px-3 py-5 dark:bg-bg3">
-              {/* {cell.name} {cell.isSortable && <IconSelector size={18} />} */}
               {cell}
             </div>
           </td>

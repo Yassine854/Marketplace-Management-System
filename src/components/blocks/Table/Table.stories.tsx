@@ -6,6 +6,13 @@ import { rows } from "./rows";
 const meta = {
   title: "Components/Blocks/Table",
   component: Index,
+  decorators: [
+    (Story) => (
+      <div style={{ margin: "3em" }} className="w-[80vw] ">
+        <Story />
+      </div>
+    ),
+  ],
   parameters: {
     layout: "centered",
   },
@@ -18,3 +25,11 @@ type Story = StoryObj<typeof meta>;
 export const Primary: Story = { args: { headCells, rows, isLoading: false } };
 
 export const Loading: Story = { args: { headCells, rows, isLoading: true } };
+
+export const WithoutData: Story = {
+  args: { headCells, rows: [], isLoading: false },
+};
+
+export const WithoutHead: Story = {
+  args: { headCells: [], rows, isLoading: false },
+};

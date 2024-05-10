@@ -2,13 +2,13 @@ import TableHead from "@/components/elements/TablesElements/TableHead";
 import TableRow from "@/components/elements/TablesElements/TableRow";
 import TableRowSkeleton from "@/components/elements/TablesElements/TableRowSkeleton";
 
-const Table = ({ headCells, rows, isLoading = true }: any) => {
+const Table = ({ headCells, rows, isLoading = true, columns = 9 }: any) => {
   return (
     <table
       border={0}
       cellPadding={0}
       cellSpacing={0}
-      className="w-full border-separate overflow-hidden overflow-x-scroll whitespace-nowrap border-none pb-16 "
+      className="relative w-full border-separate overflow-hidden overflow-x-scroll whitespace-nowrap  "
     >
       <TableHead cells={headCells} />
 
@@ -17,7 +17,7 @@ const Table = ({ headCells, rows, isLoading = true }: any) => {
           {isLoading ? (
             <>
               {[...Array(15)].map((_, i) => (
-                <TableRowSkeleton key={i} number={10} />
+                <TableRowSkeleton key={i} number={columns} />
               ))}
             </>
           ) : (

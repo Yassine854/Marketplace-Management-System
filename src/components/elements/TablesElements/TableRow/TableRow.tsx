@@ -8,7 +8,9 @@ const TableRow = ({
       onClick={onClick}
     >
       {cells?.map(({ cell }: any, index: number) => (
-        <td key={index}>{cell}</td>
+        <td key={index}>
+          <div className=" flex items-center justify-center ">{cell}</div>
+        </td>
       ))}
     </tr>
   );
