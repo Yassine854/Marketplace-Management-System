@@ -20,7 +20,7 @@ const Pagination = ({ totalOrders = 1000 }: any) => {
   } = usePagination(totalOrders);
 
   return (
-    <div className="  col-span-12 flex h-20 flex-wrap items-center justify-center gap-4 bg-n10  p-4 sm:justify-between">
+    <div className=" col-span-12 flex h-14  flex-wrap items-center justify-center gap-4 bg-n10  px-2 sm:justify-between">
       <ItemsPerPageSelector onChange={onItemsPerPageChanged} />
       {!!totalOrders && (
         <p>
