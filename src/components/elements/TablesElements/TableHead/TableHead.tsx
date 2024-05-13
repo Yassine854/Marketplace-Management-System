@@ -1,6 +1,5 @@
 const TableHead = ({ cells }: any) => {
   return (
-    // <div className="min-h-12 w-full bg-red-500"></div>
     <thead>
       <tr className="sticky top-0  z-10 h-12 min-h-12  w-full    border bg-n40   font-semibold">
         {cells?.map(({ cell }: any, index: number) => (

@@ -1,4 +1,4 @@
-import Box from "../Box";
+import Box from "../../Box";
 import OrderItemsTable from "../OrderItemsTable";
 
 const OrderDetails = () => {

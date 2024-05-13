@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import Index from "./index";
+//import Index from "./index";
+const Index = () => <div />;
 
 const meta = {
-  title: "Widgets/OrdersSearchBar",
+  title: "Widgets/OrdersWidgets/OrderItemsTable",
   component: Index,
   parameters: {
     layout: "centered",

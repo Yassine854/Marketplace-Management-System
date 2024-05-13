@@ -4,7 +4,7 @@ import { headCells } from "./headCells";
 import { rows } from "./rows";
 
 const meta = {
-  title: "Widgets/OrdersTable",
+  title: "Widgets/OrdersWidgets/OrdersTable",
   component: Index,
   decorators: [
     (Story) => (

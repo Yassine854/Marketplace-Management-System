@@ -3,8 +3,16 @@ import Index from "./index";
 const meta = {
   title: "Layouts/OrdersLayout",
   component: Index,
+  decorators: [
+    (Story) => (
+      <div className="h-[80vh] w-[90vw]">
+        {/* 👇 Decorators in Storybook also accept a function. Replace <Story/> with Story() to enable it  */}
+        <Story />
+      </div>
+    ),
+  ],
   parameters: {
-    //  layout: "centered",
+    layout: "centered",
   },
   tags: ["autodocs"],
 } satisfies Meta<typeof Index>;

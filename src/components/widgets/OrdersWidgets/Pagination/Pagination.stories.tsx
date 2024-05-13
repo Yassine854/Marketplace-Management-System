@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import Index from "./index";
+import { defaultProps } from "./Pagination.defaultProps";
 
 const meta = {
-  title: "Widgets/OrdersToolBar",
+  title: "Widgets/OrdersWidgets/Pagination",
   component: Index,
   parameters: {
     layout: "centered",
@@ -14,4 +15,4 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {};
+export const Primary: Story = { args: { ...defaultProps } };
