@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./index";
 
 const meta = {
-  title: "Components/Widgets/OrdersToolBar",
+  title: "Widgets/OrdersToolBar",
   component: Index,
   parameters: {
     layout: "centered",

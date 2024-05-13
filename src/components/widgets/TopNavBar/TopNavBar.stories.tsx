@@ -3,7 +3,7 @@ import Index from "./index";
 
 const C = () => <div>Top Nav Bar</div>;
 const meta = {
-  title: "Components/Widgets/TopNavBar",
+  title: "Widgets/TopNavBar",
   component: C,
   parameters: {
     layout: "centered",

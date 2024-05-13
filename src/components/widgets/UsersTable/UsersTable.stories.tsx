@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./index";
 const meta = {
-  title: "Components/Widgets/UsersTable",
+  title: "Widgets/UsersTable",
   component: Index,
   parameters: {
     layout: "centered",

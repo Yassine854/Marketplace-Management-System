@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./index";
 
 const meta = {
-  title: "Components/Elements/SharedElements/SearchBar",
+  title: "Elements/SharedElements/SearchBar",
   component: Index,
   parameters: {
     layout: "centered",

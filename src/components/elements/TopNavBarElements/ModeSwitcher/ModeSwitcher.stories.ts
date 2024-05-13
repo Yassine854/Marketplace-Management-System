@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./index";
 
 const meta = {
-  title: "Components/Elements/TopNavBarElements/ModeSwitcher",
+  title: "Elements/TopNavBarElements/ModeSwitcher",
   component: Index,
   parameters: {
     layout: "centered",

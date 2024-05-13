@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./index";
 import { defaultProps } from "./TableRow.defaultProps";
 const meta = {
-  title: "Components/Elements/OrdersTableElements/TableRow2",
+  title: "Elements/OrdersTableElements/TableRow2",
   component: Index,
   parameters: {
     layout: "centered",

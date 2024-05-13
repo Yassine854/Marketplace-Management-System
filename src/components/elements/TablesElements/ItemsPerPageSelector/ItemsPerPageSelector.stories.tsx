@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { defaultProps } from "./ItemsPerPageSelector.defaultProps";
 import Index from "./index";
 const meta = {
-  title: "Components/Elements/TableElements/ItemsPerPageSelector",
+  title: "Elements/TableElements/ItemsPerPageSelector",
   component: Index,
   parameters: {
     layout: "centered",

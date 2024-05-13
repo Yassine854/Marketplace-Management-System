@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 const Index = () => <div />;
 
 const meta = {
-  title: "Components/Elements/SidebarElements/SidebarSubMenu",
+  title: "Elements/SidebarElements/SidebarSubMenu",
   component: Index,
   parameters: {
     layout: "centered",

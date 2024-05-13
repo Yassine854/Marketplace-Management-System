@@ -12,10 +12,11 @@ const preview: Preview = {
     // nextjs: {
     //   appDirectory: true,
     // },
-    storySort: {
-      method: "alphabetical",
-      order: ["Components", ["Pages", "Layouts", "Widgets", "Elements"]],
-      locales: "en-US",
+
+    options: {
+      storySort: {
+        order: ["Pages", "Layouts", "Widgets", "Elements"],
+      },
     },
     controls: {
       matchers: {
