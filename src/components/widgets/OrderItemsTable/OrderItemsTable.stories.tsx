@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 const Index = () => <div />;
 
 const meta = {
-  title: "Widgets/OrdersTable",
+  title: "Widgets/OrderItemsTable",
   component: Index,
   parameters: {
     layout: "centered",
