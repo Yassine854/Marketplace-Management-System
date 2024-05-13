@@ -1,5 +1,3 @@
-"use client";
-
 import {
   IconBell,
   IconDashboard,
@@ -15,19 +13,7 @@ import Link from "next/link";
 import SidebarButton from "@/components/elements/SidebarElements/SidebarButton";
 import SidebarOrdersSubMenu from "@/components/elements/SidebarElements/SidebarOrdersSubMenu";
 import SidebarSubMenu from "@/components/elements/SidebarElements/SidebarSubMenu";
-
-const orderStatus = [
-  { name: "Open", path: "/orders/open" },
-  { name: "Valid", path: "/orders/valid" },
-  { name: "Ready", path: "/orders/ready" },
-  { name: "div", path: "" },
-  { name: "Unpaid", path: "/orders/unpaid" },
-  { name: "Delivered", path: "/orders/delivered" },
-  { name: "Archived", path: "/orders/archived" },
-  { name: "Failed", path: "/orders/failed" },
-  { name: "Closed", path: "/orders/closed" },
-  { name: "All", path: "/orders/all" },
-];
+import { statuses } from "./statuses";
 
 const Sidebar = () => {
   const { push } = useRouter();
@@ -58,10 +44,10 @@ const Sidebar = () => {
         />
         <Divider />
         <SidebarOrdersSubMenu
-          items={orderStatus}
+          items={statuses}
           isActive={pathname?.includes("orders") && !pathname?.includes("logs")}
           onClick={() => {
-            push("/orders/open");
+            push("/orders");
           }}
         />
         <Divider />
