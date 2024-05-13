@@ -5,6 +5,7 @@ import { IconPdf, IconTruck } from "@tabler/icons-react";
 import Checkbox from "@/components/elements/sharedElements/Checkbox";
 import OrdersLayout from "@/components/layouts/OrdersLayout";
 import TableActions from "@/components/elements/TablesElements/OpenOrdersTableElements/TableActions";
+import { useEffect } from "react";
 import { useOrders } from "@/hooks/useOrders";
 
 const tableHeadCells = [
@@ -75,6 +76,9 @@ const OrdersPage = () => {
     ];
   });
 
+  useEffect(() => {
+    console.log("🚀 ~ OrdersPage ~ orders:", orders);
+  }, [orders]);
   return (
     <OrdersLayout
       totalOrders={totalOrders}

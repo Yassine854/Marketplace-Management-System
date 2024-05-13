@@ -132,6 +132,12 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^19.1.0
         version: 19.1.0
+      '@storybook/addon-actions':
+        specifier: ^8.0.10
+        version: 8.0.10
+      '@storybook/addon-console':
+        specifier: ^3.0.0
+        version: 3.0.0(@storybook/addon-actions@8.0.10)(react@18.2.0)
       '@storybook/addon-essentials':
         specifier: ^8.0.10
         version: 8.0.10(@types/react@18.2.75)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1869,6 +1875,12 @@ packages:
 
   '@storybook/addon-backgrounds@8.0.10':
     resolution: {integrity: sha512-445SUQqOH5xFJWlNeMu74FEgk26O9Zm/5aqnvmeteB0Q2JLaw7k2q9i/W6XFu97QkRxqA1EGbDxLR3+e1xCjaA==}
+
+  '@storybook/addon-console@3.0.0':
+    resolution: {integrity: sha512-2pD2c9KNWuPIWlprqmWoZYrNQnG2qoDg7fAAXXNK6YDc5x/ZpK0cfOyfz/Gpdeje4QUmttZKAVjH0nOZDuxfvw==}
+    peerDependencies:
+      '@storybook/addon-actions': '*'
+      react: '*'
 
   '@storybook/addon-controls@8.0.10':
     resolution: {integrity: sha512-MAUtIJGayNSsfn3VZ6SjQwpRkb4ky+10oVfos+xX9GQ5+7RCs+oYMuE4+aiQvvfXNdV8v0pUGPUPeUzqfJmhOA==}
@@ -9394,6 +9406,12 @@ snapshots:
       '@storybook/global': 5.0.0
       memoizerific: 1.11.3
       ts-dedent: 2.2.0
+
+  '@storybook/addon-console@3.0.0(@storybook/addon-actions@8.0.10)(react@18.2.0)':
+    dependencies:
+      '@storybook/addon-actions': 8.0.10
+      '@storybook/global': 5.0.0
+      react: 18.2.0
 
   '@storybook/addon-controls@8.0.10(@types/react@18.2.75)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
