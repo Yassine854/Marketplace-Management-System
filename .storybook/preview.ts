@@ -12,6 +12,11 @@ const preview: Preview = {
     // nextjs: {
     //   appDirectory: true,
     // },
+    storySort: {
+      method: "alphabetical",
+      order: ["Components", ["Pages", "Layouts", "Widgets", "Elements"]],
+      locales: "en-US",
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,
