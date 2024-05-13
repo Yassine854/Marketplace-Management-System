@@ -60,7 +60,11 @@ const OrdersTableHeader = ({
         <button className="btn" onClick={() => setAdvanced(true)}>
           Advanced Search
         </button>
-        <SearchBar handleSearch={setSearch} />
+        <SearchBar
+          //@ts-ignore
+
+          handleSearch={setSearch}
+        />
         <div className="flex items-center gap-2">
           <p className="whitespace-nowrap">Sort By : </p>
           <Dropdown

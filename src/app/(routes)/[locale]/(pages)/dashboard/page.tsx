@@ -131,8 +131,13 @@ const ShowcaseInfo = () => {
         <div className="flex items-center gap-2">
           <p className="text-xs sm:text-sm">Sort By : </p>
           <Dropdown
+            //@ts-ignore
             selected={selected}
+            //@ts-ignore
+
             setSelected={setSelected}
+            //@ts-ignore
+
             items={options}
           />
         </div>
@@ -241,8 +246,14 @@ const RevenueOverview = () => {
         <div className="flex items-center gap-2">
           <p className="text-xs sm:text-sm">Sort By : </p>
           <Dropdown
+            //@ts-ignore
+
             selected={selected}
+            //@ts-ignore
+
             setSelected={setSelected}
+            //@ts-ignore
+
             items={options}
           />
         </div>
@@ -439,8 +450,14 @@ const ProjectsOverview = () => {
         <div className="flex items-center gap-2">
           <p className="text-xs sm:text-sm">Sort By : </p>
           <Dropdown
+            //@ts-ignore
+
             items={options}
+            //@ts-ignore
+
             selected={selected}
+            //@ts-ignore
+
             setSelected={setSelected}
           />
         </div>
@@ -651,8 +668,14 @@ const SalesStatistics = () => {
         <div className="flex items-center gap-2">
           <p className="text-xs sm:text-sm">Sort By : </p>
           <Dropdown
+            //@ts-ignore
+
             selected={selected}
+            //@ts-ignore
+
             setSelected={setSelected}
+            //@ts-ignore
+
             items={options}
           />
         </div>

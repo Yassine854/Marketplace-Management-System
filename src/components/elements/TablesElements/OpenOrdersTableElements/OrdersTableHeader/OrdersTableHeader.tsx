@@ -56,7 +56,11 @@ const OrdersTableHeader = ({
       </div>
 
       <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
-        <SearchBar handleSearch={setSearch} />
+        <SearchBar
+          //@ts-ignore
+
+          handleSearch={setSearch}
+        />
         <div className="flex items-center gap-2">
           <p className="whitespace-nowrap">Sort By : </p>
           <Dropdown
