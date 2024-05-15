@@ -26,7 +26,8 @@
       "@/utils*": ["./src/utils/*"],
       "@/hooks*": ["./src/hooks/*"],
       "@/types*": ["./src/types/*"],
-      "@/libs*": ["./src/libs/*"]
+      "@/libs*": ["./src/libs/*"],
+      "@/services*": ["./src/services/*"]
     }
   },
   "include": [

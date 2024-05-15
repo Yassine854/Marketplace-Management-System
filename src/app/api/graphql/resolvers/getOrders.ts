@@ -74,7 +74,7 @@ export const getOrders = async ({
     }
 
     const typesenseResponse = await typesenseClient
-      .collections("orders2")
+      .collections("orders")
       .documents()
       .search(searchParamsWithoutFilter);
 
