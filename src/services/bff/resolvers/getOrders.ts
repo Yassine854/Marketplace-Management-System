@@ -1,6 +1,6 @@
 import { Order } from "@/types/order";
 import { typesenseClient } from "@/libs/typesenseClient";
-
+import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
 export type GetOrdersParams = {
   status: string;
   page: number;
@@ -9,22 +9,8 @@ export type GetOrdersParams = {
   search: string;
 };
 
-const unixTimestampToDate = (timestamp: number) => {
-  // Create a new Date object using the provided timestamp
-  const dateObject = new Date(timestamp);
-
-  // Extract day, month, and year components from the Date object
-  const day = String(dateObject.getDate()).padStart(2, "0");
-  const month = String(dateObject.getMonth() + 1).padStart(2, "0"); // Adding 1 because months are 0-indexed
-  const year = dateObject.getFullYear();
-
-  // Return the date string in the format "DD/MM/YYYY"
-  return `${day}/${month}/${year}`;
-};
-
 const createOrdersList = (typesenseHits: any): Order[] =>
   typesenseHits.map(({ document }: any): Order => {
-    console.log("🚀 ~ returntypesenseHits.map ~ document:", document.items);
     return {
       id: document.id,
       customer: {

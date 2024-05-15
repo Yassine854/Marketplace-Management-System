@@ -1,7 +1,7 @@
 import { AllLocales, AppConfig } from "./utils/AppConfig";
 
 import { NextResponse } from "next/server";
-import { auth } from "@/libs/next-auth";
+import { auth } from "@/services/auth";
 import createIntlMiddleware from "next-intl/middleware";
 
 const adminRoutes = [

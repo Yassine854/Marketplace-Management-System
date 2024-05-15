@@ -2,8 +2,8 @@ import { Order } from "@/types/order";
 import { OrderLine } from "@/types/OrderLine";
 import { typesenseClient } from "@/libs/typesenseClient";
 
-const formatOrder = (typesenseHits: any): Order => {
-  const document = typesenseHits[0].document;
+const formatOrder = (typesenseResponse: any): Order => {
+  const document = typesenseResponse.hits[0].document;
 
   const lines: OrderLine[] = document.items.map((e: any) => ({
     id: e.item_id,
@@ -44,7 +44,7 @@ export const getOrder = async (
       .documents()
       .search(searchParams);
 
-    const order: Order = formatOrder(typesenseResponse?.hits);
+    const order: Order = formatOrder(typesenseResponse);
 
     return order;
   } catch (error) {

@@ -1,4 +1,4 @@
-import { auth } from "@/libs/next-auth";
+import { auth } from "@/services/auth";
 import { signIn } from "next-auth/react";
 const login = async (username: string, password: string) =>
   await signIn("credentials", {
