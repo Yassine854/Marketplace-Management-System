@@ -41,7 +41,7 @@ const OrdersTableRow = ({
       </OrdersTableCell>
       <OrdersTableCell>{order?.kamiounId}</OrdersTableCell>
       <OrdersTableCell>
-        {order?.customerFirstname + order?.customerLastname}
+        {order?.customerFirstname + " " + order?.customerLastname}
       </OrdersTableCell>
       <OrdersTableCell>{order?.total}</OrdersTableCell>
       <OrdersTableCell>

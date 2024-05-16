@@ -14,14 +14,14 @@ export const useOrders = () => {
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [sort, setSort] = useState("");
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState(`status:=${status}`);
 
   const { data, isLoading } = useGetOrders({
     page: currentPage,
     perPage: itemsPerPage,
     search: search,
     sortBy: sort,
-    filterBy: filter,
+    filterBy: "status:=" + status,
   });
 
   return {
