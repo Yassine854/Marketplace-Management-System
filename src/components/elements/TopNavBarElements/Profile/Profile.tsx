@@ -1,46 +1,41 @@
 "use client";
 
-import {
-  IconLifebuoy,
-  IconLogout,
-  IconMessage,
-  IconSettings,
-  IconUser,
-} from "@tabler/icons-react";
+import { IconLogout, IconSettings } from "@tabler/icons-react";
 
 import Image from "next/image";
-import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 import useDropdown from "@/hooks/useDropdown";
 
-const profileLinks = [
-  // {
-  //   icon: <IconUser size={18} />,
-  //   url: "/profile",
-  //   title: "My Profile",
-  // },
-  // {
-  //   icon: <IconMessage size={18} />,
-  //   url: "/messaging",
-  //   title: "Meassages",
-  // },
-  // {
-  //   icon: <IconLifebuoy size={18} />,
-  //   url: "#",
-  //   title: "Help",
-  // },
-  {
-    icon: <IconSettings size={18} />,
-    url: "/settings",
-    title: "Settings",
-  },
-  {
-    icon: <IconLogout size={18} />,
-    url: "/login",
-    title: "Logout",
-  },
-];
+const useList = () => {
+  const { logout } = useAuth();
+
+  const list = [
+    {
+      icon: <IconSettings size={18} />,
+      url: "/settings",
+      title: "Settings",
+      onClick: () => {},
+    },
+    {
+      icon: <IconLogout size={18} />,
+      url: "/login",
+      title: "Logout",
+      onClick: async () => {
+        try {
+          await logout();
+        } catch (error: any) {
+          console.error(error);
+        }
+      },
+    },
+  ];
+
+  return { list };
+};
 const Profile = () => {
+  const { list } = useList();
   const { open, ref, toggleOpen } = useDropdown();
+
   return (
     <div className="relative shrink-0" ref={ref}>
       <div className="w-10 cursor-pointer sm:w-12" onClick={toggleOpen}>
@@ -69,15 +64,15 @@ const Profile = () => {
           <span className="text-sm">mjrad@kamioun.tn</span>
         </div>
         <ul className="flex w-[250px] flex-col p-4">
-          {profileLinks.map(({ icon, title, url }) => (
+          {list.map(({ icon, title, url, onClick }) => (
             <li key={title}>
-              <Link
-                href={url}
-                className="flex items-center gap-2 rounded-md p-2 duration-300 hover:bg-primary hover:text-n0"
+              <div
+                onClick={() => onClick()}
+                className=" flex cursor-pointer items-center gap-2 rounded-md p-2 duration-300 hover:bg-primary hover:text-n0"
               >
                 <span>{icon}</span>
                 {title}
-              </Link>
+              </div>
             </li>
           ))}
         </ul>

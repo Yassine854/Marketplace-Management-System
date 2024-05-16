@@ -140,15 +140,12 @@ export const useOrdersTable = (status: string): any => {
     if (data) {
       const orders = data.orders.map((order: any, i: number) => {
         //@ts-ignore
-
         if (selectedOrders.includes(order.id)) {
           return { ...order, isSelected: true };
-        } else {
-          return { ...order, isSelected: false };
         }
+        return { ...order, isSelected: false };
       });
       //@ts-ignore
-
       setOrders([...orders]);
     }
   }, [data, selectedOrders]);
