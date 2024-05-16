@@ -37,10 +37,10 @@ export const typeDefs = gql`
   type Query {
     getOrder(orderId: ID!): Order
     getOrders(
-      status: String
       page: Int
       perPage: Int
       sortBy: String
+      filterBy: String
       search: String
     ): OrderList
   }

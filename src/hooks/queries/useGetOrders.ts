@@ -4,10 +4,10 @@ import { ApolloError } from "@apollo/client";
 import { Order } from "@/types/order";
 
 export type Params = {
-  status: string;
   page: number;
   perPage: number;
   sortBy: string;
+  filterBy: string;
   search: string;
 };
 
@@ -24,17 +24,17 @@ type Res = {
 
 const QUERY = gql`
   query GetOrders(
-    $status: String!
     $page: Int!
     $perPage: Int!
     $sortBy: String!
+    $filterBy: String!
     $search: String!
   ) {
     getOrders(
-      status: $status
       page: $page
       perPage: $perPage
       sortBy: $sortBy
+      filterBy: $filterBy
       search: $search
     ) {
       orders {
@@ -52,15 +52,15 @@ const QUERY = gql`
 `;
 
 export const useGetOrders = ({
-  status,
   page,
   perPage,
   sortBy,
+  filterBy,
   search,
-}: Params) => {
+}: Params): Res => {
   const { data, loading, error } = useQuery(QUERY, {
     variables: {
-      status,
+      filterBy,
       page,
       perPage,
       sortBy,
