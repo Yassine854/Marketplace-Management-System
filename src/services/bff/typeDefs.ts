@@ -25,6 +25,7 @@ export const typeDefs = gql`
     deliveryAgentId: String!
     deliveryAgent: String!
     deliveryDate: Float!
+    deliveryStatus: String
     source: String!
     lines: [OrderLine!]!
   }
@@ -37,10 +38,10 @@ export const typeDefs = gql`
   type Query {
     getOrder(orderId: ID!): Order
     getOrders(
-      status: String
       page: Int
       perPage: Int
       sortBy: String
+      filterBy: String
       search: String
     ): OrderList
   }

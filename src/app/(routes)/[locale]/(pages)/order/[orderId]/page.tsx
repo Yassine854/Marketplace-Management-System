@@ -1,4 +1,4 @@
-import OrderDetails from "@/components/blocks/OrderDetails";
+import OrderDetails from "@/components/widgets/OrdersWidgets/OrderDetails";
 
 const OrderDetailsPage = () => {
   return (

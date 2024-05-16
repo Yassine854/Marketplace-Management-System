@@ -1,4 +1,4 @@
-import MilkRun from "@/components/blocks/MilkRun";
+import MilkRun from "@/components/widgets/MilkRun";
 const MilkRunPage = () => {
   return (
     <>

@@ -3,11 +3,9 @@
 import { IconArrowUpRight, IconPlus } from "@tabler/icons-react";
 
 import { ApexOptions } from "apexcharts";
-import Banner from "@/components/blocks/Banner";
 import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import { IconSelector } from "@tabler/icons-react";
 import Image from "next/image";
-import Link from "next/link";
 import dynamic from "next/dynamic";
 import { faker } from "@faker-js/faker";
 import { options } from "@/public/data/timesDropdown";
@@ -131,8 +129,13 @@ const ShowcaseInfo = () => {
         <div className="flex items-center gap-2">
           <p className="text-xs sm:text-sm">Sort By : </p>
           <Dropdown
+            //@ts-ignore
             selected={selected}
+            //@ts-ignore
+
             setSelected={setSelected}
+            //@ts-ignore
+
             items={options}
           />
         </div>
@@ -241,8 +244,14 @@ const RevenueOverview = () => {
         <div className="flex items-center gap-2">
           <p className="text-xs sm:text-sm">Sort By : </p>
           <Dropdown
+            //@ts-ignore
+
             selected={selected}
+            //@ts-ignore
+
             setSelected={setSelected}
+            //@ts-ignore
+
             items={options}
           />
         </div>
@@ -439,8 +448,14 @@ const ProjectsOverview = () => {
         <div className="flex items-center gap-2">
           <p className="text-xs sm:text-sm">Sort By : </p>
           <Dropdown
+            //@ts-ignore
+
             items={options}
+            //@ts-ignore
+
             selected={selected}
+            //@ts-ignore
+
             setSelected={setSelected}
           />
         </div>
@@ -651,8 +666,14 @@ const SalesStatistics = () => {
         <div className="flex items-center gap-2">
           <p className="text-xs sm:text-sm">Sort By : </p>
           <Dropdown
+            //@ts-ignore
+
             selected={selected}
+            //@ts-ignore
+
             setSelected={setSelected}
+            //@ts-ignore
+
             items={options}
           />
         </div>

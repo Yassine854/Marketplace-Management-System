@@ -1,4 +1,4 @@
-import RolesTable from "@/components/blocks/RolesTable";
+import RolesTable from "@/components/widgets/RolesTable";
 
 const Roles = () => {
   return (

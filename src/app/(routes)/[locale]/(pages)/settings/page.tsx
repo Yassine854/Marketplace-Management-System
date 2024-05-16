@@ -1,4 +1,4 @@
-import Box from "@/components/blocks/Box";
+import Box from "@/components/widgets/Box";
 
 const Notifications = () => {
   return <Box title="Settings"></Box>;

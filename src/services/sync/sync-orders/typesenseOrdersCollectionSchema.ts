@@ -50,6 +50,10 @@ export const typesenseOrdersCollectionSchema: CollectionCreateSchema = {
       type: "string",
     },
     {
+      name: "deliveryStatus",
+      type: "string",
+    },
+    {
       name: "deliveryDate",
       type: "int64",
     },

@@ -1,6 +1,6 @@
 import { IconClock, IconMessageDots } from "@tabler/icons-react";
 
-import Box from "@/components/blocks/Box";
+import Box from "@/components/widgets/Box";
 import Image from "next/image";
 
 //import OptionsVertical from "../shared/OptionsVertical";

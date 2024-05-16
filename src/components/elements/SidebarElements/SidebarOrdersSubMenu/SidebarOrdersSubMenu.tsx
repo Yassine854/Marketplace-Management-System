@@ -1,21 +1,25 @@
-"use client";
+import { useEffect, useState } from "react";
 
 import AnimateHeight from "react-animate-height";
 import Divider from "@/components/elements/SidebarElements/Divider";
 import SidebarButton from "../SidebarButton";
 import SidebarSubMenuItem from "../SidebarSubMenuItem";
-import { useSidebarOrdersSubMenu } from "./useSidebarOrdersSubMenu";
+import { useOrders } from "@/hooks/useOrders";
 
 const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
+  const [isOpen, setIsOpen] = useState(isActive);
+
   const {
-    isOpen,
-    setIsOpen,
-    openOrdersCount,
     readyOrdersCount,
+    openOrdersCount,
     validOrdersCount,
-    pathname,
-    push,
-  } = useSidebarOrdersSubMenu(isActive);
+    selectedStatus,
+    setStatus,
+  } = useOrders();
+
+  useEffect(() => {
+    setIsOpen(isActive);
+  }, [isActive]);
 
   return (
     <div className="flex flex-col gap-2 ">
@@ -34,7 +38,7 @@ const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
         />
         <AnimateHeight height={isOpen ? "auto" : 0}>
           <ul className={`px-3 py-3 4xl:px-5`}>
-            {items.map(({ name, path }: any) => {
+            {items.map(({ name, status }: any) => {
               if (name == "div") {
                 return <Divider key={name} />;
               } else {
@@ -49,8 +53,8 @@ const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
                   <SidebarSubMenuItem
                     key={name}
                     name={nameAndCount ? nameAndCount : name}
-                    onClick={() => push(path)}
-                    isActive={pathname?.includes(path)}
+                    onClick={() => setStatus(status)}
+                    isActive={selectedStatus == status}
                   />
                 );
               }
