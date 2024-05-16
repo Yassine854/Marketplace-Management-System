@@ -1,6 +1,6 @@
 import { signIn, signOut } from "next-auth/react";
 
-import { auth } from "@/libs/next-auth";
+import { auth } from "@/services/auth";
 
 const login = async (username: string, password: string) =>
   await signIn("credentials", {

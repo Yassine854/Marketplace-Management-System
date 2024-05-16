@@ -13,16 +13,20 @@ export const typeDefs = gql`
   }
 
   type Order {
-    id: ID
-    customer: Customer
-    total: Float
-    deliveryDate: String
-    lines: [OrderLine]
-  }
-
-  type Customer {
-    id: ID
-    name: String
+    id: ID!
+    kamiounId: String!
+    state: String!
+    status: String!
+    total: Float!
+    createdAt: Float!
+    customerId: ID
+    customerFirstname: String
+    customerLastname: String
+    deliveryAgentId: String!
+    deliveryAgent: String!
+    deliveryDate: Float!
+    source: String!
+    lines: [OrderLine!]!
   }
 
   type OrderList {
