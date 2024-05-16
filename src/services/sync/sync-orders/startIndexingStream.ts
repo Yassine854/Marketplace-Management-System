@@ -10,7 +10,8 @@ export const startIndexingStream = async () => {
     const readableStream = readingOrdersStream();
     const writableStream = new Writable({
       write(chunk: any, encoding: any, callback: any) {
-        indexingOrders(chunk.toString(), encoding, callback);
+        const magentoOrders = JSON.parse(chunk.toString());
+        indexingOrders(magentoOrders, callback);
       },
     });
 

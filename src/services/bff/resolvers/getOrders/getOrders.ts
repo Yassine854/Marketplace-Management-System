@@ -1,13 +1,7 @@
+import { GetOrdersParams } from "./getOrders.types";
 import { Order } from "@/types/order";
 import { typesenseClient } from "@/libs/typesenseClient";
 import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
-export type GetOrdersParams = {
-  status: string;
-  page: number;
-  perPage: number;
-  sortBy: string;
-  search: string;
-};
 
 const createOrdersList = (typesenseHits: any): Order[] =>
   typesenseHits.map(({ document }: any): Order => {
@@ -19,50 +13,57 @@ const createOrdersList = (typesenseHits: any): Order[] =>
       },
       total: document.total,
       deliveryDate: unixTimestampToDate(document.delivery_date),
-      isSelected: false,
-      lines: [],
     };
   });
 
 export const getOrders = async ({
-  status,
   sortBy,
   page,
   perPage,
   search,
+  filterBy,
 }: GetOrdersParams): Promise<
   { orders: Order[]; totalOrders: number } | undefined
 > => {
   try {
-    let searchParams;
-
-    const searchParamsWithoutFilter = {
+    const searchParams = {
       q: search,
       query_by: "customer_firstname,customer_lastname",
       page: page,
       per_page: perPage,
       sort_by: sortBy,
-      filter_by: "created_at:[1702531200000..1735104000000]",
+      filter_by: filterBy,
     };
 
-    if (status) {
-      const filter = {
-        filter_by:
-          "status:= " + status + " && created_at:[16531200000..1675104000000]",
-      };
+    // let searchParams;
 
-      searchParams = Object.assign(
-        searchParamsWithoutFilter,
-        "created_at:[1672531200000..1675104000000]",
-      );
-    } else {
-      searchParams = searchParamsWithoutFilter;
-    }
+    // const searchParamsWithoutFilter = {
+    //   q: search,
+    //   query_by: "customer_firstname,customer_lastname",
+    //   page: page,
+    //   per_page: perPage,
+    //   sort_by: sortBy,
+    //   filter_by: "created_at:[1702531200000..1735104000000]",
+    // };
+
+    // if (status) {
+    //   const filter = {
+    //     filter_by:
+    //       "status:= " + status + " && created_at:[16531200000..1675104000000]",
+    //   };
+
+    //   searchParams = Object.assign(
+    //     searchParamsWithoutFilter,
+    //     "created_at:[1672531200000..1675104000000]",
+    //   );
+    // } else {
+    //   searchParams = searchParamsWithoutFilter;
+    // }
 
     const typesenseResponse = await typesenseClient
       .collections("orders")
       .documents()
-      .search(searchParamsWithoutFilter);
+      .search(searchParams);
 
     const orders: Order[] = createOrdersList(typesenseResponse?.hits);
 

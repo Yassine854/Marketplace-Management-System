@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { startIndexingStream } from "@/services/sync-orders/startIndexingStream";
+import { startIndexingStream } from "@/services/sync/sync-orders/startIndexingStream";
 
 export async function POST(Request: any) {
   startIndexingStream();
