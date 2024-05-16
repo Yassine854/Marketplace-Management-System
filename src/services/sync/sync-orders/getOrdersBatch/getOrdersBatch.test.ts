@@ -53,7 +53,7 @@ const orders = [
       delivery_agent_id: "D123",
       delivery_agent: "Agent A",
       delivery_date: "2022-01-01T00:00:00Z",
-      deliveryStatus: "completed",
+      delivery_status: "completed",
       verified: true,
       from_mobile: true,
     },
