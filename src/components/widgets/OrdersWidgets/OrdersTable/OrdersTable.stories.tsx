@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./index";
-import { headCells } from "./headCells";
-import { rows } from "./rows";
 
 const meta = {
   title: "Widgets/OrdersWidgets/OrdersTable",
@@ -22,4 +20,4 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = { args: { headCells, rows, isLoading: false } };
+export const Primary: Story = {};

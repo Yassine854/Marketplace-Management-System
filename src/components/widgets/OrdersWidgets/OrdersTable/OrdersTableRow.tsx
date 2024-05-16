@@ -3,6 +3,7 @@ import { IconPdf, IconTruck } from "@tabler/icons-react";
 import Checkbox from "@/components/elements/sharedElements/Checkbox";
 import OrdersTableCell from "./OrdersTableCell";
 import TableActions from "@/components/elements/TablesElements/OpenOrdersTableElements/TableActions";
+import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
 
 const actions = [
   {
@@ -38,11 +39,15 @@ const OrdersTableRow = ({
       <OrdersTableCell>
         <Checkbox key="checkbox" />
       </OrdersTableCell>
-      <OrdersTableCell>{order?.id}</OrdersTableCell>
-      <OrdersTableCell>{order?.id}</OrdersTableCell>
-      <OrdersTableCell>{order?.id}</OrdersTableCell>
-      <OrdersTableCell>{order?.id}</OrdersTableCell>
-      <OrdersTableCell>{order?.id}</OrdersTableCell>
+      <OrdersTableCell>{order?.kamiounId}</OrdersTableCell>
+      <OrdersTableCell>
+        {order?.customerFirstname + order?.customerLastname}
+      </OrdersTableCell>
+      <OrdersTableCell>{order?.total}</OrdersTableCell>
+      <OrdersTableCell>
+        {unixTimestampToDate(order?.deliveryDate)}
+      </OrdersTableCell>
+      <OrdersTableCell>{order?.deliveryAgent}</OrdersTableCell>
       <OrdersTableCell>{order?.id}</OrdersTableCell>
       <OrdersTableCell>
         <div
