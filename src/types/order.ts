@@ -14,7 +14,7 @@ const orderSchema = z.object({
   deliveryAgentId: z.string(),
   deliveryAgent: z.string(),
   deliveryDate: z.number(),
-  delivery_status: z.string(),
+  deliveryStatus: z.string(),
   source: z.string(),
   lines: z.array(orderLineSchema),
 });
