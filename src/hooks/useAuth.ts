@@ -7,6 +7,8 @@ const login = async (username: string, password: string) =>
     redirect: false,
   });
 
+const logout = async () => signOut();
+
 export const useAuth = () => {
-  return { login, getSession: auth };
+  return { login, logout, getSession: auth };
 };
