@@ -92,8 +92,6 @@ const expectedOrders = [
     deliveryAgent: "Agent A",
     deliveryDate: new Date("2022-01-01T00:00:00Z").getTime(),
     source: "CUSTOMER",
-    verified: true,
-    from_mobile: true,
     lines: [
       {
         id: "1",
