@@ -6,7 +6,7 @@ export const useOrdersCount = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { data: openOrders, isLoading: isOpenLoading } = useGetOrders({
     page: 1,
-    perPage: 1,
+    perPage: 10,
     search: "",
     sortBy: "",
     filterBy: "status:=open",
@@ -14,7 +14,7 @@ export const useOrdersCount = () => {
 
   const { data: validOrders, isLoading: isValidLoading } = useGetOrders({
     page: 1,
-    perPage: 1,
+    perPage: 10,
     sortBy: "",
     search: "",
     filterBy: "status:=valid",

@@ -12,16 +12,16 @@ export const useOrders = () => {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-  const [sortBy, setSortBy] = useState({ name: "Total", key: "total" });
-  const [sortOrder, setSortOrder] = useState<string>("asc");
+  const [sort, setSort] = useState("");
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("");
 
   const { data, isLoading } = useGetOrders({
     page: currentPage,
     perPage: itemsPerPage,
-    sortBy: sortBy.key + ":" + sortOrder,
     search: search,
-    filterBy: "status:=" + status,
+    sortBy: sort,
+    filterBy: filter,
   });
 
   return {
