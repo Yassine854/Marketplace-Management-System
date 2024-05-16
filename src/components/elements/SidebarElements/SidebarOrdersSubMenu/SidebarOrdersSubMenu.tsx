@@ -30,11 +30,7 @@ const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
       >
         <SidebarButton
           onClick={() => {
-            if (!isActive) {
-              onClick();
-            } else {
-              setIsOpen(!isOpen);
-            }
+            isActive ? setIsOpen(!isOpen) : onClick();
           }}
           isActive={isActive}
           withSubMenu

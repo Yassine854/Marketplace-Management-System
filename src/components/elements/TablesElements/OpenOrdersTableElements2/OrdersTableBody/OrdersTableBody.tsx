@@ -46,11 +46,7 @@ const OrdersTableBody = ({
                   key={order.id}
                   onClick={() => onRowClick(order.id)}
                   onCheckClick={(isChecked: boolean) => {
-                    if (isChecked) {
-                      selectOrder(order.id);
-                    } else {
-                      unSelectOrder(order.id);
-                    }
+                    isChecked ? selectOrder(order.id) : unSelectOrder(order.id);
                   }}
                 />
               ))}
