@@ -8,11 +8,8 @@ type Props = {
   children?: ReactNode;
 };
 
-const PagesLayout = async ({ children }: Props) => {
-  const { getSession } = useAuth();
-  const session = await getSession();
-  //@ts-ignore
-  const isAdmin = session?.user?.role === "ADMIN";
+const PagesLayout = ({ children }: Props) => {
+  const isAdmin = true;
   return (
     <div className="h-screen w-screen bg-n10 ">
       <TopNavBar />
