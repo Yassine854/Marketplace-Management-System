@@ -4,7 +4,6 @@ export const usePagination = (
   totalItems: number,
   onItemsPerPageChanged: any,
   onPageChanged: any,
-  reset: boolean,
 ) => {
   const [showedNumbers, setShowedNumbers] = useState<number[]>([]);
   const [showedNumbersHolder, setShowedNumbersHolder] = useState<number[]>([]);
@@ -77,10 +76,6 @@ export const usePagination = (
       setShowedNumbersHolder(showedNumbers);
     }
   }, [showedNumbers, setShowedNumbersHolder]);
-
-  useEffect(() => {
-    reset ?? onReset();
-  }, [reset]);
 
   return {
     startIndex,

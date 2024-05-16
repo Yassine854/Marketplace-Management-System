@@ -25,6 +25,10 @@ export const useOrders = () => {
     filterBy: status ? `status:=${status}` : "",
   });
 
+  useEffect(() => {
+    console.log("🚀 ~ useOrders ~ search:", search);
+  }, [search]);
+
   return {
     orders: data?.orders,
     totalOrders: data?.totalOrders,
@@ -36,5 +40,6 @@ export const useOrders = () => {
     readyOrdersCount,
     setItemsPerPage,
     setCurrentPage,
+    setSearch,
   };
 };

@@ -11,6 +11,7 @@ const OrdersPage = () => {
 
     setItemsPerPage,
     setCurrentPage,
+    setSearch,
   } = useOrders();
 
   return (
@@ -20,6 +21,7 @@ const OrdersPage = () => {
       isLoading={isLoading}
       onItemsPerPageChanged={setItemsPerPage}
       onPageChanged={setCurrentPage}
+      onSearch={setSearch}
     />
   );
 };

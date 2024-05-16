@@ -10,12 +10,12 @@ const actions = [
   { name: "Print BL's", key: "bl" },
   { name: "Manage Milk-Runs", key: "milk-run" },
 ];
-const OrdersTableHeader = ({
+const OrdersToolBar = ({
   title = "Products Table",
   sortOptions,
   sortBy,
   setSortBy,
-  setSearch,
+  onSearch,
   selectedOrders = ["234", "234324"],
 }: any) => {
   //const { push } = useRouter();
@@ -54,7 +54,7 @@ const OrdersTableHeader = ({
       </div>
 
       <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
-        <SearchBar />
+        <SearchBar onSearch={onSearch} withInstantSearch={false} />
         <div className="flex items-center gap-2">
           <p className="whitespace-nowrap">Sort By : </p>
           <Dropdown
@@ -68,4 +68,4 @@ const OrdersTableHeader = ({
   );
 };
 
-export default OrdersTableHeader;
+export default OrdersToolBar;

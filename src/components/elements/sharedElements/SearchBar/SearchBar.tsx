@@ -14,13 +14,14 @@ const SearchBar = ({
   const [text, setText] = useState("");
 
   useEffect(() => {
-    if (withInstantSearch) {
+    if (!withInstantSearch) {
       const timer = setTimeout(() => {
         onSearch(text);
-      }, 700);
+      }, 500);
 
       return () => clearTimeout(timer);
     }
+    onSearch(text);
   }, [text, onSearch, withInstantSearch]);
 
   return (
