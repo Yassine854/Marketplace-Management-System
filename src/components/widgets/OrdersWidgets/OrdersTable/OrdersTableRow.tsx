@@ -47,8 +47,8 @@ const OrdersTableRow = ({
       <OrdersTableCell>
         {unixTimestampToDate(order?.deliveryDate)}
       </OrdersTableCell>
-      <OrdersTableCell>{order?.deliveryAgent}</OrdersTableCell>
-      <OrdersTableCell>{order?.id}</OrdersTableCell>
+      <OrdersTableCell>{order?.deliveryAgent || "***"}</OrdersTableCell>
+      <OrdersTableCell>{order?.deliveryStatus || "***"}</OrdersTableCell>
       <OrdersTableCell>
         <div
           className="rounded-full p-2 hover:bg-n10"

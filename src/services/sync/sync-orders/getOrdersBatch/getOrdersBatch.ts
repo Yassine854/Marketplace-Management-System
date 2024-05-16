@@ -17,6 +17,7 @@ export const getOrdersBatch = (orders: any): Order[] =>
       deliveryAgentId:
         String(order?.extension_attributes?.delivery_agent_id) || "",
       deliveryAgent: order?.extension_attributes?.delivery_agent || "",
+      deliveryStatus: order?.extension_attributes?.delivery_status || "",
       deliveryDate:
         new Date(order?.extension_attributes?.delivery_date).getTime() || 0,
       source: getOrderSource(

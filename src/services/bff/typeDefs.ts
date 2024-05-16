@@ -25,6 +25,7 @@ export const typeDefs = gql`
     deliveryAgentId: String!
     deliveryAgent: String!
     deliveryDate: Float!
+    deliveryStatus: String
     source: String!
     lines: [OrderLine!]!
   }
