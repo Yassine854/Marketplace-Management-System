@@ -2,7 +2,7 @@ import OrdersTableHead from "./OrdersTableHead";
 import OrdersTableRow from "./OrdersTableRow";
 import TableRowSkeleton from "@/components/elements/TablesElements/TableRowSkeleton";
 
-const Table = ({ orders = [{ id: "asdfasdf" }], isLoading = false }: any) => {
+const OrdersTable = ({ orders, isLoading }: any) => {
   return (
     <table
       border={0}
@@ -33,4 +33,4 @@ const Table = ({ orders = [{ id: "asdfasdf" }], isLoading = false }: any) => {
   );
 };
 
-export default Table;
+export default OrdersTable;

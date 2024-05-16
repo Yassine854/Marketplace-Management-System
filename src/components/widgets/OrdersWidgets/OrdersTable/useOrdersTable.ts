@@ -24,6 +24,7 @@ export const useOrdersTable = (status: string): any => {
   const [search, setSearch] = useState("");
   const [orders, setOrders] = useState([]);
   const [selectedOrders, setSelectedOrders] = useState([]);
+
   const actions = [
     {
       name: "Edit",
@@ -47,11 +48,11 @@ export const useOrdersTable = (status: string): any => {
     },
   ];
   const { data, isLoading } = useGetOrders({
-    status: status,
     page: currentPage,
     perPage: itemsPerPage,
     sortBy: sortBy.key + ":" + sortOrder,
     search: search,
+    filterBy: "stat",
   });
 
   const onRowClick = (id: any) => {
