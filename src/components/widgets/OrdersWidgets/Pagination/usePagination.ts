@@ -1,20 +1,34 @@
 import { useEffect, useState } from "react";
 
-export const usePagination = (totalItems: any) => {
-  //   let pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+export const usePagination = (
+  totalItems: number,
+  onItemsPerPageChanged: any,
+  onPageChanged: any,
+  reset: boolean,
+) => {
+  const [showedNumbers, setShowedNumbers] = useState<number[]>([]);
+  const [showedNumbersHolder, setShowedNumbersHolder] = useState<number[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  //   if (currentPage < 5) {
-  //     pages = pages.slice(0, 5);
-  //   } else {
-  //     pages = pages.slice(currentPage - 4, currentPage + 1);
-  //   }
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage - 1, totalItems - 1);
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const [showedNumbers, setShowedNumbers] = useState<number[]>();
-  const [currentPage, setCurrentPage] = useState(0);
-  const onItemsPerPageChanged = (itemsPerPage: number) => {
-    setItemsPerPage(itemsPerPage);
+  const onReset = () => {
+    setShowedNumbers([]);
+    setCurrentPage(1);
+    setItemsPerPage(10);
   };
-  const paginate = (page: any) => {
+
+  const onItemsPerPageChange = (itemsPerPage: number) => {
+    // Ensure itemsPerPage is a positive integer
+    if (itemsPerPage > 0 && Number.isInteger(itemsPerPage)) {
+      setItemsPerPage(itemsPerPage);
+    }
+  };
+
+  const paginate = (page: number) => {
     setCurrentPage(page);
   };
 
@@ -29,30 +43,52 @@ export const usePagination = (totalItems: any) => {
       setCurrentPage((prevPage) => prevPage - 1);
     }
   };
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage - 1, totalItems - 1);
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
+  // // Update showedNumbers when currentPage or totalPages change
   useEffect(() => {
     let showedNumbers = Array.from(
       { length: totalPages },
       (_, index) => index + 1,
     );
-    if (currentPage < 5) {
-      setShowedNumbers(showedNumbers.slice(0, 5));
+    if (currentPage <= 5) {
+      setShowedNumbers(showedNumbers.slice(0, Math.min(5, totalPages)));
     } else {
-      setShowedNumbers(showedNumbers.slice(currentPage - 4, currentPage + 1));
+      setShowedNumbers(showedNumbers.slice(currentPage - 5, currentPage));
     }
   }, [currentPage, totalPages]);
+
+  // Reset currentPage to 1 when itemsPerPage changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [itemsPerPage, onItemsPerPageChanged]);
+
+  // Trigger callback when currentPage changes
+  useEffect(() => {
+    onPageChanged(currentPage);
+  }, [currentPage, onPageChanged]);
+
+  // Trigger callback when itemsPerPage changes
+  useEffect(() => {
+    onItemsPerPageChanged(itemsPerPage);
+  }, [itemsPerPage, onItemsPerPageChanged]);
+
+  useEffect(() => {
+    if (showedNumbers.length) {
+      setShowedNumbersHolder(showedNumbers);
+    }
+  }, [showedNumbers, setShowedNumbersHolder]);
+
+  useEffect(() => {
+    reset ?? onReset();
+  }, [reset]);
 
   return {
     startIndex,
     endIndex,
     totalPages,
-    itemsPerPage,
-    onItemsPerPageChanged,
+    onItemsPerPageChange,
     showedNumbers,
+    showedNumbersHolder,
     paginate,
     prevPage,
     nextPage,

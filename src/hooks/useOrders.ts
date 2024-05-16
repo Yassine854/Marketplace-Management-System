@@ -1,6 +1,7 @@
+import { useEffect, useState } from "react";
+
 import { useGetOrders } from "@/hooks/queries/useGetOrders";
 import { useOrdersCount } from "./useOrdersCount";
-import { useState } from "react";
 import { useStatusStore } from "@/stores/status-store";
 
 export const useOrders = () => {
@@ -21,7 +22,7 @@ export const useOrders = () => {
     perPage: itemsPerPage,
     search: search,
     sortBy: sort,
-    filterBy: "status:=" + status,
+    filterBy: status ? `status:=${status}` : "",
   });
 
   return {
@@ -33,5 +34,7 @@ export const useOrders = () => {
     openOrdersCount,
     validOrdersCount,
     readyOrdersCount,
+    setItemsPerPage,
+    setCurrentPage,
   };
 };

@@ -3,7 +3,13 @@ import OrdersTable from "@/components/widgets/OrdersWidgets/OrdersTable";
 import OrdersToolBar from "@/components/widgets/OrdersWidgets/OrdersToolBar";
 import Pagination from "@/components/widgets/OrdersWidgets/Pagination";
 
-const OrdersLayout = ({ orders, totalOrders, isLoading }: any) => {
+const OrdersLayout = ({
+  orders,
+  totalOrders,
+  isLoading,
+  onItemsPerPageChanged,
+  onPageChanged,
+}: any) => {
   return (
     <Box>
       <div className="absolute left-0 right-0 top-0 z-30 h-20 w-full bg-n10">
@@ -13,7 +19,11 @@ const OrdersLayout = ({ orders, totalOrders, isLoading }: any) => {
         <OrdersTable isLoading={isLoading} orders={orders} />
       </div>
       <div className="bt-dashed absolute bottom-0 left-0 right-0 z-10 h-16 w-full bg-n10">
-        <Pagination totalItems={totalOrders} />
+        <Pagination
+          totalItems={totalOrders}
+          onItemsPerPageChanged={onItemsPerPageChanged}
+          onPageChanged={onPageChanged}
+        />
       </div>
     </Box>
   );
