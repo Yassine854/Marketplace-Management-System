@@ -13,7 +13,7 @@ export type Params = {
 
 type Orders = {
   orders: Order[];
-  total: number;
+  totalOrders: number;
 };
 
 type Res = {
@@ -39,12 +39,18 @@ const QUERY = gql`
     ) {
       orders {
         id
-        deliveryDate
+        kamiounId
+        state
+        status
         total
-        customer {
-          id
-          name
-        }
+        createdAt
+        customerId
+        customerFirstname
+        customerLastname
+        deliveryAgentId
+        deliveryAgent
+        deliveryDate
+        source
       }
       totalOrders
     }

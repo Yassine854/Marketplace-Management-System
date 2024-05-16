@@ -5,27 +5,27 @@ import { useGetOrders } from "@/hooks/queries/useGetOrders";
 export const useOrdersCount = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { data: openOrders, isLoading: isOpenLoading } = useGetOrders({
-    status: "open",
     page: 1,
-    perPage: 10,
+    perPage: 1,
     search: "",
     sortBy: "",
+    filterBy: "status:=open",
   });
 
   const { data: validOrders, isLoading: isValidLoading } = useGetOrders({
-    status: "valid",
     page: 1,
-    perPage: 10,
+    perPage: 1,
     sortBy: "",
     search: "",
+    filterBy: "status:=valid",
   });
 
   const { data: readyOrders, isLoading: isReadyLoading } = useGetOrders({
-    status: "shipped",
     page: 1,
     perPage: 10,
     search: "",
     sortBy: "",
+    filterBy: "status:=shipped",
   });
 
   useEffect(() => {
