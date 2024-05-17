@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 
 import Dropdown from "@/components/elements/sharedElements/Dropdown";
@@ -11,7 +9,6 @@ const actions = [
   { name: "Manage Milk-Runs", key: "milk-run" },
 ];
 const OrdersToolBar = ({
-  title = "Products Table",
   sortOptions,
   sortBy,
   setSortBy,
@@ -19,7 +16,6 @@ const OrdersToolBar = ({
   selectedStatus,
   selectedOrders = ["234", "234324"],
 }: any) => {
-  //const { push } = useRouter();
   const [selected, setSelected] = useState({ name: "Actions", key: "a" });
 
   useEffect(() => {
@@ -31,7 +27,7 @@ const OrdersToolBar = ({
   return (
     <div className=" flex h-20 w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">
       <div className="flex items-center justify-center">
-        <p className="m-4 text-xl font-bold capitalize ">{title}</p>
+        <p className="m-4 text-xl font-bold capitalize ">{`${selectedStatus} Orders Table`}</p>
         {!!selectedOrders.length && (
           <>
             <Dropdown
