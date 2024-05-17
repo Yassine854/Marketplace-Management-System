@@ -1,6 +1,6 @@
 "use client";
 
-import OrdersLayout from "@/components/layouts/OrdersLayout";
+import OrdersTemplate from "@/components/Templates/OrdersTemplate";
 import { useOrders } from "@/hooks/useOrders";
 import { useStatusStore } from "@/stores/status-store";
 
@@ -17,7 +17,7 @@ const OrdersPage = () => {
   } = useOrders(status);
 
   return (
-    <OrdersLayout
+    <OrdersTemplate
       orders={orders}
       totalOrders={totalOrders}
       isLoading={isLoading}

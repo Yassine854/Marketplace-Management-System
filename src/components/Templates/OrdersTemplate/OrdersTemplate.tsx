@@ -3,7 +3,7 @@ import OrdersTable from "@/components/widgets/OrdersWidgets/OrdersTable";
 import OrdersToolBar from "@/components/widgets/OrdersWidgets/OrdersToolBar";
 import Pagination from "@/components/widgets/OrdersWidgets/Pagination";
 
-const OrdersLayout = ({
+const OrdersTemplate = ({
   orders,
   totalOrders,
   isLoading,
@@ -30,4 +30,4 @@ const OrdersLayout = ({
   );
 };
 
-export default OrdersLayout;
+export default OrdersTemplate;

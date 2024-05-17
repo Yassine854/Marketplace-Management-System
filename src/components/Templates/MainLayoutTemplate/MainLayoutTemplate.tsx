@@ -1,16 +1,10 @@
-"use client";
-
-import { ReactNode } from "react";
+import { Children } from "@/types/children";
 import Sidebar from "@/components/widgets/Sidebar";
 import TopNavBar from "@/components/widgets/TopNavBar";
 import { useOrders } from "@/hooks/useOrders";
 import { useStatusStore } from "@/stores/status-store";
 
-type Props = {
-  children?: ReactNode;
-};
-
-const PagesLayout = ({ children }: Props) => {
+const MainLayoutTemplate = ({ children }: Children) => {
   const isAdmin = true;
   const { status, setStatus } = useStatusStore();
   const {
@@ -38,4 +32,4 @@ const PagesLayout = ({ children }: Props) => {
   );
 };
 
-export default PagesLayout;
+export default MainLayoutTemplate;

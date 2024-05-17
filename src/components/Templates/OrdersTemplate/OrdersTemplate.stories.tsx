@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./index";
 const meta = {
-  title: "Layouts/OrdersLayout",
+  title: "Templates/OrdersTemplate",
   component: Index,
   decorators: [
     (Story) => (
