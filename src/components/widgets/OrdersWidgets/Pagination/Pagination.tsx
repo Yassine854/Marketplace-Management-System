@@ -9,7 +9,7 @@ const Pagination = ({
   totalItems,
   onItemsPerPageChanged,
   onPageChanged,
-}: any) => {
+}: Props) => {
   const {
     startIndex,
     endIndex,

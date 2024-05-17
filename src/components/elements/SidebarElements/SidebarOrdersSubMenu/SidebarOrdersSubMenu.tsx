@@ -4,18 +4,18 @@ import AnimateHeight from "react-animate-height";
 import Divider from "@/components/elements/SidebarElements/Divider";
 import SidebarButton from "../SidebarButton";
 import SidebarSubMenuItem from "../SidebarSubMenuItem";
-import { useOrders } from "@/hooks/useOrders";
 
-const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
+const SidebarOrdersSubMenu = ({
+  isActive = false,
+  onClick,
+  items,
+  readyOrdersCount,
+  openOrdersCount,
+  validOrdersCount,
+  selectedStatus,
+  onSubMenuItemClick,
+}: any) => {
   const [isOpen, setIsOpen] = useState(isActive);
-
-  const {
-    readyOrdersCount,
-    openOrdersCount,
-    validOrdersCount,
-    selectedStatus,
-    setStatus,
-  } = useOrders();
 
   useEffect(() => {
     setIsOpen(isActive);
@@ -53,7 +53,7 @@ const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
                   <SidebarSubMenuItem
                     key={name}
                     name={nameAndCount ? nameAndCount : name}
-                    onClick={() => setStatus(status)}
+                    onClick={() => onSubMenuItemClick(status)}
                     isActive={selectedStatus == status}
                   />
                 );
@@ -66,4 +66,4 @@ const SidebarSubMenu = ({ isActive = false, onClick, items }: any) => {
   );
 };
 
-export default SidebarSubMenu;
+export default SidebarOrdersSubMenu;

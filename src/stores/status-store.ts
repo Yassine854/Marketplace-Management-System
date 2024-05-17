@@ -1,6 +1,11 @@
 import { create } from "zustand";
 
-export const useStatusStore = create((set) => ({
+type StatusState = {
+  status: string;
+  setStatus: (status: string) => void;
+};
+
+export const useStatusStore = create<StatusState>((set) => ({
   status: "open",
-  setStatus: (status: any) => set((state: any) => ({ status: status })),
+  setStatus: (status) => set(() => ({ status })),
 }));
