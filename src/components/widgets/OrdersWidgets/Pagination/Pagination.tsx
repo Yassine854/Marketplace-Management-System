@@ -9,6 +9,7 @@ const Pagination = ({
   totalItems,
   onItemsPerPageChanged,
   onPageChanged,
+  selectedStatus,
 }: Props) => {
   const {
     startIndex,
@@ -21,11 +22,19 @@ const Pagination = ({
     prevPage,
     paginate,
     onItemsPerPageChange,
-  } = usePagination(totalItems, onItemsPerPageChanged, onPageChanged);
+  } = usePagination(
+    totalItems,
+    onItemsPerPageChanged,
+    onPageChanged,
+    selectedStatus,
+  );
 
   return (
     <div className=" col-span-12 flex h-14  flex-wrap items-center justify-center gap-4 bg-n10  px-2 sm:justify-between">
-      <ItemsPerPageSelector onChange={onItemsPerPageChange} />
+      <ItemsPerPageSelector
+        onChange={onItemsPerPageChange}
+        selectedStatus={selectedStatus}
+      />
 
       <p>
         {!!totalItems &&

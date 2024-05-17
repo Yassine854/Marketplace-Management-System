@@ -9,6 +9,7 @@ const options = [10, 25, 50];
 
 const ItemsPerPageSelector = ({
   onChange = (number: number) => console.log("Items Per Page", number),
+  selectedStatus,
 }: any) => {
   const { open, ref, toggleOpen } = useDropdown();
   const [selected, setSelected] = useState(10);
@@ -16,6 +17,10 @@ const ItemsPerPageSelector = ({
   useEffect(() => {
     onChange(selected);
   }, [selected, onChange]);
+
+  useEffect(() => {
+    setSelected(10);
+  }, [selectedStatus]);
   return (
     <div className={tailwind.container} ref={ref}>
       <div onClick={toggleOpen} className={tailwind.main}>

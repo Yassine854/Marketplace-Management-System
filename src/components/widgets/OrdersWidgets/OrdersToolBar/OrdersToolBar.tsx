@@ -16,6 +16,7 @@ const OrdersToolBar = ({
   sortBy,
   setSortBy,
   onSearch,
+  selectedStatus,
   selectedOrders = ["234", "234324"],
 }: any) => {
   //const { push } = useRouter();
@@ -24,6 +25,8 @@ const OrdersToolBar = ({
   useEffect(() => {
     // setSelected({ name: "Actions", key: "a" });
   }, [selectedOrders]);
+
+  useEffect(() => {}, [selectedStatus]);
 
   return (
     <div className=" flex h-20 w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">

@@ -18,6 +18,7 @@ const OrdersPage = () => {
 
   return (
     <OrdersTemplate
+      selectedStatus={status}
       orders={orders}
       totalOrders={totalOrders}
       isLoading={isLoading}
