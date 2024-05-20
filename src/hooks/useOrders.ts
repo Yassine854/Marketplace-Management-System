@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useGetOrders } from "@/hooks/queries/useGetOrders";
+import { useNavigation } from "./useNavigation";
+import { useOrderStore } from "@/stores/orderStore";
 import { useOrdersCount } from "./useOrdersCount";
 
 type Ref = {
@@ -8,14 +10,17 @@ type Ref = {
   changeSelected?: (selected: any) => void;
 };
 export const useOrders = (status: string) => {
+  const { navigateToOrderDetails } = useNavigation();
   const { openOrdersCount, validOrdersCount, readyOrdersCount } =
     useOrdersCount();
 
+  const { setOrderId } = useOrderStore();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [sort, onSort] = useState("");
-  const [search, setSearch] = useState("");
+  const [search, onSearch] = useState("");
   const [filter, setFilter] = useState(`status:=${status}`);
+  const [isOrdersLoading, setIsOrdersLoading] = useState(false);
 
   const { data, isLoading } = useGetOrders({
     page: currentPage,
@@ -42,23 +47,36 @@ export const useOrders = (status: string) => {
     sortRef.current?.reset();
   }, [status]);
 
-  // useEffect(() => {
-  //   sortRef.current?.changeSelected({ name: "test", key: "test" });
-  // }, [sort]);
+  const onOrderClick = (orderId: string) => {
+    setOrderId(orderId);
+    navigateToOrderDetails();
+  };
+
+  useEffect(() => {
+    if (isLoading) {
+      const timer = setTimeout(() => {
+        setIsOrdersLoading(true);
+      }, 200);
+
+      return () => clearTimeout(timer);
+    }
+    setIsOrdersLoading(false);
+  }, [isLoading]);
 
   return {
     orders: data?.orders,
     totalOrders: data?.totalOrders,
-    isLoading,
+    isLoading: isOrdersLoading,
     selectedStatus: status,
     openOrdersCount,
     validOrdersCount,
     readyOrdersCount,
     setItemsPerPage,
     setCurrentPage,
-    setSearch,
+    onSearch,
     onSort,
     changeSelectedSort,
+    onOrderClick,
     refs: { paginationRef, searchRef, sortRef },
   };
 };

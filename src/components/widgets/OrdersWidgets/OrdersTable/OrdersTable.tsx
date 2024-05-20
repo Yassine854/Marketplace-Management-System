@@ -8,15 +8,15 @@ const { orders: defaultOrders } = defaultProps;
 const OrdersTable = ({
   orders = defaultOrders,
   isLoading,
-  onSort,
   changeSelectedSort,
+  onOrderClick,
 }: any) => {
   return (
     <table
       border={0}
       cellPadding={0}
       cellSpacing={0}
-      className="relative w-full border-separate overflow-hidden whitespace-nowrap rounded-xl border-4  "
+      className="relative w-full "
     >
       <OrdersTableHead changeSelectedSort={changeSelectedSort} />
 
@@ -31,7 +31,11 @@ const OrdersTable = ({
           ) : (
             <>
               {orders?.map((order: any) => (
-                <OrdersTableRow key={order?.id} order={order} />
+                <OrdersTableRow
+                  key={order?.id}
+                  order={order}
+                  onClick={onOrderClick}
+                />
               ))}
             </>
           )}
