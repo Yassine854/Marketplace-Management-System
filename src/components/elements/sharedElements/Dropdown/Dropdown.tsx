@@ -8,6 +8,7 @@ import useDropdown from "./useDropdown";
 
 export type DropRef = {
   reset: () => void;
+  changeSelected: (selected: string) => void;
 };
 
 // eslint-disable-next-line react/display-name
@@ -30,6 +31,9 @@ const Dropdown = forwardRef<DropRef, Props>(
     useImperativeHandle(ref, () => ({
       reset: () => {
         reset();
+      },
+      changeSelected: (selected: any) => {
+        setSelected(selected);
       },
     }));
 

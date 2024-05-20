@@ -5,7 +5,12 @@ import { defaultProps } from "./OrdersTable.defaultProps";
 
 const { orders: defaultOrders } = defaultProps;
 
-const OrdersTable = ({ orders = defaultOrders, isLoading }: any) => {
+const OrdersTable = ({
+  orders = defaultOrders,
+  isLoading,
+  onSort,
+  changeSelectedSort,
+}: any) => {
   return (
     <table
       border={0}
@@ -13,7 +18,7 @@ const OrdersTable = ({ orders = defaultOrders, isLoading }: any) => {
       cellSpacing={0}
       className="relative w-full border-separate overflow-hidden whitespace-nowrap rounded-xl border-4  "
     >
-      <OrdersTableHead />
+      <OrdersTableHead changeSelectedSort={changeSelectedSort} />
 
       <tbody>
         <>

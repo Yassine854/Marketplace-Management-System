@@ -1,8 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useGetOrders } from "@/hooks/queries/useGetOrders";
 import { useOrdersCount } from "./useOrdersCount";
 
+type Ref = {
+  reset: () => void;
+  changeSelected?: (selected: any) => void;
+};
 export const useOrders = (status: string) => {
   const { openOrdersCount, validOrdersCount, readyOrdersCount } =
     useOrdersCount();
@@ -21,6 +25,27 @@ export const useOrders = (status: string) => {
     filterBy: status ? `status:=${status}` : "",
   });
 
+  const paginationRef = useRef<Ref>(null);
+  const searchRef = useRef<Ref>(null);
+  const sortRef = useRef<Ref>(null);
+
+  const changeSelectedSort = (selected: string) => {
+    if (sortRef) {
+      const changeSelected = sortRef?.current?.changeSelected;
+      changeSelected && changeSelected(selected);
+    }
+  };
+
+  useEffect(() => {
+    searchRef.current?.reset();
+    paginationRef.current?.reset();
+    sortRef.current?.reset();
+  }, [status]);
+
+  // useEffect(() => {
+  //   sortRef.current?.changeSelected({ name: "test", key: "test" });
+  // }, [sort]);
+
   return {
     orders: data?.orders,
     totalOrders: data?.totalOrders,
@@ -33,5 +58,7 @@ export const useOrders = (status: string) => {
     setCurrentPage,
     setSearch,
     onSort,
+    changeSelectedSort,
+    refs: { paginationRef, searchRef, sortRef },
   };
 };

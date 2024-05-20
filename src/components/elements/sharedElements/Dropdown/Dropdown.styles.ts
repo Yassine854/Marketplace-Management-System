@@ -1,8 +1,10 @@
 export const tailwind = {
   container(width: string, bg: string): string {
-    return ` font-semibold flex cursor-pointer select-none items-center justify-between gap-2 rounded-[30px] border border-n30 px-3 py-1.5 text-xs dark:border-n500 sm:px-4 sm:py-2  ${
-      width ? width : "min-w-max sm:min-w-[140px]"
-    } ${bg ? bg : "bg-primary/5 dark:bg-bg3 "}`;
+    return ` font-semibold flex cursor-pointer select-none items-center justify-between gap-2 rounded-[30px] border border-n30 px-3 py-1.5 text-xs dark:border-n500 sm:px-4 sm:py-2 
+    min-w-48
+    
+
+    `;
   },
   list(width: string, open: boolean): string {
     return `absolute z-20 flex-col rounded-md ${

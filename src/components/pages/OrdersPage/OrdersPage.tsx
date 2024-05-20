@@ -15,10 +15,13 @@ const OrdersPage = () => {
     setCurrentPage,
     setSearch,
     onSort,
+    changeSelectedSort,
+    refs,
   } = useOrders(status);
 
   return (
     <OrdersTemplate
+      refs={refs}
       selectedStatus={status}
       orders={orders}
       totalOrders={totalOrders}
@@ -26,6 +29,7 @@ const OrdersPage = () => {
       onItemsPerPageChanged={setItemsPerPage}
       onPageChanged={setCurrentPage}
       onSearch={setSearch}
+      changeSelectedSort={changeSelectedSort}
       onSort={onSort}
     />
   );
