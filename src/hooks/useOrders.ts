@@ -20,6 +20,7 @@ export const useOrders = (status: string) => {
   const [sort, onSort] = useState("");
   const [search, onSearch] = useState("");
   const [filter, setFilter] = useState(`status:=${status}`);
+  const [isOrdersLoading, setIsOrdersLoading] = useState(false);
 
   const { data, isLoading } = useGetOrders({
     page: currentPage,
@@ -51,10 +52,21 @@ export const useOrders = (status: string) => {
     navigateToOrderDetails();
   };
 
+  useEffect(() => {
+    if (isLoading) {
+      const timer = setTimeout(() => {
+        setIsOrdersLoading(true);
+      }, 200);
+
+      return () => clearTimeout(timer);
+    }
+    setIsOrdersLoading(false);
+  }, [isLoading]);
+
   return {
     orders: data?.orders,
     totalOrders: data?.totalOrders,
-    isLoading,
+    isLoading: isOrdersLoading,
     selectedStatus: status,
     openOrdersCount,
     validOrdersCount,
