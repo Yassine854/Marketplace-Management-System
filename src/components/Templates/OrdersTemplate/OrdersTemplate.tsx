@@ -17,16 +17,14 @@ const OrdersTemplate = ({
 }: any) => {
   return (
     <Box>
-      <div className="absolute left-0 right-0 top-0 z-30 h-20 w-full bg-n10">
-        <OrdersToolBar
-          searchRef={refs.searchRef}
-          onSearch={onSearch}
-          onSort={onSort}
-          selectedStatus={selectedStatus}
-          sortRef={refs.sortRef}
-        />
-      </div>
-      <div className="mt-16 flex  w-full overflow-y-scroll  bg-n10 px-4">
+      <OrdersToolBar
+        searchRef={refs.searchRef}
+        onSearch={onSearch}
+        onSort={onSort}
+        selectedStatus={selectedStatus}
+        sortRef={refs.sortRef}
+      />
+      <div className="  overflow-y-scroll  bg-n10 pb-20">
         <OrdersTable
           isLoading={isLoading}
           orders={orders}

@@ -30,7 +30,7 @@ const OrdersToolBar = ({
   const [selectedAction, setSelectedAction] = useState("");
 
   return (
-    <div className=" flex h-20 w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">
+    <div className=" flex  w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">
       <div className="flex items-center justify-center">
         <p className="m-4 text-xl font-bold capitalize ">{`${selectedStatus} Orders Table`}</p>
         {!!selectedOrders.length && (

@@ -8,7 +8,6 @@ const { orders: defaultOrders } = defaultProps;
 const OrdersTable = ({
   orders = defaultOrders,
   isLoading,
-  onSort,
   changeSelectedSort,
 }: any) => {
   return (
@@ -16,7 +15,7 @@ const OrdersTable = ({
       border={0}
       cellPadding={0}
       cellSpacing={0}
-      className="relative w-full border-separate overflow-hidden whitespace-nowrap rounded-xl border-4  "
+      className="relative w-full "
     >
       <OrdersTableHead changeSelectedSort={changeSelectedSort} />
 

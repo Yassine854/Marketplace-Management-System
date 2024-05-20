@@ -25,10 +25,10 @@ const Checkbox = ({
         onChange={() => {
           setChecked((e: boolean) => !e);
         }}
-        className="absolute  flex h-8 w-8 cursor-pointer items-center justify-center bg-blue-500 opacity-0"
+        className="absolute   flex  h-8 w-8 cursor-pointer items-center justify-center bg-blue-500 opacity-0"
         checked={checked}
       />
-      <div className=" flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-400 bg-n0 focus-within:border-primary dark:bg-bg4 ltr:mr-2 rtl:ml-2">
+      <div className=" flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-400 bg-n0 focus-within:border-primary dark:bg-bg4 ">
         <svg
           className="pointer-events-none hidden h-[10px] w-[10px] fill-current text-primary"
           version="1.1"

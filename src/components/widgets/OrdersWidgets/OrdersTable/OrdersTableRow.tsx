@@ -39,7 +39,7 @@ const OrdersTableRow = ({
       </OrdersTableCell>
       <OrdersTableCell>{order?.kamiounId}</OrdersTableCell>
       <OrdersTableCell>
-        <p className="max-w-32 truncate text-ellipsis">
+        <p className=" truncate text-ellipsis">
           {order?.customerFirstname + " " + order?.customerLastname}
         </p>
       </OrdersTableCell>
