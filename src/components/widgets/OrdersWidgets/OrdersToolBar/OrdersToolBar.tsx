@@ -14,6 +14,7 @@ const OrdersToolBar = ({
   onSearch,
   selectedStatus,
   selectedOrders = ["234", "234324"],
+  searchRef,
 }: any) => {
   const [selected, setSelected] = useState({ name: "Actions", key: "a" });
 
@@ -46,7 +47,7 @@ const OrdersToolBar = ({
       </div>
 
       <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
-        <SearchBar onSearch={onSearch} withInstantSearch={false} />
+        <SearchBar ref={searchRef} onSearch={onSearch} isWithInstantSearch />
         <div className="flex items-center gap-2">
           <p className="whitespace-nowrap">Sort By : </p>
           <Dropdown
