@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-
 import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import SearchBar from "@/components/elements/sharedElements/SearchBar";
+import { useState } from "react";
 
 const actions = [
   { name: "Generate Pick List", key: "picklist" },
@@ -17,12 +16,6 @@ const OrdersToolBar = ({
   selectedOrders = ["234", "234324"],
 }: any) => {
   const [selected, setSelected] = useState({ name: "Actions", key: "a" });
-
-  useEffect(() => {
-    // setSelected({ name: "Actions", key: "a" });
-  }, [selectedOrders]);
-
-  useEffect(() => {}, [selectedStatus]);
 
   return (
     <div className=" flex h-20 w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">

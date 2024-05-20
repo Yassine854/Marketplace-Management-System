@@ -4,3 +4,7 @@ export type Props = {
   onPageChanged: (page: number) => void;
   selectedStatus: string;
 };
+
+export type PaginationRef = {
+  reset: () => void;
+};

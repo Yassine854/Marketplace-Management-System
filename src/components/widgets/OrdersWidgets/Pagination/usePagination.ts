@@ -83,6 +83,7 @@ export const usePagination = (
   }, [selectedStatus]);
 
   return {
+    reset,
     startIndex,
     endIndex,
     totalPages,
