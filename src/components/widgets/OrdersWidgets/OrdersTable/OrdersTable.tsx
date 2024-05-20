@@ -1,14 +1,17 @@
 import OrdersTableHead from "./OrdersTableHead";
 import OrdersTableRow from "./OrdersTableRow";
-import TableRowSkeleton from "@/components/elements/TablesElements/TableRowSkeleton";
+import TableRowSkeleton from "./RowSkeleton";
+import { defaultProps } from "./OrdersTable.defaultProps";
 
-const OrdersTable = ({ orders, isLoading }: any) => {
+const { orders: defaultOrders } = defaultProps;
+
+const OrdersTable = ({ orders = defaultOrders, isLoading }: any) => {
   return (
     <table
       border={0}
       cellPadding={0}
       cellSpacing={0}
-      className="relative w-full border-separate overflow-hidden overflow-x-scroll whitespace-nowrap  "
+      className="relative w-full border-separate overflow-hidden whitespace-nowrap rounded-xl border-4  "
     >
       <OrdersTableHead />
 

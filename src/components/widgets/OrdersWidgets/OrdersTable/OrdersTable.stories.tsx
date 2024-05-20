@@ -6,7 +6,7 @@ const meta = {
   component: Index,
   decorators: [
     (Story) => (
-      <div style={{ margin: "3em" }} className="w-[80vw] ">
+      <div>
         <Story />
       </div>
     ),

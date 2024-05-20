@@ -1,12 +1,12 @@
 import Checkbox from "@/components/elements/sharedElements/Checkbox";
+import CheckboxCell from "./CheckboxCell";
 import OrdersTableCell from "./OrdersTableCell";
-
 const OrdersTableHead = () => {
   return (
     <thead>
-      <tr className="sticky top-0  z-10 h-12 min-h-12  w-full    border bg-n40   font-semibold">
+      <tr className="sticky top-0  z-10 h-12 min-h-12  w-full     bg-n40 font-semibold ">
         <OrdersTableCell>
-          <Checkbox key="checkbox" />
+          <Checkbox />
         </OrdersTableCell>
         <OrdersTableCell>ID</OrdersTableCell>
         <OrdersTableCell>Customer</OrdersTableCell>

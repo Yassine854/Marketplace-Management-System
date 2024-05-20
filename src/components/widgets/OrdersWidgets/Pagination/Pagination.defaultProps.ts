@@ -4,4 +4,5 @@ export const defaultProps: Props = {
   totalItems: 1000,
   onItemsPerPageChanged: () => {},
   onPageChanged: () => {},
+  selectedStatus: "Status",
 };

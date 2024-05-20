@@ -29,7 +29,7 @@ const TableActions = ({
           fromBottom ? "bottom-0" : "top-0"
         } z-30 min-w-max rounded-md border bg-n0 p-1.5 dark:border-n500 dark:bg-bg4 ltr:right-5 rtl:left-5`}
       >
-        {actions.map((e: any, i: number) => {
+        {actions?.map((e: any, i: number) => {
           return (
             <li
               key={i}

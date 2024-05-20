@@ -3,13 +3,21 @@ import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import ItemsPerPageSelector from "@/components/elements/TablesElements/ItemsPerPageSelector";
 import { Props } from "./Pagination.types";
 import cn from "@/utils/cn";
+import { defaultProps } from "./Pagination.defaultProps";
 import { usePagination } from "./usePagination";
 
+const {
+  totalItems: defaultTotalItems,
+  onItemsPerPageChanged: defaultOnItemsPerPageChanged,
+  onPageChanged: defaultOnPageChanged,
+  selectedStatus: defaultSelectedStatus,
+} = defaultProps;
+
 const Pagination = ({
-  totalItems,
-  onItemsPerPageChanged,
-  onPageChanged,
-  selectedStatus,
+  totalItems = defaultTotalItems,
+  onItemsPerPageChanged = defaultOnItemsPerPageChanged,
+  onPageChanged = defaultOnPageChanged,
+  selectedStatus = defaultSelectedStatus,
 }: Props) => {
   const {
     startIndex,

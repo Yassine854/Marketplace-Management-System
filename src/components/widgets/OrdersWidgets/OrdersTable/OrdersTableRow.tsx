@@ -1,6 +1,8 @@
 import { IconPdf, IconTruck } from "@tabler/icons-react";
 
+import ActionsCell from "./ActionsCell";
 import Checkbox from "@/components/elements/sharedElements/Checkbox";
+import CheckboxCell from "./CheckboxCell";
 import OrdersTableCell from "./OrdersTableCell";
 import TableActions from "@/components/elements/TablesElements/OpenOrdersTableElements/TableActions";
 import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
@@ -37,18 +39,26 @@ const OrdersTableRow = ({
       onClick={onClick}
     >
       <OrdersTableCell>
-        <Checkbox key="checkbox" />
+        <Checkbox />
       </OrdersTableCell>
       <OrdersTableCell>{order?.kamiounId}</OrdersTableCell>
       <OrdersTableCell>
-        {order?.customerFirstname + " " + order?.customerLastname}
+        <p className="max-w-32 truncate text-ellipsis">
+          {order?.customerFirstname + " " + order?.customerLastname}
+        </p>
       </OrdersTableCell>
-      <OrdersTableCell>{order?.total}</OrdersTableCell>
+      <OrdersTableCell>
+        <p className="truncate ">{order?.total}</p>
+      </OrdersTableCell>
       <OrdersTableCell>
         {unixTimestampToDate(order?.deliveryDate)}
       </OrdersTableCell>
-      <OrdersTableCell>{order?.deliveryAgent || "***"}</OrdersTableCell>
-      <OrdersTableCell>{order?.deliveryStatus || "***"}</OrdersTableCell>
+      <OrdersTableCell>
+        <p className="truncate ">{order?.deliveryAgent || "***"}</p>
+      </OrdersTableCell>
+      <OrdersTableCell>
+        <p className="truncate ">{order?.deliveryStatus || "***"}</p>
+      </OrdersTableCell>
       <OrdersTableCell>
         <div
           className="rounded-full p-2 hover:bg-n10"
@@ -62,9 +72,10 @@ const OrdersTableRow = ({
       <OrdersTableCell>
         <IconTruck color="red" />
       </OrdersTableCell>
-      <OrdersTableCell>
+      <ActionsCell />
+      {/* <OrdersTableCell>
         <TableActions actions={actions} orderId={order.id} />
-      </OrdersTableCell>
+      </OrdersTableCell> */}
     </tr>
   );
 };

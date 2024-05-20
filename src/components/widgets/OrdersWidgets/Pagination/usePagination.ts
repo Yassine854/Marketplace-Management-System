@@ -64,12 +64,12 @@ export const usePagination = (
 
   // Trigger callback when currentPage changes
   useEffect(() => {
-    onPageChanged(currentPage);
+    onPageChanged && onPageChanged(currentPage);
   }, [currentPage, onPageChanged]);
 
   // Trigger callback when itemsPerPage changes
   useEffect(() => {
-    onItemsPerPageChanged(itemsPerPage);
+    onItemsPerPageChanged && onItemsPerPageChanged(itemsPerPage);
   }, [itemsPerPage, onItemsPerPageChanged]);
 
   useEffect(() => {
