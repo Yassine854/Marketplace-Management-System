@@ -4,6 +4,7 @@ export const usePagination = (
   totalItems: number,
   onItemsPerPageChanged: any,
   onPageChanged: any,
+  selectedStatus: string,
 ) => {
   const [showedNumbers, setShowedNumbers] = useState<number[]>([]);
   const [showedNumbersHolder, setShowedNumbersHolder] = useState<number[]>([]);
@@ -14,7 +15,7 @@ export const usePagination = (
   const endIndex = Math.min(startIndex + itemsPerPage - 1, totalItems - 1);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const onReset = () => {
+  const reset = () => {
     setShowedNumbers([]);
     setCurrentPage(1);
     setItemsPerPage(10);
@@ -63,12 +64,12 @@ export const usePagination = (
 
   // Trigger callback when currentPage changes
   useEffect(() => {
-    onPageChanged(currentPage);
+    onPageChanged && onPageChanged(currentPage);
   }, [currentPage, onPageChanged]);
 
   // Trigger callback when itemsPerPage changes
   useEffect(() => {
-    onItemsPerPageChanged(itemsPerPage);
+    onItemsPerPageChanged && onItemsPerPageChanged(itemsPerPage);
   }, [itemsPerPage, onItemsPerPageChanged]);
 
   useEffect(() => {
@@ -77,7 +78,12 @@ export const usePagination = (
     }
   }, [showedNumbers, setShowedNumbersHolder]);
 
+  useEffect(() => {
+    reset();
+  }, [selectedStatus]);
+
   return {
+    reset,
     startIndex,
     endIndex,
     totalPages,

@@ -36,6 +36,7 @@ export const typesenseOrdersCollectionSchema: CollectionCreateSchema = {
     {
       name: "customerFirstname",
       type: "string",
+      sort: true,
     },
     {
       name: "customerLastname",

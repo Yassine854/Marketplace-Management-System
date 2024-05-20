@@ -15,7 +15,14 @@ import SidebarOrdersSubMenu from "@/components/elements/SidebarElements/SidebarO
 import SidebarSubMenu from "@/components/elements/SidebarElements/SidebarSubMenu";
 import { statuses } from "./statuses";
 
-const Sidebar = ({ isAdmin }: any) => {
+const Sidebar = ({
+  isAdmin,
+  readyOrdersCount,
+  openOrdersCount,
+  validOrdersCount,
+  selectedStatus,
+  onOrderStatusClick,
+}: any) => {
   const { push } = useRouter();
   const pathname = usePathname();
   //const { getSession } = useAuth();
@@ -46,11 +53,17 @@ const Sidebar = ({ isAdmin }: any) => {
         />
         <Divider />
         <SidebarOrdersSubMenu
+          isAdmin={isAdmin}
+          readyOrdersCount={readyOrdersCount}
+          openOrdersCount={openOrdersCount}
+          validOrdersCount={validOrdersCount}
+          selectedStatus={selectedStatus}
           items={statuses}
           isActive={pathname?.includes("orders") && !pathname?.includes("logs")}
           onClick={() => {
             push("/orders");
           }}
+          onSubMenuItemClick={onOrderStatusClick}
         />
         <Divider />
         <SidebarButton

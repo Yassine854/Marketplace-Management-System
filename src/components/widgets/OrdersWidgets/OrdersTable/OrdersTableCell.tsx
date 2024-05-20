@@ -1,7 +1,7 @@
 const OrdersTableCell = ({ children }: any) => (
-  <td className="w-14">
-    <div className="flex cursor-pointer select-none items-center justify-center gap-1 bg-primary/5 px-3 py-5 dark:bg-bg3">
-      <div key={"id"}>{children}</div>
+  <td className="h-20 min-w-24 max-w-16 border  ">
+    <div className="flex cursor-pointer select-none items-center justify-center   truncate text-ellipsis p-4">
+      {children}
     </div>
   </td>
 );

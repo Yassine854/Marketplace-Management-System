@@ -1,27 +1,36 @@
 "use client";
 
-import OrdersLayout from "@/components/layouts/OrdersLayout";
+import OrdersTemplate from "@/components/Templates/OrdersTemplate";
 import { useOrders } from "@/hooks/useOrders";
+import { useStatusStore } from "@/stores/status-store";
 
 const OrdersPage = () => {
+  const { status } = useStatusStore();
+
   const {
     orders,
     totalOrders,
     isLoading,
-
     setItemsPerPage,
     setCurrentPage,
     setSearch,
-  } = useOrders();
+    onSort,
+    changeSelectedSort,
+    refs,
+  } = useOrders(status);
 
   return (
-    <OrdersLayout
+    <OrdersTemplate
+      refs={refs}
+      selectedStatus={status}
       orders={orders}
       totalOrders={totalOrders}
       isLoading={isLoading}
       onItemsPerPageChanged={setItemsPerPage}
       onPageChanged={setCurrentPage}
       onSearch={setSearch}
+      changeSelectedSort={changeSelectedSort}
+      onSort={onSort}
     />
   );
 };

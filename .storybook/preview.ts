@@ -15,7 +15,7 @@ const preview: Preview = {
 
     options: {
       storySort: {
-        order: ["Pages", "Layouts", "Widgets", "Elements"],
+        order: ["Pages", "Templates", "Widgets", "Elements"],
       },
     },
     controls: {

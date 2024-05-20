@@ -1,50 +1,45 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import SearchBar from "@/components/elements/sharedElements/SearchBar";
+import { useState } from "react";
 
 const actions = [
   { name: "Generate Pick List", key: "picklist" },
   { name: "Print BL's", key: "bl" },
   { name: "Manage Milk-Runs", key: "milk-run" },
 ];
-const OrdersToolBar = ({
-  title = "Products Table",
-  sortOptions,
-  sortBy,
-  setSortBy,
-  onSearch,
-  selectedOrders = ["234", "234324"],
-}: any) => {
-  //const { push } = useRouter();
-  const [selected, setSelected] = useState({ name: "Actions", key: "a" });
 
-  useEffect(() => {
-    // setSelected({ name: "Actions", key: "a" });
-  }, [selectedOrders]);
+const sortOptions = [
+  { name: "Newest", key: "createdAt:asc" },
+  { name: "Oldest", key: "createdAt:desc" },
+  { name: "Earliest Delivery Date", key: "deliveryDate:asc" },
+  { name: "Latest Delivery Date", key: "deliveryDate:desc" },
+  { name: "Highest Total", key: "total:desc" },
+  { name: "Lowest Total", key: "total:asc" },
+  { name: "Customers (A-Z)", key: "customerFirstname:asc" },
+  { name: "Customers (Z-A)", key: "customerFirstname:desc" },
+];
+
+const OrdersToolBar = ({
+  onSearch,
+  onSort,
+  selectedStatus,
+  selectedOrders = ["234", "234324"],
+  searchRef,
+  sortRef,
+}: any) => {
+  const [selectedAction, setSelectedAction] = useState("");
 
   return (
     <div className=" flex h-20 w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">
       <div className="flex items-center justify-center">
-        <p className="m-4 text-xl font-bold capitalize ">{title}</p>
+        <p className="m-4 text-xl font-bold capitalize ">{`${selectedStatus} Orders Table`}</p>
         {!!selectedOrders.length && (
           <>
-            <Dropdown
-              items={actions}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            {selected.name !== "Actions" && (
+            <Dropdown items={actions} onSelectedChange={setSelectedAction} />
+            {selectedAction && (
               <button
                 className="btn m-4 flex h-4 items-center  justify-center p-4"
-                onClick={() => {
-                  if (selected?.key == "milk-run") {
-                    // push("/milk-run");
-                  }
-                  setSelected({ name: "Actions", key: "a" });
-                }}
+                onClick={() => {}}
               >
                 Confirm
               </button>
@@ -54,13 +49,13 @@ const OrdersToolBar = ({
       </div>
 
       <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
-        <SearchBar onSearch={onSearch} withInstantSearch={false} />
+        <SearchBar ref={searchRef} onSearch={onSearch} isWithInstantSearch />
         <div className="flex items-center gap-2">
-          <p className="whitespace-nowrap">Sort By : </p>
+          <p className="whitespace-nowrap font-bold">Sort By : </p>
           <Dropdown
-            selected={sortBy}
-            setSelected={setSortBy}
+            onSelectedChange={onSort}
             items={sortOptions}
+            ref={sortRef}
           />
         </div>
       </div>

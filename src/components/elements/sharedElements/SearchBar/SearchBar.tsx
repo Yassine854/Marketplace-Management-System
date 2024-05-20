@@ -1,49 +1,50 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { forwardRef, useImperativeHandle } from "react";
 
 import { IconSearch } from "@tabler/icons-react";
+import { useSearchBar } from "./useSearchBar";
 
-type Props = {
+export type Props = {
   onSearch?: (text: string) => void;
-  withInstantSearch?: boolean;
+  isWithInstantSearch?: boolean;
+};
+export type searchRef = {
+  reset: () => void;
 };
 
-const SearchBar = ({
-  onSearch = (text) => console.log(text),
-  withInstantSearch = false,
-}: Props) => {
-  const [text, setText] = useState("");
+// eslint-disable-next-line react/display-name
+const SearchBar = forwardRef<searchRef, Props>(
+  (
+    {
+      onSearch = (text: string) => console.log(text),
+      isWithInstantSearch = false,
+    },
+    ref,
+  ) => {
+    const { handleSubmit, handleInputChange, reset, text } = useSearchBar(
+      isWithInstantSearch,
+      onSearch,
+    );
 
-  useEffect(() => {
-    if (!withInstantSearch) {
-      const timer = setTimeout(() => {
-        onSearch(text);
-      }, 500);
+    useImperativeHandle(ref, () => ({
+      reset: () => {
+        reset();
+      },
+    }));
 
-      return () => clearTimeout(timer);
-    }
-    onSearch(text);
-  }, [text, onSearch, withInstantSearch]);
-
-  return (
-    <form
-      onSubmit={() => {
-        !withInstantSearch && onSearch(text);
-      }}
-      className="hidden w-full max-w-[250px] items-center justify-between gap-3 rounded-[30px] border border-transparent bg-primary/5 px-3 focus-within:border-primary dark:bg-bg3 md:flex xxl:px-5"
-    >
-      <input
-        type="text"
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          setText(event.target.value);
-        }}
-        placeholder="Search"
-        className="w-full bg-transparent py-2 text-sm focus:outline-none"
-      />
-      <button>
-        <IconSearch size={20} />
-      </button>
-    </form>
-  );
-};
-
+    return (
+      <div className="hidden w-full max-w-[250px] items-center justify-between gap-3 rounded-[30px] border border-transparent bg-primary/5 px-3 focus-within:border-primary dark:bg-bg3 md:flex xxl:px-5">
+        <input
+          onChange={handleInputChange}
+          value={text}
+          type="text"
+          placeholder="Search"
+          className="w-full bg-transparent py-2 text-sm focus:outline-none"
+        />
+        <button onClick={handleSubmit} className="cursor-pointer">
+          <IconSearch size={24} />
+        </button>
+      </div>
+    );
+  },
+);
 export default SearchBar;
