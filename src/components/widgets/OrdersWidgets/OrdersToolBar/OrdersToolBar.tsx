@@ -9,9 +9,9 @@ const actions = [
 ];
 
 const sortOptions = [
-  { name: "Latest", key: "createdAt:asc" },
-  { name: "Earliest", key: "createdAt:desc" },
-  { name: "Delivery Date", key: "deliveryDate:desc" },
+  { name: "Newest", key: "createdAt:asc" },
+  { name: "Oldest", key: "createdAt:desc" },
+  { name: "Delivery Date", key: "deliveryDate:asc" },
   { name: "Highest Total", key: "total:desc" },
   { name: "Lowest Total", key: "total:asc" },
 ];
