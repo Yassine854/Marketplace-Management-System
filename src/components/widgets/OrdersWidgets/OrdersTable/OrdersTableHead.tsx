@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
-
 import Checkbox from "@/components/elements/sharedElements/Checkbox";
 import { IconSelector } from "@tabler/icons-react";
 import OrdersTableCell from "./OrdersTableCell";
+import { useState } from "react";
 
 const OrdersTableHead = ({ changeSelectedSort }: any) => {
   const [sort, setSort] = useState("");
