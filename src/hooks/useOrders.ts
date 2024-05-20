@@ -9,7 +9,7 @@ export const useOrders = (status: string) => {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-  const [sort, setSort] = useState("");
+  const [sort, onSort] = useState("");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState(`status:=${status}`);
 
@@ -32,5 +32,6 @@ export const useOrders = (status: string) => {
     setItemsPerPage,
     setCurrentPage,
     setSearch,
+    onSort,
   };
 };

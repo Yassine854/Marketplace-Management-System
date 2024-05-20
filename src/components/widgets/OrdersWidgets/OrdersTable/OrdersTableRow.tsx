@@ -4,16 +4,14 @@ import ActionsCell from "./ActionsCell";
 import Checkbox from "@/components/elements/sharedElements/Checkbox";
 import CheckboxCell from "./CheckboxCell";
 import OrdersTableCell from "./OrdersTableCell";
-import TableActions from "@/components/elements/TablesElements/OpenOrdersTableElements/TableActions";
+import TableActions from "@/components/elements/TablesElements/TableActions";
 import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
 
 const actions = [
   {
     name: "Edit",
     key: "edit",
-    action: (id: any) => {
-      //  push("/order/" + id);
-    },
+    action: (id: any) => {},
   },
   {
     name: "Generate Pick List",
@@ -24,9 +22,7 @@ const actions = [
   {
     name: "Manage Milk-Runs",
     key: "mr",
-    action: () => {
-      //push("/milk-run");
-    },
+    action: () => {},
   },
 ];
 const OrdersTableRow = ({
@@ -73,9 +69,6 @@ const OrdersTableRow = ({
         <IconTruck color="red" />
       </OrdersTableCell>
       <ActionsCell />
-      {/* <OrdersTableCell>
-        <TableActions actions={actions} orderId={order.id} />
-      </OrdersTableCell> */}
     </tr>
   );
 };

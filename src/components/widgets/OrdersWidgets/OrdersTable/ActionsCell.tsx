@@ -1,4 +1,4 @@
-import TableActions from "@/components/elements/TablesElements/OpenOrdersTableElements/TableActions";
+import TableActions from "@/components/elements/TablesElements/TableActions";
 
 const ActionsCell = ({ actions, orderId }: any) => {
   return (

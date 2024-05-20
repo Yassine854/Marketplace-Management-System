@@ -5,8 +5,5 @@ export type Item = {
 
 export type Props = {
   items: Item[];
-  selected?: Item;
-  setSelected: (item: Item) => void;
-  width?: string;
-  bg?: string;
+  onSelectedChange?: (key: string) => void;
 };

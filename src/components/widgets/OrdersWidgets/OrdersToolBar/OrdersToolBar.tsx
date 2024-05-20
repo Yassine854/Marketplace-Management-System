@@ -7,16 +7,24 @@ const actions = [
   { name: "Print BL's", key: "bl" },
   { name: "Manage Milk-Runs", key: "milk-run" },
 ];
+
+const sortOptions = [
+  { name: "Latest", key: "createdAt:asc" },
+  { name: "Earliest", key: "createdAt:desc" },
+  { name: "Delivery Date", key: "deliveryDate:desc" },
+  { name: "Highest Total", key: "total:desc" },
+  { name: "Lowest Total", key: "total:asc" },
+];
+
 const OrdersToolBar = ({
-  sortOptions,
-  sortBy,
-  setSortBy,
   onSearch,
+  onSort,
   selectedStatus,
   selectedOrders = ["234", "234324"],
   searchRef,
+  sortRef,
 }: any) => {
-  const [selected, setSelected] = useState({ name: "Actions", key: "a" });
+  const [selectedAction, setSelectedAction] = useState("");
 
   return (
     <div className=" flex h-20 w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">
@@ -24,20 +32,11 @@ const OrdersToolBar = ({
         <p className="m-4 text-xl font-bold capitalize ">{`${selectedStatus} Orders Table`}</p>
         {!!selectedOrders.length && (
           <>
-            <Dropdown
-              items={actions}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            {selected.name !== "Actions" && (
+            <Dropdown items={actions} onSelectedChange={setSelectedAction} />
+            {selectedAction && (
               <button
                 className="btn m-4 flex h-4 items-center  justify-center p-4"
-                onClick={() => {
-                  if (selected?.key == "milk-run") {
-                    // push("/milk-run");
-                  }
-                  setSelected({ name: "Actions", key: "a" });
-                }}
+                onClick={() => {}}
               >
                 Confirm
               </button>
@@ -49,11 +48,11 @@ const OrdersToolBar = ({
       <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
         <SearchBar ref={searchRef} onSearch={onSearch} isWithInstantSearch />
         <div className="flex items-center gap-2">
-          <p className="whitespace-nowrap">Sort By : </p>
+          <p className="whitespace-nowrap font-bold">Sort By : </p>
           <Dropdown
-            selected={sortBy}
-            setSelected={setSortBy}
+            onSelectedChange={onSort}
             items={sortOptions}
+            ref={sortRef}
           />
         </div>
       </div>
