@@ -2,7 +2,7 @@ import { Children } from "@/types/children";
 import Sidebar from "@/components/widgets/Sidebar";
 import TopNavBar from "@/components/widgets/TopNavBar";
 import { useOrders } from "@/hooks/useOrders";
-import { useStatusStore } from "@/stores/status-store";
+import { useStatusStore } from "@/stores/statusStore";
 
 const MainLayoutTemplate = ({ children }: Children) => {
   const isAdmin = true;

@@ -2,7 +2,7 @@
 
 import OrdersTemplate from "@/components/Templates/OrdersTemplate";
 import { useOrders } from "@/hooks/useOrders";
-import { useStatusStore } from "@/stores/status-store";
+import { useStatusStore } from "@/stores/statusStore";
 
 const OrdersPage = () => {
   const { status } = useStatusStore();
