@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useGetOrders } from "@/hooks/queries/useGetOrders";
+import { useNavigation } from "./useNavigation";
+import { useOrderStore } from "@/stores/orderStore";
 import { useOrdersCount } from "./useOrdersCount";
 
 type Ref = {
@@ -8,9 +10,11 @@ type Ref = {
   changeSelected?: (selected: any) => void;
 };
 export const useOrders = (status: string) => {
+  const { navigateToOrderDetails } = useNavigation();
   const { openOrdersCount, validOrdersCount, readyOrdersCount } =
     useOrdersCount();
 
+  const { setOrderId } = useOrderStore();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [sort, onSort] = useState("");
@@ -42,9 +46,10 @@ export const useOrders = (status: string) => {
     sortRef.current?.reset();
   }, [status]);
 
-  // useEffect(() => {
-  //   sortRef.current?.changeSelected({ name: "test", key: "test" });
-  // }, [sort]);
+  const onOrderClick = (orderId: string) => {
+    setOrderId(orderId);
+    navigateToOrderDetails();
+  };
 
   return {
     orders: data?.orders,
@@ -59,6 +64,7 @@ export const useOrders = (status: string) => {
     setSearch,
     onSort,
     changeSelectedSort,
+    onOrderClick,
     refs: { paginationRef, searchRef, sortRef },
   };
 };

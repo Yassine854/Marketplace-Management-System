@@ -17,10 +17,12 @@ const OrdersPage = () => {
     onSort,
     changeSelectedSort,
     refs,
+    onOrderClick,
   } = useOrders(status);
 
   return (
     <OrdersTemplate
+      onOrderClick={onOrderClick}
       refs={refs}
       selectedStatus={status}
       orders={orders}

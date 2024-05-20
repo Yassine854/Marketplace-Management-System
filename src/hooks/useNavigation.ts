@@ -11,8 +11,8 @@ export const useNavigation = () => {
     back();
   };
 
-  const navigateToOrderDetails = (orderId: string) => {
-    push("/order/" + orderId);
+  const navigateToOrderDetails = () => {
+    push("/order");
   };
 
   const navigateToDashboard = () => {

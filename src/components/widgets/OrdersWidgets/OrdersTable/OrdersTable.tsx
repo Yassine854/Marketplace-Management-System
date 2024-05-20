@@ -9,6 +9,7 @@ const OrdersTable = ({
   orders = defaultOrders,
   isLoading,
   changeSelectedSort,
+  onOrderClick,
 }: any) => {
   return (
     <table
@@ -30,7 +31,11 @@ const OrdersTable = ({
           ) : (
             <>
               {orders?.map((order: any) => (
-                <OrdersTableRow key={order?.id} order={order} />
+                <OrdersTableRow
+                  key={order?.id}
+                  order={order}
+                  onClick={onOrderClick}
+                />
               ))}
             </>
           )}
