@@ -18,7 +18,7 @@ export const useOrders = (status: string) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [sort, onSort] = useState("");
-  const [search, setSearch] = useState("");
+  const [search, onSearch] = useState("");
   const [filter, setFilter] = useState(`status:=${status}`);
 
   const { data, isLoading } = useGetOrders({
@@ -61,7 +61,7 @@ export const useOrders = (status: string) => {
     readyOrdersCount,
     setItemsPerPage,
     setCurrentPage,
-    setSearch,
+    onSearch,
     onSort,
     changeSelectedSort,
     onOrderClick,

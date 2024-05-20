@@ -8,7 +8,7 @@ import { tailwind } from "./OrderItemsTable.styles";
 import { useEffect } from "react";
 import { useOrdersTable } from "./useOrderDetailsTable";
 
-const OrdersTable = ({ status = "open" }: { status?: string }) => {
+const OrderItemsTable = ({ status = "open" }: { status?: string }) => {
   const title = status.toString() + " " + "Orders";
 
   const setStatus = (status: string): string => {
@@ -22,50 +22,50 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
     return status;
   };
 
-  const {
-    order,
-    currentPage,
-    paginate,
-    totalOrders,
-    totalPages,
-    nextPage,
-    prevPage,
-    startIndex,
-    endIndex,
-    orders,
-    isLoading,
-    itemsPerPage,
-    setItemsPerPage,
-    sortOptions,
-    sortBy,
-    setSortBy,
-    setSortOrder,
-    setSearch,
-    setSelectedOrders,
-    selectAllOrders,
-    selectedOrders,
-    unSelectAllOrders,
-    selectOrder,
-    unSelectOrder,
-    onRowClick,
-    actions,
-  } = useOrdersTable(setStatus(status));
+  // const {
+  //   order,
+  //   currentPage,
+  //   paginate,
+  //   totalOrders,
+  //   totalPages,
+  //   nextPage,
+  //   prevPage,
+  //   startIndex,
+  //   endIndex,
+  //   orders,
+  //   isLoading,
+  //   itemsPerPage,
+  //   setItemsPerPage,
+  //   sortOptions,
+  //   sortBy,
+  //   setSortBy,
+  //   setSortOrder,
+  //   setSearch,
+  //   setSelectedOrders,
+  //   selectAllOrders,
+  //   selectedOrders,
+  //   unSelectAllOrders,
+  //   selectOrder,
+  //   unSelectOrder,
+  //   onRowClick,
+  //   actions,
+  // } = useOrdersTable(setStatus(status));
 
   return (
     <Box>
       <div className={tailwind.header}>
-        <OrderItemsTableHeader
+        {/* <OrderItemsTableHeader
           title={title}
           sortOptions={sortOptions}
           sortBy={sortBy}
           setSortBy={setSortBy}
           setSearch={setSearch}
           selectedOrders={selectedOrders}
-        />
+        /> */}
       </div>
 
       <div className={tailwind.main}>
-        <TableBody
+        {/* <TableBody
           order={order}
           onRowClick={onRowClick}
           isLoading={isLoading}
@@ -79,11 +79,11 @@ const OrdersTable = ({ status = "open" }: { status?: string }) => {
           selectOrder={selectOrder}
           unSelectOrder={unSelectOrder}
           actions={actions}
-        />
+        /> */}
       </div>
       <div className={tailwind.footer} />
     </Box>
   );
 };
 
-export default OrdersTable;
+export default OrderItemsTable;
