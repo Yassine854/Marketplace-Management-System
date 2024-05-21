@@ -1,6 +1,6 @@
-import OrdersTableHead from "./OrdersTableHead";
-import OrdersTableRow from "./OrdersTableRow";
-import TableRowSkeleton from "./RowSkeleton";
+import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
+import OrdersTableRow from "./elements/OrdersTableRow";
+import TableRowSkeleton from "./elements/RowSkeleton";
 import { defaultProps } from "./OrdersTable.defaultProps";
 const { orders: defaultOrders } = defaultProps;
 
