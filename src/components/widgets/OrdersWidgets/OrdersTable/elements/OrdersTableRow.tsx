@@ -63,7 +63,7 @@ const OrdersTableRow = ({
           <IconPdf />
         </div>
       </OrdersTableCell>
-      <ActionsCell />
+      <ActionsCell actions={actions} />
       <OrdersTableCell>
         <IconTruck color="red" />
       </OrdersTableCell>
