@@ -2,7 +2,6 @@ import OrdersTableHead from "./OrdersTableHead";
 import OrdersTableRow from "./OrdersTableRow";
 import TableRowSkeleton from "./RowSkeleton";
 import { defaultProps } from "./OrdersTable.defaultProps";
-
 const { orders: defaultOrders } = defaultProps;
 
 const OrdersTable = ({
@@ -12,12 +11,7 @@ const OrdersTable = ({
   onOrderClick,
 }: any) => {
   return (
-    <table
-      border={0}
-      cellPadding={0}
-      cellSpacing={0}
-      className="relative w-full "
-    >
+    <table border={0} cellPadding={0} cellSpacing={0}>
       <OrdersTableHead changeSelectedSort={changeSelectedSort} />
 
       <tbody>
