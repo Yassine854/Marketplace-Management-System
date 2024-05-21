@@ -1,7 +1,7 @@
 import Image from "next/image";
 import LoginForm from "@/components/widgets/LoginForm";
 
-const LoginTemplate = () => {
+const LoginPage = () => {
   return (
     <div className="  flex min-h-screen flex-grow items-center justify-center bg-[url(/images/login-bg.png)] bg-cover px-3 py-10 md:px-5 md:py-16 lg:py-20 xl:py-28">
       <div className="box w-full max-w-[805px] items-center p-3 md:p-4 xl:p-6">
@@ -22,4 +22,4 @@ const LoginTemplate = () => {
   );
 };
 
-export default LoginTemplate;
+export default LoginPage;
