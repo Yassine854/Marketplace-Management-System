@@ -28,8 +28,8 @@ const OrdersTableHead = ({ changeSelectedSort }: any) => {
         <OrdersTableHeadCell>Delivery Agent</OrdersTableHeadCell>
         <OrdersTableHeadCell>Delivery Status</OrdersTableHeadCell>
         <OrdersTableHeadSmallCell>Summary</OrdersTableHeadSmallCell>
-        <OrdersTableHeadSmallCell>Label</OrdersTableHeadSmallCell>
         <OrdersTableHeadSmallCell>Actions</OrdersTableHeadSmallCell>
+        <OrdersTableHeadSmallCell>Label</OrdersTableHeadSmallCell>
       </tr>
     </thead>
   );
