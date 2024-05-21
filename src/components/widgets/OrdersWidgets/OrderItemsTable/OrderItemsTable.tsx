@@ -1,5 +1,3 @@
-"use client";
-
 import Box from "../../Box";
 import OrderItemsTableHeader from "@/components/elements/TablesElements/OrderLinesTableElements/OrderItemsTableHeader";
 import Pagination from "@/components/widgets/OrdersWidgets/Pagination";

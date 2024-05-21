@@ -1,5 +1,5 @@
 import SyncPage from "@/components/pages/SyncPage";
 
-export const Sync = () => <SyncPage />;
+const Sync = () => <SyncPage />;
 
 export default Sync;
