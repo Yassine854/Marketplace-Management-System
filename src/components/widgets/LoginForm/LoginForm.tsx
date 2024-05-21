@@ -1,5 +1,3 @@
-"use client";
-
 import * as z from "zod";
 
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
