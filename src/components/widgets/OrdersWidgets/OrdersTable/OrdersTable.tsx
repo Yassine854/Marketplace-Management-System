@@ -9,10 +9,17 @@ const OrdersTable = ({
   isLoading,
   changeSelectedSort,
   onOrderClick,
+  onSelectAllClick,
+  onSelectOrderClick,
+  isAllOrdersSelected,
 }: any) => {
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>
-      <OrdersTableHead changeSelectedSort={changeSelectedSort} />
+      <OrdersTableHead
+        changeSelectedSort={changeSelectedSort}
+        onSelectAllClick={onSelectAllClick}
+        isAllOrdersSelected={isAllOrdersSelected}
+      />
 
       <tbody>
         <>
@@ -29,6 +36,7 @@ const OrdersTable = ({
                   key={order?.id}
                   order={order}
                   onClick={onOrderClick}
+                  onSelectOrderClick={onSelectOrderClick}
                 />
               ))}
             </>

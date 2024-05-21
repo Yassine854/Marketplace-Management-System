@@ -64,7 +64,6 @@ export const useGetOrders = ({
   filterBy,
   search,
 }: Params): Res => {
-  console.log("🚀 ~ search:", search);
   const { data, loading, error } = useQuery(QUERY, {
     variables: {
       filterBy,

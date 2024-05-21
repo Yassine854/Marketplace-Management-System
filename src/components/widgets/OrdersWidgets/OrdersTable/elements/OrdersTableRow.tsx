@@ -26,6 +26,7 @@ const actions = [
 const OrdersTableRow = ({
   onClick = () => console.log("Row clicked"),
   order,
+  onSelectOrderClick,
 }: any) => {
   return (
     <tr
@@ -33,7 +34,12 @@ const OrdersTableRow = ({
       onClick={onClick}
     >
       <OrdersTableCell>
-        <Checkbox />
+        <Checkbox
+          isChecked={order.isSelected}
+          onClick={(isChecked) => {
+            onSelectOrderClick(isChecked, order.id);
+          }}
+        />
       </OrdersTableCell>
       <OrdersTableCell>{order?.kamiounId}</OrdersTableCell>
       <OrdersTableCell>

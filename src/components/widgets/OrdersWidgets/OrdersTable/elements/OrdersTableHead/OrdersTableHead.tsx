@@ -4,7 +4,11 @@ import OrdersTableHeadCell from "../OrdersTableHeadCell";
 import OrdersTableHeadSmallCell from "../OrdersTableHeadSmallCell";
 import { useOrdersTableHead } from "./useOrdersTableHead";
 
-const OrdersTableHead = ({ changeSelectedSort }: any) => {
+const OrdersTableHead = ({
+  changeSelectedSort,
+  onSelectAllClick,
+  isAllOrdersSelected,
+}: any) => {
   const { onCustomerClick, onDeliveryDateClick, onTotalClick } =
     useOrdersTableHead(changeSelectedSort);
 
@@ -12,7 +16,10 @@ const OrdersTableHead = ({ changeSelectedSort }: any) => {
     <thead className="sticky top-0 z-10">
       <tr className="  h-12  w-full bg-n40 font-semibold">
         <OrdersTableHeadSmallCell>
-          <Checkbox />
+          <Checkbox
+            onClick={onSelectAllClick}
+            isChecked={isAllOrdersSelected}
+          />
         </OrdersTableHeadSmallCell>
         <OrdersTableHeadCell>ID</OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onCustomerClick}>
