@@ -23,9 +23,9 @@ const OrdersToolBar = ({
   onSearch,
   onSort,
   selectedStatus,
-  selectedOrders = ["234", "234324"],
   searchRef,
   sortRef,
+  isSomeOrdersSelected,
 }: any) => {
   const [selectedAction, setSelectedAction] = useState("");
 
@@ -33,7 +33,7 @@ const OrdersToolBar = ({
     <div className=" flex  w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">
       <div className="flex items-center justify-center">
         <p className="m-4 text-xl font-bold capitalize ">{`${selectedStatus} Orders Table`}</p>
-        {!!selectedOrders.length && (
+        {isSomeOrdersSelected && (
           <>
             <Dropdown items={actions} onSelectedChange={setSelectedAction} />
             {selectedAction && (

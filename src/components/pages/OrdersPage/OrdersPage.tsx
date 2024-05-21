@@ -22,6 +22,10 @@ const OrdersPage = () => {
     changeSelectedSort,
     refs,
     onOrderClick,
+    onSelectAllClick,
+    onSelectOrderClick,
+    isAllOrdersSelected,
+    isSomeOrdersSelected,
   } = useOrders(status);
 
   return (
@@ -32,6 +36,8 @@ const OrdersPage = () => {
         onSort={onSort}
         selectedStatus={status}
         sortRef={refs.sortRef}
+        selectedOrders
+        isSomeOrdersSelected={isSomeOrdersSelected}
       />
       <div className=" flex  w-full flex-grow flex-col overflow-y-scroll bg-n10 pb-24">
         <OrdersTable
@@ -40,6 +46,9 @@ const OrdersPage = () => {
           onSort={onSort}
           changeSelectedSort={changeSelectedSort}
           onOrderClick={onOrderClick}
+          onSelectAllClick={onSelectAllClick}
+          onSelectOrderClick={onSelectOrderClick}
+          isAllOrdersSelected={isAllOrdersSelected}
         />
         {orders?.length == 0 && <AnyMatchingResults />}
       </div>
