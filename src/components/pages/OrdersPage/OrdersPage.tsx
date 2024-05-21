@@ -1,7 +1,7 @@
 "use client";
 
 import AnyMatchingResults from "@/components/elements/TablesElements/AnyMatchingResults";
-import Box from "@/components/widgets/Box";
+import Box from "@/components/Layouts/Box";
 import OrdersTable from "@/components/widgets/OrdersWidgets/OrdersTable";
 import OrdersToolBar from "@/components/widgets/OrdersWidgets/OrdersToolBar";
 import Pagination from "@/components/widgets/OrdersWidgets/Pagination";

@@ -1,5 +1,5 @@
 import Banner from "../Banner";
-import Box from "../Box";
+import Box from "../../Layouts/Box";
 const OrderDetails = () => {
   return (
     <Box>

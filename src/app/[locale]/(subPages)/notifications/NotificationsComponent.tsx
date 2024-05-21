@@ -1,9 +1,8 @@
 import { IconClock, IconMessageDots } from "@tabler/icons-react";
 
-import Box from "@/components/widgets/Box";
+import Box from "@/components/Layouts/Box";
 import Image from "next/image";
 
-//import OptionsVertical from "../shared/OptionsVertical";
 type Notification = {
   id: number;
   name: string;
@@ -104,13 +103,10 @@ const notificationsData: NotificationsData = {
     },
   ],
 };
-const ActivitiesLogs = () => {
-  return (
-    <Box>
-      <div className="bb-dashed sticky top-0   flex h-16 items-center justify-between bg-n0">
-        <p className="text-3xl font-bold">Activities Logs</p>
-      </div>
 
+const Notifications = () => {
+  return (
+    <Box title="Notifications">
       {Object.keys(notificationsData).map((key) => (
         <div key={key}>
           <p className="px-6 py-4 font-semibold">{key}</p>
@@ -133,7 +129,18 @@ const ActivitiesLogs = () => {
                     !read && "bg-primary/5 dark:bg-bg3"
                   } mb-4 flex flex-wrap items-start gap-4 border border-n30 last:mb-0 dark:border-n500 md:gap-6`}
                 >
+                  <Image
+                    src={img}
+                    width={48}
+                    className="rounded-full"
+                    height={48}
+                    alt="img"
+                  />
                   <div className="grow">
+                    <div className="mb-3 flex flex-wrap items-center gap-2 md:gap-4">
+                      <p className="text-xl font-medium">{name}</p>
+                      <span className="text-sm">{timePast}</span>
+                    </div>
                     <div className="bb-dashed mb-5 flex gap-1 pb-5">
                       <IconMessageDots />
                       <div className="flex flex-wrap items-center gap-1 text-sm">
@@ -159,4 +166,4 @@ const ActivitiesLogs = () => {
   );
 };
 
-export default ActivitiesLogs;
+export default Notifications;

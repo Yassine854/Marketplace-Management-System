@@ -1,6 +1,6 @@
 import { IconClock, IconMessageDots } from "@tabler/icons-react";
 
-import Box from "@/components/widgets/Box";
+import Box from "@/components/Layouts/Box";
 import Image from "next/image";
 
 //import OptionsVertical from "../shared/OptionsVertical";
@@ -104,11 +104,11 @@ const notificationsData: NotificationsData = {
     },
   ],
 };
-const OrdersLogs = () => {
+const ActivitiesLogs = () => {
   return (
     <Box>
       <div className="bb-dashed sticky top-0   flex h-16 items-center justify-between bg-n0">
-        <p className="text-3xl font-bold">Orders Logs</p>
+        <p className="text-3xl font-bold">Activities Logs</p>
       </div>
 
       {Object.keys(notificationsData).map((key) => (
@@ -159,4 +159,4 @@ const OrdersLogs = () => {
   );
 };
 
-export default OrdersLogs;
+export default ActivitiesLogs;
