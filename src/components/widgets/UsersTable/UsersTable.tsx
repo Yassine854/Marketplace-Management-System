@@ -1,7 +1,7 @@
 "use client";
 
 import Banner from "../Banner";
-import Box from "../Box";
+import Box from "../../Layouts/Box";
 import { faker } from "@faker-js/faker";
 export function createRandomUser() {
   return {

@@ -1,4 +1,4 @@
-import Box from "@/components/widgets/Box";
+import Box from "@/components/Layouts/Box";
 
 export const SyncPage = () => {
   return (

@@ -1,6 +1,6 @@
 import { IconClock, IconMessageDots } from "@tabler/icons-react";
 
-import Box from "@/components/widgets/Box";
+import Box from "@/components/Layouts/Box";
 import Image from "next/image";
 
 type Notification = {

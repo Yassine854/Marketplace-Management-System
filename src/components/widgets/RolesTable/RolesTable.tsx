@@ -1,7 +1,7 @@
 "use client";
 
 import Banner from "../Banner";
-import Box from "../Box";
+import Box from "../../Layouts/Box";
 import Checkbox from "@/components/elements/sharedElements/Checkbox";
 
 const roles = ["manager", "ops", " customer service", "sales", "Finance"];
