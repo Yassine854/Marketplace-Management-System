@@ -56,7 +56,7 @@ export const useOrders = (status: string) => {
     if (isLoading) {
       const timer = setTimeout(() => {
         setIsOrdersLoading(true);
-      }, 200);
+      }, 500);
 
       return () => clearTimeout(timer);
     }

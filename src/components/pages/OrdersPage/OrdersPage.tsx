@@ -1,5 +1,6 @@
 "use client";
 
+import AnyMatchingResults from "@/components/elements/TablesElements/AnyMatchingResults";
 import Box from "@/components/widgets/Box";
 import OrdersTable from "@/components/widgets/OrdersWidgets/OrdersTable";
 import OrdersToolBar from "@/components/widgets/OrdersWidgets/OrdersToolBar";
@@ -32,7 +33,7 @@ const OrdersPage = () => {
         selectedStatus={status}
         sortRef={refs.sortRef}
       />
-      <div className="  overflow-y-scroll  bg-n10 pb-20">
+      <div className=" flex  w-full flex-grow flex-col overflow-y-scroll bg-n10 pb-24">
         <OrdersTable
           isLoading={isLoading}
           orders={orders}
@@ -40,15 +41,19 @@ const OrdersPage = () => {
           changeSelectedSort={changeSelectedSort}
           onOrderClick={onOrderClick}
         />
+        {orders?.length == 0 && <AnyMatchingResults />}
       </div>
+
       <div className="bt-dashed absolute bottom-0 left-0 right-0 z-10 h-16 w-full bg-n10">
-        <Pagination
-          ref={refs.paginationRef}
-          selectedStatus={status}
-          totalItems={totalOrders}
-          onItemsPerPageChanged={setItemsPerPage}
-          onPageChanged={setCurrentPage}
-        />
+        {orders?.length !== 0 && (
+          <Pagination
+            ref={refs.paginationRef}
+            selectedStatus={status}
+            totalItems={totalOrders}
+            onItemsPerPageChanged={setItemsPerPage}
+            onPageChanged={setCurrentPage}
+          />
+        )}
       </div>
     </Box>
   );
