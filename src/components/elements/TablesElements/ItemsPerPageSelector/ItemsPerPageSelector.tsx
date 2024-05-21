@@ -1,13 +1,26 @@
-"use client";
+import { useEffect, useState } from "react";
 
 import { IconChevronDown } from "@tabler/icons-react";
 import { Props } from "./ItemsPerPageSelector.types";
 import { tailwind } from "./ItemsPerPageSelector.styles";
-import useDropdown from "@/hooks/useDropdown";
+import useDropdown from "./useDropdown";
+
 const options = [10, 25, 50];
 
-const ItemsPerPageSelector = ({ selected = 10, setSelected }: Props) => {
+const ItemsPerPageSelector = ({
+  onChange = (number: number) => console.log("Items Per Page", number),
+  selectedStatus,
+}: any) => {
   const { open, ref, toggleOpen } = useDropdown();
+  const [selected, setSelected] = useState(10);
+
+  useEffect(() => {
+    onChange(selected);
+  }, [selected, onChange]);
+
+  useEffect(() => {
+    setSelected(10);
+  }, [selectedStatus]);
   return (
     <div className={tailwind.container} ref={ref}>
       <div onClick={toggleOpen} className={tailwind.main}>

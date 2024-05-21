@@ -1,8 +1,5 @@
 import { useParams, useRouter } from "next/navigation";
 
-import { Params } from "./queries/useGetOrdersCount";
-import { useEffect } from "react";
-
 export const useNavigation = () => {
   const { back, push } = useRouter();
   const { status, locale } = useParams();
@@ -11,8 +8,8 @@ export const useNavigation = () => {
     back();
   };
 
-  const navigateToOrderDetails = (orderId: string) => {
-    push("/order/" + orderId);
+  const navigateToOrderDetails = () => {
+    push("/order-details");
   };
 
   const navigateToDashboard = () => {
