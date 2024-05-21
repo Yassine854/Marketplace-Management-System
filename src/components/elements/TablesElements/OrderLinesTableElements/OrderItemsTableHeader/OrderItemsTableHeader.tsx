@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import Dropdown from "@/components/elements/sharedElements/Dropdown";
 import { IconArrowNarrowLeft } from "@tabler/icons-react";
-import SearchBar from "@/components/elements/TablesElements/SearchBar";
+import SearchBar from "@/components/elements/sharedElements/SearchBar";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useRouter } from "next/navigation";
 
