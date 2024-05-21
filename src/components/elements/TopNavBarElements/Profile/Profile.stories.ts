@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import Index from "./index";
 
 const meta = {
-  title: "Components/Elements/TopNavBarElements/Profile",
+  title: "Elements/TopNavBarElements/Profile",
   component: Index,
   parameters: {
     layout: "centered",

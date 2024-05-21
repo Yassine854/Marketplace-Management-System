@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 const Index = () => <div />;
 
 const meta = {
-  title: "Components/Elements/TopNavBarElements/LanguageSwticher",
+  title: "Elements/TopNavBarElements/LanguageSwticher",
   component: Index,
   decorators: [],
   parameters: {

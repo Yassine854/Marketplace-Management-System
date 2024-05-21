@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["@testing-library/jest-dom"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -26,9 +27,20 @@
       "@/utils*": ["./src/utils/*"],
       "@/hooks*": ["./src/hooks/*"],
       "@/types*": ["./src/types/*"],
-      "@/libs*": ["./src/libs/*"]
+      "@/libs*": ["./src/libs/*"],
+      "@/services*": ["./src/services/*"],
+      "@/components*": ["./src/components/*"],
+      "@/stores*": ["./src/stores/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/components/widgets/Sidebar/Sidebar.test.jsx",
+    "src/libs/typesenseClient.ts",
+    "src/hooks/queries/useGetOrders.ts"
+  ],
   "exclude": ["node_modules"]
 }
