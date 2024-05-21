@@ -38,7 +38,7 @@ const OrdersToolBar = ({
             <Dropdown items={actions} onSelectedChange={setSelectedAction} />
             {selectedAction && (
               <button
-                className="btn m-4 flex h-4 items-center  justify-center p-4"
+                className="btn m-2 flex h-2 items-center  justify-center p-4"
                 onClick={() => {}}
               >
                 Confirm
