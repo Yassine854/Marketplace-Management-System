@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useGetOrders } from "@/hooks/queries/useGetOrders";
-import { useNavigation } from "./useNavigation";
+import { useNavigation } from "../useNavigation";
 import { useOrderStore } from "@/stores/orderStore";
-import { useOrdersCount } from "./useOrdersCount";
+import { useOrdersCount } from "../useOrdersCount";
 
 type Ref = {
   reset: () => void;
