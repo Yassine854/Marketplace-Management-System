@@ -63,10 +63,10 @@ const OrdersTableRow = ({
           <IconPdf />
         </div>
       </OrdersTableCell>
+      <ActionsCell actions={actions} />
       <OrdersTableCell>
         <IconTruck color="red" />
       </OrdersTableCell>
-      <ActionsCell />
     </tr>
   );
 };
