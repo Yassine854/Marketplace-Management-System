@@ -1,5 +1,4 @@
 import { compare } from "bcryptjs";
-import { dynamodbClient } from "./dynamodbClient";
 
 export const handleAuthentication = async (
   username: string,

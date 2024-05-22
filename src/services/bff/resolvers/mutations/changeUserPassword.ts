@@ -1,5 +1,5 @@
 import { UserPayload } from "../resolvers.types";
-import bcrypt from "bcrypt";
+import { hashPassword } from "@/utils/hashPassword";
 import { prismaClient } from "@/libs/prismaClient";
 
 export const changeUserPassword = async (
@@ -18,9 +18,7 @@ export const changeUserPassword = async (
       };
     }
 
-    // Hash the new password
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    const hashedPassword = await hashPassword(newPassword);
 
     const updatedUser = await prismaClient.user.update({
       where: { id: userId },

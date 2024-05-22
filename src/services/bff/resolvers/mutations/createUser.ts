@@ -1,6 +1,5 @@
-import { User } from "@/types/user";
 import { UserPayload } from "../resolvers.types";
-import bcrypt from "bcrypt";
+import { hashPassword } from "@/utils/hashPassword";
 import { prismaClient } from "@/libs/prismaClient";
 
 export const createUser = async (newUser: any): Promise<UserPayload> => {
@@ -17,9 +16,7 @@ export const createUser = async (newUser: any): Promise<UserPayload> => {
       };
     }
 
-    // Hash the password before storing it
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(newUser.password, saltRounds);
+    const hashedPassword = await hashPassword(newUser.password);
 
     const user = await prismaClient.user.create({
       data: {
