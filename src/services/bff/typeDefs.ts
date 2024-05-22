@@ -63,4 +63,15 @@ export const typeDefs = gql`
     getUser(userId:ID!):User
     getUsers():[User]!
   }
+
+  type Mutation{
+
+    createUser(username:String!,email:String,password:String!):String!
+    changeUserPassword(userId:ID!,newPassword:String!):String!
+    editUsername(userId:ID!,newUsername:String!):String!
+    changeUserEmail(userId:ID!,newEmail:String!):String!
+    deleteUser(userId:ID!):String!
+
+
+  }
 `;
