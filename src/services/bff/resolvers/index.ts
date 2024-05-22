@@ -2,7 +2,7 @@ import { GetOrdersParams, getOrders } from "./queries/getOrders";
 
 import { createUser } from "./queries/createUser";
 import { getOrder } from "./queries/getOrder";
-import { getUser } from "./getUser";
+import { getUser } from "./queries/getUser";
 import { getUsers } from "./queries/getUsers";
 
 export const resolvers = {
