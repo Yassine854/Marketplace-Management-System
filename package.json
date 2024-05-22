@@ -16,7 +16,10 @@
     "prepare": "husky install",
     "commit": "git add . && ./node_modules/cz-customizable/standalone.js",
     "pre-commit": "git add . && lint-staged",
-    "chromatic": "npx chromatic --project-token=chpt_e71ad843e237161"
+    "chromatic": "npx chromatic --project-token=chpt_e71ad843e237161",
+    "prisma:studio": "dotenv -e .env.local npx prisma studio",
+    "prisma:push": "dotenv -e .env.local prisma db push",
+    "prisma:generate": "dotenv -e .env.local npx prisma generate"
   },
   "dependencies": {
     "@apollo/client": "^3.9.11",
@@ -39,6 +42,7 @@
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "dotenv-cli": "^7.4.2",
     "graphql": "^16.8.1",
     "graphql-tag": "^2.12.6",
     "install": "^0.13.0",
