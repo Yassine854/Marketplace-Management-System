@@ -1,4 +1,4 @@
-import { OrderLine } from "@/types/OrderLine";
+import { OrderLine } from "@/types/orderLine";
 
 export const getOrderLines = (orderItems: any): OrderLine[] =>
   orderItems?.map((item: any) => {

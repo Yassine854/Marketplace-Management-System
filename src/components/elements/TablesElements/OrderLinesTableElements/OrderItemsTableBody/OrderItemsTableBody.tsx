@@ -1,7 +1,7 @@
 "use client";
 
 import AnyMatchingResults from "../../AnyMatchingResults";
-import { OrderLine } from "../../../../../types/OrderLine";
+import { OrderLine } from "../../../../../types/orderLine";
 import OrdersTableHead from "../OrderItemsTableHead";
 import TableRow from "../OrderItemsTableRow";
 import TableRowSkeleton from "../../TableRowSkeleton";
