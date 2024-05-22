@@ -1,11 +1,12 @@
 import { compare } from "bcryptjs";
-import { dynamodbClient } from "./dynamodbClient";
-
+import { getUser } from "../bff/resolvers/queries/getUser";
 export const handleAuthentication = async (
   username: string,
   password: string,
 ): Promise<any> => {
   try {
+    const res = await getUser(username);
+    console.log("🚀 ~ user:", res);
     // const res = await dynamodbClient.get({
     //   TableName: process.env.NEXT_PUBLIC_AUTH_DYNAMODB_TABLE_NAME,
     //   Key: {
