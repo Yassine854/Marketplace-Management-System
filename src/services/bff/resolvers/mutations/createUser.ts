@@ -1,13 +1,9 @@
 import { User } from "@/types/user";
+import { UserPayload } from "../resolvers.types";
+import bcrypt from "bcrypt";
 import { prismaClient } from "@/libs/prismaClient";
 
-type CreateUserPayload = {
-  user?: User;
-  success: boolean;
-  message?: string;
-};
-
-export const createUser = async (newUser: any): Promise<CreateUserPayload> => {
+export const createUser = async (newUser: any): Promise<UserPayload> => {
   try {
     const existingUser = await prismaClient.user.findUnique({
       where: { username: newUser.username },
@@ -21,8 +17,17 @@ export const createUser = async (newUser: any): Promise<CreateUserPayload> => {
       };
     }
 
+    // Hash the password before storing it
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newUser.password, saltRounds);
+
     const user = await prismaClient.user.create({
-      data: { ...newUser, role: "agent", status: "pending" },
+      data: {
+        ...newUser,
+        password: hashedPassword,
+        role: "agent",
+        status: "pending",
+      },
     });
 
     return {

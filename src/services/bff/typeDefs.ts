@@ -1,4 +1,6 @@
+import { UserPayload } from "./resolvers/resolvers.types";
 import { gql } from "graphql-tag";
+import { warehouses } from "./../../components/elements/TopNavBarElements/WarehouseSelector/WarehouseSelector";
 
 export const typeDefs = gql`
   input CreateUserInput {
@@ -84,9 +86,10 @@ export const typeDefs = gql`
 
   type Mutation {
     createUser(input: CreateUserInput): UserPayload!
-    changeUserPassword(userId: ID!, newPassword: String!): String!
-    editUsername(userId: ID!, newUsername: String!): String!
-    changeUserEmail(userId: ID!, newEmail: String!): String!
-    deleteUser(userId: ID!): String!
+    deleteUser(userId: ID!): UserPayload!
+    changeUserPassword(userId: ID!, newPassword: String!): UserPayload!
+    changeUserEmail(userId: ID!, newEmail: String!): UserPayload!
+    changeUserRole(userId: ID!, newRole: String!): UserPayload!
+    changeUserWarehouses(userId: ID!, newWarehouses: [String]!): UserPayload!
   }
 `;
