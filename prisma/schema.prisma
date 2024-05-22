@@ -7,18 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  username   String   @unique
-  email      String?  @unique
-  password   String
-  role       String
-  status     String
-  warehouses String[]
-}
-
 model Role {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   permissions String[]
+  // User        User[]
+}
+
+model User {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  username   String   @unique
+  email      String?
+  password   String
+  role       String
+  // role       Role     @relation(fields: [id], references: [id])
+  status     String
+  warehouses String[]
+  roleId     String?  @db.ObjectId
 }
