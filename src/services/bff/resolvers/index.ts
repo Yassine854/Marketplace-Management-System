@@ -1,9 +1,9 @@
-import { GetOrdersParams, getOrders } from "./getOrders";
+import { GetOrdersParams, getOrders } from "./queries/getOrders";
 
-import { createUser } from "./createUser";
-import { getOrder } from "./getOrder";
+import { createUser } from "./queries/createUser";
+import { getOrder } from "./queries/getOrder";
 import { getUser } from "./getUser";
-import { getUsers } from "./getUsers";
+import { getUsers } from "./queries/getUsers";
 
 export const resolvers = {
   Mutation: {
