@@ -60,7 +60,7 @@ export const typeDefs = gql`
       search: String
     ): OrderList
 
-    getUser(userId: ID!): User
+    getUser(username: String!): User
     getUsers: [User]!
   }
 
