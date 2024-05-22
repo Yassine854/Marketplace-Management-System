@@ -35,6 +35,15 @@ export const typeDefs = gql`
     totalOrders: Int
   }
 
+  type User {
+    id: ID!
+    username: String!
+    email: String
+    password: String!
+    role: String!
+    warehouses: [String]!
+  }
+
   type Query {
     getOrder(orderId: ID!): Order
     getOrders(
