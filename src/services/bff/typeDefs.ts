@@ -7,19 +7,13 @@ export const typeDefs = gql`
     password: String!
   }
 
-  type CreateUserPayload {
+  type UserPayload {
     user: User
     success: Boolean!
     message: String
   }
 
-  type GetUserPayload {
-    user: User
-    success: Boolean!
-    message: String
-  }
-
-  type GetUsersPayload {
+  type UsersPayload {
     users: [User]
     success: Boolean!
     message: String
@@ -84,12 +78,12 @@ export const typeDefs = gql`
       search: String
     ): OrderList
 
-    getUser(username: String!): GetUserPayload!
-    getUsers: GetUsersPayload!
+    getUser(username: String!): UserPayload!
+    getUsers: UsersPayload!
   }
 
   type Mutation {
-    createUser(input: CreateUserInput): CreateUserPayload!
+    createUser(input: CreateUserInput): UserPayload!
     changeUserPassword(userId: ID!, newPassword: String!): String!
     editUsername(userId: ID!, newUsername: String!): String!
     changeUserEmail(userId: ID!, newEmail: String!): String!
