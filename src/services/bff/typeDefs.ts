@@ -59,5 +59,8 @@ export const typeDefs = gql`
       filterBy: String
       search: String
     ): OrderList
+
+    getUser(userId:ID!):User
+    getUsers():[User]!
   }
 `;
