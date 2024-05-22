@@ -1,6 +1,30 @@
 import { gql } from "graphql-tag";
 
 export const typeDefs = gql`
+  input CreateUserInput {
+    username: String!
+    email: String
+    password: String!
+  }
+
+  type CreateUserPayload {
+    user: User
+    success: Boolean!
+    message: String
+  }
+
+  type GetUserPayload {
+    user: User
+    success: Boolean!
+    message: String
+  }
+
+  type GetUsersPayload {
+    users: [User]
+    success: Boolean!
+    message: String
+  }
+
   type OrderLine {
     id: ID
     orderId: ID
@@ -60,12 +84,12 @@ export const typeDefs = gql`
       search: String
     ): OrderList
 
-    getUser(username: String!): User
-    getUsers: [User]!
+    getUser(username: String!): GetUserPayload!
+    getUsers: GetUsersPayload!
   }
 
   type Mutation {
-    createUser(username: String!, email: String, password: String!): String!
+    createUser(input: CreateUserInput): CreateUserPayload!
     changeUserPassword(userId: ID!, newPassword: String!): String!
     editUsername(userId: ID!, newUsername: String!): String!
     changeUserEmail(userId: ID!, newEmail: String!): String!
