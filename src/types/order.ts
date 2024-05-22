@@ -1,4 +1,4 @@
-import { orderLineSchema } from "./OrderLine";
+import { orderLineSchema } from "./orderLine";
 import { z } from "zod";
 
 const orderSchema = z.object({
