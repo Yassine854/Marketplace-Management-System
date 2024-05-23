@@ -25,9 +25,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async redirect({ url, baseUrl }) {
-      return baseUrl;
-    },
     async signIn({ user, account, profile, email, credentials }) {
       return true;
     },
