@@ -27,6 +27,9 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
+RUN npm install -g dotenv-cli
+RUN dotenv -e .env.local -- npx prisma  generate               # <---important to support Prisma query engine in Alpine Linux in final image
+
 RUN yarn build
 
 # If using npm comment out above and use below instead
@@ -37,6 +40,9 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
+ENV DATABASE_URL  mongodb+srv://oms-staging:CSpjq3hxDWICxnx4@cluster0.y0bqdlb.mongodb.net/kamioun-oms-staging?retryWrites=true&w=majority&appName=Cluster0
+ENV AUTH_SECRET cZ2C8b8vNHrGOb7IHKXbi1aP2szMTHFjNsWTgO9dj9g
+
 # Uncomment the following line in case you want to disable telemetry during runtime.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
