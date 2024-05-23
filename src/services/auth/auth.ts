@@ -24,9 +24,13 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  trustHost: true,
-  // secret: process.env.AUTH_SECRET,
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      return baseUrl;
+    },
+    async signIn({ user, account, profile, email, credentials }) {
+      return true;
+    },
     async jwt({ token, user }) {
       //@ts-ignore
       if (user) token.role = user?.role;
