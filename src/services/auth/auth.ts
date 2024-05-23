@@ -25,9 +25,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      return true;
-    },
     async jwt({ token, user }) {
       //@ts-ignore
       if (user) token.role = user?.role;
