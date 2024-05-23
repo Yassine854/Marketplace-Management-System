@@ -15,6 +15,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           credentials?.username as string,
           credentials?.password as string,
         );
+
+        if (!user) {
+          throw new Error("User not found.");
+        }
+
         return user;
       },
     }),
