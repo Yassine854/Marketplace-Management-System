@@ -4,7 +4,7 @@ import LoginForm from "@/components/widgets/LoginForm";
 const LoginPage = () => {
   return (
     <div className="  flex min-h-screen flex-grow items-center justify-center bg-[url(/images/login-bg.png)] bg-cover px-3 py-10 md:px-5 md:py-16 lg:py-20 xl:py-28">
-      <div className="box w-full max-w-[805px] items-center p-3 md:p-4 xl:p-6">
+      <div className="box w-full max-w-[805px] items-center p-4">
         <div className="box bg-primary/5 dark:bg-bg3 lg:p-6 xl:p-8">
           <div className="flex flex-grow items-center justify-center ">
             <Image
