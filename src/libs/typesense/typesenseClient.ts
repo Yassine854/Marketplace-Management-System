@@ -3,11 +3,11 @@ import typesense from "typesense";
 export const typesenseClient = new typesense.Client({
   nodes: [
     {
-      host: String(process.env.NEXT_PUBLIC_TYPESENSE_HOST),
-      port: Number(process.env.NEXT_PUBLIC_TYPESENSE_PORT),
-      protocol: String(process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL),
+      host: String(process.env.TYPESENSE_HOST),
+      port: Number(process.env.TYPESENSE_PORT),
+      protocol: String(process.env.TYPESENSE_PROTOCOL),
     },
   ],
-  apiKey: String(process.env.NEXT_PUBLIC_TYPESENSE_KEY),
+  apiKey: String(process.env.TYPESENSE_KEY),
   connectionTimeoutSeconds: 5,
 });
