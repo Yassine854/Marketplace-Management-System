@@ -1,4 +1,4 @@
-import { typesenseClient } from "@/libs/typesenseClient";
+import { typesenseClient } from "@/libs/typesense/typesenseClient";
 
 export const isCollectionExist = async (collectionName: string) => {
   try {
