@@ -1,9 +1,9 @@
 import { UsersPayload } from "../resolvers.types";
-import { prismaClient } from "@/libs/prismaClient";
+import { getPrismaUsers } from "@/libs/prisma/getPrismaUsers";
 
 export const getUsers = async (): Promise<UsersPayload> => {
   try {
-    const users = await prismaClient.user.findMany();
+    const users = await getPrismaUsers();
 
     if (users.length > 0) {
       return {
