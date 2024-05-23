@@ -1,6 +1,6 @@
 import { UserPayload } from "../resolvers.types";
 import { hashPassword } from "@/utils/hashPassword";
-import { prismaClient } from "@/libs/prismaClient";
+import { prismaClient } from "@/libs/prisma/prismaClient";
 
 export const createUser = async (newUser: any): Promise<UserPayload> => {
   try {

@@ -1,12 +1,12 @@
 import { compare } from "bcryptjs";
-import { getUser } from "../bff/resolvers/queries/getUser";
+import { getPrismaUser } from "@/libs/prisma";
 
 export const handleAuthentication = async (
   username: string,
   password: string,
 ): Promise<any> => {
   try {
-    const { user } = await getUser(username);
+    const user = await getPrismaUser(username);
 
     if (!user) {
       return null;

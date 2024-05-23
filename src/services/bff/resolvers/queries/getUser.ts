@@ -1,13 +1,9 @@
 import { UserPayload } from "../resolvers.types";
-import { prismaClient } from "@/libs/prismaClient";
+import { getPrismaUser } from "@/libs/prisma";
 
 export const getUser = async (username: string): Promise<UserPayload> => {
   try {
-    const user = await prismaClient.user.findUnique({
-      where: {
-        username,
-      },
-    });
+    const user = await getPrismaUser(username);
 
     if (user) {
       return {

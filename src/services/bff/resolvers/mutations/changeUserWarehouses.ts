@@ -1,5 +1,5 @@
 import { UserPayload } from "../resolvers.types";
-import { prismaClient } from "@/libs/prismaClient";
+import { prismaClient } from "@/libs/prisma/prismaClient";
 
 export const changeUserWarehouses = async (
   userId: string,
