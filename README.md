@@ -1,6 +1,12 @@
 # Order management system 2.0
 
-## Getting started
+## Containerization (Docker)
+
+
+=> Build docker image : pnpm docker:build
+=> Run docker image as a container : pnpm docker:run
+
+
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
 

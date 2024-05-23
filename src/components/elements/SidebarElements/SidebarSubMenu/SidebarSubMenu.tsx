@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "@/libs/i18nNavigation";
+import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
 
 import AnimateHeight from "react-animate-height";
 import SidebarButton from "../SidebarButton";

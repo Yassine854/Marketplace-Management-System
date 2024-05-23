@@ -15,12 +15,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           credentials?.username as string,
           credentials?.password as string,
         );
+
+        if (!user) {
+          throw new Error("User not found.");
+        }
+
         return user;
       },
     }),
   ],
   trustHost: true,
-  secret: process.env.NEXT_PUBLIC_NEXTAUTH_SECRET,
+  // secret: process.env.AUTH_SECRET,
   callbacks: {
     async jwt({ token, user }) {
       //@ts-ignore

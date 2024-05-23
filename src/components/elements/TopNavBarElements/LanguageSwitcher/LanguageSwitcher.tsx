@@ -1,7 +1,7 @@
 "use client";
 
 import { IconChevronDown, IconWorld } from "@tabler/icons-react";
-import { usePathname, useRouter } from "@/libs/i18nNavigation";
+import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
 
 import { AllLocales } from "@/utils/AppConfig";
 import ISO6391 from "iso-639-1";
