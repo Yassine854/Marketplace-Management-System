@@ -19,7 +19,9 @@
     "chromatic": "npx chromatic --project-token=chpt_e71ad843e237161",
     "prisma:studio": "dotenv -e .env.local npx prisma studio",
     "prisma:push": "dotenv -e .env.local prisma db push",
-    "prisma:generate": "dotenv -e .env.local npx prisma generate"
+    "prisma:generate": "dotenv -e .env.local npx prisma generate",
+    "docker:build": "sudo docker build -t kamioun-oms .",
+    "docker:run": "sudo docker run  --restart=always -p 3000:3000 kamioun-oms:latest"
   },
   "dependencies": {
     "@apollo/client": "^3.9.11",
