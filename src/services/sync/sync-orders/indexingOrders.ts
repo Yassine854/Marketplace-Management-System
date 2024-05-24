@@ -1,5 +1,5 @@
 import { getOrdersBatch } from "./getOrdersBatch";
-import { typesenseClient } from "@/libs/typesense/typesenseClient";
+import { typesenseClient } from "@/libs/typesense";
 
 export const indexingOrders = async (magentoOrders: any, callback: any) => {
   try {

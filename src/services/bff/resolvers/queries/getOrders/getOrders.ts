@@ -1,6 +1,6 @@
 import { GetOrdersParams } from "./getOrders.types";
 import { Order } from "@/types/order";
-import { typesenseClient } from "@/libs/typesense/typesenseClient";
+import { typesenseClient } from "@/libs/typesense";
 
 const createOrdersList = (typesenseHits: any): Order[] =>
   typesenseHits.map(({ document }: any): Order => document);
