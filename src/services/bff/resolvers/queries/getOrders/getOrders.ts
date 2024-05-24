@@ -36,6 +36,6 @@ export const getOrders = async ({
       totalOrders: typesenseResponse.found,
     };
   } catch (error) {
-    console.error(error);
+    console.error("getOrders resolver Error ", error);
   }
 };
