@@ -9,12 +9,18 @@ export const handleAuthentication = async (
     const user = await getPrismaUser(username);
 
     if (!user) {
+      console.error("User Not Found");
       return null;
     }
 
     const isPasswordCorrect = await compare(password, user.password);
 
-    return isPasswordCorrect ? user : null;
+    if (!isPasswordCorrect) {
+      console.error("Wrong Password");
+      return null;
+    }
+
+    return user;
   } catch (error) {
     console.error("Error authenticating user:", error);
     return null;

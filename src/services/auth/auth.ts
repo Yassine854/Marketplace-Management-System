@@ -11,16 +11,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const user = await handleAuthentication(
+        const auth = await handleAuthentication(
           credentials?.username as string,
           credentials?.password as string,
         );
 
-        if (!user) {
-          throw new Error("User not found.");
-        }
-
-        return user;
+        return auth;
       },
     }),
   ],
@@ -37,4 +33,5 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     },
   },
   trustHost: true,
+  debug: process.env.NODE_ENV === "production" ? false : true,
 });
