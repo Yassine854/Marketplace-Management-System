@@ -17,10 +17,6 @@ export const createUser = async (newUser: any): Promise<UserPayload> => {
     }
 
     const hashedPassword = await hashPassword(newUser.password);
-    console.log(
-      "🚀 ~ createUser ~ hashedPassword:",
-      JSON.stringify(hashedPassword),
-    );
 
     const user = await prismaClient.user.create({
       data: {
