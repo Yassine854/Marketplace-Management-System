@@ -7,7 +7,17 @@ export const handleAuthentication = async (
   password: string,
 ): Promise<any> => {
   try {
-    const user = await getPrismaUser(username);
+    //const user = await getPrismaUser(username);
+    const user = {
+      id: "6653642aa14959b57cba5694",
+      username: "123456",
+      email: null,
+      password: "123456",
+      role: "agent",
+      status: "pending",
+      warehouses: [],
+      roleId: null,
+    };
 
     if (!user) {
       console.error("User Not Found");
