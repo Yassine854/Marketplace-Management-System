@@ -22,7 +22,7 @@ export const changeUserPassword = async (
 
     const updatedUser = await prismaClient.user.update({
       where: { id: userId },
-      data: { password: hashedPassword },
+      data: { password: JSON.stringify(hashedPassword) },
     });
 
     return {

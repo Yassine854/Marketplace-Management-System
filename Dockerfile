@@ -28,7 +28,8 @@ COPY . .
 # ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN  npx prisma  generate               # <---important to support Prisma query engine in Alpine Linux in final image
-RUN npm install -g pnpm
+RUN npm i -g pnpm
+RUN pnpm i
 RUN pnpm build
 
 
@@ -56,9 +57,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-EXPOSE 3003
+EXPOSE 3000
 
-ENV PORT 3003
+ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
