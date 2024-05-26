@@ -1,5 +1,6 @@
-import { compare } from "bcryptjs";
 import { getPrismaUser } from "@/libs/prisma";
+import { isPasswordValid } from "@/utils/isPasswordValid";
+// // Method to set salt and hash the password for a user
 
 export const handleAuthentication = async (
   username: string,
@@ -13,14 +14,13 @@ export const handleAuthentication = async (
       return null;
     }
 
-    const isPasswordCorrect = await compare(password, user.password);
+    const storedPassword = JSON.parse(user?.password);
 
-    if (!isPasswordCorrect) {
-      console.error("Wrong Password");
-      return null;
+    if (isPasswordValid(password, storedPassword.hash, storedPassword.salt)) {
+      return user;
     }
-
-    return user;
+    console.error("Wrong Password");
+    return null;
   } catch (error) {
     console.error("Error authenticating user:", error);
     return null;
