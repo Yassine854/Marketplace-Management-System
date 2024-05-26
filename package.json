@@ -21,7 +21,7 @@
     "prisma:push": "dotenv -e .env.local prisma db push",
     "prisma:generate": "dotenv -e .env.local npx prisma generate",
     "docker:build": "sudo docker build -t kamioun-oms .",
-    "docker:run": "sudo docker run  --restart=always -p 3000:3000 kamioun-oms:latest"
+    "docker:start": "sudo docker run  --restart=always -p 3003:3003 kamioun-oms:latest"
   },
   "dependencies": {
     "@apollo/client": "^3.9.11",
