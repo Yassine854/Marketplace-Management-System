@@ -1,13 +1,12 @@
-import crypto from "crypto";
+//import crypto from "crypto";
 
 export const isPasswordValid = (
   password: string,
-  storedHash: string,
-  storedSalt: string,
+  storedPassword: string,
 ): boolean => {
-  const hash = crypto
-    .pbkdf2Sync(password, storedSalt, 1000, 64, "sha512")
-    .toString("hex");
+  // const hash = crypto
+  //   .pbkdf2Sync(password, storedSalt, 1000, 64, "sha512")
+  //   .toString("hex");
 
-  return storedHash === hash;
+  return storedPassword === password;
 };

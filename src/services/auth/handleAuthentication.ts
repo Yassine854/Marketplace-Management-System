@@ -14,9 +14,7 @@ export const handleAuthentication = async (
       return null;
     }
 
-    const storedPassword = JSON.parse(user?.password);
-
-    if (isPasswordValid(password, storedPassword.hash, storedPassword.salt)) {
+    if (isPasswordValid(password, user?.password)) {
       return user;
     }
     console.error("Wrong Password");
