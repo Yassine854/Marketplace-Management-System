@@ -11,6 +11,9 @@ export const useNavigation = () => {
   const navigateToOrderDetails = () => {
     push("/order-details");
   };
+  const navigateToLogin = () => {
+    push("/login");
+  };
 
   const navigateToDashboard = () => {
     push("/dashboard");
@@ -19,6 +22,7 @@ export const useNavigation = () => {
     navigateBack,
     navigateToOrderDetails,
     navigateToDashboard,
+    navigateToLogin,
     status: String(status),
     locale: String(locale),
   };
