@@ -16,12 +16,12 @@ export const createUser = async (newUser: any): Promise<UserPayload> => {
       };
     }
 
-    const hashedPassword = await hashPassword(newUser.password);
+    const hashedPassword = hashPassword(newUser.password);
 
     const user = await prismaClient.user.create({
       data: {
         ...newUser,
-        password: JSON.stringify(hashedPassword),
+        password: hashedPassword,
         role: "agent",
         status: "pending",
       },
