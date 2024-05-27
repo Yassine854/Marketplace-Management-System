@@ -12,8 +12,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         const user = await handleAuthentication(
-          credentials?.username as string,
-          credentials?.password as string,
+          credentials.username,
+          credentials.password,
         );
 
         return user;
@@ -22,7 +22,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
-      console.log("in SignIn callback", user, credentials);
       const isAllowedToSignIn = true;
       if (isAllowedToSignIn) {
         return true;
@@ -30,14 +29,28 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         // Return false to display a default error message
         return false;
         // Or you can return a URL to redirect to:
-        // return '/unauthorized'
+        //return '/unauthorized'
       }
     },
     async jwt({ token, user }) {
-      return Promise.resolve(token);
+      if (user) {
+        token.role = user.role;
+        token.username = user.username;
+        token.email = user.email;
+        token.id = user.id;
+        token.warehouses = user.warehouses;
+      }
+      return token;
     },
     async session({ session, token }) {
-      return Promise.resolve(session);
+      if (token) {
+        session.user.role = token.role;
+        session.user.username = token.username;
+        session.user.email = token.email;
+        session.user.id = token.id;
+        session.user.warehouses = token.warehouses;
+      }
+      return session;
     },
   },
   secret: process.env.AUTH_SECRET,

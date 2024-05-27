@@ -25,8 +25,6 @@ const Sidebar = ({
 }: any) => {
   const { push } = useRouter();
   const pathname = usePathname();
-  //const { getSession } = useAuth();
-  // const session = await getSession();
 
   return (
     <aside className="sidebar  no-scrollbar fixed bottom-0 left-0  top-0 z-20 h-screen w-64 overflow-hidden overflow-y-scroll bg-n10">

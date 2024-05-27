@@ -1,11 +1,12 @@
 import { Children } from "@/types/children";
 import Sidebar from "@/components/widgets/Sidebar";
 import TopNavBar from "@/components/widgets/TopNavBar";
+import { useAuth } from "@/hooks/useAuth";
 import { useOrders } from "@/hooks/useOrders";
 import { useStatusStore } from "@/stores/statusStore";
 
 const MainLayout = ({ children }: Children) => {
-  const isAdmin = true;
+  const { user } = useAuth();
   const { status, setStatus } = useStatusStore();
   const {
     readyOrdersCount,
@@ -14,6 +15,8 @@ const MainLayout = ({ children }: Children) => {
     selectedStatus,
   } = useOrders(status);
 
+  //@ts-ignore
+  const isAdmin = user?.role === "admin";
   return (
     <div className="h-screen w-screen bg-n10 ">
       <TopNavBar />
