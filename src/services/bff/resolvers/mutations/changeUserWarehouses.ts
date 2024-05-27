@@ -1,5 +1,5 @@
 import { UserPayload } from "../resolvers.types";
-import { prismaClient } from "@/libs/prismaClient";
+import { prismaClient } from "@/libs/prisma/prismaClient";
 
 export const changeUserWarehouses = async (
   userId: string,
@@ -28,7 +28,8 @@ export const changeUserWarehouses = async (
       message: "User warehouses updated successfully",
     };
   } catch (error: any) {
-    console.error("Error changing user warehouses:", error);
+    process.env.NODE_ENV === "development" &&
+      console.error("Error changing user warehouses:", error);
     return {
       success: false,
       message:

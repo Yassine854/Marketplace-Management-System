@@ -1,9 +1,9 @@
 import { UsersPayload } from "../resolvers.types";
-import { prismaClient } from "@/libs/prismaClient";
+import { getPrismaUsers } from "@/libs/prisma/getPrismaUsers";
 
 export const getUsers = async (): Promise<UsersPayload> => {
   try {
-    const users = await prismaClient.user.findMany();
+    const users = await getPrismaUsers();
 
     if (users.length > 0) {
       return {
@@ -18,7 +18,8 @@ export const getUsers = async (): Promise<UsersPayload> => {
       };
     }
   } catch (error: any) {
-    console.error("Error fetching users:", error);
+    process.env.NODE_ENV === "development" &&
+      console.error("Error fetching users:", error);
     return {
       success: false,
       message: error.message || "An error occurred while fetching users",

@@ -1,6 +1,6 @@
 import { GetOrdersParams } from "./getOrders.types";
 import { Order } from "@/types/order";
-import { typesenseClient } from "@/libs/typesenseClient";
+import { typesenseClient } from "@/libs/typesense";
 
 const createOrdersList = (typesenseHits: any): Order[] =>
   typesenseHits.map(({ document }: any): Order => document);
@@ -36,6 +36,7 @@ export const getOrders = async ({
       totalOrders: typesenseResponse.found,
     };
   } catch (error) {
-    console.error(error);
+    process.env.NODE_ENV === "development" &&
+      console.error("getOrders resolver Error ", error);
   }
 };

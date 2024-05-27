@@ -1,6 +1,6 @@
 import { UserPayload } from "../resolvers.types";
-import { hashPassword } from "@/utils/hashPassword";
-import { prismaClient } from "@/libs/prismaClient";
+import { hashPassword } from "@/utils/password";
+import { prismaClient } from "@/libs/prisma/prismaClient";
 
 export const createUser = async (newUser: any): Promise<UserPayload> => {
   try {
@@ -33,7 +33,8 @@ export const createUser = async (newUser: any): Promise<UserPayload> => {
       message: "User created successfully",
     };
   } catch (error: any) {
-    console.error("Error creating user:", error);
+    process.env.NODE_ENV === "development" &&
+      console.error("Error creating user:", error);
     return {
       user: undefined,
       success: false,

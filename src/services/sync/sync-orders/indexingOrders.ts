@@ -1,5 +1,5 @@
 import { getOrdersBatch } from "./getOrdersBatch";
-import { typesenseClient } from "@/libs/typesenseClient";
+import { typesenseClient } from "@/libs/typesense";
 
 export const indexingOrders = async (magentoOrders: any, callback: any) => {
   try {
@@ -12,7 +12,7 @@ export const indexingOrders = async (magentoOrders: any, callback: any) => {
 
     callback();
   } catch (err) {
-    console.error(err);
+    process.env.NODE_ENV === "development" && console.error(err);
     callback(err);
   }
 };
