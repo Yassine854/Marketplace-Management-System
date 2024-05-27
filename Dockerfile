@@ -29,7 +29,7 @@ COPY . .
 
 RUN  npx prisma  generate               # <---important to support Prisma query engine in Alpine Linux in final image
 RUN npm i -g pnpm
-RUN pnpm i
+RUN pnpm i 
 RUN pnpm build
 
 
