@@ -32,20 +32,15 @@ const LoginForm = () => {
   });
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    try {
-      setIsLoading(true);
-      const { username, password } = data;
-      const res = await login(username, password);
-      setIsLoading(false);
-      if (res?.error) {
-        toast.error("Invalid username or password");
-      } else {
-        toast.success("Welcome To Kamioun OMS !", { duration: 3000 });
-        navigateToDashboard();
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("An unexpected error occurred.");
+    setIsLoading(true);
+    const { username, password } = data;
+    const res = await login(username, password);
+    setIsLoading(false);
+    if (res?.error === "CredentialsSignin") {
+      toast.error("Invalid username or password");
+    } else {
+      toast.success("Welcome To Kamioun OMS !", { duration: 3000 });
+      navigateToDashboard();
     }
   };
 

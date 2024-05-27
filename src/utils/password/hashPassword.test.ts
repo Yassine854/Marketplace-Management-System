@@ -1,43 +1,45 @@
+import bcrypt from "bcryptjs";
 import { hashPassword } from "./index";
 
+jest.mock("bcryptjs");
+
 describe("hashPassword", () => {
-  it("should return a consistent hash for the same input", () => {
-    const password = "password123";
-    const hashedPassword1 = hashPassword(password);
-    const hashedPassword2 = hashPassword(password);
-    expect(hashedPassword1).toBe(hashedPassword2);
+  const password = "password123";
+  const salt = "randomsalt";
+  const hashedPassword = "hashedpassword";
+
+  beforeEach(() => {
+    (bcrypt.genSalt as jest.Mock).mockClear();
+    (bcrypt.hash as jest.Mock).mockClear();
   });
 
-  it("should return different hashes for different inputs", () => {
-    const password1 = "password123";
-    const password2 = "differentPassword";
-    const hashedPassword1 = hashPassword(password1);
-    const hashedPassword2 = hashPassword(password2);
-    expect(hashedPassword1).not.toBe(hashedPassword2);
+  it("should generate a salt and hash the password", async () => {
+    (bcrypt.genSalt as jest.Mock).mockResolvedValue(salt);
+    (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
+
+    const result = await hashPassword(password);
+
+    expect(bcrypt.genSalt).toHaveBeenCalledWith(10);
+    expect(bcrypt.hash).toHaveBeenCalledWith(password, salt);
+    expect(result).toBe(hashedPassword);
   });
 
-  it("should handle empty string", () => {
-    const password = "";
-    const hashedPassword = hashPassword(password);
-    expect(hashedPassword).toBe("0");
+  it("should handle errors thrown by bcrypt.genSalt", async () => {
+    const error = new Error("genSalt error");
+    (bcrypt.genSalt as jest.Mock).mockRejectedValue(error);
+
+    await expect(hashPassword(password)).rejects.toThrow("genSalt error");
+    expect(bcrypt.genSalt).toHaveBeenCalledWith(10);
+    expect(bcrypt.hash).not.toHaveBeenCalled();
   });
 
-  it("should handle common passwords correctly", () => {
-    const commonPasswords = [
-      "123456",
-      "password",
-      "123456789",
-      "12345678",
-      "12345",
-    ];
-    const hashedPasswords = commonPasswords.map(hashPassword);
+  it("should handle errors thrown by bcrypt.hash", async () => {
+    const error = new Error("hash error");
+    (bcrypt.genSalt as jest.Mock).mockResolvedValue(salt);
+    (bcrypt.hash as jest.Mock).mockRejectedValue(error);
 
-    // Ensure that hashes are consistent and unique
-    for (let i = 0; i < commonPasswords.length; i++) {
-      expect(hashedPasswords[i]).toBe(hashPassword(commonPasswords[i]));
-      for (let j = i + 1; j < commonPasswords.length; j++) {
-        expect(hashedPasswords[i]).not.toBe(hashedPasswords[j]);
-      }
-    }
+    await expect(hashPassword(password)).rejects.toThrow("hash error");
+    expect(bcrypt.genSalt).toHaveBeenCalledWith(10);
+    expect(bcrypt.hash).toHaveBeenCalledWith(password, salt);
   });
 });

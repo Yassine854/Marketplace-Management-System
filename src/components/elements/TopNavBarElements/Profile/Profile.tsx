@@ -24,7 +24,7 @@ const useList = () => {
         try {
           await logout();
         } catch (error: any) {
-          console.error(error);
+          process.env.NODE_ENV === "development" && console.error(error);
         }
       },
     },

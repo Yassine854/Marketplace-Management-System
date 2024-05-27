@@ -21,6 +21,6 @@ export const getOrder = async (
 
     return order;
   } catch (error) {
-    console.error(error);
+    process.env.NODE_ENV === "development" && console.error(error);
   }
 };

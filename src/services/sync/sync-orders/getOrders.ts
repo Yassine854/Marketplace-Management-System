@@ -11,7 +11,8 @@ export const getOrders = async (page: any) => {
       items: response.data.items,
     };
   } catch (error) {
-    console.error("Error fetching data:", error);
+    process.env.NODE_ENV === "development" &&
+      console.error("Error fetching data:", error);
     throw error;
   }
 };

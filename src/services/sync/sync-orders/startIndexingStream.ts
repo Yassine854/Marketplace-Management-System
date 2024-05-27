@@ -16,15 +16,17 @@ export const startIndexingStream = async () => {
     });
 
     readableStream.on("error", (error: any) => {
-      console.error("Stream error:", error);
+      process.env.NODE_ENV === "development" &&
+        console.error("Stream error:", error);
     });
 
     writableStream.on("error", (error: any) => {
-      console.error("Writable stream error:", error);
+      process.env.NODE_ENV === "development" &&
+        console.error("Writable stream error:", error);
     });
 
     readableStream.pipe(writableStream);
   } catch (err) {
-    console.error(err);
+    process.env.NODE_ENV === "development" && console.error(err);
   }
 };

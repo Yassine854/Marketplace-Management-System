@@ -19,13 +19,15 @@ export const getUser = async (username: string): Promise<UserPayload> => {
     }
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error("Error fetching user:", error.message);
+      process.env.NODE_ENV === "development" &&
+        console.error("Error fetching user:", error.message);
       return {
         success: false,
         message: error.message,
       };
     } else {
-      console.error("Unknown error fetching user");
+      process.env.NODE_ENV === "development" &&
+        console.error("Unknown error fetching user");
       return {
         success: false,
         message: "An unknown error occurred while fetching the user",

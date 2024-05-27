@@ -18,7 +18,7 @@ export const changeUserPassword = async (
       };
     }
 
-    const hashedPassword = hashPassword(newPassword);
+    const hashedPassword = await hashPassword(newPassword);
 
     const updatedUser = await prismaClient.user.update({
       where: { id: userId },
@@ -32,13 +32,15 @@ export const changeUserPassword = async (
     };
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error("Error updating password:", error.message);
+      process.env.NODE_ENV === "development" &&
+        console.error("Error updating password:", error.message);
       return {
         success: false,
         message: error.message,
       };
     } else {
-      console.error("Unknown error updating password");
+      process.env.NODE_ENV === "development" &&
+        console.error("Unknown error updating password");
       return {
         success: false,
         message: "An unknown error occurred while updating the password",

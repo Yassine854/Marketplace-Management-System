@@ -8,7 +8,7 @@ export const deleteOrdersCollection = async () => {
 
     console.log("Orders Collection deleted successfully ");
   } catch (err) {
-    console.error(err);
+    process.env.NODE_ENV === "development" && console.error(err);
     throw new Error();
   }
 };

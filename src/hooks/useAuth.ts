@@ -5,8 +5,9 @@ import { useNavigation } from "./useNavigation";
 
 export const useAuth = () => {
   const { navigateToLogin } = useNavigation();
+
   const login = async (username: string, password: string) =>
-    await signIn("credentials", {
+    signIn("credentials", {
       username,
       password,
       redirect: false,

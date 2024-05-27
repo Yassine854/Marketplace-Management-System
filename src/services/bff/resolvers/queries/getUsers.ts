@@ -18,7 +18,8 @@ export const getUsers = async (): Promise<UsersPayload> => {
       };
     }
   } catch (error: any) {
-    console.error("Error fetching users:", error);
+    process.env.NODE_ENV === "development" &&
+      console.error("Error fetching users:", error);
     return {
       success: false,
       message: error.message || "An error occurred while fetching users",

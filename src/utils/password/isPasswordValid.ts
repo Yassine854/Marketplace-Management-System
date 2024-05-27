@@ -1,10 +1,9 @@
-import { hashPassword } from "./hashPassword";
+import bcrypt from "bcryptjs";
 
-export const isPasswordValid = (
+export const isPasswordValid = async (
   password: string,
-  storedPassword: string,
-): boolean => {
-  const strHash = hashPassword(password);
-
-  return strHash === storedPassword;
+  storedHashedPassword: string,
+): Promise<boolean> => {
+  const isValid = await bcrypt.compare(password, storedHashedPassword);
+  return isValid;
 };

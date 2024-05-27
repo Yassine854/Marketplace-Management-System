@@ -10,17 +10,20 @@ export const handleAuthentication = async (
     const user = await getPrismaUser(username);
 
     if (!user) {
-      console.error("User Not Found");
+      process.env.NODE_ENV === "development" && console.error("User Not Found");
       return null;
     }
 
-    if (isPasswordValid(password, user?.password)) {
+    const isValid = await isPasswordValid(password, user?.password);
+
+    if (isValid) {
       return user;
     }
-    console.error("Wrong Password");
+    process.env.NODE_ENV === "development" && console.error("Wrong Password");
     return null;
   } catch (error) {
-    console.error("Error authenticating user:", error);
+    process.env.NODE_ENV === "development" &&
+      console.error("Error authenticating user:", error);
     return null;
   }
 };
