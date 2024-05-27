@@ -36,6 +36,7 @@ export const getOrders = async ({
       totalOrders: typesenseResponse.found,
     };
   } catch (error) {
-    console.error("getOrders resolver Error ", error);
+    process.env.NODE_ENV === "development" &&
+      console.error("getOrders resolver Error ", error);
   }
 };

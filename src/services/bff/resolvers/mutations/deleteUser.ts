@@ -24,7 +24,8 @@ export const deleteUser = async (userId: string): Promise<UserPayload> => {
       message: "User deleted successfully",
     };
   } catch (error: any) {
-    console.error("Error deleting user:", error);
+    process.env.NODE_ENV === "development" &&
+      console.error("Error deleting user:", error);
     return {
       success: false,
       message: error.message || "An error occurred while deleting the user",

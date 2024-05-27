@@ -1,9 +1,7 @@
-export const hashPassword = (password: string): string => {
-  let hash = 0;
-  for (let i = 0; i < password.length; i++) {
-    const chr = password.charCodeAt(i);
-    hash = (hash << 5) - hash + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash.toString();
+import bcrypt from "bcryptjs";
+
+export const hashPassword = async (password: string): Promise<string> => {
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  return hashedPassword;
 };

@@ -29,13 +29,15 @@ export const changeUserEmail = async (
     };
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error("Error updating email:", error.message);
+      process.env.NODE_ENV === "development" &&
+        console.error("Error updating email:", error.message);
       return {
         success: false,
         message: error.message,
       };
     } else {
-      console.error("Unknown error updating email");
+      process.env.NODE_ENV === "development" &&
+        console.error("Unknown error updating email");
       return {
         success: false,
         message: "An unknown error occurred while updating the email",

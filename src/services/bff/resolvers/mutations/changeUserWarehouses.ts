@@ -28,7 +28,8 @@ export const changeUserWarehouses = async (
       message: "User warehouses updated successfully",
     };
   } catch (error: any) {
-    console.error("Error changing user warehouses:", error);
+    process.env.NODE_ENV === "development" &&
+      console.error("Error changing user warehouses:", error);
     return {
       success: false,
       message:

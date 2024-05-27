@@ -28,7 +28,8 @@ export const changeUserRole = async (
       message: "User role updated successfully",
     };
   } catch (error: any) {
-    console.error("Error changing user role:", error);
+    process.env.NODE_ENV === "development" &&
+      console.error("Error changing user role:", error);
     return {
       success: false,
       message:

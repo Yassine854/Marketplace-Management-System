@@ -16,7 +16,7 @@ export const createUser = async (newUser: any): Promise<UserPayload> => {
       };
     }
 
-    const hashedPassword = hashPassword(newUser.password);
+    const hashedPassword = await hashPassword(newUser.password);
 
     const user = await prismaClient.user.create({
       data: {
@@ -33,7 +33,8 @@ export const createUser = async (newUser: any): Promise<UserPayload> => {
       message: "User created successfully",
     };
   } catch (error: any) {
-    console.error("Error creating user:", error);
+    process.env.NODE_ENV === "development" &&
+      console.error("Error creating user:", error);
     return {
       user: undefined,
       success: false,

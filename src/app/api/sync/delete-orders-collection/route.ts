@@ -8,7 +8,7 @@ export async function DELETE(Request: any) {
       status: 200,
     });
   } catch (err) {
-    console.error(err);
+    process.env.NODE_ENV === "development" && console.error(err);
     return NextResponse.json("Error", {
       status: 500,
     });

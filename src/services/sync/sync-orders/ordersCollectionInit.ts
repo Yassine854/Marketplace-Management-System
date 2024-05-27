@@ -16,6 +16,6 @@ export const ordersCollectionInit = async () => {
       console.log("orders collection created Successfully...");
     }
   } catch (err) {
-    console.error(err);
+    process.env.NODE_ENV === "development" && console.error(err);
   }
 };
