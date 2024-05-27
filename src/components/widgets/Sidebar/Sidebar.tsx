@@ -6,7 +6,7 @@ import {
   IconRefresh,
   IconUsers,
 } from "@tabler/icons-react";
-import { usePathname, useRouter } from "@/libs/i18nNavigation";
+import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
 
 import Divider from "@/components/elements/SidebarElements/Divider";
 import Image from "next/image";

@@ -1,5 +1,7 @@
-const LoginPage = () => {
-  return <div />;
-};
+"use client";
 
-export default LoginPage;
+import LoginPage from "@/components/pages/LoginPage";
+
+const Login = () => <LoginPage />;
+
+export default Login;

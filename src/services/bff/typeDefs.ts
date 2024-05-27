@@ -1,6 +1,26 @@
+import { UserPayload } from "./resolvers/resolvers.types";
 import { gql } from "graphql-tag";
+import { warehouses } from "./../../components/elements/TopNavBarElements/WarehouseSelector/WarehouseSelector";
 
 export const typeDefs = gql`
+  input CreateUserInput {
+    username: String!
+    email: String
+    password: String!
+  }
+
+  type UserPayload {
+    user: User
+    success: Boolean!
+    message: String
+  }
+
+  type UsersPayload {
+    users: [User]
+    success: Boolean!
+    message: String
+  }
+
   type OrderLine {
     id: ID
     orderId: ID
@@ -35,6 +55,21 @@ export const typeDefs = gql`
     totalOrders: Int
   }
 
+  type User {
+    id: ID!
+    username: String!
+    email: String
+    password: String!
+    role: String!
+    warehouses: [String]!
+  }
+
+  type Role {
+    id: ID!
+    name: String!
+    permissions: [String]!
+  }
+
   type Query {
     getOrder(orderId: ID!): Order
     getOrders(
@@ -44,5 +79,17 @@ export const typeDefs = gql`
       filterBy: String
       search: String
     ): OrderList
+
+    getUser(username: String!): UserPayload!
+    getUsers: UsersPayload!
+  }
+
+  type Mutation {
+    createUser(input: CreateUserInput): UserPayload!
+    deleteUser(userId: ID!): UserPayload!
+    changeUserPassword(userId: ID!, newPassword: String!): UserPayload!
+    changeUserEmail(userId: ID!, newEmail: String!): UserPayload!
+    changeUserRole(userId: ID!, newRole: String!): UserPayload!
+    changeUserWarehouses(userId: ID!, newWarehouses: [String]!): UserPayload!
   }
 `;

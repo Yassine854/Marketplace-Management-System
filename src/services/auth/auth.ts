@@ -15,22 +15,32 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           credentials?.username as string,
           credentials?.password as string,
         );
+
         return user;
       },
     }),
   ],
-  trustHost: true,
-  secret: process.env.NEXT_PUBLIC_NEXTAUTH_SECRET,
   callbacks: {
+    async signIn({ user, account, profile, email, credentials }) {
+      console.log("in SignIn callback", user, credentials);
+      const isAllowedToSignIn = true;
+      if (isAllowedToSignIn) {
+        return true;
+      } else {
+        // Return false to display a default error message
+        return false;
+        // Or you can return a URL to redirect to:
+        // return '/unauthorized'
+      }
+    },
     async jwt({ token, user }) {
-      //@ts-ignore
-      if (user) token.role = user?.role;
-      return token;
+      return Promise.resolve(token);
     },
     async session({ session, token }) {
-      //@ts-ignore
-      if (session?.user) session.user.role = token.role;
-      return session;
+      return Promise.resolve(session);
     },
   },
+  secret: process.env.AUTH_SECRET,
+  trustHost: true,
+  debug: process.env.NODE_ENV === "production" ? false : true,
 });

@@ -1,38 +1,29 @@
-import { compare } from "bcryptjs";
-import { dynamodbClient } from "./dynamodbClient";
+import { getPrismaUser } from "@/libs/prisma";
+import { isPasswordValid } from "@/utils/password/isPasswordValid";
+// // Method to set salt and hash the password for a user
 
 export const handleAuthentication = async (
   username: string,
   password: string,
 ): Promise<any> => {
   try {
-    // const res = await dynamodbClient.get({
-    //   TableName: process.env.NEXT_PUBLIC_AUTH_DYNAMODB_TABLE_NAME,
-    //   Key: {
-    //     username: username,
-    //   },
-    // });
+    const user = await getPrismaUser(username);
 
-    // const user = {
-    //   username: res?.Item?.username,
-    //   hashedPassword: res?.Item?.hashedPassword,
+    if (!user) {
+      process.env.NODE_ENV === "development" && console.error("User Not Found");
+      return null;
+    }
 
-    //   role: res?.Item?.role,
-    // };
+    const isValid = await isPasswordValid(password, user?.password);
 
-    // if (!user?.username || !user?.hashedPassword || !user?.role) {
-    //   throw new Error("Invalid credentials");
-    // }
-
-    // const isPasswordCorrect = await compare(password, user?.hashedPassword);
-    //return isPasswordCorrect ? user : null;
-
-    return {
-      username: "test123",
-      hashedPassword: "234324",
-      role: "ADMIN",
-    };
+    if (isValid) {
+      return user;
+    }
+    process.env.NODE_ENV === "development" && console.error("Wrong Password");
+    return null;
   } catch (error) {
-    console.error(error);
+    process.env.NODE_ENV === "development" &&
+      console.error("Error authenticating user:", error);
+    return null;
   }
 };

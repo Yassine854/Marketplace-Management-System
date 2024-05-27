@@ -1,5 +1,5 @@
 import { isCollectionExist } from "./isCollectionExist";
-import { typesenseClient } from "@/libs/typesenseClient";
+import { typesenseClient } from "@/libs/typesense";
 import { typesenseOrdersCollectionSchema } from "./typesenseOrdersCollectionSchema";
 
 export const ordersCollectionInit = async () => {
@@ -16,6 +16,6 @@ export const ordersCollectionInit = async () => {
       console.log("orders collection created Successfully...");
     }
   } catch (err) {
-    console.error(err);
+    process.env.NODE_ENV === "development" && console.error(err);
   }
 };
