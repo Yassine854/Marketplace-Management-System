@@ -3,7 +3,6 @@ import {
   IconDashboard,
   IconList,
   IconMap2,
-  IconRefresh,
   IconUsers,
 } from "@tabler/icons-react";
 import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
@@ -120,19 +119,6 @@ const Sidebar = ({
             />
 
             <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
-          </>
-        )}
-
-        {isAdmin && (
-          <>
-            <SidebarButton
-              isActive={pathname?.includes("sync")}
-              name={"Sync"}
-              icon={<IconRefresh />}
-              onClick={() => {
-                push("/sync");
-              }}
-            />
           </>
         )}
       </div>
