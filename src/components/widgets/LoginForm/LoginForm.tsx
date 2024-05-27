@@ -3,26 +3,20 @@ import * as z from "zod";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
+import { FormSchema } from "./formSchema";
+import Loading from "@/components/elements/Loading";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const FormSchema = z.object({
-  username: z
-    .string()
-    .min(6, { message: "Username must be at least 6 characters." }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters." }),
-});
-
 type FormData = z.infer<typeof FormSchema>;
 
 const LoginForm = () => {
   const { navigateToDashboard } = useNavigation();
   const [showPass, setShowPass] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
   const {
@@ -39,9 +33,10 @@ const LoginForm = () => {
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
+      setIsLoading(true);
       const { username, password } = data;
       const res = await login(username, password);
-
+      setIsLoading(false);
       if (res?.error) {
         toast.error("Invalid username or password");
       } else {
@@ -96,12 +91,16 @@ const LoginForm = () => {
       </div>
 
       <div className="mt-8 flex items-center justify-center gap-6 p-8">
-        <button
-          type="submit"
-          className="btn w-64 items-center justify-center px-5"
-        >
-          Login
-        </button>
+        {isLoading && <Loading />}
+
+        {!isLoading && (
+          <button
+            type="submit"
+            className="btn h-12 w-64 items-center justify-center px-5"
+          >
+            {isLoading ? <Loading /> : "Login"}
+          </button>
+        )}
       </div>
     </form>
   );
