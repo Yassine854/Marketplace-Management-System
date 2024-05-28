@@ -1,11 +1,10 @@
+import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
+import OrdersTableRow from "./elements/OrdersTableRow";
 import TableRowSkeleton from "./elements/RowSkeleton";
-import UsersTableHead from "./elements/UsersTableHead/UsersTableHead";
-import UsersTableRow from "./elements/UsersTableRow";
-import { defaultProps } from "./UsersTable.defaultProps";
+import { defaultProps } from "./OrdersTable.defaultProps";
 const { orders: defaultOrders } = defaultProps;
 
-const UsersTable = ({
-  users,
+const OrdersTable = ({
   orders = defaultOrders,
   isLoading,
   changeSelectedSort,
@@ -14,10 +13,9 @@ const UsersTable = ({
   onSelectOrderClick,
   isAllOrdersSelected,
 }: any) => {
-  console.log("🚀 ~ users:", users);
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>
-      <UsersTableHead
+      <OrdersTableHead
         changeSelectedSort={changeSelectedSort}
         onSelectAllClick={onSelectAllClick}
         isAllOrdersSelected={isAllOrdersSelected}
@@ -27,14 +25,19 @@ const UsersTable = ({
         <>
           {isLoading ? (
             <>
-              {[...Array(12)].map((_, i) => (
-                <TableRowSkeleton key={i} number={7} />
+              {[...Array(25)].map((_, i) => (
+                <TableRowSkeleton key={i} number={10} />
               ))}
             </>
           ) : (
             <>
-              {users?.map((user: any) => (
-                <UsersTableRow key={user?.id} user={user} />
+              {orders?.map((order: any) => (
+                <OrdersTableRow
+                  key={order?.id}
+                  order={order}
+                  onClick={onOrderClick}
+                  onSelectOrderClick={onSelectOrderClick}
+                />
               ))}
             </>
           )}
@@ -44,4 +47,4 @@ const UsersTable = ({
   );
 };
 
-export default UsersTable;
+export default OrdersTable;
