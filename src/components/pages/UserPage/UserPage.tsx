@@ -1,5 +1,5 @@
-import Box from "@/components/Layouts/Box";
-import UserForm from "@/components/widgets/UserForm";
+import Box from "@/components/layouts/Box";
+import UserForm from "@/components/forms/CreateUserForm";
 import { useGetUsers } from "@/hooks/queries/useGetUsers";
 
 const UserPage = () => {

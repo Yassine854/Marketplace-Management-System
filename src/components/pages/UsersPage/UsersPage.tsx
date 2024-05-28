@@ -1,5 +1,5 @@
-import Box from "@/components/Layouts/Box";
-import UsersTable from "@/components/widgets/UsersTable";
+import Box from "@/components/layouts/Box";
+import UsersTable from "@/components/tables/UsersTable";
 import UsersTableHeader from "@/components/widgets/UsersTableHeader";
 import { useGetUsers } from "@/hooks/queries/useGetUsers";
 

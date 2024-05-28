@@ -1,4 +1,4 @@
-import Box from "@/components/Layouts/Box";
+import Box from "@/components/layouts/Box";
 import OrderItemsTable from "@/components/widgets/OrdersWidgets/OrderItemsTable";
 
 const OrderDetailsPage = () => {
