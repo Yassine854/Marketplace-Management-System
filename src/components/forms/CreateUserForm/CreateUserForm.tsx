@@ -19,6 +19,7 @@ const CreateUserForm = () => {
     handleSubmit,
     register,
     formState: { errors },
+    getValues,
   } = useForm<FormData>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -57,7 +58,7 @@ const CreateUserForm = () => {
               label="Email"
               placeholder="Enter email"
               register={register("email")}
-              isError={errors.email}
+              isError={getValues("email") && errors.email}
               errorMessage={errors.email?.message}
             />
             <TextInput
