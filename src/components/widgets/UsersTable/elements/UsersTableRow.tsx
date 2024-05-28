@@ -1,37 +1,36 @@
 import { IconSettings } from "@tabler/icons-react";
-import OrdersTableCell from "./OrdersTableCell";
-import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
+import UsersTableCell from "./UsersTableCell";
 
 const OrdersTableRow = ({ order }: any) => {
   return (
     <tr className=" even:bg-primary/5 hover:bg-n30 dark:even:bg-bg3">
-      <OrdersTableCell>
+      <UsersTableCell>
         <p className=" truncate text-ellipsis text-sm">
           {order?.customerFirstname}
         </p>
-      </OrdersTableCell>
-      <OrdersTableCell>
+      </UsersTableCell>
+      <UsersTableCell>
         <p className=" truncate text-ellipsis text-sm">
           {order?.customerFirstname + " " + order?.customerLastname}
         </p>
-      </OrdersTableCell>
-      <OrdersTableCell>
+      </UsersTableCell>
+      <UsersTableCell>
         <p className=" truncate text-ellipsis text-sm">
           {order?.customerFirstname + " " + order?.customerLastname}
         </p>
-      </OrdersTableCell>
-      <OrdersTableCell>
+      </UsersTableCell>
+      <UsersTableCell>
         <p className="truncate ">{order?.total}</p>
-      </OrdersTableCell>
-      <OrdersTableCell>
-        {unixTimestampToDate(order?.deliveryDate)}
-      </OrdersTableCell>
-      <OrdersTableCell>
+      </UsersTableCell>
+      <UsersTableCell>
         <p className="truncate ">{order?.deliveryAgent || "***"}</p>
-      </OrdersTableCell>
-      <OrdersTableCell>
+      </UsersTableCell>
+      <UsersTableCell>
+        <p className="truncate ">{order?.deliveryAgent || "***"}</p>
+      </UsersTableCell>
+      <UsersTableCell>
         <IconSettings string={2} />
-      </OrdersTableCell>
+      </UsersTableCell>
     </tr>
   );
 };

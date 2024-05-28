@@ -1,8 +1,6 @@
-import Checkbox from "@/components/elements/sharedElements/Checkbox";
 import { IconSelector } from "@tabler/icons-react";
-import OrdersTableHeadCell from "../OrdersTableHeadCell";
-import OrdersTableHeadSmallCell from "../OrdersTableHeadSmallCell";
-import { useOrdersTableHead } from "./useOrdersTableHead";
+import OrdersTableHeadCell from "./UsersTableHeadCell";
+import { useOrdersTableHead } from "./useUsersTableHead";
 
 const OrdersTableHead = ({ changeSelectedSort }: any) => {
   const { onCustomerClick, onDeliveryDateClick, onTotalClick } =
