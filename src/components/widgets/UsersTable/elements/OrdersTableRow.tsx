@@ -1,28 +1,10 @@
-import { IconPdf, IconTruck } from "@tabler/icons-react";
+import { IconPdf, IconSettings, IconTruck } from "@tabler/icons-react";
 
 import ActionsCell from "./ActionsCell";
 import Checkbox from "@/components/elements/sharedElements/Checkbox";
 import OrdersTableCell from "./OrdersTableCell";
 import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
 
-const actions = [
-  {
-    name: "Edit",
-    key: "edit",
-    action: (id: any) => {},
-  },
-  {
-    name: "Generate Pick List",
-    key: "picklist",
-    action: () => {},
-  },
-  { name: "Print BL's", key: "bl", action: () => {} },
-  {
-    name: "Manage Milk-Runs",
-    key: "mr",
-    action: () => {},
-  },
-];
 const OrdersTableRow = ({
   onClick = () => console.log("Row clicked"),
   order,
@@ -34,14 +16,15 @@ const OrdersTableRow = ({
       onClick={onClick}
     >
       <OrdersTableCell>
-        <Checkbox
-          isChecked={order.isSelected}
-          onClick={(isChecked) => {
-            onSelectOrderClick(isChecked, order.id);
-          }}
-        />
+        <p className=" truncate text-ellipsis text-sm">
+          {order?.customerFirstname}
+        </p>
       </OrdersTableCell>
-      <OrdersTableCell>{order?.kamiounId}</OrdersTableCell>
+      <OrdersTableCell>
+        <p className=" truncate text-ellipsis text-sm">
+          {order?.customerFirstname + " " + order?.customerLastname}
+        </p>
+      </OrdersTableCell>
       <OrdersTableCell>
         <p className=" truncate text-ellipsis text-sm">
           {order?.customerFirstname + " " + order?.customerLastname}
@@ -57,22 +40,8 @@ const OrdersTableRow = ({
         <p className="truncate ">{order?.deliveryAgent || "***"}</p>
       </OrdersTableCell>
       <OrdersTableCell>
-        <p className="truncate ">{order?.deliveryStatus || "***"}</p>
+        <IconSettings />
       </OrdersTableCell>
-      <OrdersTableCell>
-        <div
-          className="rounded-full p-2 hover:bg-n10"
-          onClick={(event: any) => {
-            event.stopPropagation();
-          }}
-        >
-          <IconPdf />
-        </div>
-      </OrdersTableCell>
-      <OrdersTableCell>
-        <IconTruck color="red" />
-      </OrdersTableCell>
-      <ActionsCell actions={actions} />
     </tr>
   );
 };

@@ -2,7 +2,7 @@
 
 import AnyMatchingResults from "@/components/elements/TablesElements/AnyMatchingResults";
 import Box from "@/components/Layouts/Box";
-import OrdersTable from "@/components/widgets/OrdersWidgets/OrdersTable";
+import OrdersTable from "@/components/widgets/UsersTable";
 import OrdersToolBar from "@/components/widgets/OrdersWidgets/OrdersToolBar";
 import Pagination from "@/components/widgets/OrdersWidgets/Pagination";
 import { useOrders } from "@/hooks/useOrders";
