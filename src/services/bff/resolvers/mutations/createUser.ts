@@ -1,6 +1,7 @@
 import { UserPayload } from "../resolvers.types";
 import { hashPassword } from "@/utils/password";
 import { prismaClient } from "@/libs/prisma/prismaClient";
+import { warehouses } from "@/components/elements/TopNavBarElements/WarehouseSelector/WarehouseSelector";
 
 export const createUser = async (newUser: any): Promise<UserPayload> => {
   try {
@@ -22,8 +23,11 @@ export const createUser = async (newUser: any): Promise<UserPayload> => {
       data: {
         ...newUser,
         password: hashedPassword,
-        role: "agent",
+        role: "admin",
         status: "pending",
+        warehouses: ["tunis"],
+        firstName: "Mohamed",
+        lastName: "Jrad",
       },
     });
 

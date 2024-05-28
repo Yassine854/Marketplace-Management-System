@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import Dropdown from "../../elements/sharedElements/Dropdown";
 import { FormSchema } from "./formSchema";
+import TextInput from "@/components/inputs/TextInput";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 type FormData = z.infer<typeof FormSchema>;
@@ -17,7 +18,6 @@ const CreateUserForm = () => {
   const {
     handleSubmit,
     register,
-    getValues,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(FormSchema),
@@ -46,84 +46,35 @@ const CreateUserForm = () => {
             <p className="text-xl font-bold">Create User</p>
           </div>
           <div className="box mb-6 grid grid-cols-2 gap-4 bg-primary/5 dark:bg-bg3 md:p-4 xl:p-6 xxxl:gap-6">
-            <div className="col-span-2 md:col-span-1">
-              <label
-                htmlFor="username"
-                className="mb-4 block font-medium md:text-lg"
-              >
-                Username *
-              </label>
-              <input
-                type="text"
-                className="w-full rounded-3xl border border-n30 bg-n0 px-6 py-3 text-sm focus:outline-none dark:border-n500 dark:bg-bg4"
-                placeholder="Enter Username"
-                id="username"
-                {...register("username")}
-              />
-              {errors.username && (
-                <p className="ml-4 mt-1 text-red-600">
-                  {errors.username.message}
-                </p>
-              )}
-            </div>
-            <div className="col-span-2 md:col-span-1">
-              <label
-                htmlFor="email"
-                className="mb-4 block font-medium md:text-lg"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                className="w-full rounded-3xl border border-n30 bg-n0 px-6 py-3 text-sm focus:outline-none dark:border-n500 dark:bg-bg4"
-                placeholder="Enter Email"
-                id="email"
-                {...register("email")}
-              />
-              {getValues("email") && errors.email && (
-                <p className="ml-4 mt-1 text-red-600">{errors.email.message}</p>
-              )}
-            </div>
-            <div className="col-span-2 md:col-span-1">
-              <label
-                htmlFor="firstName"
-                className="mb-4 block font-medium md:text-lg"
-              >
-                First Name *
-              </label>
-              <input
-                type="text"
-                className="w-full rounded-3xl border border-n30 bg-n0 px-6 py-3 text-sm focus:outline-none dark:border-n500 dark:bg-bg4"
-                placeholder="Enter First Name"
-                id="firstName"
-                {...register("firstName")}
-              />
-              {errors.firstName && (
-                <p className="ml-4 mt-1 text-red-600">
-                  {errors.firstName.message}
-                </p>
-              )}
-            </div>
-            <div className="col-span-2 md:col-span-1">
-              <label
-                htmlFor="lastName"
-                className="mb-4 block font-medium md:text-lg"
-              >
-                Last Name *
-              </label>
-              <input
-                type="text"
-                className="w-full rounded-3xl border border-n30 bg-n0 px-6 py-3 text-sm focus:outline-none dark:border-n500 dark:bg-bg4"
-                placeholder="Enter Last Name"
-                id="lastName"
-                {...register("lastName")}
-              />
-              {errors.lastName && (
-                <p className="ml-4 mt-1 text-red-600">
-                  {errors.lastName.message}
-                </p>
-              )}
-            </div>
+            <TextInput
+              label="Username * "
+              placeholder="Enter username"
+              register={register("username")}
+              isError={errors.username}
+              errorMessage={errors.username?.message}
+            />
+            <TextInput
+              label="Email"
+              placeholder="Enter email"
+              register={register("email")}
+              isError={errors.email}
+              errorMessage={errors.email?.message}
+            />
+            <TextInput
+              label="First Name *"
+              placeholder="Enter first name"
+              register={register("firstName")}
+              isError={errors.firstName}
+              errorMessage={errors.firstName?.message}
+            />
+            <TextInput
+              label="Last Name *"
+              placeholder="Enter lastName"
+              register={register("lastName")}
+              isError={errors.lastName}
+              errorMessage={errors.lastName?.message}
+            />
+
             <div className="col-span-2 md:col-span-1">
               <label
                 htmlFor="role"
@@ -149,6 +100,7 @@ const CreateUserForm = () => {
               />
             </div>
           </div>
+
           <div className="mt-6">
             <div className="mt-7 flex gap-4 lg:mt-10">
               <button type="submit" className="btn px-4 hover:shadow-none">
