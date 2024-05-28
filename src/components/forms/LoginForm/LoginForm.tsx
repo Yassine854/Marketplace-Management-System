@@ -5,6 +5,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { FormSchema } from "./formSchema";
 import Loading from "@/components/elements/Loading";
 import PasswordInput from "@/components/inputs/PasswordInput";
+import TextInput from "@/components/inputs/TextInput";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigation } from "@/hooks/useNavigation";
@@ -45,21 +46,16 @@ const LoginForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="mb-4">
-        <label htmlFor="username" className="ml-4 block font-medium md:text-lg">
-          Username
-        </label>
-        <input
-          placeholder="Username"
-          {...register("username")}
-          id="username"
-          className="w-full rounded-3xl border border-n30 bg-n0 px-3 py-2 text-sm focus:outline-none dark:border-n500 dark:bg-bg4 md:px-6 md:py-3"
-        />
-        {errors.username && (
-          <p className="pl-2 pt-1 text-red-500">{errors.username.message}</p>
-        )}
-      </div>
+      <TextInput
+        label="Username"
+        placeholder="Enter your username"
+        register={register("username")}
+        isError={errors.username}
+        errorMessage={errors.username?.message}
+      />
+
       <PasswordInput
+        placeholder="Enter your password"
         register={register("password")}
         label="Password"
         isError={errors.password}
