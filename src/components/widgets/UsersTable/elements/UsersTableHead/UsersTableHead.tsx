@@ -2,8 +2,18 @@ import { IconSelector } from "@tabler/icons-react";
 import OrdersTableHeadCell from "./UsersTableHeadCell";
 import { useOrdersTableHead } from "./useUsersTableHead";
 
+const Sort = ({ children, onClick }: any) => (
+  <div
+    onClick={onClick}
+    className="flex cursor-pointer items-center justify-center"
+  >
+    {children}
+    <IconSelector size={18} />
+  </div>
+);
+
 const OrdersTableHead = ({ changeSelectedSort }: any) => {
-  const { onCustomerClick, onDeliveryDateClick, onTotalClick } =
+  const { onCustomerClick, onTotalClick } =
     useOrdersTableHead(changeSelectedSort);
 
   return (
@@ -11,19 +21,19 @@ const OrdersTableHead = ({ changeSelectedSort }: any) => {
       <tr className="  h-12  w-full bg-n40 font-semibold">
         <OrdersTableHeadCell>Username</OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onCustomerClick}>
-          Name <IconSelector size={18} />
+          <Sort>Name</Sort>
         </OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onCustomerClick}>
-          Email <IconSelector size={18} />
+          <Sort>Email</Sort>
         </OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onTotalClick}>
-          Role <IconSelector size={18} />
+          <Sort>Role</Sort>
         </OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onTotalClick}>
-          Status <IconSelector size={18} />
+          <Sort>Status</Sort>
         </OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onTotalClick}>
-          Created_at <IconSelector size={18} />
+          <Sort>Created at</Sort>
         </OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onTotalClick}>Edit</OrdersTableHeadCell>
       </tr>
