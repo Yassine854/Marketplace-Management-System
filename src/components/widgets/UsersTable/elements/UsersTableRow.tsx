@@ -1,8 +1,8 @@
 import { IconSettings } from "@tabler/icons-react";
 import UsersTableCell from "./UsersTableCell";
 
-const OrdersTableRow = ({ user }: any) => {
-  console.log("🚀 ~ OrdersTableRow ~ user:", user);
+const UsersTableRow = ({ user }: any) => {
+  console.log("🚀 ~ UsersTableRow ~ user:", user);
   const status = "New";
   //const warehouses = ["mghira", "sousse", "shargasfasdfia", "ariana", "all"];
   const warehouses = ["all"];
@@ -60,4 +60,4 @@ const OrdersTableRow = ({ user }: any) => {
     </tr>
   );
 };
-export default OrdersTableRow;
+export default UsersTableRow;

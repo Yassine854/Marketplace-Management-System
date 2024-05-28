@@ -40,7 +40,7 @@ const Dropdown = forwardRef<DropRef, Props>(
     return (
       <div className="relative" ref={dropRef}>
         <div onClick={toggleOpen} className={tailwind.container("", "")}>
-          {selected.name}
+          {selected?.name}
           <IconChevronDown
             size={20}
             className={`duration-300 ${open && "rotate-180"}`}
@@ -55,7 +55,7 @@ const Dropdown = forwardRef<DropRef, Props>(
               }}
               key={key}
               className={`cursor-pointer rounded-md px-4 py-2 text-xs font-semibold duration-300 hover:text-primary ${
-                selected.key == key && "bg-primary text-n0 hover:!text-n0"
+                selected?.key == key && "bg-primary text-n0 hover:!text-n0"
               }`}
             >
               {name}
