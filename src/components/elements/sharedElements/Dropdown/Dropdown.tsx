@@ -38,7 +38,7 @@ const Dropdown = forwardRef<DropRef, Props>(
     }));
 
     return (
-      <div className="relative" ref={dropRef}>
+      <div className="relative  rounded-3xl bg-n0" ref={dropRef}>
         <div onClick={toggleOpen} className={tailwind.container("", "")}>
           {selected?.name}
           <IconChevronDown

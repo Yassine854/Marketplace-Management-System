@@ -1,10 +1,10 @@
 import * as z from "zod";
 
-import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import { FormSchema } from "./formSchema";
 import Loading from "@/components/elements/Loading";
+import PasswordInput from "@/components/inputs/PasswordInput";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigation } from "@/hooks/useNavigation";
@@ -15,7 +15,6 @@ type FormData = z.infer<typeof FormSchema>;
 
 const LoginForm = () => {
   const { navigateToDashboard } = useNavigation();
-  const [showPass, setShowPass] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
@@ -60,30 +59,12 @@ const LoginForm = () => {
           <p className="pl-2 pt-1 text-red-500">{errors.username.message}</p>
         )}
       </div>
-
-      <div className="mb-4">
-        <label htmlFor="password" className="ml-4 block font-medium md:text-lg">
-          Password
-        </label>
-        <div className="relative rounded-3xl border border-n30 bg-n0 px-3 py-2 dark:border-n500 dark:bg-bg4 md:px-6 md:py-3">
-          <input
-            placeholder="Password"
-            type={showPass ? "text" : "password"}
-            id="password"
-            className="w-11/12 bg-transparent text-sm focus:outline-none"
-            {...register("password")}
-          />
-          <span
-            onClick={() => setShowPass(!showPass)}
-            className="absolute top-1/2 -translate-y-1/2 cursor-pointer ltr:right-5 rtl:left-5"
-          >
-            {showPass ? <IconEye /> : <IconEyeOff />}
-          </span>
-        </div>
-        {errors.password && (
-          <p className="pl-4 pt-1 text-red-500">{errors.password.message}</p>
-        )}
-      </div>
+      <PasswordInput
+        register={register("password")}
+        label="Password"
+        isError={errors.password}
+        errorMessage={errors.password?.message}
+      />
 
       <div className="mt-8 flex items-center justify-center gap-6 p-8">
         {isLoading && <Loading />}
