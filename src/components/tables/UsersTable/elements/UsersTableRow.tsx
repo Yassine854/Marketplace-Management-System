@@ -3,7 +3,7 @@ import UsersTableCell from "./UsersTableCell";
 
 const UsersTableRow = ({ user }: any) => {
   console.log("🚀 ~ UsersTableRow ~ user:", user);
-  const status = "New";
+  let status = "New";
   //const warehouses = ["mghira", "sousse", "shargasfasdfia", "ariana", "all"];
   const warehouses = ["all"];
   return (

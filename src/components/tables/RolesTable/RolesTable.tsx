@@ -1,8 +1,6 @@
-"use client";
-
-import Banner from "../Banner";
-import Box from "../../layouts/Box";
-import Checkbox from "@/components/elements/sharedElements/Checkbox";
+import Banner from "@/components/widgets/Banner";
+import Box from "@/components/layouts/Box";
+import Checkbox from "@/components/inputs/Checkbox";
 
 const roles = ["manager", "ops", " customer service", "sales", "Finance"];
 

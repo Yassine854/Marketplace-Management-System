@@ -1,4 +1,4 @@
-import Box from "../../../layouts/Box";
+import Box from "@/components/layouts/Box";
 import OrderItemsTableHeader from "@/components/elements/TablesElements/OrderLinesTableElements/OrderItemsTableHeader";
 import Pagination from "@/components/widgets/OrdersWidgets/Pagination";
 import TableBody from "@/components/elements/TablesElements/OrderLinesTableElements/OrderItemsTableBody";

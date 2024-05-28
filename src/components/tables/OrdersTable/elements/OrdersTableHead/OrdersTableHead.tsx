@@ -1,4 +1,4 @@
-import Checkbox from "@/components/elements/sharedElements/Checkbox";
+import Checkbox from "@/components/inputs/Checkbox";
 import { IconSelector } from "@tabler/icons-react";
 import OrdersTableHeadCell from "../OrdersTableHeadCell";
 import OrdersTableHeadSmallCell from "../OrdersTableHeadSmallCell";

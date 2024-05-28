@@ -1,7 +1,7 @@
 import { IconPdf, IconTruck } from "@tabler/icons-react";
 
 import ActionsCell from "./ActionsCell";
-import Checkbox from "@/components/elements/sharedElements/Checkbox";
+import Checkbox from "@/components/inputs/Checkbox";
 import OrdersTableCell from "./OrdersTableCell";
 import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
 

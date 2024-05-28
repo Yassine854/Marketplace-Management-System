@@ -2,7 +2,7 @@ import * as z from "zod";
 
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import Dropdown from "../../elements/sharedElements/Dropdown";
+import Dropdown from "../../inputs/Dropdown";
 import { FormSchema } from "./formSchema";
 import TextInput from "@/components/inputs/TextInput";
 import { zodResolver } from "@hookform/resolvers/zod";
