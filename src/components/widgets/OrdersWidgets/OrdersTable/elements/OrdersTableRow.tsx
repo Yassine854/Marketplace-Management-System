@@ -43,7 +43,7 @@ const OrdersTableRow = ({
       </OrdersTableCell>
       <OrdersTableCell>{order?.kamiounId}</OrdersTableCell>
       <OrdersTableCell>
-        <p className=" truncate text-ellipsis">
+        <p className=" truncate text-ellipsis text-sm">
           {order?.customerFirstname + " " + order?.customerLastname}
         </p>
       </OrdersTableCell>
@@ -69,10 +69,10 @@ const OrdersTableRow = ({
           <IconPdf />
         </div>
       </OrdersTableCell>
-      <ActionsCell actions={actions} />
       <OrdersTableCell>
         <IconTruck color="red" />
       </OrdersTableCell>
+      <ActionsCell actions={actions} />
     </tr>
   );
 };

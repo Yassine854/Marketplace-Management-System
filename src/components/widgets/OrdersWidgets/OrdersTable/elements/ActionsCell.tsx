@@ -3,7 +3,7 @@ import TableActions from "@/components/elements/TablesElements/TableActions";
 const ActionsCell = ({ actions, orderId }: any) => {
   return (
     <td>
-      <div className="flex h-20 w-24 items-center justify-center border ">
+      <div className="flex h-20  items-center justify-center border ">
         <TableActions actions={actions} orderId={orderId} />
       </div>
     </td>

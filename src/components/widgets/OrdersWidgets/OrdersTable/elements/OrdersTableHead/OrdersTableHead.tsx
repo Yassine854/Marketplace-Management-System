@@ -35,8 +35,8 @@ const OrdersTableHead = ({
         <OrdersTableHeadCell>Delivery Agent</OrdersTableHeadCell>
         <OrdersTableHeadCell>Delivery Status</OrdersTableHeadCell>
         <OrdersTableHeadSmallCell>Summary</OrdersTableHeadSmallCell>
-        <OrdersTableHeadSmallCell>Actions</OrdersTableHeadSmallCell>
         <OrdersTableHeadSmallCell>Label</OrdersTableHeadSmallCell>
+        <OrdersTableHeadSmallCell>Actions</OrdersTableHeadSmallCell>
       </tr>
     </thead>
   );
