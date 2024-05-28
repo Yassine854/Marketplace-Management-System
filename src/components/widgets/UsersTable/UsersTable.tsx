@@ -25,8 +25,8 @@ const OrdersTable = ({
         <>
           {isLoading ? (
             <>
-              {[...Array(25)].map((_, i) => (
-                <TableRowSkeleton key={i} number={10} />
+              {[...Array(12)].map((_, i) => (
+                <TableRowSkeleton key={i} number={7} />
               ))}
             </>
           ) : (

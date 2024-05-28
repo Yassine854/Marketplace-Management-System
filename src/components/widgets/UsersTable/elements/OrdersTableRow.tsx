@@ -1,20 +1,10 @@
-import { IconPdf, IconSettings, IconTruck } from "@tabler/icons-react";
-
-import ActionsCell from "./ActionsCell";
-import Checkbox from "@/components/elements/sharedElements/Checkbox";
+import { IconSettings } from "@tabler/icons-react";
 import OrdersTableCell from "./OrdersTableCell";
 import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
 
-const OrdersTableRow = ({
-  onClick = () => console.log("Row clicked"),
-  order,
-  onSelectOrderClick,
-}: any) => {
+const OrdersTableRow = ({ order }: any) => {
   return (
-    <tr
-      className="cursor-pointer even:bg-primary/5 hover:bg-n30 dark:even:bg-bg3"
-      onClick={onClick}
-    >
+    <tr className=" even:bg-primary/5 hover:bg-n30 dark:even:bg-bg3">
       <OrdersTableCell>
         <p className=" truncate text-ellipsis text-sm">
           {order?.customerFirstname}
@@ -40,7 +30,7 @@ const OrdersTableRow = ({
         <p className="truncate ">{order?.deliveryAgent || "***"}</p>
       </OrdersTableCell>
       <OrdersTableCell>
-        <IconSettings />
+        <IconSettings string={2} />
       </OrdersTableCell>
     </tr>
   );

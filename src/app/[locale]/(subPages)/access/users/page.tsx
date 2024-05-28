@@ -1,11 +1,6 @@
-import OrdersTable from "@/components/widgets/UsersTable";
-import UsersTable from "@/components/widgets/UsersTable";
+"use client";
 
-const Users = () => {
-  return (
-    <>
-      <UsersTable />
-    </>
-  );
-};
+import UsersPage from "@/components/pages/UsersPage";
+
+const Users = () => <UsersPage />;
 export default Users;
