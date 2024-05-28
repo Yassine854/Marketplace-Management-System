@@ -21,7 +21,7 @@ export const useGetUsers = () => {
   const { data, loading, error } = useQuery(QUERY);
 
   return {
-    data: data?.getUsers.users,
+    users: data?.getUsers.users,
     isLoading: loading,
     error,
   };
