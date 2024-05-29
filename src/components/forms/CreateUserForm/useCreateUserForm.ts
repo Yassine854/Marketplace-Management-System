@@ -22,8 +22,11 @@ const warehouses = [
   { name: "sousse", key: "2001" },
   { name: "Mounastir", key: "3001" },
 ];
+
 export const useCreateUserForm = () => {
   const [selectedRole, setSelectedRole] = useState(roles[0]);
+  const warehouseRef = useRef(null);
+
   const {
     handleSubmit,
     register,
@@ -32,8 +35,6 @@ export const useCreateUserForm = () => {
   } = useForm<FormData>({
     resolver: zodResolver(FormSchema),
   });
-
-  const warehouseRef = useRef(null);
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     console.log("🚀 ~ const onSubmit:SubmitHandler<FormData>= ~ data:", data);
