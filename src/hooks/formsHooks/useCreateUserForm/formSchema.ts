@@ -10,7 +10,7 @@ export const FormSchema = z
       .or(z.literal("")),
     firstName: z.string().min(1, { message: "Required" }),
     lastName: z.string().min(1, { message: "Required" }),
-    role: z.string(),
+    roleId: z.string(),
     warehouseId: z.string(),
     password: z
       .string()

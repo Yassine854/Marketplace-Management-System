@@ -1,11 +1,11 @@
 import Dropdown from "../../inputs/Dropdown";
+import Loading from "@/components/elements/Loading";
 import PasswordInput from "@/components/inputs/PasswordInput";
 import TextInput from "@/components/inputs/TextInput";
-import { useCreateUserForm } from "./useCreateUserForm";
+import { useCreateUserForm } from "../../../hooks/formsHooks/useCreateUserForm";
 
 const CreateUserForm = () => {
   const {
-    onSubmit,
     handleSubmit,
     register,
     setValue,
@@ -14,13 +14,14 @@ const CreateUserForm = () => {
     warehouseRef,
     warehouses,
     roles,
+    isLoading,
   } = useCreateUserForm();
 
   return (
     <div className="grid h-full w-full items-center justify-center gap-4  xxxl:gap-6">
       <form
         className="w-full lg:col-span-7 xl:col-span-8"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit}
       >
         <div className="box w-full xl:p-8">
           <div className="bb-dashed mb-6 flex items-center justify-between pb-6">
@@ -72,9 +73,9 @@ const CreateUserForm = () => {
               label="Role"
               items={roles}
               onSelectedChange={(selected) => {
-                setValue("role", selected);
+                setValue("roleId", selected);
 
-                var result = roles.filter((obj) => {
+                var result = roles.filter((obj: any) => {
                   return obj.key === selected;
                 });
 
@@ -91,9 +92,12 @@ const CreateUserForm = () => {
 
           <div className="mt-6">
             <div className="mt-7 flex gap-4 lg:mt-10">
-              <button type="submit" className="btn px-4 hover:shadow-none">
-                Create
-              </button>
+              {!isLoading && (
+                <button type="submit" className="btn px-4 hover:shadow-none">
+                  Create
+                </button>
+              )}
+              {isLoading && <Loading />}
               <button type="reset" className="btn-outline px-4 shadow-none">
                 Cancel
               </button>

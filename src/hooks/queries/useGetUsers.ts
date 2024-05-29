@@ -9,9 +9,8 @@ const QUERY = gql`
         id
         username
         email
-
-        role
-        warehouses
+        roleId
+        warehouseId
       }
     }
   }

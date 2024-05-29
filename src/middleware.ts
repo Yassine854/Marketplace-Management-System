@@ -22,17 +22,17 @@ const middleware = auth((req: any) => {
   const session = req?.auth;
   const isAdmin = session?.user?.role === "admin";
 
-  if (!session && isAuthPage) {
-    return NextResponse.redirect(new URL("/login", req.nextUrl));
-  }
+  // if (!session && isAuthPage) {
+  //   return NextResponse.redirect(new URL("/login", req.nextUrl));
+  // }
 
-  if (session && !isAuthPage) {
-    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
-  }
+  // if (session && !isAuthPage) {
+  //   return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+  // }
 
-  if (session && !isAdmin && adminRoutes.includes(req.nextUrl.pathname)) {
-    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
-  }
+  // if (session && !isAdmin && adminRoutes.includes(req.nextUrl.pathname)) {
+  //   return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+  // }
 
   return intlMiddleware(req);
 });

@@ -4,6 +4,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 
 import { FormSchema } from "./formSchema";
+import { toast } from "react-hot-toast";
+import { useUser } from "@/hooks/useUser";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 type FormData = z.infer<typeof FormSchema>;
@@ -26,7 +28,7 @@ const warehouses = [
 export const useCreateUserForm = () => {
   const [selectedRole, setSelectedRole] = useState(roles[0]);
   const warehouseRef = useRef(null);
-
+  const user = useUser();
   const {
     handleSubmit,
     register,
@@ -37,7 +39,33 @@ export const useCreateUserForm = () => {
   });
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    console.log("🚀 ~ const onSubmit:SubmitHandler<FormData>= ~ data:", data);
+    const {
+      username,
+      email,
+      firstName,
+      lastName,
+      roleId,
+      warehouseId,
+      password,
+    } = data;
+
+    const { message, success } = await user.mutation.create.newUser({
+      username,
+      email,
+      firstName,
+      lastName,
+      roleId,
+      warehouseId,
+      password,
+    });
+
+    if (success) {
+      toast.success(message, {
+        duration: 2000,
+      });
+    } else {
+      toast.error(message, { duration: 2000 });
+    }
   };
 
   useEffect(() => {
@@ -52,7 +80,7 @@ export const useCreateUserForm = () => {
 
   return {
     onSubmit,
-    handleSubmit,
+    handleSubmit: handleSubmit(onSubmit),
     register,
     setValue,
     errors,
@@ -60,5 +88,6 @@ export const useCreateUserForm = () => {
     warehouseRef,
     roles,
     warehouses,
+    isLoading: user.mutation.create.isLoading,
   };
 };

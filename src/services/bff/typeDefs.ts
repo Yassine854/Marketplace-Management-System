@@ -1,12 +1,14 @@
-import { UserPayload } from "./resolvers/resolvers.types";
 import { gql } from "graphql-tag";
-import { warehouses } from "./../../components/elements/TopNavBarElements/WarehouseSelector/WarehouseSelector";
 
 export const typeDefs = gql`
   input CreateUserInput {
     username: String!
     email: String
     password: String!
+    firstName: String!
+    lastName: String!
+    roleId: String!
+    warehouseId: String!
   }
 
   type UserPayload {
@@ -60,8 +62,8 @@ export const typeDefs = gql`
     username: String!
     email: String
     password: String!
-    role: String!
-    warehouses: [String]!
+    roleId: String!
+    warehouseId: String!
   }
 
   type Role {

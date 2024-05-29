@@ -17,12 +17,15 @@ export const changeUserWarehouses = async (
       };
     }
 
-    const updatedUser = await prismaClient.user.update({
-      where: { id: userId },
-      data: { warehouses: { set: newWarehouses } },
-    });
+    const updatedUser = {};
+
+    // await prismaClient.user.update({
+    //   where: { id: userId },
+    //   data: { warehouseId: { set: newWarehouses } },
+    // });
 
     return {
+      //@ts-ignore
       user: updatedUser,
       success: true,
       message: "User warehouses updated successfully",
