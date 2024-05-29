@@ -1,41 +1,20 @@
-import * as z from "zod";
-
-import { SubmitHandler, useForm } from "react-hook-form";
-
 import Dropdown from "../../inputs/Dropdown";
-import { FormSchema } from "./formSchema";
+import PasswordInput from "@/components/inputs/PasswordInput";
 import TextInput from "@/components/inputs/TextInput";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-type FormData = z.infer<typeof FormSchema>;
-
-const roles = [
-  { name: "Agent", key: "AGENT" },
-  { name: "Admin", key: "ADMIN" },
-];
+import { useCreateUserForm } from "./useCreateUserForm";
 
 const CreateUserForm = () => {
   const {
+    onSubmit,
     handleSubmit,
     register,
-    formState: { errors },
-    getValues,
-  } = useForm<FormData>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      username: "",
-      email: "",
-      firstName: "",
-      lastName: "",
-      role: "agent",
-      warehouses: [""],
-    },
-  });
-
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
-    console.log("🚀 ~ const onSubmit:SubmitHandler<FormData>= ~ data:", data);
-  };
-
+    setValue,
+    errors,
+    setSelectedRole,
+    warehouseRef,
+    warehouses,
+    roles,
+  } = useCreateUserForm();
   return (
     <div className="grid h-full w-full items-center justify-center gap-4  xxxl:gap-6">
       <form
@@ -58,9 +37,22 @@ const CreateUserForm = () => {
               label="Email"
               placeholder="Enter email"
               register={register("email")}
-              isError={getValues("email") && errors.email}
+              isError={errors.email}
               errorMessage={errors.email?.message}
             />
+            <PasswordInput
+              label="Password"
+              register={register("password")}
+              isError={errors.password}
+              errorMessage={errors.password?.message}
+            />
+            <PasswordInput
+              label="Confirm Password"
+              register={register("confirmPassword")}
+              isError={errors.confirmPassword}
+              errorMessage={errors.confirmPassword?.message}
+            />
+
             <TextInput
               label="First Name *"
               placeholder="Enter first name"
@@ -75,31 +67,25 @@ const CreateUserForm = () => {
               isError={errors.lastName}
               errorMessage={errors.lastName?.message}
             />
+            <Dropdown
+              label="Role"
+              items={roles}
+              onSelectedChange={(selected) => {
+                setValue("role", selected);
 
-            <div className="col-span-2 md:col-span-1">
-              <label
-                htmlFor="role"
-                className="mb-4 block font-medium md:text-lg"
-              >
-                Role
-              </label>
-              <Dropdown
-                items={roles}
-                // Provide items, setSelected, selected props as needed
-              />
-            </div>
-            <div className="col-span-2 md:col-span-1">
-              <label
-                htmlFor="warehouses"
-                className="mb-4 block font-medium md:text-lg"
-              >
-                Warehouses
-              </label>
-              <Dropdown
-                items={[]}
-                // Provide items, setSelected, selected props as needed
-              />
-            </div>
+                var result = roles.filter((obj) => {
+                  return obj.key === selected;
+                });
+
+                setSelectedRole(result[0]);
+              }}
+            />
+            <Dropdown
+              label="Warehouse"
+              ref={warehouseRef}
+              items={warehouses}
+              onSelectedChange={(selected) => setValue("warehouseId", selected)}
+            />
           </div>
 
           <div className="mt-6">

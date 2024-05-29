@@ -6,4 +6,5 @@ export type Item = {
 export type Props = {
   items: Item[];
   onSelectedChange?: (key: string) => void;
+  label?: string;
 };
