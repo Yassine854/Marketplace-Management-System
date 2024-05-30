@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { FormSchema } from "./formSchema";
 import { toast } from "react-hot-toast";
+import { useNavigation } from "@/hooks/useNavigation";
 import { useUser } from "@/hooks/useUser";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -26,6 +27,7 @@ const warehouses = [
 ];
 
 export const useCreateUserForm = () => {
+  const { navigateToUsersTable } = useNavigation();
   const [selectedRole, setSelectedRole] = useState(roles[0]);
   const warehouseRef = useRef(null);
   const user = useUser();
@@ -44,8 +46,8 @@ export const useCreateUserForm = () => {
       email,
       firstName,
       lastName,
-      roleId,
-      warehouseId,
+      roleCode,
+      warehouseCode,
       password,
     } = data;
 
@@ -54,8 +56,8 @@ export const useCreateUserForm = () => {
       email,
       firstName,
       lastName,
-      roleId,
-      warehouseId,
+      roleCode,
+      warehouseCode,
       password,
     });
 
@@ -63,6 +65,7 @@ export const useCreateUserForm = () => {
       toast.success(message, {
         duration: 2000,
       });
+      navigateToUsersTable();
     } else {
       toast.error(message, { duration: 2000 });
     }

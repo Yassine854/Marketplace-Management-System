@@ -6,15 +6,11 @@ const { orders: defaultOrders } = defaultProps;
 
 const UsersTable = ({
   users,
-  orders = defaultOrders,
   isLoading,
   changeSelectedSort,
-  onOrderClick,
   onSelectAllClick,
-  onSelectOrderClick,
   isAllOrdersSelected,
 }: any) => {
-  console.log("🚀 ~ users:", users);
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>
       <UsersTableHead

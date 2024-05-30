@@ -9,15 +9,17 @@ const QUERY = gql`
         id
         username
         email
-        roleId
-        warehouseId
+        roleCode
+        warehouseCode
       }
     }
   }
 `;
 
 export const useGetUsers = () => {
-  const { data, loading, error } = useQuery(QUERY);
+  const { data, loading, error } = useQuery(QUERY, {
+    fetchPolicy: "no-cache",
+  });
 
   return {
     users: data?.getUsers.users,

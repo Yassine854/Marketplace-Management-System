@@ -9,14 +9,13 @@ datasource db {
 
 model Role {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  code        String @unique
   name        String
   permissions String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-model Warehouse {
-  id   String @id @map("_id") @db.ObjectId
-  name String
-}
 
 model User {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -26,8 +25,8 @@ model User {
   lastName    String
   password    String
   status      String
-  warehouseId String
-  roleId      String
+  warehouseCode String
+  roleCode      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

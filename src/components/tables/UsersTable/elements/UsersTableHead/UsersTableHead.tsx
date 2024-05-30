@@ -30,7 +30,7 @@ const OrdersTableHead = ({ changeSelectedSort }: any) => {
           <Sort>Role</Sort>
         </OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onTotalClick}>
-          Warehouses
+          Warehouse
         </OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onTotalClick}>
           <Sort>Status</Sort>

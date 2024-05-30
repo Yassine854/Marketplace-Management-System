@@ -21,7 +21,7 @@ export const changeUserWarehouses = async (
 
     // await prismaClient.user.update({
     //   where: { id: userId },
-    //   data: { warehouseId: { set: newWarehouses } },
+    //   data: { warehouseCode: { set: newWarehouses } },
     // });
 
     return {

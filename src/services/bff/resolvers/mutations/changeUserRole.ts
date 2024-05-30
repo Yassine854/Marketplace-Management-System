@@ -19,7 +19,7 @@ export const changeUserRole = async (
 
     const updatedUser = await prismaClient.user.update({
       where: { id: userId },
-      data: { roleId: newRole },
+      data: { roleCode: newRole },
     });
 
     return {

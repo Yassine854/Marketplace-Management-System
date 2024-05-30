@@ -7,8 +7,8 @@ export const typeDefs = gql`
     password: String!
     firstName: String!
     lastName: String!
-    roleId: String!
-    warehouseId: String!
+    roleCode: String!
+    warehouseCode: String!
   }
 
   type Warehouse {
@@ -73,8 +73,8 @@ export const typeDefs = gql`
     username: String!
     email: String
     password: String!
-    roleId: String!
-    warehouseId: String!
+    roleCode: String!
+    warehouseCode: String!
   }
 
   type Role {
