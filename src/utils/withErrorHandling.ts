@@ -13,8 +13,7 @@ export function withErrorHandling<T>(asyncFunc: AsyncFunction<T>) {
       return {
         data: undefined,
         success: false,
-        message:
-          error.message || "Failed to create user. Please try again later.",
+        message: error.message || "Error",
       };
     }
   };

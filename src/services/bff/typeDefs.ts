@@ -11,6 +11,11 @@ export const typeDefs = gql`
     warehouseId: String!
   }
 
+  type Warehouse {
+    code: String!
+    name: String!
+  }
+
   type UserPayload {
     user: User
     success: Boolean!
@@ -19,6 +24,12 @@ export const typeDefs = gql`
 
   type UsersPayload {
     users: [User]
+    success: Boolean!
+    message: String
+  }
+
+  type WarehousesPayload {
+    warehouses: [Warehouse]!
     success: Boolean!
     message: String
   }
@@ -84,6 +95,7 @@ export const typeDefs = gql`
 
     getUser(username: String!): UserPayload!
     getUsers: UsersPayload!
+    getWarehouses: WarehousesPayload!
   }
 
   type Mutation {

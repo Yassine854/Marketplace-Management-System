@@ -9,6 +9,7 @@ import { deleteUser } from "./mutations/deleteUser";
 import { getOrder } from "./queries/getOrder";
 import { getUser } from "./queries/getUser";
 import { getUsers } from "./queries/getUsers";
+import { getWarehouses } from "./queries/getWarehouses";
 
 export const resolvers = {
   Mutation: {
@@ -30,5 +31,6 @@ export const resolvers = {
     getUser: (parent: any, args: { username: string }) =>
       getUser(args.username),
     getUsers: (parent: any, args: any) => getUsers(),
+    getWarehouses: (parent: any, args: any) => getWarehouses(),
   },
 };
