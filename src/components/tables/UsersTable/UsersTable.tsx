@@ -1,8 +1,6 @@
 import TableRowSkeleton from "./elements/RowSkeleton";
 import UsersTableHead from "./elements/UsersTableHead/UsersTableHead";
 import UsersTableRow from "./elements/UsersTableRow";
-import { defaultProps } from "./UsersTable.defaultProps";
-const { orders: defaultOrders } = defaultProps;
 
 const UsersTable = ({
   users,

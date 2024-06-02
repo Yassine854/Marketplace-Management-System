@@ -27,7 +27,7 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN  npx prisma  generate  --no-engine          
+RUN  npx prisma  generate        
 RUN npm i -g pnpm
 RUN pnpm i 
 RUN pnpm build

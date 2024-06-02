@@ -17,7 +17,6 @@ const MainLayout = ({ children }: Children) => {
 
   //@ts-ignore
   const isAdmin = user?.roleCode === "ADMIN";
-  console.log("🚀 ~ MainLayout ~ user:", user);
   return (
     <div className="h-screen w-screen bg-n10 ">
       <TopNavBar />

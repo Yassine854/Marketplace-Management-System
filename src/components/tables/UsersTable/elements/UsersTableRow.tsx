@@ -2,7 +2,6 @@ import { IconSettings } from "@tabler/icons-react";
 import UsersTableCell from "./UsersTableCell";
 
 const UsersTableRow = ({ user }: any) => {
-  console.log("🚀 ~ UsersTableRow ~ user:", user);
   let status = "New";
   //const warehouses = ["mghira", "sousse", "shargasfasdfia", "ariana", "all"];
   const warehouses = ["all"];
