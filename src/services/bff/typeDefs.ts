@@ -70,11 +70,15 @@ export const typeDefs = gql`
 
   type User {
     id: ID!
+    firstName: String!
+    lastName: String!
     username: String!
     email: String
     password: String!
+    status: String!
     roleCode: String!
     warehouseCode: String!
+    createdAt: String!
   }
 
   type Role {

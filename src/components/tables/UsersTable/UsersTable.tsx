@@ -22,7 +22,7 @@ const UsersTable = ({
           {isLoading ? (
             <>
               {[...Array(12)].map((_, i) => (
-                <TableRowSkeleton key={i} number={7} />
+                <TableRowSkeleton key={i} number={8} />
               ))}
             </>
           ) : (

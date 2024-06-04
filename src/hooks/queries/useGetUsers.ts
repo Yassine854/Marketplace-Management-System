@@ -8,9 +8,13 @@ const QUERY = gql`
       users {
         id
         username
+        firstName
+        lastName
         email
+        status
         roleCode
         warehouseCode
+        createdAt
       }
     }
   }

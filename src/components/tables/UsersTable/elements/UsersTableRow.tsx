@@ -1,8 +1,8 @@
 import { IconSettings } from "@tabler/icons-react";
 import UsersTableCell from "./UsersTableCell";
+import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
 
 const UsersTableRow = ({ user }: any) => {
-  console.log("🚀 ~ UsersTableRow ~ user:", user);
   return (
     <tr className=" even:bg-primary/5 hover:bg-n30 dark:even:bg-bg3">
       {/* Username */}
@@ -11,11 +11,15 @@ const UsersTableRow = ({ user }: any) => {
       </UsersTableCell>
       {/* Name */}
       <UsersTableCell>
-        <p className=" truncate text-ellipsis text-sm">{user.name} </p>
+        <p className=" truncate text-ellipsis text-sm">
+          {user.firstName + " " + user.lastName}{" "}
+        </p>
       </UsersTableCell>
       {/* Email */}
       <UsersTableCell>
-        <p className=" truncate text-ellipsis text-sm">{user.email} </p>
+        <p className=" truncate text-ellipsis text-sm">
+          {user.email || "*****"}{" "}
+        </p>
       </UsersTableCell>
       {/* Role */}
       <UsersTableCell>
@@ -55,7 +59,9 @@ const UsersTableRow = ({ user }: any) => {
       </UsersTableCell>
       {/* Created At */}
       <UsersTableCell>
-        <p className="truncate ">{user.username}</p>
+        <p className="truncate ">
+          {unixTimestampToDate(Number(user.createdAt))}
+        </p>
       </UsersTableCell>
       {/* Edit */}
       <UsersTableCell>
