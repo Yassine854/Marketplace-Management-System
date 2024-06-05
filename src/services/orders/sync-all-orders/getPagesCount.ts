@@ -1,4 +1,4 @@
-import { axiosClient } from "./axiosClient";
+import { axiosClient } from "../../../libs/axios/axiosClient";
 
 const batchSize = 250;
 

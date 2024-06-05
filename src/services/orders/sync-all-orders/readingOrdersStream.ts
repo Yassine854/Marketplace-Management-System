@@ -1,5 +1,5 @@
 import { Readable } from "stream";
-import { getOrders } from "./getOrders";
+import { getMagentoOrders } from "../../../libs/magento/getMagentoOrders";
 import { getPagesCount } from "./getPagesCount";
 
 export function readingOrdersStream() {
@@ -19,7 +19,7 @@ export function readingOrdersStream() {
         if (page <= pagesCount) {
           console.log("Fetching orders from page", page, "...");
 
-          const { items } = await getOrders(page);
+          const { items } = await getMagentoOrders(page);
 
           this.push(JSON.stringify(items));
           page++;

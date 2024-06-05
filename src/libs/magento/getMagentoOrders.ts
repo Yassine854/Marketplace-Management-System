@@ -1,8 +1,8 @@
-import { axiosClient } from "./axiosClient";
+import { axiosClient } from "../axios/axiosClient";
 
 const batchSize = 250;
 
-export const getOrders = async (page: any) => {
+export const getMagentoOrders = async (page: any) => {
   try {
     const response = await axiosClient.get(
       `/orders?searchCriteria[pageSize]=${batchSize}&searchCriteria[currentPage]=${page}&searchCriteria[sortOrders][0][field]=entity_id&searchCriteria[sortOrders][0][direction]=DESC`,
