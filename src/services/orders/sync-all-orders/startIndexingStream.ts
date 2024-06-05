@@ -2,6 +2,7 @@ import { Writable } from "stream";
 import { indexingOrders } from "./indexingOrders";
 import { ordersCollectionInit } from "./ordersCollectionInit";
 import { readingOrdersStream } from "./readingOrdersStream";
+import { NextResponse } from "next/server";
 
 export const startIndexingStream = async () => {
   try {
@@ -26,6 +27,8 @@ export const startIndexingStream = async () => {
     });
 
     readableStream.pipe(writableStream);
+
+    return NextResponse.json("Orders Syncing ...", { status: 202 });
   } catch (err) {
     process.env.NODE_ENV === "development" && console.error(err);
   }
