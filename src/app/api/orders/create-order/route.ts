@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { deleteOrdersCollection } from "@/services/sync/delete-orders-collection";
+import { deleteOrdersCollection } from "@/services/orders/delete-orders-collection";
 
 export async function DELETE(Request: any) {
   try {

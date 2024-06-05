@@ -1,6 +1,6 @@
 import { isCollectionExist } from "./isCollectionExist";
 import { typesenseClient } from "@/libs/typesense";
-import { typesenseOrdersCollectionSchema } from "./typesenseOrdersCollectionSchema";
+import { typesenseOrdersCollectionSchema } from "@/libs/typesense/OrdersCollectionSchema";
 
 export const ordersCollectionInit = async () => {
   try {

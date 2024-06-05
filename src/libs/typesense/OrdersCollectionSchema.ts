@@ -64,7 +64,7 @@ export const typesenseOrdersCollectionSchema: CollectionCreateSchema = {
     },
 
     {
-      name: "lines",
+      name: "items",
       type: "auto",
     },
   ],
