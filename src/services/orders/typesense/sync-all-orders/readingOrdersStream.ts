@@ -1,5 +1,5 @@
 import { Readable } from "stream";
-import { getMagentoOrders } from "../../../libs/magento/getMagentoOrders";
+import { getMagentoOrders } from "../../../../libs/magento/getMagentoOrders";
 import { getPagesCount } from "./getPagesCount";
 
 export function readingOrdersStream() {

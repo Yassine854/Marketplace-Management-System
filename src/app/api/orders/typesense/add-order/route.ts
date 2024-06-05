@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { deleteOrdersCollection } from "@/services/orders/delete-orders-collection";
+import { deleteOrdersCollection } from "@/services/orders/typesense/delete-orders-collection";
 
 export async function POST(Request: any) {
   try {
