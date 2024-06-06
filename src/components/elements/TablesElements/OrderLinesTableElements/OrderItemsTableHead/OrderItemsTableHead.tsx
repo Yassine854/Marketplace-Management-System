@@ -1,6 +1,6 @@
 "use client";
 
-import Checkbox from "../../../sharedElements/Checkbox";
+import Checkbox from "../../../../inputs/Checkbox";
 import { IconSelector } from "@tabler/icons-react";
 import { useState } from "react";
 

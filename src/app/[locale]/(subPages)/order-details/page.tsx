@@ -1,7 +1,3 @@
 "use client";
 
-import OrderDetailsPage from "@/components/pages/OrderDetailsPage";
-
-const OrderDetails = () => <OrderDetailsPage />;
-
-export default OrderDetails;
+export { default } from "@/components/pages/OrderDetailsPage";

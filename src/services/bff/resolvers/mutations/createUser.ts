@@ -1,19 +1,17 @@
-import { UserPayload } from "../resolvers.types";
+import { User } from "@/types/user";
 import { hashPassword } from "@/utils/password";
 import { prismaClient } from "@/libs/prisma/prismaClient";
 
-export const createUser = async (newUser: any): Promise<UserPayload> => {
+export const createUser = async (
+  newUser: any,
+): Promise<{ data: User | undefined; message: string; success: boolean }> => {
   try {
     const existingUser = await prismaClient.user.findUnique({
       where: { username: newUser.username },
     });
 
     if (existingUser) {
-      return {
-        user: undefined,
-        success: false,
-        message: "User already exists",
-      };
+      throw new Error("User already exists");
     }
 
     const hashedPassword = await hashPassword(newUser.password);
@@ -22,23 +20,20 @@ export const createUser = async (newUser: any): Promise<UserPayload> => {
       data: {
         ...newUser,
         password: hashedPassword,
-        role: "agent",
         status: "pending",
       },
     });
 
+    if (!user) {
+      throw new Error("Unable To Create User");
+    }
     return {
-      user,
+      data: user,
       success: true,
-      message: "User created successfully",
+      message: "User Created Successfully !",
     };
-  } catch (error: any) {
-    process.env.NODE_ENV === "development" &&
-      console.error("Error creating user:", error);
-    return {
-      user: undefined,
-      success: false,
-      message: error.message || "An error occurred while creating the user",
-    };
+  } catch (err) {
+    process.env.NODE_ENV === "development" && console.error(err);
+    return { data: undefined, message: err as string, success: false };
   }
 };

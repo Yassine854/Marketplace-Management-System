@@ -1,5 +1,5 @@
-import Dropdown from "@/components/elements/sharedElements/Dropdown";
-import SearchBar from "@/components/elements/sharedElements/SearchBar";
+import Dropdown from "@/components/inputs/Dropdown";
+import SearchBar from "@/components/inputs/SearchBar";
 import { useState } from "react";
 
 const actions = [

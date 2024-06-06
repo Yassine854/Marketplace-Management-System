@@ -1,12 +1,19 @@
-import { UserPayload } from "./resolvers/resolvers.types";
 import { gql } from "graphql-tag";
-import { warehouses } from "./../../components/elements/TopNavBarElements/WarehouseSelector/WarehouseSelector";
 
 export const typeDefs = gql`
   input CreateUserInput {
     username: String!
     email: String
     password: String!
+    firstName: String!
+    lastName: String!
+    roleCode: String!
+    warehouseCode: String!
+  }
+
+  type Warehouse {
+    code: String!
+    name: String!
   }
 
   type UserPayload {
@@ -17,6 +24,12 @@ export const typeDefs = gql`
 
   type UsersPayload {
     users: [User]
+    success: Boolean!
+    message: String
+  }
+
+  type WarehousesPayload {
+    warehouses: [Warehouse]!
     success: Boolean!
     message: String
   }
@@ -57,11 +70,15 @@ export const typeDefs = gql`
 
   type User {
     id: ID!
+    firstName: String!
+    lastName: String!
     username: String!
     email: String
     password: String!
-    role: String!
-    warehouses: [String]!
+    status: String!
+    roleCode: String!
+    warehouseCode: String!
+    createdAt: String!
   }
 
   type Role {
@@ -82,6 +99,7 @@ export const typeDefs = gql`
 
     getUser(username: String!): UserPayload!
     getUsers: UsersPayload!
+    getWarehouses: WarehousesPayload!
   }
 
   type Mutation {
