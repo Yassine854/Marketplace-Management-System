@@ -1,4 +1,6 @@
-import RolesTable from "@/components/widgets/RolesTable";
+"use client";
+
+import RolesTable from "@/components/tables/RolesTable";
 
 const Roles = () => {
   return (
