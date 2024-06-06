@@ -1,5 +1,4 @@
-import Box from "../../../Layouts/Box";
-import OrderItemsTable from "../OrderItemsTable";
+import OrderItemsTable from "@/components/tables/OrderItemsTable";
 
 const OrderDetails = () => {
   return <OrderItemsTable />;

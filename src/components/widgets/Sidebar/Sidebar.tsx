@@ -3,7 +3,6 @@ import {
   IconDashboard,
   IconList,
   IconMap2,
-  IconRefresh,
   IconUsers,
 } from "@tabler/icons-react";
 import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
@@ -26,8 +25,6 @@ const Sidebar = ({
 }: any) => {
   const { push } = useRouter();
   const pathname = usePathname();
-  //const { getSession } = useAuth();
-  // const session = await getSession();
 
   return (
     <aside className="sidebar  no-scrollbar fixed bottom-0 left-0  top-0 z-20 h-screen w-64 overflow-hidden overflow-y-scroll bg-n10">
@@ -120,19 +117,6 @@ const Sidebar = ({
             />
 
             <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
-          </>
-        )}
-
-        {isAdmin && (
-          <>
-            <SidebarButton
-              isActive={pathname?.includes("sync")}
-              name={"Sync"}
-              icon={<IconRefresh />}
-              onClick={() => {
-                push("/sync");
-              }}
-            />
           </>
         )}
       </div>

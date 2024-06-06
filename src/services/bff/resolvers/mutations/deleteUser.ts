@@ -19,6 +19,7 @@ export const deleteUser = async (userId: string): Promise<UserPayload> => {
     });
 
     return {
+      //@ts-ignore
       user: userToDelete,
       success: true,
       message: "User deleted successfully",

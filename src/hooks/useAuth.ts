@@ -1,10 +1,10 @@
-import { signIn, signOut } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
-import { auth } from "@/services/auth";
 import { useNavigation } from "./useNavigation";
 
 export const useAuth = () => {
   const { navigateToLogin } = useNavigation();
+  const { data, status } = useSession();
 
   const login = async (username: string, password: string) =>
     signIn("credentials", {
@@ -18,5 +18,5 @@ export const useAuth = () => {
     navigateToLogin();
   };
 
-  return { login, logout, getSession: auth };
+  return { login, logout, user: data?.user, status };
 };

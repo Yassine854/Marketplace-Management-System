@@ -19,16 +19,13 @@ const intlMiddleware = createIntlMiddleware({
 
 const middleware = auth((req: any) => {
   const isAuthPage = req.nextUrl.pathname !== "/login";
-  //testPathnameRegex(authPages, req.nextUrl.pathname);
   const session = req?.auth;
-  const isAdmin = session?.user?.role === "ADMIN";
+  const isAdmin = session?.user?.roleCode === "ADMIN";
 
-  // Redirect to sign-in page if not authenticated
   if (!session && isAuthPage) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
   }
 
-  // Redirect to home page if authenticated and trying to access auth pages
   if (session && !isAuthPage) {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
