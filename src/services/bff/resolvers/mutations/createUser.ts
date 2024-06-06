@@ -28,6 +28,7 @@ export const createUser = async (
       throw new Error("Unable To Create User");
     }
     return {
+      //@ts-ignore
       data: user,
       success: true,
       message: "User Created Successfully !",

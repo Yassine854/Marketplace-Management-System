@@ -7,6 +7,7 @@ export const getUsers = async (): Promise<UsersPayload> => {
 
     if (users.length > 0) {
       return {
+        //@ts-ignore
         users,
         success: true,
         message: "Users fetched successfully",

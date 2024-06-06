@@ -26,6 +26,7 @@ export const changeUserPassword = async (
     });
 
     return {
+      //@ts-ignore
       user: updatedUser,
       success: true,
       message: "Password updated successfully",

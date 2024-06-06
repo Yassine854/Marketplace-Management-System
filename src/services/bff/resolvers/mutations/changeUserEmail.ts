@@ -23,6 +23,7 @@ export const changeUserEmail = async (
     });
 
     return {
+      //@ts-ignore
       user: updatedUser,
       success: true,
       message: "Email updated successfully",
