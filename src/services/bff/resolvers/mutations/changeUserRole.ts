@@ -19,10 +19,12 @@ export const changeUserRole = async (
 
     const updatedUser = await prismaClient.user.update({
       where: { id: userId },
-      data: { role: newRole },
+      //@ts-ignore
+      data: { roleCode: newRole },
     });
 
     return {
+      //@ts-ignore
       user: updatedUser,
       success: true,
       message: "User role updated successfully",
