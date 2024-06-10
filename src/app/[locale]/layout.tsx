@@ -3,13 +3,16 @@
 import { ApolloProviderWrapper } from "@/libs/apollo/apollo-provider-wrapper";
 import AuthWrapper from "@/libs/next-auth/authWrapper";
 import { Toaster } from "react-hot-toast";
+import TanstackQueryProvider from "@/libs/tanstackQuery/TanstackQueryProvider";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <AuthWrapper>
       <ApolloProviderWrapper>
-        <Toaster />
-        {children}
+        <TanstackQueryProvider>
+          <Toaster />
+          {children}
+        </TanstackQueryProvider>
       </ApolloProviderWrapper>
     </AuthWrapper>
   );
