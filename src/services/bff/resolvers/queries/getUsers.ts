@@ -1,11 +1,11 @@
 import { UsersPayload } from "../resolvers.types";
-import { getPrismaUsers } from "@/libs/prisma/getPrismaUsers";
+import { getPrismaAllUsers } from "@/libs/prisma/getPrismaAllUsers";
 
 export const getUsers = async (): Promise<UsersPayload> => {
   try {
-    const users = await getPrismaUsers();
+    const users = await getPrismaAllUsers();
 
-    if (users.length > 0) {
+    if (users && users?.length > 0) {
       return {
         //@ts-ignore
         users,
