@@ -10,6 +10,6 @@ export const getPrismaUser = async (username: string) => {
 
     return user;
   } catch (err) {
-    console.error("Get Primsa User Error ", err);
+    console.error("Get Prisma User Error ", err);
   }
 };
