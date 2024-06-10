@@ -1,17 +1,4 @@
-import { NextResponse } from "next/server";
-import { deleteOrdersCollection } from "@/services/orders/typesense/delete-orders-collection";
+import { addOrder } from "@/services/orders/typesense/addOrder";
+import { NextRequest } from "next/server";
 
-export async function POST(Request: any) {
-  try {
-    await deleteOrdersCollection();
-    return NextResponse.json("Orders Collection Deleted Successfully ...", {
-      status: 200,
-    });
-    throw new Error();
-  } catch (err) {
-    process.env.NODE_ENV === "development" && console.error(err);
-    return NextResponse.json("Error", {
-      status: 500,
-    });
-  }
-}
+export const POST = async (request: NextRequest) => addOrder(request);
