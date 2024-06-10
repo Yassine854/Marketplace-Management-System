@@ -3,13 +3,29 @@ import { NextResponse } from "next/server";
 export const successResponse = (orderId: string) =>
   NextResponse.json(
     {
-      message: "Order successfully added.",
+      message: "Order successfully updated.",
       orderId,
     },
     {
-      status: 201,
+      status: 200,
     },
   );
+
+export const notFoundResponse = (message: string) => {
+  const parts = message.split("with id:");
+
+  const id = parts[1].trim();
+
+  return NextResponse.json(
+    {
+      error: "Order not found.",
+      orderId: id,
+    },
+    {
+      status: 404,
+    },
+  );
+};
 
 export const invalidRequestResponse = (message: string) => {
   const parts = message.split("Server said:");
@@ -35,16 +51,6 @@ export const unauthorizedErrorResponse = () =>
     },
     {
       status: 401,
-    },
-  );
-
-export const conflictResponse = () =>
-  NextResponse.json(
-    {
-      error: "Order already exists.",
-    },
-    {
-      status: 409,
     },
   );
 
