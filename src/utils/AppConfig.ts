@@ -1,6 +1,6 @@
-import type { LocalePrefix } from "node_modules/next-intl/dist/types/src/shared/types";
+//import type { LocalePrefix } from "node_modules/next-intl/dist/types/src/shared/types";
 
-const localePrefix: LocalePrefix = "as-needed";
+//const localePrefix: LocalePrefix = "as-needed";
 
 export const AppConfig = {
   name: "Kamioun OMS",
@@ -12,7 +12,7 @@ export const AppConfig = {
     { id: "fr", name: "Français" },
   ],
   defaultLocale: "en",
-  localePrefix,
+  // localePrefix,
 };
 
 export const AllLocales = AppConfig.locales.map((locale) => locale.id);
