@@ -3,7 +3,7 @@ import RevenueOverview from "./RevenueOverview";
 import SalesStatistics from "./SalesStatistics";
 import ShowcaseInfo from "./ShowcaseInfo";
 import States from "./States";
-import Banner from "./Banner";
+import Banner from "../../elements/Banner";
 import Link from "next/link";
 
 const SalesPage = () => {

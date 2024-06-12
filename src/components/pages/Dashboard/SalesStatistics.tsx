@@ -5,7 +5,7 @@ import { ApexOptions } from "apexcharts";
 import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import Dropdown from "./Dropdown";
+import Dropdown from "../../elements/Dropdown";
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });

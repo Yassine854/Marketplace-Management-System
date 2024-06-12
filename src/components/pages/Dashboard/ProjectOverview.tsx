@@ -5,7 +5,7 @@ import { faker } from "@faker-js/faker";
 import { IconSelector } from "@tabler/icons-react";
 import Image from "next/image";
 import { useState } from "react";
-import Dropdown from "./Dropdown";
+import Dropdown from "../../elements/Dropdown";
 
 type ProjectType = {
   title: string;
