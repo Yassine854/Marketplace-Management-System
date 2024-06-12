@@ -2,7 +2,8 @@
 
 import { IconBuildingWarehouse, IconChevronDown } from "@tabler/icons-react";
 
-import useDropdown from "@/hooks/useDropdown";
+import { useDropdown } from "@/hooks/useDropdown";
+
 import { useState } from "react";
 
 export const warehouses = [

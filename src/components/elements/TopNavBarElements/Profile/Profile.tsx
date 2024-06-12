@@ -1,10 +1,8 @@
-"use client";
-
 import { IconLogout, IconSettings } from "@tabler/icons-react";
 
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
-import useDropdown from "@/hooks/useDropdown";
+import { useDropdown } from "@/hooks/useDropdown";
 
 const useList = () => {
   const { logout } = useAuth();
