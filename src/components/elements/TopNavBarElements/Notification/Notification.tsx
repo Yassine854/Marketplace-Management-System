@@ -1,9 +1,7 @@
-"use client";
-
 import { IconBell } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
-import useDropdown from "@/hooks/useDropdown";
+import { useDropdown } from "@/hooks/useDropdown";
 const notifications = [
   {
     id: 1,
