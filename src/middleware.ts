@@ -13,7 +13,7 @@ const adminRoutes = [
 
 const intlMiddleware = createIntlMiddleware({
   locales: AllLocales,
-  localePrefix: AppConfig.localePrefix,
+  // localePrefix: AppConfig.localePrefix,
   defaultLocale: AppConfig.defaultLocale,
 });
 
