@@ -1,0 +1,29 @@
+meta {
+  name: Add Order to Typesense
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/orders/typesense/add-order
+  body: json
+  auth: none
+}
+
+headers {
+  X-API-Key: 
+}
+
+body:json {
+  {
+    
+  "order":{
+    
+    "id":"assadfsdf"
+  }
+  }
+}
+
+assert {
+  res.status: eq 200
+}
