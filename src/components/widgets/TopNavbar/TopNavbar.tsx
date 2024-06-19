@@ -1,4 +1,8 @@
-import { IconMenu2, IconSearch } from "@tabler/icons-react";
+import {
+  IconMenu2,
+  IconSearch,
+  IconBuildingWarehouse,
+} from "@tabler/icons-react";
 import { Dispatch, SetStateAction } from "react";
 import Notification from "@/components/elements/TopNavBarElements/Notification";
 import Profile from "@/components/elements/TopNavBarElements/Profile";
@@ -9,7 +13,7 @@ import { useLayout } from "@/utils/LayoutContext";
 import { useDropdown } from "@/hooks/useDropdown";
 import { IconChevronDown, IconLayoutSidebar } from "@tabler/icons-react";
 
-export const layoutList = ["Vertical", "Two Column", "Hovered", "Horizontal"];
+export const layoutList = ["All", "El Mghira", "chargeia", "Sousse"];
 
 const SelectLayout = ({ isWhite }: { isWhite?: boolean }) => {
   const { open, ref, toggleOpen } = useDropdown();
@@ -30,7 +34,8 @@ const SelectLayout = ({ isWhite }: { isWhite?: boolean }) => {
         } flex w-full cursor-pointer items-center justify-between gap-2 rounded-[30px] px-4 py-3 xxl:px-6`}
       >
         <span className="flex select-none items-center gap-2">
-          <IconLayoutSidebar className="text-primary" />
+          {/* <IconLayoutSidebar className="text-primary" /> */}
+          <IconBuildingWarehouse className="text-primary" />
           {layout}
         </span>
         <IconChevronDown
