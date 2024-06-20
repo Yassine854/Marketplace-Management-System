@@ -4,13 +4,15 @@ import { useGetOrders } from "@/hooks/queries/useGetOrders";
 import { useNavigation } from "../useNavigation";
 import { useOrderStore } from "@/stores/orderStore";
 import { useOrdersCount } from "../useOrdersCount";
-
+import { onPDFIconClick } from "./onPDFIconClick";
+import { useStatusStore } from "@/stores/statusStore";
 type Ref = {
   reset: () => void;
   changeSelected?: (selected: any) => void;
 };
 
-export const useOrders = (status: string) => {
+export const useOrders = () => {
+  const { status, setStatus } = useStatusStore();
   const { navigateToOrderDetails } = useNavigation();
   const { openOrdersCount, validOrdersCount, readyOrdersCount } =
     useOrdersCount();
@@ -141,5 +143,6 @@ export const useOrders = (status: string) => {
     isAllOrdersSelected,
     isSomeOrdersSelected,
     refs: { paginationRef, searchRef, sortRef },
+    onPDFIconClick,
   };
 };

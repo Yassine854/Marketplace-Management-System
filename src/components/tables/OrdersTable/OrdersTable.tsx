@@ -2,17 +2,22 @@ import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
 import OrdersTableRow from "./elements/OrdersTableRow";
 import TableRowSkeleton from "./elements/RowSkeleton";
 import { defaultProps } from "./OrdersTable.defaultProps";
+
+import { useOrders } from "@/hooks/useOrders";
 const { orders: defaultOrders } = defaultProps;
 
-const OrdersTable = ({
-  orders = defaultOrders,
-  isLoading,
-  changeSelectedSort,
-  onOrderClick,
-  onSelectAllClick,
-  onSelectOrderClick,
-  isAllOrdersSelected,
-}: any) => {
+const OrdersTable = () => {
+  const {
+    orders = defaultOrders,
+    isLoading,
+    changeSelectedSort,
+    onOrderClick,
+    onSelectAllClick,
+    onSelectOrderClick,
+    isAllOrdersSelected,
+    onPDFIconClick,
+  } = useOrders();
+
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>
       <OrdersTableHead
@@ -37,6 +42,7 @@ const OrdersTable = ({
                   order={order}
                   onClick={onOrderClick}
                   onSelectOrderClick={onSelectOrderClick}
+                  onPDFIconClick={onPDFIconClick}
                 />
               ))}
             </>

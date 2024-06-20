@@ -1,0 +1,18 @@
+import { axiosClient } from "@/libs/axios/axiosClient";
+
+export const generateOrderSummary = async (
+  orderId: string,
+): Promise<string> => {
+  try {
+    const data = JSON.stringify({
+      orderId: orderId,
+    });
+
+    const res = await axiosClient.post("order_summary/generate", data);
+    return res?.data;
+  } catch (error) {
+    process.env.NODE_ENV === "development" &&
+      console.error("Error generating Order Summary :", error);
+    throw error;
+  }
+};

@@ -27,6 +27,7 @@ const OrdersTableRow = ({
   onClick = () => console.log("Row clicked"),
   order,
   onSelectOrderClick,
+  onPDFIconClick,
 }: any) => {
   return (
     <tr
@@ -41,7 +42,11 @@ const OrdersTableRow = ({
           }}
         />
       </OrdersTableCell>
-      <OrdersTableCell>{order?.kamiounId}</OrdersTableCell>
+      <OrdersTableCell>
+        <div className="flex flex-grow items-start justify-start">
+          <IconTruck color="red" />-{order?.kamiounId}
+        </div>
+      </OrdersTableCell>
       <OrdersTableCell>
         <p className=" truncate text-ellipsis">
           {order?.customerFirstname + " " + order?.customerLastname}
@@ -64,6 +69,7 @@ const OrdersTableRow = ({
           className="rounded-full p-2 hover:bg-n10"
           onClick={(event: any) => {
             event.stopPropagation();
+            onPDFIconClick(order.id);
           }}
         >
           <IconPdf />

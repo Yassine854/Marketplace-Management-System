@@ -1,8 +1,10 @@
 import axios from "axios";
-const TOKEN = process.env.MAGENTO_TOKEN;
+
+const TOKEN = process.env.NEXT_PUBLIC_MAGENTO_TOKEN;
+const baseURL = process.env.NEXT_PUBLIC_MAGENTO_BASE_URL;
 
 export const axiosClient = axios.create({
-  baseURL: "https://accept.kamioun.com/rest/default/V1",
+  baseURL,
   headers: {
     "Content-Type": "application/json",
     Authorization: `Bearer ${TOKEN}`,
