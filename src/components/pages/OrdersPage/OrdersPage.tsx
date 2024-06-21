@@ -24,7 +24,7 @@ const OrdersPage = () => {
     onSelectOrderClick,
     isAllOrdersSelected,
     isSomeOrdersSelected,
-  } = useOrders(status);
+  } = useOrders();
 
   return (
     <Box>
@@ -38,16 +38,7 @@ const OrdersPage = () => {
         isSomeOrdersSelected={isSomeOrdersSelected}
       />
       <div className=" flex  w-full flex-grow flex-col overflow-y-scroll bg-n10 pb-24">
-        <OrdersTable
-          isLoading={isLoading}
-          orders={orders}
-          onSort={onSort}
-          changeSelectedSort={changeSelectedSort}
-          onOrderClick={onOrderClick}
-          onSelectAllClick={onSelectAllClick}
-          onSelectOrderClick={onSelectOrderClick}
-          isAllOrdersSelected={isAllOrdersSelected}
-        />
+        <OrdersTable />
         {orders?.length == 0 && <AnyMatchingResults />}
       </div>
 
