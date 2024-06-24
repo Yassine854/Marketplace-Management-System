@@ -38,7 +38,7 @@ const Dropdown = forwardRef<DropRef, Props>(
     }));
 
     return (
-      <div className="col-span-2 md:col-span-1">
+      <div className="col-span-2 flex items-center justify-center md:col-span-1">
         <label
           htmlFor="role"
           className="mb-2 ml-2 block font-medium md:text-lg"
@@ -46,7 +46,7 @@ const Dropdown = forwardRef<DropRef, Props>(
           {label}
         </label>
 
-        <div className="relative  rounded-3xl bg-n0" ref={dropRef}>
+        <div className="relative  rounded-3xl bg-n20" ref={dropRef}>
           <div onClick={toggleOpen} className={tailwind.container("", "")}>
             {selected?.name}
             <IconChevronDown

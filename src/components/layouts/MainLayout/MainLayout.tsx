@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import Sidebar from "@/components/widgets/SidebarVertical";
 import TopNav from "@/components/widgets/TopNavbar";
-
+import { useStatusStore } from "@/stores/statusStore";
 import { useEffect, useState } from "react";
 
 export default function MainLayout({
@@ -10,6 +10,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
+  const { setStatus } = useStatusStore();
 
   const { user } = useAuth();
 
@@ -45,16 +46,19 @@ export default function MainLayout({
         sidebarIsOpen={sidebarIsOpen}
         setSidebar={setSidebarIsOpen}
         isAdmin={isAdmin}
+        onOrderStatusClick={(status: any) => {
+          setStatus(status);
+        }}
       />
       <div className="flex h-full flex-grow ">
         <div
           className={`transition-all duration-300 ease-in-out ${
             sidebarIsOpen
-              ? "h-full bg-orange-400 ltr:xxl:w-[280px] ltr:xxxl:w-[336px] rtl:xxl:w-[280px] rtl:xxxl:w-[336px]"
+              ? "h-full  ltr:xxl:w-[280px] ltr:xxxl:w-[336px] rtl:xxl:w-[280px] rtl:xxxl:w-[336px]"
               : "h-full w-0"
           }`}
         />
-        <div className="flex h-full flex-grow bg-red-400">{children}</div>
+        <div className="b flex h-full flex-grow">{children}</div>
       </div>
     </div>
   );

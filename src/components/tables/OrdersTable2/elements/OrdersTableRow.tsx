@@ -30,10 +30,7 @@ const OrdersTableRow = ({
   onSelectOrderClick,
 }: any) => {
   return (
-    <tr
-      className="cursor-pointer even:bg-primary/5 hover:bg-n30 dark:even:bg-bg3"
-      onClick={onClick}
-    >
+    <tr className="cursor-pointer even:bg-primary/5 hover:bg-n60 dark:even:bg-bg3">
       <OrdersTableCell>
         <Checkbox
           isChecked={order.isSelected}
@@ -42,24 +39,20 @@ const OrdersTableRow = ({
           }}
         />
       </OrdersTableCell>
-      <OrdersTableCell>{order?.kamiounId}</OrdersTableCell>
       <OrdersTableCell>
-        <p className=" truncate text-ellipsis">
-          {order?.customerFirstname + " " + order?.customerLastname}
-        </p>
+        <div className="flex h-full w-full pl-6">
+          <IconTruck color="green" />-{order?.kamiounId}
+        </div>
       </OrdersTableCell>
       <OrdersTableCell>
-        <p className="truncate ">{order?.total}</p>
+        {order?.customerFirstname + " " + order?.customerLastname}
       </OrdersTableCell>
+      <OrdersTableCell>{order?.total}</OrdersTableCell>
       <OrdersTableCell>
         {unixTimestampToDate(order?.deliveryDate)}
       </OrdersTableCell>
-      <OrdersTableCell>
-        <p className="truncate ">{order?.deliveryAgent || "***"}</p>
-      </OrdersTableCell>
-      <OrdersTableCell>
-        <p className="truncate ">{order?.deliveryStatus || "***"}</p>
-      </OrdersTableCell>
+      <OrdersTableCell>{order?.deliveryAgent || "***"}</OrdersTableCell>
+      <OrdersTableCell>{order?.deliveryStatus || "***"}</OrdersTableCell>
       <OrdersTableCell>
         <div
           className="rounded-full p-2 hover:bg-n10"
