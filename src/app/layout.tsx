@@ -17,6 +17,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Kamioun - Order Management System",
 };
+
 const RootLayout = ({
   children,
   params: { locale },

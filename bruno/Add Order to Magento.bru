@@ -1,0 +1,32 @@
+meta {
+  name: Add Order to Magento
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{magentoUrl}}/rest/default/V1/orders/create
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: pd2as4cqycmj671bga4egknw2csoa9b6
+}
+
+body:json {
+  {
+      "entity": {
+          "entity_id": 59883,
+          "state": "new",
+          "status": "open",
+          "items": [
+              {
+                  "item_id": 736776,
+                  "weight": 8
+              }
+          ]
+      }
+  }
+  
+}

@@ -15,19 +15,22 @@ import Link from "next/link";
 import SidebarButton from "@/components/elements/SidebarElements/SidebarButton";
 import SidebarOrdersSubMenu from "@/components/elements/SidebarElements/SidebarOrdersSubMenu";
 import SidebarSubMenu from "@/components/elements/SidebarElements/SidebarSubMenu";
-
+import { useOrders } from "@/hooks/useOrders";
 import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
 
 const SidebarVertical = ({
   setSidebar,
   sidebarIsOpen,
   isAdmin,
-  readyOrdersCount,
-  openOrdersCount,
-  validOrdersCount,
-  selectedStatus,
   onOrderStatusClick,
 }: any) => {
+  const {
+    readyOrdersCount,
+    openOrdersCount,
+    validOrdersCount,
+    selectedStatus,
+  } = useOrders();
+
   const sidebarRef = useRef<HTMLDivElement | null>(null);
 
   const { push } = useRouter();
@@ -65,11 +68,11 @@ const SidebarVertical = ({
       } sidebar fixed top-0 h-full bg-n0 duration-300 dark:bg-bg4 ltr:left-0 rtl:right-0`}
       ref={sidebarRef}
     >
-      <div className={`p-4 xxl:p-6 xxxl:p-[30px]`}>
+      <div className={`p-5`}>
         <div className="flex items-center justify-center ">
           <Link href="/">
             <Image
-              width={260}
+              width={180}
               height={38}
               src="/images/Kamioun-logo-text.png"
               alt="logo"
@@ -80,7 +83,7 @@ const SidebarVertical = ({
           </button>
         </div>
       </div>
-      <div className="fixed left-0 right-0 h-full overflow-y-auto pb-12">
+      <div className="fixed left-0 right-0 h-full overflow-y-auto pb-12 ">
         <div className="min-h-[70%] px-4 pb-24 xxl:px-6 xxxl:px-8">
           <Divider />
           <SidebarButton

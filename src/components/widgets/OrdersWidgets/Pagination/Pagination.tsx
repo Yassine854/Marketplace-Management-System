@@ -51,7 +51,7 @@ const Pagination = forwardRef<PaginationRef, Props>(
     }));
 
     return (
-      <div className=" col-span-12 flex h-14  flex-wrap items-center justify-center gap-4 bg-n10  px-2 sm:justify-between">
+      <div className=" col-span-12 flex h-14  w-full flex-wrap items-center justify-center gap-4  rounded-xl bg-n10 px-2 sm:justify-between">
         <ItemsPerPageSelector
           onChange={onItemsPerPageChange}
           selectedStatus={selectedStatus}

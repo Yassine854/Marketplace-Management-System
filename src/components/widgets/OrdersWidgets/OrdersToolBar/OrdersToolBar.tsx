@@ -30,8 +30,8 @@ const OrdersToolBar = ({
   const [selectedAction, setSelectedAction] = useState("");
 
   return (
-    <div className=" flex  w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">
-      <div className="flex items-center justify-center">
+    <div className=" flex  h-14 flex-grow flex-wrap items-center justify-between gap-3 rounded-xl border-2 bg-blue-500 bg-n0 p-2">
+      {/* <div className="flex items-center justify-center">
         <p className="m-4 text-xl font-bold capitalize ">{`${selectedStatus} Orders Table`}</p>
         {isSomeOrdersSelected && (
           <>
@@ -46,9 +46,9 @@ const OrdersToolBar = ({
             )}
           </>
         )}
-      </div>
+      </div> */}
 
-      <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
+      {/* <div className="flex items-center gap-4 lg:gap-8 xl:gap-10 justify-center">
         <SearchBar ref={searchRef} onSearch={onSearch} isWithInstantSearch />
         <div className="flex items-center gap-2">
           <p className="whitespace-nowrap font-bold">Sort By : </p>
@@ -58,7 +58,7 @@ const OrdersToolBar = ({
             ref={sortRef}
           />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
