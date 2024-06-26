@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import Sidebar from "@/components/widgets/SidebarVertical";
 import TopNav from "@/components/widgets/TopNavbar";
-import { useStatusStore } from "@/stores/statusStore";
+import { useOrdersStore } from "@/stores/ordersStore";
 import { useEffect, useState } from "react";
 
 export default function MainLayout({
@@ -10,7 +10,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
-  const { setStatus } = useStatusStore();
+  const { setStatus } = useOrdersStore();
 
   const { user } = useAuth();
 

@@ -16,17 +16,19 @@ auth:bearer {
 
 body:json {
   {
-      "entity": {
-          "entity_id": 59883,
-          "state": "new",
-          "status": "open",
-          "items": [
-              {
-                  "item_id": 736776,
-                  "weight": 8
-              }
-          ]
+    "entity": {
+      "entity_id": 1001,
+      "customer_id": 5001,
+      "customer_email": "john.doe@example.com",
+      "customer_firstname": "John",
+      "customer_lastname": "Doe",
+      "extension_attributes": {
+        "delivery_date": "2024-06-30",
+        "creator": "John Doe",
+        "creator_id": 5001,
+        "agent_comment": "Please deliver between 9 AM and 5 PM."
       }
+    }
   }
   
 }

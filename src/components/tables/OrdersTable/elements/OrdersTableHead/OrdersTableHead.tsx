@@ -2,7 +2,7 @@ import Checkbox from "@/components/inputs/Checkbox";
 import { IconSelector } from "@tabler/icons-react";
 import OrdersTableHeadCell from "../OrdersTableHeadCell";
 import OrdersTableHeadSmallCell from "../OrdersTableHeadSmallCell";
-import { useOrdersTableHead } from "./useOrdersTableHead";
+import { useOrdersTableHead } from "@/hooks/ordersHooks";
 
 const OrdersTableHead = ({
   changeSelectedSort,
@@ -13,8 +13,8 @@ const OrdersTableHead = ({
     useOrdersTableHead(changeSelectedSort);
 
   return (
-    <thead className="sticky top-0 z-10">
-      <tr className="  h-12  w-full bg-n40 font-semibold">
+    <thead className="sticky left-0 right-0 top-0 z-10 bg-n40 ">
+      <tr>
         <OrdersTableHeadSmallCell>
           <Checkbox
             onClick={onSelectAllClick}
@@ -36,7 +36,6 @@ const OrdersTableHead = ({
         <OrdersTableHeadCell>Delivery Status</OrdersTableHeadCell>
         <OrdersTableHeadSmallCell>Summary</OrdersTableHeadSmallCell>
         <OrdersTableHeadSmallCell>Actions</OrdersTableHeadSmallCell>
-        <OrdersTableHeadSmallCell>Label</OrdersTableHeadSmallCell>
       </tr>
     </thead>
   );

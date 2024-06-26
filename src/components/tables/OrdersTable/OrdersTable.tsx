@@ -1,22 +1,20 @@
 import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
 import OrdersTableRow from "./elements/OrdersTableRow";
 import TableRowSkeleton from "./elements/RowSkeleton";
-import { defaultProps } from "./OrdersTable.defaultProps";
 
-import { useOrders } from "@/hooks/useOrders";
-const { orders: defaultOrders } = defaultProps;
+import {
+  useOrdersData,
+  useOrdersSelection,
+  useOrdersSorting,
+  useOrdersActions,
+} from "@/hooks/ordersHooks";
 
-const OrdersTable = () => {
-  const {
-    orders = defaultOrders,
-    isLoading,
-    changeSelectedSort,
-    onOrderClick,
-    onSelectAllClick,
-    onSelectOrderClick,
-    isAllOrdersSelected,
-    onPDFIconClick,
-  } = useOrders();
+const OrdersTable = ({}) => {
+  const { isAllOrdersSelected, onSelectAllClick, onSelectOrderClick } =
+    useOrdersSelection();
+  const { changeSelectedSort } = useOrdersSorting();
+  const { orders, isLoading } = useOrdersData();
+  const { onPDFIconClick, onOrderClick } = useOrdersActions();
 
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>
@@ -31,20 +29,21 @@ const OrdersTable = () => {
           {isLoading ? (
             <>
               {[...Array(25)].map((_, i) => (
-                <TableRowSkeleton key={i} number={10} />
+                <TableRowSkeleton key={i} number={9} />
               ))}
             </>
           ) : (
             <>
-              {orders?.map((order: any) => (
-                <OrdersTableRow
-                  key={order?.id}
-                  order={order}
-                  onClick={onOrderClick}
-                  onSelectOrderClick={onSelectOrderClick}
-                  onPDFIconClick={onPDFIconClick}
-                />
-              ))}
+              {orders?.length > 0 &&
+                orders?.map((order: any) => (
+                  <OrdersTableRow
+                    key={order?.id}
+                    order={order}
+                    onClick={onOrderClick(order.id)}
+                    onSelectOrderClick={onSelectOrderClick}
+                    onPDFIconClick={onPDFIconClick}
+                  />
+                ))}
             </>
           )}
         </>

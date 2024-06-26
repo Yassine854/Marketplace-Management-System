@@ -15,7 +15,7 @@ import Link from "next/link";
 import SidebarButton from "@/components/elements/SidebarElements/SidebarButton";
 import SidebarOrdersSubMenu from "@/components/elements/SidebarElements/SidebarOrdersSubMenu";
 import SidebarSubMenu from "@/components/elements/SidebarElements/SidebarSubMenu";
-import { useOrders } from "@/hooks/useOrders";
+import { useOrdersData, useOrdersCount } from "@/hooks/ordersHooks";
 import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
 
 const SidebarVertical = ({
@@ -24,12 +24,9 @@ const SidebarVertical = ({
   isAdmin,
   onOrderStatusClick,
 }: any) => {
-  const {
-    readyOrdersCount,
-    openOrdersCount,
-    validOrdersCount,
-    selectedStatus,
-  } = useOrders();
+  const { selectedStatus } = useOrdersData();
+  const { openOrdersCount, validOrdersCount, readyOrdersCount } =
+    useOrdersCount();
 
   const sidebarRef = useRef<HTMLDivElement | null>(null);
 
