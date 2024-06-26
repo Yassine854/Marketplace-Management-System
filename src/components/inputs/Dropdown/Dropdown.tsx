@@ -14,7 +14,6 @@ export type DropRef = {
 // eslint-disable-next-line react/display-name
 const Dropdown = forwardRef<DropRef, Props>(
   ({ items = defaultProps.items, onSelectedChange, label }, ref) => {
-    // ({ items = defaultProps.items, onSelectedChange }: Props) => {
     const { open, ref: dropRef, toggleOpen } = useDropdown();
     const [selected, setSelected] = useState(items[0]);
 

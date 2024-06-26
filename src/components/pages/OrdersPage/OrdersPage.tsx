@@ -3,14 +3,15 @@ import AnyMatchingResults from "@/components/elements/TablesElements/AnyMatching
 import OrdersTable from "@/components/tables/OrdersTable";
 import OrdersToolBar from "@/components/widgets/OrdersWidgets/OrdersToolBar";
 import Pagination from "@/components/widgets/OrdersWidgets/Pagination";
+import { useOrdersStore } from "@/stores/ordersStore";
 import {
+  useOrdersActions,
   useOrdersData,
   useOrdersSearch,
   useOrdersSelection,
   useOrdersSorting,
   useOrdersTablePagination,
 } from "@/hooks/ordersHooks";
-import { useOrdersStore } from "@/stores/ordersStore";
 
 const OrdersPage = () => {
   const { setSort, sortRef } = useOrdersSorting();
@@ -18,6 +19,7 @@ const OrdersPage = () => {
   const { isSomeOrdersSelected } = useOrdersSelection();
   const { orders, totalOrders } = useOrdersData();
   const { status } = useOrdersStore();
+  const { toolbarActions, isLoading } = useOrdersActions();
   const { paginationRef, setCurrentPage, setItemsPerPage } =
     useOrdersTablePagination();
 
@@ -32,6 +34,8 @@ const OrdersPage = () => {
           sortRef={sortRef}
           selectedOrders
           isSomeOrdersSelected={isSomeOrdersSelected}
+          actions={toolbarActions}
+          isLoading={isLoading}
         />
       </div>
       <Divider />

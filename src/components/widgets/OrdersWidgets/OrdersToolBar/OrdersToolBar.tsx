@@ -1,12 +1,13 @@
+import Loading from "@/components/elements/Loading";
 import Dropdown from "@/components/inputs/Dropdown";
 import SearchBar from "@/components/inputs/SearchBar";
 import { useState } from "react";
 
-const actions = [
-  { name: "Generate Pick List", key: "picklist" },
-  { name: "Generate Delivery Note", key: "delivery-note" },
-  { name: "Manage Milk-Runs", key: "milk-run" },
-];
+// const actions = [
+//   { name: "Generate Pick List", key: "picklist" },
+//   { name: "Generate Delivery Note", key: "delivery-note" },
+//   { name: "Manage Milk-Runs", key: "milk-run" },
+// ];
 
 const sortOptions = [
   { name: "Newest", key: "createdAt:asc" },
@@ -26,6 +27,8 @@ const OrdersToolBar = ({
   searchRef,
   sortRef,
   isSomeOrdersSelected,
+  actions,
+  isLoading,
 }: any) => {
   const [selectedAction, setSelectedAction] = useState("");
 
@@ -37,13 +40,28 @@ const OrdersToolBar = ({
           <>
             <Dropdown items={actions} onSelectedChange={setSelectedAction} />
             {selectedAction && (
-              <button
-                className="btn m-2 flex h-2 items-center  justify-center p-4"
-                onClick={() => {}}
-              >
-                Confirm
-              </button>
+              <>
+                {!isLoading && (
+                  <button
+                    className="btn m-2 flex h-2 items-center  justify-center p-4"
+                    onClick={() => {
+                      const selected = actions.find(
+                        (action: any) => action.key === selectedAction,
+                      );
+                      selected.action();
+                    }}
+                  >
+                    Confirm
+                  </button>
+                )}
+                {isLoading && (
+                  <div className="ml-4 h-8 w-8 ">
+                    <Loading />
+                  </div>
+                )}
+              </>
             )}
+            {}
           </>
         )}
       </div>
