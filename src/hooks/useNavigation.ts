@@ -2,7 +2,7 @@ import { useParams, useRouter } from "next/navigation";
 
 export const useNavigation = () => {
   const { back, push } = useRouter();
-  const { status, locale } = useParams();
+  const { locale } = useParams();
 
   const navigateBack = () => {
     back();
@@ -26,6 +26,11 @@ export const useNavigation = () => {
   const navigateToCreateUserForm = () => {
     push("/access/create-user");
   };
+
+  const navigateToManageMilkRun = () => {
+    push("/milk-run");
+  };
+
   return {
     navigateBack,
     navigateToOrderDetails,
@@ -33,7 +38,7 @@ export const useNavigation = () => {
     navigateToUsersTable,
     navigateToLogin,
     navigateToCreateUserForm,
-    status: String(status),
+    navigateToManageMilkRun,
     locale: String(locale),
   };
 };

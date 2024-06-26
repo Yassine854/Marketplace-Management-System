@@ -3,8 +3,10 @@ import { onOrderClick } from "./onOrderClick";
 import { onGeneratePickListClick } from "./onGeneratePickListClick";
 import { useOrdersStore } from "@/stores/ordersStore";
 import { onGenerateDeliveryNotesClick } from "./onGenerateDeliveryNotesClick";
+import { useNavigation } from "@/hooks/useNavigation";
 
 export const useOrdersActions = () => {
+  const { navigateToOrderDetails, navigateToManageMilkRun } = useNavigation();
   const {} = useOrdersStore();
 
   const tableRowActions = [
@@ -12,7 +14,7 @@ export const useOrdersActions = () => {
       name: "Edit",
       key: "edit",
       action: (orderId: any) => {
-        console.log("Edit");
+        navigateToOrderDetails();
       },
     },
     {
@@ -33,7 +35,7 @@ export const useOrdersActions = () => {
       name: "Manage Milk-Runs",
       key: "mr",
       action: (orderId: string) => {
-        console.log("MILK");
+        navigateToManageMilkRun();
       },
     },
   ];
