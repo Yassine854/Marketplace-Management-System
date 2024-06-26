@@ -9,7 +9,7 @@ import {
   useOrdersActions,
 } from "@/hooks/ordersHooks";
 
-const OrdersTable = ({}) => {
+const OrdersTable = () => {
   const { isAllOrdersSelected, onSelectAllClick, onSelectOrderClick } =
     useOrdersSelection();
   const { changeSelectedSort } = useOrdersSorting();

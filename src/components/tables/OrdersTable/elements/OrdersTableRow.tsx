@@ -22,6 +22,7 @@ const actions = [
     action: () => {},
   },
 ];
+
 const OrdersTableRow = ({
   onClick = () => console.log("Row clicked"),
   order,
@@ -66,10 +67,13 @@ const OrdersTableRow = ({
           <IconPdf />
         </div>
       </OrdersTableCell>
-      <OrdersTableCell>
-        <TableActions actions={actions} orderId={order.id} />
-      </OrdersTableCell>
+      <td className="px-3 py-4">
+        <div className=" flex justify-center">
+          <TableActions orderId={order.id} actions={actions} />
+        </div>
+      </td>
     </tr>
   );
 };
+
 export default OrdersTableRow;
