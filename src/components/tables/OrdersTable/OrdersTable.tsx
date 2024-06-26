@@ -14,7 +14,12 @@ const OrdersTable = () => {
     useOrdersSelection();
   const { changeSelectedSort } = useOrdersSorting();
   const { orders, isLoading } = useOrdersData();
-  const { onPDFIconClick, onOrderClick } = useOrdersActions();
+  const {
+    onPDFIconClick,
+    onOrderClick,
+    onGeneratePickListClick,
+    tableRowActions,
+  } = useOrdersActions();
 
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>
@@ -42,6 +47,7 @@ const OrdersTable = () => {
                     onClick={onOrderClick(order.id)}
                     onSelectOrderClick={onSelectOrderClick}
                     onPDFIconClick={onPDFIconClick}
+                    actionsList={tableRowActions}
                   />
                 ))}
             </>

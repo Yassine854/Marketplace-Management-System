@@ -1,9 +1,8 @@
 import { generateOrderSummary } from "@/libs/magento/generateOrderSummary";
 
-export const onPDFIconClick = async (orderId: string) => {
+export const onPDFIconClick = async (orderId: string): Promise<void> => {
   try {
     const pdfUrl = await generateOrderSummary(orderId);
-
     let properties =
       "height=" +
       window.innerHeight +

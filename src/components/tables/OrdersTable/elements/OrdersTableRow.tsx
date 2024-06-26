@@ -4,30 +4,12 @@ import OrdersTableCell from "./OrdersTableCell";
 import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
 import TableActions from "@/components/elements/TablesElements/TableActions";
 
-const actions = [
-  {
-    name: "Edit",
-    key: "edit",
-    action: (id: any) => {},
-  },
-  {
-    name: "Generate Pick List",
-    key: "picklist",
-    action: () => {},
-  },
-  { name: "Print BL's", key: "bl", action: () => {} },
-  {
-    name: "Manage Milk-Runs",
-    key: "mr",
-    action: () => {},
-  },
-];
-
 const OrdersTableRow = ({
   onClick = () => console.log("Row clicked"),
   order,
   onSelectOrderClick,
   onPDFIconClick,
+  actionsList,
 }: any) => {
   return (
     <tr
@@ -69,7 +51,7 @@ const OrdersTableRow = ({
       </OrdersTableCell>
       <td className="px-3 py-4">
         <div className=" flex justify-center">
-          <TableActions orderId={order.id} actions={actions} />
+          <TableActions orderId={order.id} actionsList={actionsList} />
         </div>
       </td>
     </tr>
