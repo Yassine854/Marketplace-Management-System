@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const actions = [
   { name: "Generate Pick List", key: "picklist" },
-  { name: "Print BL's", key: "bl" },
+  { name: "Generate Delivery Note", key: "delivery-note" },
   { name: "Manage Milk-Runs", key: "milk-run" },
 ];
 
