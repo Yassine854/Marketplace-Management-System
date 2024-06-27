@@ -3,6 +3,7 @@ import Checkbox from "@/components/inputs/Checkbox";
 import OrdersTableCell from "./OrdersTableCell";
 import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
 import TableActions from "@/components/elements/TablesElements/TableActions";
+import Loading from "@/components/elements/Loading";
 
 const OrdersTableRow = ({
   onClick = () => console.log("Row clicked"),
@@ -10,6 +11,7 @@ const OrdersTableRow = ({
   onSelectOrderClick,
   onPDFIconClick,
   actionsList,
+  isLoading,
 }: any) => {
   return (
     <tr
@@ -51,7 +53,14 @@ const OrdersTableRow = ({
       </OrdersTableCell>
       <td className="px-3 py-4">
         <div className=" flex justify-center">
-          <TableActions orderId={order.id} actionsList={actionsList} />
+          {isLoading === order.id && (
+            <div className="h-6 w-6">
+              <Loading />
+            </div>
+          )}
+          {isLoading !== order.id && (
+            <TableActions orderId={order.id} actionsList={actionsList} />
+          )}
         </div>
       </td>
     </tr>

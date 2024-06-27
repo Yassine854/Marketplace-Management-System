@@ -14,7 +14,7 @@ export const useOrdersData = () => {
     setIsOrdersLoading,
   } = useOrdersStore();
 
-  const { data, isLoading } = useGetOrders({
+  const { data, isLoading, refetch } = useGetOrders({
     page: currentPage,
     perPage: itemsPerPage,
     search,
@@ -48,5 +48,6 @@ export const useOrdersData = () => {
     setOrders,
     isLoading,
     selectedStatus: status,
+    refetch,
   };
 };

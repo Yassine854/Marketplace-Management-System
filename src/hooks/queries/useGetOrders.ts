@@ -20,6 +20,7 @@ type Res = {
   data: Orders;
   error: ApolloError | undefined;
   isLoading: boolean;
+  refetch: any;
 };
 
 const QUERY = gql`
@@ -64,7 +65,7 @@ export const useGetOrders = ({
   filterBy,
   search,
 }: Params): Res => {
-  const { data, loading, error } = useQuery(QUERY, {
+  const { data, loading, error, refetch } = useQuery(QUERY, {
     variables: {
       filterBy,
       page,
@@ -78,5 +79,6 @@ export const useGetOrders = ({
     data: data?.getOrders,
     isLoading: loading,
     error,
+    refetch,
   };
 };

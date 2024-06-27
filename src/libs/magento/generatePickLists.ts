@@ -1,10 +1,10 @@
-import { axiosClient } from "@/libs/axios/axiosClient";
+import { axiosMagentoClient } from "@/libs/axios/axiosMagentoClient";
 
-export const generatePickList = async (
+export const generatePickLists = async (
   ordersIdsString: string,
 ): Promise<string> => {
   try {
-    const res = await axiosClient.get(
+    const res = await axiosMagentoClient.get(
       `orders/picklist?ordersIds=${ordersIdsString}`,
     );
     return res?.data;

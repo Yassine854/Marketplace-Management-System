@@ -21,12 +21,13 @@ const TableActions = ({
       }}
     >
       <IconDotsVertical className="cursor-pointer" size={20} />
-
       <ul
         className={`${
           open ? "visible scale-100 opacity-100" : "invisible scale-0 opacity-0"
-        } absolute top-0 z-30 min-w-max rounded-md border bg-n0 p-1.5 dark:border-n500 dark:bg-bg4 ltr:right-5 rtl:left-5`}
+        } absolute top-0 z-30 min-w-max rounded-md border bg-n0 p-2 dark:border-n500 dark:bg-bg4 ltr:right-5 rtl:left-5`}
       >
+        <div className="mb-1 mt-1 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
+
         {actionsList?.map(({ action, name }: any, i: number) => {
           return (
             <li
@@ -34,11 +35,13 @@ const TableActions = ({
               onClick={(event) => {
                 event.stopPropagation();
                 action(orderId);
+                toggleOpen();
               }}
             >
-              <button className="block w-full rounded-md px-3 py-1.5 duration-300 hover:bg-primary hover:text-n30">
-                {name}
+              <button className="block w-full rounded-md px-3 py-1.5 font-bold duration-300 hover:bg-primary hover:text-n30">
+                <p className="font-bold">{name}</p>
               </button>
+              <div className="mb-1 mt-1 border-t-2  border-dashed border-primary/20 text-xs font-semibold " />
             </li>
           );
         })}

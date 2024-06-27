@@ -1,4 +1,4 @@
-import { axiosClient } from "@/libs/axios/axiosClient";
+import { axiosMagentoClient } from "@/libs/axios/axiosMagentoClient";
 
 export const generateDeliveryNotes = async (
   ordersIdsString: string,
@@ -8,7 +8,10 @@ export const generateDeliveryNotes = async (
       ordersIds: ordersIdsString,
     });
 
-    const res = await axiosClient.post("order_summary/bulk_zip_generate", data);
+    const res = await axiosMagentoClient.post(
+      "order_summary/bulk_zip_generate",
+      data,
+    );
     return res?.data;
   } catch (error) {
     process.env.NODE_ENV === "development" &&
