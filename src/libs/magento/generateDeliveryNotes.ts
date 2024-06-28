@@ -1,4 +1,4 @@
-import { axiosMagentoClient } from "@/libs/axios/axiosMagentoClient";
+import { axios } from "@/libs/axios";
 
 export const generateDeliveryNotes = async (
   ordersIdsString: string,
@@ -8,7 +8,7 @@ export const generateDeliveryNotes = async (
       ordersIds: ordersIdsString,
     });
 
-    const res = await axiosMagentoClient.post(
+    const res = await axios.magentoClient.post(
       "order_summary/bulk_zip_generate",
       data,
     );

@@ -1,4 +1,4 @@
-import { axiosMagentoClient } from "@/libs/axios/axiosMagentoClient";
+import { axios } from "@/libs/axios";
 
 export const cancelOrder = async (orderId: string): Promise<string> => {
   try {
@@ -10,7 +10,10 @@ export const cancelOrder = async (orderId: string): Promise<string> => {
       },
     };
 
-    const res = await axiosMagentoClient.post(`orders/${orderId}/cancel`, data);
+    const res = await axios.magentoClient.post(
+      `orders/${orderId}/cancel`,
+      data,
+    );
     return res?.data;
   } catch (error) {
     process.env.NODE_ENV === "development" &&

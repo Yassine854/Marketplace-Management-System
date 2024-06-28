@@ -1,4 +1,4 @@
-import { axiosMagentoClient } from "@/libs/axios/axiosMagentoClient";
+import { axios } from "@/libs/axios";
 
 export const generateOrderSummary = async (
   orderId: string,
@@ -8,7 +8,7 @@ export const generateOrderSummary = async (
       orderId: orderId,
     });
 
-    const res = await axiosMagentoClient.post("order_summary/generate", data);
+    const res = await axios.magentoClient.post("order_summary/generate", data);
     return res?.data;
   } catch (error) {
     process.env.NODE_ENV === "development" &&

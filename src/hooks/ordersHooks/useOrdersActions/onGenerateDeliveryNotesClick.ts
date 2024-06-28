@@ -1,10 +1,10 @@
-import { generateDeliveryNotes } from "@/libs/magento/generateDeliveryNotes";
+import { magento } from "@/libs/magento";
 
 export const onGenerateDeliveryNotesClick = async (
   ordersIdsList: string[],
 ): Promise<any> => {
   try {
-    const deliveryNotesUrl = await generateDeliveryNotes(
+    const deliveryNotesUrl = await magento.generateDeliveryNotes(
       ordersIdsList.toString(),
     );
     window.open(deliveryNotesUrl);

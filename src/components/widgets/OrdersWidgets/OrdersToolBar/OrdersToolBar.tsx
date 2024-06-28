@@ -10,8 +10,8 @@ import { useState } from "react";
 // ];
 
 const sortOptions = [
-  { name: "Newest", key: "createdAt:asc" },
-  { name: "Oldest", key: "createdAt:desc" },
+  { name: "Newest", key: "createdAt:desc" },
+  { name: "Oldest", key: "createdAt:asc" },
   { name: "Earliest Delivery Date", key: "deliveryDate:asc" },
   { name: "Latest Delivery Date", key: "deliveryDate:desc" },
   { name: "Highest Total", key: "total:desc" },

@@ -1,8 +1,7 @@
 import { Readable } from "stream";
-import { getMagentoOrders } from "../../../../libs/magento/getMagentoOrders";
-import { getPagesCount } from "./getPagesCount";
+import { magento } from "@/libs/magento";
 
-export function readingOrdersStream() {
+export const readingOrdersStream = () => {
   let page = 1;
   let isEnd = false;
 
@@ -14,12 +13,12 @@ export function readingOrdersStream() {
           return;
         }
 
-        const { pagesCount } = await getPagesCount();
+        const { pagesCount } = await magento.getPagesCount();
 
         if (page <= pagesCount) {
           console.log("Fetching orders from page", page, "...");
 
-          const { items } = await getMagentoOrders(page);
+          const { items } = await magento.getOrdersByBatch(page);
 
           this.push(JSON.stringify(items));
           page++;
@@ -33,4 +32,4 @@ export function readingOrdersStream() {
       }
     },
   });
-}
+};

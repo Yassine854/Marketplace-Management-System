@@ -1,5 +1,5 @@
 import { cancelOrder } from "@/libs/magento/cancelOrder";
-import { axiosServicesClient } from "@/libs/axios/axiosServicesClient";
+import { axios } from "@/libs/axios";
 
 export const onCancelMultipleOrdersClick = async (
   orderIdsList: string[],
@@ -9,7 +9,7 @@ export const onCancelMultipleOrdersClick = async (
     await Promise.all(
       orderIdsList.map(async (id) => {
         await cancelOrder(id);
-        await axiosServicesClient.put("/api/orders/typesense/edit-order", {
+        await axios.servicesClient.put("/api/orders/typesense/edit-order", {
           order: {
             id: id,
             status: "failed",
