@@ -25,7 +25,7 @@ export const useDropdown = () => {
       document.removeEventListener("click", handleGlobalClick);
       document.removeEventListener("keydown", handleEscapeKeyPress);
     };
-  }, []); // Empty dependency array to run only once when the component mounts
+  }, []);
 
   const toggleOpen = () => {
     setOpen((prevOpen) => !prevOpen);

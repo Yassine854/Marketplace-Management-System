@@ -1,9 +1,9 @@
 const OrdersTableHeadCell = ({ children, onClick }: any) => (
   <td
-    className="h-16 min-w-40 max-w-16 border-x-4 border-n30  p-2 "
+    className={`h-14 px-8 ${onClick ? "cursor-pointer" : ""}`}
     onClick={onClick}
   >
-    <div className="  flex cursor-pointer  items-center justify-center   truncate text-ellipsis ">
+    <div className="flex h-full w-full items-center justify-center font-bold">
       {children}
     </div>
   </td>

@@ -1,4 +1,8 @@
-import { IconMenu2, IconSearch } from "@tabler/icons-react";
+import {
+  IconMenu2,
+  IconSearch,
+  IconBuildingWarehouse,
+} from "@tabler/icons-react";
 import { Dispatch, SetStateAction } from "react";
 import Notification from "@/components/elements/TopNavBarElements/Notification";
 import Profile from "@/components/elements/TopNavBarElements/Profile";
@@ -9,7 +13,7 @@ import { useLayout } from "@/utils/LayoutContext";
 import { useDropdown } from "@/hooks/useDropdown";
 import { IconChevronDown, IconLayoutSidebar } from "@tabler/icons-react";
 
-export const layoutList = ["Vertical", "Two Column", "Hovered", "Horizontal"];
+export const layoutList = ["All", "El Mghira", "chargeia", "Sousse"];
 
 const SelectLayout = ({ isWhite }: { isWhite?: boolean }) => {
   const { open, ref, toggleOpen } = useDropdown();
@@ -30,7 +34,8 @@ const SelectLayout = ({ isWhite }: { isWhite?: boolean }) => {
         } flex w-full cursor-pointer items-center justify-between gap-2 rounded-[30px] px-4 py-3 xxl:px-6`}
       >
         <span className="flex select-none items-center gap-2">
-          <IconLayoutSidebar className="text-primary" />
+          {/* <IconLayoutSidebar className="text-primary" /> */}
+          <IconBuildingWarehouse className="text-primary" />
           {layout}
         </span>
         <IconChevronDown
@@ -72,19 +77,11 @@ const TopNav = ({
   const { layout } = useLayout();
   return (
     <nav
-      className={`navbar-top z-20 px-4 py-3 shadow-sm duration-300 dark:border-b dark:border-n700 xxl:px-6 ${
-        sidebarIsOpen && layout == "Two Column"
-          ? "w-full xxl:w-[calc(100%-280px)] xxxl:w-[calc(100%-360px)] ltr:xxl:ml-[280px] ltr:xxxl:ml-[360px] rtl:xxl:mr-[280px] rtl:xxxl:mr-[360px]"
-          : "w-full"
-      } ${
-        sidebarIsOpen && layout == "Vertical"
+      className={`navbar-top z-20 px-4  shadow-sm duration-300 dark:border-b dark:border-n700 xxl:px-6 ${
+        sidebarIsOpen
           ? "w-full xxl:w-[calc(100%-280px)] xxxl:w-[calc(100%-336px)] ltr:xxl:ml-[280px] ltr:xxxl:ml-[336px] rtl:xxl:mr-[280px] rtl:xxxl:mr-[336px]"
           : "w-full"
-      }  ${
-        sidebarIsOpen && layout == "Hovered"
-          ? "w-full xxl:w-[calc(100%-80px)] ltr:xxl:ml-[80px] rtl:xxl:mr-[80px] "
-          : "w-full"
-      }  fixed flex items-center justify-between gap-3 bg-n0 dark:bg-bg4 md:py-4 xxl:py-6`}
+      }    fixed flex items-center justify-between gap-3 bg-n0 p-3 dark:bg-bg4`}
     >
       <div className="flex grow items-center md:gap-4 xxl:gap-6">
         <button onClick={() => setSidebar(!sidebarIsOpen)}>

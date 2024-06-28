@@ -3,10 +3,6 @@
 import RolesTable from "@/components/tables/RolesTable";
 
 const Roles = () => {
-  return (
-    <>
-      <RolesTable />
-    </>
-  );
+  return <>{/* <RolesTable /> */}</>;
 };
 export default Roles;
