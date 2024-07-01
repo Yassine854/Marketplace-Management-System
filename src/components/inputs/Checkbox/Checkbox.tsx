@@ -21,7 +21,7 @@ const Checkbox = ({
     >
       <input
         type="checkbox"
-        defaultChecked={checked}
+        // defaultChecked={checked}
         onChange={() => {
           setChecked((e: boolean) => !e);
         }}

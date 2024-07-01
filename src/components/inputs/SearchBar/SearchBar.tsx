@@ -32,7 +32,7 @@ const SearchBar = forwardRef<searchRef, Props>(
     }));
 
     return (
-      <div className="hidden w-full max-w-[250px] items-center justify-between gap-3 rounded-[30px] border border-transparent bg-primary/5 px-3 focus-within:border-primary dark:bg-bg3 md:flex xxl:px-5">
+      <div className="hidden w-full max-w-[250px] items-center justify-between gap-3 rounded-[30px] border border-transparent bg-n30 bg-primary/5 px-3 focus-within:border-primary dark:bg-bg3 md:flex xxl:px-5">
         <input
           onChange={handleInputChange}
           value={text}

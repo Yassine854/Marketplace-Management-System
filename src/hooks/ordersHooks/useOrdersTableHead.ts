@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useOrdersStore } from "@/stores/ordersStore";
 
 export const useOrdersTableHead = (
   changeSelectedSort: (selected: any) => void,
 ) => {
-  const [sort, setSort] = useState("");
+  const { sort, setSort } = useOrdersStore();
 
   const onTotalClick = () => {
     setSort(sort === "total:asc" ? "total:desc" : "total:asc");

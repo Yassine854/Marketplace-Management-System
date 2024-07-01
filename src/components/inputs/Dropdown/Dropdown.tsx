@@ -14,7 +14,6 @@ export type DropRef = {
 // eslint-disable-next-line react/display-name
 const Dropdown = forwardRef<DropRef, Props>(
   ({ items = defaultProps.items, onSelectedChange, label }, ref) => {
-    // ({ items = defaultProps.items, onSelectedChange }: Props) => {
     const { open, ref: dropRef, toggleOpen } = useDropdown();
     const [selected, setSelected] = useState(items[0]);
 
@@ -38,7 +37,7 @@ const Dropdown = forwardRef<DropRef, Props>(
     }));
 
     return (
-      <div className="col-span-2 md:col-span-1">
+      <div className="col-span-2 flex items-center justify-center md:col-span-1">
         <label
           htmlFor="role"
           className="mb-2 ml-2 block font-medium md:text-lg"
@@ -46,7 +45,7 @@ const Dropdown = forwardRef<DropRef, Props>(
           {label}
         </label>
 
-        <div className="relative  rounded-3xl bg-n0" ref={dropRef}>
+        <div className="relative  rounded-3xl bg-n20" ref={dropRef}>
           <div onClick={toggleOpen} className={tailwind.container("", "")}>
             {selected?.name}
             <IconChevronDown

@@ -1,26 +1,9 @@
-"use client";
-
 import { useEffect, useState } from "react";
-
-import Dropdown from "@/components/inputs/Dropdown";
 import { IconArrowNarrowLeft } from "@tabler/icons-react";
-import SearchBar from "@/components/inputs/SearchBar";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useRouter } from "next/navigation";
 
-const actions = [
-  { name: "Generate Pick List", key: "picklist" },
-  { name: "Print BL's", key: "bl" },
-  { name: "Manage Milk-Runs", key: "milk-run" },
-];
-const OrdersTableHeader = ({
-  title,
-  sortOptions,
-  sortBy,
-  setSortBy,
-  setSearch,
-  selectedOrders,
-}: any) => {
+const OrdersTableHeader = ({ selectedOrders }: any) => {
   const { push } = useRouter();
   const [selected, setSelected] = useState({ name: "Actions", key: "a" });
   const { navigateBack } = useNavigation();

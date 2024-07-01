@@ -1,16 +1,17 @@
+import Loading from "@/components/elements/Loading";
 import Dropdown from "@/components/inputs/Dropdown";
 import SearchBar from "@/components/inputs/SearchBar";
 import { useState } from "react";
 
-const actions = [
-  { name: "Generate Pick List", key: "picklist" },
-  { name: "Print BL's", key: "bl" },
-  { name: "Manage Milk-Runs", key: "milk-run" },
-];
+// const actions = [
+//   { name: "Generate Pick List", key: "picklist" },
+//   { name: "Generate Delivery Note", key: "delivery-note" },
+//   { name: "Manage Milk-Runs", key: "milk-run" },
+// ];
 
 const sortOptions = [
-  { name: "Newest", key: "createdAt:asc" },
-  { name: "Oldest", key: "createdAt:desc" },
+  { name: "Newest", key: "createdAt:desc" },
+  { name: "Oldest", key: "createdAt:asc" },
   { name: "Earliest Delivery Date", key: "deliveryDate:asc" },
   { name: "Latest Delivery Date", key: "deliveryDate:desc" },
   { name: "Highest Total", key: "total:desc" },
@@ -26,31 +27,48 @@ const OrdersToolBar = ({
   searchRef,
   sortRef,
   isSomeOrdersSelected,
+  actions,
+  isLoading,
 }: any) => {
   const [selectedAction, setSelectedAction] = useState("");
 
   return (
-    <div className=" flex  w-full flex-wrap items-center justify-between gap-3 bg-n10 p-2">
+    <div className=" flex flex-grow flex-wrap items-center justify-between gap-3  bg-n0 px-4">
       <div className="flex items-center justify-center">
-        <p className="m-4 text-xl font-bold capitalize ">{`${selectedStatus} Orders Table`}</p>
+        <p className="m-4 text-xl font-bold capitalize ">{`${selectedStatus} Orders `}</p>
         {isSomeOrdersSelected && (
           <>
             <Dropdown items={actions} onSelectedChange={setSelectedAction} />
             {selectedAction && (
-              <button
-                className="btn m-2 flex h-2 items-center  justify-center p-4"
-                onClick={() => {}}
-              >
-                Confirm
-              </button>
+              <>
+                {!isLoading && (
+                  <button
+                    className="btn m-2 flex h-2 items-center  justify-center p-4"
+                    onClick={() => {
+                      const selected = actions.find(
+                        (action: any) => action.key === selectedAction,
+                      );
+                      selected.action();
+                    }}
+                  >
+                    Confirm
+                  </button>
+                )}
+                {isLoading && (
+                  <div className="ml-4 h-8 w-8 ">
+                    <Loading />
+                  </div>
+                )}
+              </>
             )}
+            {}
           </>
         )}
       </div>
 
-      <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
+      <div className="flex items-center justify-center gap-4 lg:gap-8 xl:gap-10">
         <SearchBar ref={searchRef} onSearch={onSearch} isWithInstantSearch />
-        <div className="flex items-center gap-2">
+        <div className="flex items-center  justify-center">
           <p className="whitespace-nowrap font-bold">Sort By : </p>
           <Dropdown
             onSelectedChange={onSort}
