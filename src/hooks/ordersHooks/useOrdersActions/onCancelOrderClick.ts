@@ -1,9 +1,9 @@
-import { magento } from "@/libs/magento";
+//import { magento } from "@/libs/magento";
 import { axios } from "@/libs/axios";
 
 export const onCancelOrderClick = async (orderId: string, refetch: any) => {
   try {
-    await magento.cancelOrder(orderId);
+    // await magento.cancelOrder(orderId);
     await axios.servicesClient.put("/api/orders/typesense/edit-order", {
       order: {
         id: orderId,
