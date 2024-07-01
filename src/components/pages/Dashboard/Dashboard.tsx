@@ -8,7 +8,7 @@ import Link from "next/link";
 
 const SalesPage = () => {
   return (
-    <>
+    <div className="m-16 mt-24  flex w-full flex-col">
       <Banner
         title="Kamioun dashboard"
         links={
@@ -22,14 +22,14 @@ const SalesPage = () => {
           </div>
         }
       />
-      <div className="grid grid-cols-12 gap-4 xxxl:gap-6">
+      <div className="grid grid-cols-12 gap-4 overflow-x-hidden xxxl:gap-6">
         <States />
         <SalesStatistics />
         <ShowcaseInfo />
         <ProjectsOverview />
         <RevenueOverview />
       </div>
-    </>
+    </div>
   );
 };
 
