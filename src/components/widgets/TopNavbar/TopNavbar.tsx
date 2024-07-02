@@ -3,7 +3,7 @@ import {
   IconSearch,
   IconBuildingWarehouse,
 } from "@tabler/icons-react";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import Notification from "@/components/elements/TopNavBarElements/Notification";
 import Profile from "@/components/elements/TopNavBarElements/Profile";
 
@@ -12,14 +12,31 @@ import { useState } from "react";
 import { useLayout } from "@/utils/LayoutContext";
 import { useDropdown } from "@/hooks/useDropdown";
 import { IconChevronDown, IconLayoutSidebar } from "@tabler/icons-react";
+import { useOrdersStore } from "@/stores/ordersStore";
 
-export const layoutList = ["All", "El Mghira", "chargeia", "Sousse"];
+export const layoutList = ["All", "Sousse", "Kamarket"];
 
 const SelectLayout = ({ isWhite }: { isWhite?: boolean }) => {
   const { open, ref, toggleOpen } = useDropdown();
+  const { setStoreId } = useOrdersStore();
   // const { layout, changeLayout } = useLayout();
 
   const [layout, setLayout] = useState(layoutList[0]);
+
+  useEffect(() => {
+    switch (layout) {
+      case "All":
+        setStoreId("1");
+        break;
+      case "Sousse":
+        setStoreId("2");
+        break;
+
+      case "Kamarket":
+        setStoreId("4");
+        break;
+    }
+  }, [layout]);
   return (
     <div
       ref={ref}

@@ -41,6 +41,7 @@ const QUERY = gql`
       orders {
         id
         kamiounId
+        storeId
         state
         status
         total

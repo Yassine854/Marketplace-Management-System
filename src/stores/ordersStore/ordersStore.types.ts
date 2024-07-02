@@ -5,6 +5,7 @@ export type OrdersStore = {
   selectedOrders: string[];
   itemsPerPage: number;
   status: string;
+  storeId: string;
   isAllOrdersSelected: boolean;
   isSomeOrdersSelected: boolean;
   search: string;
@@ -17,6 +18,7 @@ export type OrdersStore = {
   setOrders: (orders: Order[]) => void;
   setSelectedOrders: (selectedOrders: string[]) => void;
   setStatus: (status: string) => void;
+  setStoreId: (storeId: string) => void;
   setSearch: (search: string) => void;
   setSort: (sort: string) => void;
   checkIfAllOrdersSelected: () => void;

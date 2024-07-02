@@ -1,54 +1,56 @@
-import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
-import OrdersTableRow from "./elements/OrdersTableRow";
-import TableRowSkeleton from "./elements/RowSkeleton";
-
 import {
   useOrdersData,
   useOrdersSelection,
   useOrdersSorting,
-  useOrdersActions,
+  useOrderActions,
+  useGenerateOrderSummary,
 } from "@/hooks/ordersHooks";
 
+import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
+import OrdersTableRow from "./elements/OrdersTableRow";
+import TableRowSkeleton from "./elements/RowSkeleton";
+
 const OrdersTable = () => {
-  const { isAllOrdersSelected, onSelectAllClick, onSelectOrderClick } =
-    useOrdersSelection();
   const { changeSelectedSort } = useOrdersSorting();
   const { orders, isLoading } = useOrdersData();
-  const {
-    onPDFIconClick,
-    onOrderClick,
-    rowActions,
-    isLoading: isActionLoading,
-  } = useOrdersActions();
+  const { generateSummary, pendingOrderId } = useGenerateOrderSummary();
+  const { onOrderClick, rowActions, orderUnderActionId } = useOrderActions();
+  const { isAllOrdersSelected, selectAllOrders, selectOrder } =
+    useOrdersSelection();
 
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>
       <OrdersTableHead
         changeSelectedSort={changeSelectedSort}
-        onSelectAllClick={onSelectAllClick}
+        onSelectAllClick={selectAllOrders}
         isAllOrdersSelected={isAllOrdersSelected}
       />
 
       <tbody>
         <>
-          {isLoading ? (
+          {isLoading && (
             <>
               {[...Array(25)].map((_, i) => (
                 <TableRowSkeleton key={i} number={9} />
               ))}
             </>
-          ) : (
+          )}
+
+          {!isLoading && (
             <>
               {orders?.length > 0 &&
                 orders?.map((order: any) => (
                   <OrdersTableRow
-                    key={order?.id}
+                    key={order.id}
                     order={order}
-                    onClick={onOrderClick(order.id)}
-                    onSelectOrderClick={onSelectOrderClick}
-                    onPDFIconClick={onPDFIconClick}
+                    onClick={() => {
+                      onOrderClick(order.id);
+                    }}
+                    onSelectClick={selectOrder}
+                    onPDFIconClick={generateSummary}
                     actionsList={rowActions}
-                    isLoading={isActionLoading}
+                    isGenerateSummaryPending={pendingOrderId == order.id}
+                    isSomeActionPending={orderUnderActionId == order.id}
                   />
                 ))}
             </>

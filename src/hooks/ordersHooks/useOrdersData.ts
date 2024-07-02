@@ -9,6 +9,7 @@ export const useOrdersData = () => {
     currentPage,
     itemsPerPage,
     status,
+    storeId,
     orders,
     setOrders,
     setIsOrdersLoading,
@@ -19,7 +20,9 @@ export const useOrdersData = () => {
     perPage: itemsPerPage,
     search,
     sortBy: sort,
-    filterBy: status ? `status:=${status}` : "",
+    filterBy: status
+      ? `status:=${status} && storeId:=${storeId}`
+      : `storeId:=${storeId}`,
   });
 
   useEffect(() => {

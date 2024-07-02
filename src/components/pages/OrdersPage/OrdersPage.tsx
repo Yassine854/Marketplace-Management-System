@@ -5,7 +5,7 @@ import OrdersToolBar from "@/components/widgets/OrdersWidgets/OrdersToolBar";
 import Pagination from "@/components/widgets/OrdersWidgets/Pagination";
 import { useOrdersStore } from "@/stores/ordersStore";
 import {
-  useOrdersActions,
+  useOrderActions,
   useOrdersData,
   useOrdersSearch,
   useOrdersSelection,
@@ -19,7 +19,7 @@ const OrdersPage = () => {
   const { isSomeOrdersSelected } = useOrdersSelection();
   const { orders, totalOrders } = useOrdersData();
   const { status } = useOrdersStore();
-  const { toolbarActions, isLoading } = useOrdersActions();
+  const { toolbarActions } = useOrderActions();
   const { paginationRef, setCurrentPage, setItemsPerPage } =
     useOrdersTablePagination();
 
@@ -35,7 +35,7 @@ const OrdersPage = () => {
           selectedOrders
           isSomeOrdersSelected={isSomeOrdersSelected}
           actions={toolbarActions}
-          isLoading={isLoading}
+          isLoading={false}
         />
       </div>
       <Divider />

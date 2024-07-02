@@ -5,7 +5,8 @@ export const useOrdersStore = create<OrdersStore>((set, get) => ({
   orders: [],
   selectedOrders: [],
   itemsPerPage: 10,
-  status: "",
+  status: "open",
+  storeId: "1",
   isAllOrdersSelected: false,
   isSomeOrdersSelected: false,
   search: "",
@@ -21,6 +22,7 @@ export const useOrdersStore = create<OrdersStore>((set, get) => ({
   setOrders: (orders) => set({ orders }),
   setSelectedOrders: (selectedOrders) => set({ selectedOrders }),
   setStatus: (status) => set({ status }),
+  setStoreId: (storeId) => set({ storeId }),
   checkIfAllOrdersSelected: () => {
     const { selectedOrders, itemsPerPage } = get();
     set({ isAllOrdersSelected: selectedOrders.length === itemsPerPage });

@@ -8,10 +8,11 @@ import Loading from "@/components/elements/Loading";
 const OrdersTableRow = ({
   onClick = () => console.log("Row clicked"),
   order,
-  onSelectOrderClick,
+  onSelectClick,
   onPDFIconClick,
+  isGenerateSummaryPending,
   actionsList,
-  isLoading,
+  isSomeActionPending,
 }: any) => {
   return (
     <tr
@@ -22,7 +23,7 @@ const OrdersTableRow = ({
         <Checkbox
           isChecked={order.isSelected}
           onClick={(isChecked) => {
-            onSelectOrderClick(isChecked, order.id);
+            onSelectClick(isChecked, order.id);
           }}
         />
       </OrdersTableCell>
@@ -41,24 +42,33 @@ const OrdersTableRow = ({
       <OrdersTableCell>{order?.deliveryAgent || "***"}</OrdersTableCell>
       <OrdersTableCell>{order?.deliveryStatus || "***"}</OrdersTableCell>
       <OrdersTableCell>
-        <div
-          className="rounded-full p-2 hover:bg-n10"
-          onClick={(event: any) => {
-            event.stopPropagation();
-            onPDFIconClick(order.id);
-          }}
-        >
-          <IconPdf />
-        </div>
-      </OrdersTableCell>
-      <td className="px-3 py-4">
         <div className=" flex justify-center">
-          {isLoading === order.id && (
+          {isGenerateSummaryPending && (
             <div className="h-6 w-6">
               <Loading />
             </div>
           )}
-          {isLoading !== order.id && (
+          {!isGenerateSummaryPending && (
+            <div
+              className="rounded-full p-2 hover:bg-n10"
+              onClick={(event: any) => {
+                event.stopPropagation();
+                onPDFIconClick(order.id);
+              }}
+            >
+              <IconPdf />
+            </div>
+          )}
+        </div>
+      </OrdersTableCell>
+      <td className="px-3 py-4">
+        <div className=" flex justify-center">
+          {isSomeActionPending && (
+            <div className="h-6 w-6">
+              <Loading />
+            </div>
+          )}
+          {!isSomeActionPending && (
             <TableActions orderId={order.id} actionsList={actionsList} />
           )}
         </div>

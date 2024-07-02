@@ -11,17 +11,56 @@ post {
 }
 
 headers {
-  X-API-Key: 
+  X-API-Key: HgomyMjEBfIAi0FukmGf5E65sKDhEy
 }
 
 body:json {
-  {
-    
-  "order":{
-    
-    "id":"assadfsdf"
-  }
-  }
+  { 
+      "order": { 
+        "id": "hello-world2223332",
+        "kamiounId": "mohamed-jrad",
+        "state": "new",
+        "status": "open",
+        "total": 150.75,
+        "createdAt": 1625212800,
+        "customerId": "c6789",
+        "storeId":"1",
+        "customerPhone": "27875997",
+        "customerFirstname": "John",
+        "customerLastname": "Doe",
+        "deliveryAgentId": "da9876",
+        "deliveryAgent": "DeliveryCo",
+        "deliveryDate": 1625798400,
+        "deliveryStatus": "pending",
+        "source": "online",
+        "items": [
+          {
+            "id": "ol123",
+            "orderId": "12345",
+            "kamiounOrderId": "k123",
+            "productId": "p1234",
+            "productName": "Product Name 1",
+            "quantity": 2,
+            "productPrice": 50.25,
+            "totalPrice": 100.50,
+            "sku": "sku1234"
+          },
+          {
+            "id": "ol124",
+            "orderId": "12345",
+            "kamiounOrderId": "k123",
+            "productId": "p5678",
+            "productName": "Product Name 2",
+            "quantity": 1,
+            "productPrice": 50.25,
+            "totalPrice": 50.25,
+            "sku": "sku5678"
+          }
+        ]
+      } 
+    } 
+  
+  
 }
 
 assert {

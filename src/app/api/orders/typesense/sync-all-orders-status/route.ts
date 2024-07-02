@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
-import { deleteOrdersCollection } from "@/services/orders/typesense/delete-orders-collection";
 
-export async function DELETE(Request: any) {
+export async function GET(Request: any) {
   try {
-    await deleteOrdersCollection();
-    return NextResponse.json("Orders Collection Deleted Successfully ...", {
+    return NextResponse.json("Orders Collection Syncing : 40 % ", {
       status: 200,
     });
   } catch (err) {

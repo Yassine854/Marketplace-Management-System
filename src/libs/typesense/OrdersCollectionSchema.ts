@@ -14,6 +14,10 @@ export const typesenseOrdersCollectionSchema: CollectionCreateSchema = {
       type: "string",
     },
     {
+      name: "storeId",
+      type: "string",
+    },
+    {
       name: "state",
       type: "string",
     },
