@@ -11,9 +11,9 @@ import Loading from "@/components/elements/Loading";
 const OrderCancelingModal = ({
   isOpen,
   onOpenChange,
-  cancelOrder,
-  orderId,
+  message,
   isPending,
+  onConfirm,
 }: any) => {
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -23,7 +23,7 @@ const OrderCancelingModal = ({
             <ModalHeader className="flex w-full flex-col gap-1"></ModalHeader>
             <ModalBody>
               <div className="flex h-full w-full items-center justify-center pt-4 text-center text-xl font-bold">
-                Are you sure you want to cancel this order : {`${orderId}`} ?
+                {message}
               </div>
             </ModalBody>
             <ModalFooter>
@@ -31,8 +31,8 @@ const OrderCancelingModal = ({
                 <p className="font-semibold">Close</p>
               </Button>
               {!isPending && (
-                <Button color="danger" onPress={() => cancelOrder(orderId)}>
-                  <p className="font-semibold">Yes</p>
+                <Button color="danger" onPress={onConfirm}>
+                  <p className="font-semibold">Confirm</p>
                 </Button>
               )}
               {isPending && (

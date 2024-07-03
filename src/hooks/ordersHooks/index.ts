@@ -7,3 +7,4 @@ export * from "./useOrdersCount";
 export * from "./useOrdersTableHead";
 export * from "./useOrderActions/useOrderActions";
 export * from "./useOrderActions/useGenerateOrderSummary";
+export * from "./useMultipleOrdersActions";

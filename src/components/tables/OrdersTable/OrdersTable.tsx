@@ -8,7 +8,7 @@ import {
 import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
 import OrdersTableRow from "./elements/OrdersTableRow";
 import TableRowSkeleton from "./elements/RowSkeleton";
-import OrderCancelingModal from "./elements/OrderCancelingModal";
+import OrderCancelingModal from "../../widgets/OrderCancelingModal";
 
 const OrdersTable = () => {
   const { orders, isLoading } = useOrdersData();
@@ -58,6 +58,7 @@ const OrdersTable = () => {
                     order={order}
                     onClick={() => {
                       onOrderClick(order.id);
+                      console.log("🚀 ~ OrdersTable ~ order.id:", order.id);
                     }}
                     onSelectClick={selectOrder}
                     onPDFIconClick={generateSummary}
@@ -71,9 +72,9 @@ const OrdersTable = () => {
         </>
       </tbody>
       <OrderCancelingModal
+        message={` Are you sure you want to cancel this order : ${orderToCancelId}? `}
         isOpen={isCancelingModalOpen}
-        orderId={orderToCancelId}
-        cancelOrder={cancelOrder}
+        onConfirm={() => cancelOrder(orderToCancelId)}
         onOpenChange={onOpenChange}
         isPending={isCancelingPending}
       />

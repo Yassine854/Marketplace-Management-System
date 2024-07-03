@@ -13,7 +13,8 @@ export const useOrdersStore = create<OrdersStore>((set, get) => ({
   sort: "",
   currentPage: 1,
   isOrdersLoading: false,
-
+  orderOnReviewId: "",
+  setOrderOnReviewId: (orderOnReviewId: string) => set({ orderOnReviewId }),
   setItemsPerPage: (itemsPerPage: number) => set({ itemsPerPage }),
   setCurrentPage: (currentPage: number) => set({ currentPage }),
   setSort: (sort: string) => set({ sort }),

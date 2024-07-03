@@ -3,12 +3,6 @@ import Dropdown from "@/components/inputs/Dropdown";
 import SearchBar from "@/components/inputs/SearchBar";
 import { useState } from "react";
 
-// const actions = [
-//   { name: "Generate Pick List", key: "picklist" },
-//   { name: "Generate Delivery Note", key: "delivery-note" },
-//   { name: "Manage Milk-Runs", key: "milk-run" },
-// ];
-
 const sortOptions = [
   { name: "Newest", key: "createdAt:desc" },
   { name: "Oldest", key: "createdAt:asc" },
@@ -28,7 +22,7 @@ const OrdersToolBar = ({
   sortRef,
   isSomeOrdersSelected,
   actions,
-  isLoading,
+  isPending,
 }: any) => {
   const [selectedAction, setSelectedAction] = useState("");
 
@@ -41,7 +35,7 @@ const OrdersToolBar = ({
             <Dropdown items={actions} onSelectedChange={setSelectedAction} />
             {selectedAction && (
               <>
-                {!isLoading && (
+                {!isPending && (
                   <button
                     className="btn m-2 flex h-2 items-center  justify-center p-4"
                     onClick={() => {
@@ -54,14 +48,13 @@ const OrdersToolBar = ({
                     Confirm
                   </button>
                 )}
-                {isLoading && (
+                {isPending && (
                   <div className="ml-4 h-8 w-8 ">
                     <Loading />
                   </div>
                 )}
               </>
             )}
-            {}
           </>
         )}
       </div>

@@ -1,4 +1,4 @@
-export const orderActions = ({
+export const orderActionsByStatus = ({
   navigateToManageMilkRun,
   navigateToOrderDetails,
   generateDeliveryNote,
@@ -7,6 +7,7 @@ export const orderActions = ({
   openCancelingModal,
   setOrderUnderActionId,
   setOrderToCancelId,
+  setOrderOnReviewId,
 }: any) => {
   const setToValid = {
     name: "Set To Valid",
@@ -77,7 +78,7 @@ export const orderActions = ({
   const edit = {
     name: "Edit",
     action: (orderId: any) => {
-      setOrderUnderActionId(orderId);
+      setOrderOnReviewId(orderId);
       navigateToOrderDetails();
     },
   };

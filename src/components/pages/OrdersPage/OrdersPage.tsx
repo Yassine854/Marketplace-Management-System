@@ -5,13 +5,14 @@ import OrdersToolBar from "@/components/widgets/OrdersWidgets/OrdersToolBar";
 import Pagination from "@/components/widgets/OrdersWidgets/Pagination";
 import { useOrdersStore } from "@/stores/ordersStore";
 import {
-  useOrderActions,
   useOrdersData,
   useOrdersSearch,
   useOrdersSelection,
   useOrdersSorting,
+  useMultipleOrdersActions,
   useOrdersTablePagination,
 } from "@/hooks/ordersHooks";
+import OrderCancelingModal from "@/components/widgets/OrderCancelingModal";
 
 const OrdersPage = () => {
   const { setSort, sortRef } = useOrdersSorting();
@@ -19,7 +20,15 @@ const OrdersPage = () => {
   const { isSomeOrdersSelected } = useOrdersSelection();
   const { orders, totalOrders } = useOrdersData();
   const { status } = useOrdersStore();
-  const { toolbarActions } = useOrderActions();
+  const {
+    actions,
+    isPending,
+    isCancelingModalOpen,
+    onOpenChange,
+    onClose,
+    isCancelingPending,
+    cancelOrders,
+  } = useMultipleOrdersActions();
   const { paginationRef, setCurrentPage, setItemsPerPage } =
     useOrdersTablePagination();
 
@@ -34,8 +43,8 @@ const OrdersPage = () => {
           sortRef={sortRef}
           selectedOrders
           isSomeOrdersSelected={isSomeOrdersSelected}
-          actions={toolbarActions}
-          isLoading={false}
+          actions={actions}
+          isPending={isPending}
         />
       </div>
       <Divider />
@@ -56,6 +65,14 @@ const OrdersPage = () => {
           />
         )}
       </div>
+      <OrderCancelingModal
+        onConfirm={cancelOrders}
+        message={" Are you sure you want to cancel those orders ? "}
+        isOpen={isCancelingModalOpen}
+        onOpenChange={onOpenChange}
+        isPending={isCancelingPending}
+        onClose={onClose}
+      />
     </div>
   );
 };

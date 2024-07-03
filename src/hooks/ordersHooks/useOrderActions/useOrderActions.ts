@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { onOrderClick } from "./onOrderClick";
 import { useGeneratePickList } from "./useGeneratePickList";
 import { useOrdersStore } from "@/stores/ordersStore";
 import { useGenerateDeliveryNote } from "./useGenerateDeliveryNote";
@@ -8,7 +7,7 @@ import { useCancelOrder } from "./useCancelOrder";
 import { useOrdersData } from "../useOrdersData";
 import { useEditOrderStatusAndState } from "./useEditOrderStatusAndState";
 import { useDisclosure } from "@nextui-org/react";
-import { orderActions } from "./orderActions";
+import { orderActionsByStatus } from "./orderActionsByStatus";
 import { useOrdersCount } from "../useOrdersCount";
 import { useGenerateOrderSummary } from "./useGenerateOrderSummary";
 
@@ -20,7 +19,7 @@ export const useOrderActions = () => {
     onClose,
   } = useDisclosure();
 
-  const { status } = useOrdersStore();
+  const { status, setOrderOnReviewId } = useOrdersStore();
 
   const { refetch } = useOrdersData();
 
@@ -45,7 +44,13 @@ export const useOrderActions = () => {
   const [orderToCancelId, setOrderToCancelId] = useState("");
   const [orderUnderActionId, setOrderUnderActionId] = useState<string>("");
 
-  const actions = orderActions({
+  const onOrderClick = (orderId: string) => {
+    setOrderOnReviewId(orderId);
+
+    navigateToOrderDetails();
+  };
+
+  const actions = orderActionsByStatus({
     navigateToManageMilkRun,
     navigateToOrderDetails,
     generateDeliveryNote,
@@ -54,6 +59,7 @@ export const useOrderActions = () => {
     openCancelingModal,
     setOrderUnderActionId,
     setOrderToCancelId,
+    setOrderOnReviewId,
   });
 
   useEffect(() => {
