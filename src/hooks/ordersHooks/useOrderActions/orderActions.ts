@@ -26,7 +26,7 @@ export const orderActions = ({
     name: "Set  To Unpaid ",
     action: (orderId: any) => {
       setOrderUnderActionId(orderId);
-      editStatusAndState({ orderId, status: "open", state: "new" });
+      editStatusAndState({ orderId, status: "unpaid", state: "unpaid" });
     },
   };
 
