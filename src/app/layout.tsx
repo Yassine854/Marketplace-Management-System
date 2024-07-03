@@ -6,6 +6,7 @@ import { LayoutProvider } from "@/utils/LayoutContext";
 import type { Metadata } from "next";
 import { Next13NProgress } from "nextjs13-progress";
 import ThemeProvider from "@/utils/ThemeProvider";
+import { NextUIProvider } from "@nextui-org/react";
 
 type PageParamsType = {
   locale: string;
@@ -30,7 +31,9 @@ const RootLayout = ({
       <body className={`${inter.className}   text-n500  dark:text-n30 `}>
         <ThemeProvider>
           <Next13NProgress color="#5D69F4" height={3} />
-          <LayoutProvider>{children}</LayoutProvider>
+          <LayoutProvider>
+            <NextUIProvider>{children}</NextUIProvider>
+          </LayoutProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -4,7 +4,7 @@ import { magento } from "@/libs/magento";
 import { axios } from "@/libs/axios";
 
 export const useCancelOrder = () => {
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, mutateAsync } = useMutation({
     mutationFn: async (orderId: string) => {
       await magento.cancelOrder(orderId);
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
@@ -16,12 +16,12 @@ export const useCancelOrder = () => {
       });
     },
     onSuccess: () => {
-      toast.success(`Order Canceled Updated Successfully`, { duration: 5000 });
+      toast.success(`Order Canceled  Successfully`, { duration: 5000 });
     },
     onError: () => {
       toast.error(`Something Went Wrong`, { duration: 5000 });
     },
   });
 
-  return { cancelOrder: mutate, isPending };
+  return { cancelOrder: mutate, cancelOrderAsync: mutateAsync, isPending };
 };

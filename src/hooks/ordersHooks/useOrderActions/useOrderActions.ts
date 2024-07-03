@@ -10,11 +10,19 @@ import { onCancelMultipleOrdersClick } from "./onCancelMultipleOrdersClick";
 import { useCancelOrder } from "./useCancelOrder";
 import { useOrdersData } from "../useOrdersData";
 import { useEditOrderStatusAndState } from "./useEditOrderStatusAndState";
+import { useDisclosure } from "@nextui-org/react";
 
 export const useOrderActions = () => {
+  const [orderToCancelId, setOrderToCancelId] = useState("");
   const [rowActions, setRowActions] = useState([]);
   const [pendingOrderId, setPendingOrderId] = useState<string>("");
   const [orderUnderActionId, setOrderUnderActionId] = useState<string>("59722");
+  const {
+    isOpen: isCancelingModalOpen,
+    onOpen: openCancelingModal,
+    onOpenChange,
+    onClose,
+  } = useDisclosure();
 
   const { navigateToOrderDetails, navigateToManageMilkRun } = useNavigation();
   const { status } = useOrdersStore();
@@ -31,8 +39,17 @@ export const useOrderActions = () => {
   const { editStatusAndState, isPending: isEditingPending } =
     useEditOrderStatusAndState();
 
-  const { cancelOrder, isPending: isCancelingPending } = useCancelOrder();
+  const {
+    cancelOrder,
+    isPending: isCancelingPending,
+    cancelOrderAsync,
+  } = useCancelOrder();
 
+  const handleOrderCanceling = async () => {
+    await cancelOrderAsync(orderToCancelId);
+
+    onClose();
+  };
   useEffect(() => {
     if (!isEditingPending && !isCancelingPending) {
       //  setOrderUnderActionId("");
@@ -111,8 +128,10 @@ export const useOrderActions = () => {
   const cancel = {
     name: "Cancel",
     action: async (orderId: any) => {
-      setOrderUnderActionId(orderId);
-      cancelOrder(orderId);
+      setOrderToCancelId(orderId);
+      openCancelingModal();
+      // setOrderUnderActionId(orderId);
+      // cancelOrder(orderId);
     },
   };
 
@@ -120,7 +139,9 @@ export const useOrderActions = () => {
     name: "Edit",
     action: (orderId: any) => {
       setOrderUnderActionId(orderId);
-      navigateToOrderDetails();
+      openCancelingModal();
+      // setOrderUnderActionId(orderId);
+      //navigateToOrderDetails();
     },
   };
 
@@ -186,11 +207,16 @@ export const useOrderActions = () => {
 
   return {
     onOrderClick,
-
+    cancelOrder,
+    isCancelingModalOpen,
     rowActions,
     toolbarActions,
     isPending,
     pendingOrderId,
     orderUnderActionId,
+    onOpenChange,
+    handleOrderCanceling,
+    isCancelingPending,
+    orderToCancelId,
   };
 };

@@ -9,12 +9,23 @@ import {
 import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
 import OrdersTableRow from "./elements/OrdersTableRow";
 import TableRowSkeleton from "./elements/RowSkeleton";
+import OrderCancelingModal from "./elements/OrderCancelingModal";
 
 const OrdersTable = () => {
   const { changeSelectedSort } = useOrdersSorting();
   const { orders, isLoading } = useOrdersData();
   const { generateSummary, pendingOrderId } = useGenerateOrderSummary();
-  const { onOrderClick, rowActions, orderUnderActionId } = useOrderActions();
+  const {
+    onOrderClick,
+    rowActions,
+    orderUnderActionId,
+    isCancelingModalOpen,
+    onOpenChange,
+    handleOrderCanceling,
+    isCancelingPending,
+    orderToCancelId,
+  } = useOrderActions();
+
   const { isAllOrdersSelected, selectAllOrders, selectOrder } =
     useOrdersSelection();
 
@@ -57,6 +68,13 @@ const OrdersTable = () => {
           )}
         </>
       </tbody>
+      <OrderCancelingModal
+        isOpen={isCancelingModalOpen}
+        orderId={orderToCancelId}
+        cancelOrder={handleOrderCanceling}
+        onOpenChange={onOpenChange}
+        isPending={isCancelingPending}
+      />
     </table>
   );
 };
