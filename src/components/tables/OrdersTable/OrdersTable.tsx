@@ -3,7 +3,6 @@ import {
   useOrdersSelection,
   useOrdersSorting,
   useOrderActions,
-  useGenerateOrderSummary,
 } from "@/hooks/ordersHooks";
 
 import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
@@ -12,22 +11,25 @@ import TableRowSkeleton from "./elements/RowSkeleton";
 import OrderCancelingModal from "./elements/OrderCancelingModal";
 
 const OrdersTable = () => {
-  const { changeSelectedSort } = useOrdersSorting();
   const { orders, isLoading } = useOrdersData();
-  const { generateSummary, pendingOrderId } = useGenerateOrderSummary();
-  const {
-    onOrderClick,
-    rowActions,
-    orderUnderActionId,
-    isCancelingModalOpen,
-    onOpenChange,
-    handleOrderCanceling,
-    isCancelingPending,
-    orderToCancelId,
-  } = useOrderActions();
+
+  const { changeSelectedSort } = useOrdersSorting();
 
   const { isAllOrdersSelected, selectAllOrders, selectOrder } =
     useOrdersSelection();
+
+  const {
+    onOrderClick,
+    orderUnderActionId,
+    isCancelingModalOpen,
+    onOpenChange,
+    cancelOrder,
+    isCancelingPending,
+    orderToCancelId,
+    actions,
+    generateSummary,
+    pendingOrderId,
+  } = useOrderActions();
 
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>
@@ -59,7 +61,7 @@ const OrdersTable = () => {
                     }}
                     onSelectClick={selectOrder}
                     onPDFIconClick={generateSummary}
-                    actionsList={rowActions}
+                    actionsList={actions}
                     isGenerateSummaryPending={pendingOrderId == order.id}
                     isSomeActionPending={orderUnderActionId == order.id}
                   />
@@ -71,7 +73,7 @@ const OrdersTable = () => {
       <OrderCancelingModal
         isOpen={isCancelingModalOpen}
         orderId={orderToCancelId}
-        cancelOrder={handleOrderCanceling}
+        cancelOrder={cancelOrder}
         onOpenChange={onOpenChange}
         isPending={isCancelingPending}
       />

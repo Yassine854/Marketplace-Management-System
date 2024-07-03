@@ -14,7 +14,7 @@ import { useDropdown } from "@/hooks/useDropdown";
 import { IconChevronDown, IconLayoutSidebar } from "@tabler/icons-react";
 import { useOrdersStore } from "@/stores/ordersStore";
 
-export const layoutList = ["All", "Sousse", "Kamarket"];
+export const layoutList = ["All", "Tunis", "Sousse", "Kamarket"];
 
 const SelectLayout = ({ isWhite }: { isWhite?: boolean }) => {
   const { open, ref, toggleOpen } = useDropdown();
@@ -26,6 +26,9 @@ const SelectLayout = ({ isWhite }: { isWhite?: boolean }) => {
   useEffect(() => {
     switch (layout) {
       case "All":
+        setStoreId("");
+        break;
+      case "Tunis":
         setStoreId("1");
         break;
       case "Sousse":
@@ -36,7 +39,8 @@ const SelectLayout = ({ isWhite }: { isWhite?: boolean }) => {
         setStoreId("4");
         break;
     }
-  }, [layout]);
+  }, [layout, setStoreId]);
+
   return (
     <div
       ref={ref}

@@ -6,4 +6,4 @@ export * from "./useOrdersTablePagination";
 export * from "./useOrdersCount";
 export * from "./useOrdersTableHead";
 export * from "./useOrderActions/useOrderActions";
-export * from "./useGenerateOrderSummary";
+export * from "./useOrderActions/useGenerateOrderSummary";

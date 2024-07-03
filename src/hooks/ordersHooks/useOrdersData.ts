@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGetOrders } from "@/hooks/queries/useGetOrders";
 import { useOrdersStore } from "@/stores/ordersStore";
 
@@ -15,15 +15,31 @@ export const useOrdersData = () => {
     setIsOrdersLoading,
   } = useOrdersStore();
 
+  const [filterBy, setFilterBy] = useState("");
+
   const { data, isLoading, refetch } = useGetOrders({
     page: currentPage,
     perPage: itemsPerPage,
     search,
     sortBy: sort,
-    filterBy: status
-      ? `status:=${status} && storeId:=${storeId}`
-      : `storeId:=${storeId}`,
+    filterBy,
   });
+
+  useEffect(() => {
+    let filterBy = "";
+
+    if (status && storeId) {
+      filterBy = `status:=${status} && storeId:=${storeId}`;
+    }
+    if (status && !storeId) {
+      filterBy = `status:=${status}`;
+    }
+    if (!status && storeId) {
+      filterBy = `storeId:=${storeId}`;
+    }
+
+    setFilterBy(filterBy);
+  }, [status, storeId]);
 
   useEffect(() => {
     if (isLoading) {
