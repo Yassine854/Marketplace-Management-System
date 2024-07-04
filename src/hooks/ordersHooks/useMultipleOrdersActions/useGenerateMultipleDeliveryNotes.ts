@@ -2,11 +2,11 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { magento } from "@/libs/magento";
 
-export const useGenerateDeliveryNote = () => {
+export const useGenerateMultipleDeliveryNotes = () => {
   const { mutate, isPending } = useMutation({
-    mutationFn: async (orderId: string) => {
+    mutationFn: async (ordersIds: string[]) => {
       const deliveryNotesUrl = await magento.generateDeliveryNotes(
-        [orderId].toString(),
+        ordersIds.toString(),
       );
 
       return deliveryNotesUrl;
@@ -23,5 +23,5 @@ export const useGenerateDeliveryNote = () => {
     },
   });
 
-  return { generateDeliveryNote: mutate, isPending };
+  return { generateDeliveryNotes: mutate, isPending };
 };

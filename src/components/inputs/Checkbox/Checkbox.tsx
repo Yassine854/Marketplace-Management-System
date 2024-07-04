@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { Props } from "./Checkbox.types";
 
 const Checkbox = ({
+  checkboxRef,
   isChecked = false,
   onClick = (isChecked: boolean) => console.log("is checked", isChecked),
-}: Props) => {
+}: any) => {
   const [checked, setChecked] = useState(isChecked);
 
   useEffect(() => {
@@ -13,9 +14,11 @@ const Checkbox = ({
   }, [isChecked]);
   return (
     <div
+      ref={checkboxRef}
       className="flex h-8 w-8 items-center justify-center rounded-full   hover:bg-n70"
       onClick={(event: any) => {
-        event.stopPropagation();
+        console.log("🚀 ~ event:", event);
+        //  event.stopPropagation();
         onClick(!checked);
       }}
     >

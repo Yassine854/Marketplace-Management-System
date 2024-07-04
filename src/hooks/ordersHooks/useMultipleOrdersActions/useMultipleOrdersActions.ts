@@ -1,9 +1,11 @@
+import { useGenerateMultipleDeliveryNotes } from "./useGenerateMultipleDeliveryNotes";
 import { useEffect, useState } from "react";
 import { useOrdersStore } from "@/stores/ordersStore";
 import { multipleOrdersActionsByStatus } from "./multipleOrdersActionsByStatus";
 import { useEditOrdersStatusesAndStates } from "./useEditMultipleOrdersStatusesAndStates";
 import { useDisclosure } from "@nextui-org/react";
 import { useCancelMultipleOrders } from "./useCancelMultipleOrders";
+import { useGenerateMultiplePickLists } from "./useGenerateMultiplePickLists";
 
 export const useMultipleOrdersActions = () => {
   const { status, selectedOrders } = useOrdersStore();
@@ -12,6 +14,12 @@ export const useMultipleOrdersActions = () => {
 
   const { cancelOrdersAsync, isPending: isCancelingPending } =
     useCancelMultipleOrders();
+
+  const { generatePickLists, isPending: isGeneratingPickListPending } =
+    useGenerateMultiplePickLists();
+
+  const { generateDeliveryNotes, isPending: isGenerateDeliveryNotePending } =
+    useGenerateMultipleDeliveryNotes();
 
   const {
     isOpen: isCancelingModalOpen,
@@ -28,27 +36,31 @@ export const useMultipleOrdersActions = () => {
 
   const actions = multipleOrdersActionsByStatus({
     editStatusesAndStates,
+    generatePickLists,
     selectedOrders,
-    // navigateToManageMilkRun,
-    // generateDeliveryNote,
-    // generatePickList,
-    // editStatusAndState,
+    generateDeliveryNotes,
     openCancelingModal,
-    // setOrderUnderActionId,
-    // setOrderToCancelId,
   });
 
   useEffect(() => {
-    if (isEditingPending) {
+    if (
+      isEditingPending ||
+      isGeneratingPickListPending ||
+      isGenerateDeliveryNotePending
+    ) {
       setIsPending(true);
     } else {
       setIsPending(false);
     }
-  }, [isEditingPending]);
+  }, [
+    isEditingPending,
+    isGeneratingPickListPending,
+    isGenerateDeliveryNotePending,
+  ]);
 
   return {
     //@ts-ignore
-    actions: actions[status],
+    actions: status ? actions[status] : actions["all"],
     isPending,
     isCancelingModalOpen,
     openCancelingModal,
@@ -56,5 +68,6 @@ export const useMultipleOrdersActions = () => {
     onClose,
     isCancelingPending,
     cancelOrders,
+    generatePickLists,
   };
 };

@@ -1,13 +1,10 @@
 export const multipleOrdersActionsByStatus = ({
-  navigateToManageMilkRun,
-  generateDeliveryNote,
-  generatePickList,
-  editStatusAndState,
+  generatePickLists,
   openCancelingModal,
-  setOrderUnderActionId,
-  setOrderToCancelId,
+  generateDeliveryNotes,
   selectedOrders,
   editStatusesAndStates,
+  navigateToManageMilkRun,
 }: any) => {
   const setToValid = {
     name: "Set To Valid",
@@ -107,20 +104,20 @@ export const multipleOrdersActionsByStatus = ({
   };
 
   const pickList = {
-    name: "Generate Pick List",
+    name: "Generate Pick Lists",
     key: "9",
 
     action: () => {
-      // generatePickList(orderId);
+      generatePickLists(selectedOrders);
     },
   };
 
   const deliveryNote = {
-    name: "Generate Delivery Note",
+    name: "Generate Delivery Notes",
     key: "10",
 
     action: () => {
-      //generateDeliveryNote(orderId);
+      generateDeliveryNotes(selectedOrders);
     },
   };
 
@@ -129,7 +126,7 @@ export const multipleOrdersActionsByStatus = ({
     key: "11",
 
     action: () => {
-      // navigateToManageMilkRun();
+      navigateToManageMilkRun();
     },
   };
 
@@ -156,5 +153,6 @@ export const multipleOrdersActionsByStatus = ({
     archived: [pickList, deliveryNote],
     failed: [pickList, deliveryNote],
     closed: [pickList, deliveryNote],
+    all: [pickList, deliveryNote],
   };
 };

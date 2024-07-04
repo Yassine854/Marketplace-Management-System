@@ -22,7 +22,7 @@ export const useCancelMultipleOrders = () => {
       );
     },
     onSuccess: () => {
-      toast.success(`Order Canceled Updated Successfully`, { duration: 5000 });
+      toast.success(`Order Canceled  Successfully`, { duration: 5000 });
     },
     onError: () => {
       toast.error(`Something Went Wrong`, { duration: 5000 });
