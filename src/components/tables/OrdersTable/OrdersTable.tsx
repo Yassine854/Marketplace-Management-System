@@ -1,23 +1,10 @@
-import {
-  useOrdersData,
-  useOrdersSelection,
-  useOrdersSorting,
-  useOrderActions,
-} from "@/hooks/ordersHooks";
-
 import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
 import OrdersTableRow from "./elements/OrdersTableRow";
 import TableRowSkeleton from "./elements/RowSkeleton";
 import OrderCancelingModal from "../../widgets/OrderCancelingModal";
+import { useOrdersTable } from "./useOrdersTable";
 
 const OrdersTable = () => {
-  const { orders, isLoading } = useOrdersData();
-
-  const { changeSelectedSort } = useOrdersSorting();
-
-  const { isAllOrdersSelected, selectAllOrders, selectOrder } =
-    useOrdersSelection();
-
   const {
     onOrderClick,
     orderUnderActionId,
@@ -29,7 +16,13 @@ const OrdersTable = () => {
     actions,
     generateSummary,
     pendingOrderId,
-  } = useOrderActions();
+    orders,
+    isLoading,
+    isAllOrdersSelected,
+    selectAllOrders,
+    selectOrder,
+    changeSelectedSort,
+  } = useOrdersTable();
 
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>

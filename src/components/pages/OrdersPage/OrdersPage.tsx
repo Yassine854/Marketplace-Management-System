@@ -1,36 +1,32 @@
 import Divider from "@/components/elements/SidebarElements/Divider";
-import AnyMatchingResults from "@/components/elements/TablesElements/AnyMatchingResults";
+import AnyMatchingResults from "@/components/widgets/ordersWidgets/AnyMatchingResults";
 import OrdersTable from "@/components/tables/OrdersTable";
-import OrdersToolBar from "@/components/widgets/OrdersWidgets/OrdersToolBar";
-import Pagination from "@/components/widgets/OrdersWidgets/Pagination";
-import { useOrdersStore } from "@/stores/ordersStore";
-import {
-  useOrdersData,
-  useOrdersSearch,
-  useOrdersSelection,
-  useOrdersSorting,
-  useMultipleOrdersActions,
-  useOrdersTablePagination,
-} from "@/hooks/ordersHooks";
+import OrdersToolBar from "@/components/widgets/ordersWidgets/OrdersToolBar";
+import Pagination from "@/components/widgets/ordersWidgets/Pagination";
 import OrderCancelingModal from "@/components/widgets/OrderCancelingModal";
+import { useOrdersPage } from "./useOrdersPage";
 
 const OrdersPage = () => {
-  const { setSort, sortRef } = useOrdersSorting();
-  const { searchRef, setSearch } = useOrdersSearch();
-  const { isSomeOrdersSelected } = useOrdersSelection();
-  const { orders, totalOrders } = useOrdersData();
-  const { status } = useOrdersStore();
   const {
+    sortRef,
+    setSort,
+    onOpenChange,
+    cancelOrders,
+    paginationRef,
+    setCurrentPage,
+    setItemsPerPage,
+    searchRef,
+    setSearch,
+    isCancelingModalOpen,
+    isSomeOrdersSelected,
+    orders,
+    totalOrders,
+    status,
     actions,
     isPending,
-    isCancelingModalOpen,
-    onOpenChange,
-    onClose,
     isCancelingPending,
-    cancelOrders,
-  } = useMultipleOrdersActions();
-  const { paginationRef, setCurrentPage, setItemsPerPage } =
-    useOrdersTablePagination();
+    onClose,
+  } = useOrdersPage();
 
   return (
     <div className="flex h-full w-full flex-grow flex-col justify-between    ">
@@ -48,7 +44,6 @@ const OrdersPage = () => {
         />
       </div>
       <Divider />
-
       <div className="    relative  flex w-full  flex-grow flex-col overflow-y-scroll  bg-n10 px-3 pb-24">
         <OrdersTable />
         {orders?.length == 0 && <AnyMatchingResults />}

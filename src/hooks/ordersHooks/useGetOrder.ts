@@ -26,18 +26,27 @@ const QUERY = gql`
   query GetOrder($orderId: ID!) {
     getOrder(orderId: $orderId) {
       id
-      customer {
-        id
-      }
+      kamiounId
+      storeId
+      state
+      status
       total
+      createdAt
+      customerId
+      customerFirstname
+      customerLastname
+      deliveryAgentId
+      deliveryAgent
       deliveryDate
+      deliveryStatus
+      source
       lines {
         id
         orderId
         productId
-        productPrice
         productName
         quantity
+        productPrice
         totalPrice
         sku
       }
@@ -45,7 +54,7 @@ const QUERY = gql`
   }
 `;
 
-export const useGetOrder = ({ orderId }: { orderId: string }) => {
+export const useGetOrder = (orderId: string) => {
   const { data, loading, error } = useQuery(QUERY, {
     variables: {
       orderId,

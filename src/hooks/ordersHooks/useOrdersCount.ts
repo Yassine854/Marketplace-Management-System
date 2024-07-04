@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-
-import { useGetOrders } from "@/hooks/queries/useGetOrders";
 import { useOrdersStore } from "@/stores/ordersStore";
+import { useGetOrders } from "./useGetOrders";
+
 export const useOrdersCount = () => {
   const [isLoading, setIsLoading] = useState(false);
 

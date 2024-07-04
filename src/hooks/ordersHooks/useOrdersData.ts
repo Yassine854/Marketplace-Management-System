@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useGetOrders } from "@/hooks/queries/useGetOrders";
 import { useOrdersStore } from "@/stores/ordersStore";
+import { useGetOrders } from "./useGetOrders";
 
 export const useOrdersData = () => {
   const {

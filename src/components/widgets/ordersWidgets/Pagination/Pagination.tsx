@@ -2,7 +2,7 @@ import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { PaginationRef, Props } from "./Pagination.types";
 import { forwardRef, useImperativeHandle } from "react";
 
-import ItemsPerPageSelector from "@/components/elements/TablesElements/ItemsPerPageSelector";
+import ItemsPerPageSelector from "./ItemsPerPageSelector";
 import cn from "@/utils/cn";
 import { defaultProps } from "./Pagination.defaultProps";
 import { usePagination } from "./usePagination";
