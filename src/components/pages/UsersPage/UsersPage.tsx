@@ -1,7 +1,6 @@
-import Box from "@/components/layouts/Box";
 import UsersTable from "@/components/tables/UsersTable";
 import UsersTableHeader from "@/components/widgets/UsersTableHeader";
-import { useGetUsers } from "@/hooks/queries/useGetUsers";
+import { useGetUsers } from "@/hooks/useGetUsers";
 import { useNavigation } from "@/hooks/useNavigation";
 
 const UsersPage = () => {
@@ -9,12 +8,12 @@ const UsersPage = () => {
   const { navigateToCreateUserForm } = useNavigation();
 
   return (
-    <Box>
+    <div className=" mt-24 flex flex-grow flex-col">
       <UsersTableHeader onButtonClick={navigateToCreateUserForm} />
-      <div className=" flex  w-full flex-grow flex-col overflow-y-scroll bg-n10 pb-24">
+      <div className=" flex  w-full flex-grow flex-col overflow-y-scroll bg-n10">
         <UsersTable users={users} isLoading={isLoading} />
       </div>
-    </Box>
+    </div>
   );
 };
 

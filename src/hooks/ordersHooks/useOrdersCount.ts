@@ -1,31 +1,48 @@
 import { useEffect, useState } from "react";
-
-import { useGetOrders } from "@/hooks/queries/useGetOrders";
+import { useOrdersStore } from "@/stores/ordersStore";
+import { useGetOrders } from "./useGetOrders";
 
 export const useOrdersCount = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { data: openOrders, isLoading: isOpenLoading } = useGetOrders({
+
+  const { storeId } = useOrdersStore();
+
+  const {
+    data: openOrders,
+    isLoading: isOpenLoading,
+    refetch: r1,
+  } = useGetOrders({
     page: 1,
-    perPage: 10,
+    perPage: 1,
     search: "",
     sortBy: "",
-    filterBy: "status:=open",
+    filterBy: storeId ? `status:=open  && storeId:=${storeId}` : "status:=open",
   });
 
-  const { data: validOrders, isLoading: isValidLoading } = useGetOrders({
+  const {
+    data: validOrders,
+    isLoading: isValidLoading,
+    refetch: r2,
+  } = useGetOrders({
     page: 1,
-    perPage: 10,
+    perPage: 1,
     sortBy: "",
     search: "",
-    filterBy: "status:=valid",
+    filterBy: storeId ? `status:=valid && storeId:=${storeId}` : "status:valid",
   });
 
-  const { data: readyOrders, isLoading: isReadyLoading } = useGetOrders({
+  const {
+    data: readyOrders,
+    isLoading: isReadyLoading,
+    refetch: r3,
+  } = useGetOrders({
     page: 1,
-    perPage: 10,
+    perPage: 1,
     search: "",
     sortBy: "",
-    filterBy: "status:=shipped",
+    filterBy: storeId
+      ? `status:=shipped && storeId:=${storeId}`
+      : "status:shipped",
   });
 
   useEffect(() => {
@@ -35,7 +52,14 @@ export const useOrdersCount = () => {
     setIsLoading(false);
   }, [isOpenLoading, isValidLoading, isReadyLoading]);
 
+  const handleRefetch = () => {
+    r1();
+    r2();
+    r3();
+  };
+
   return {
+    refetch: handleRefetch,
     isLoading,
     openOrdersCount: openOrders?.totalOrders || 0,
     validOrdersCount: validOrders?.totalOrders || 0,

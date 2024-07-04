@@ -5,4 +5,6 @@ export * from "./useOrdersSorting";
 export * from "./useOrdersTablePagination";
 export * from "./useOrdersCount";
 export * from "./useOrdersTableHead";
-export * from "./useOrdersActions/useOrdersActions";
+export * from "./useOrderActions/useOrderActions";
+export * from "./useOrderActions/useGenerateOrderSummary";
+export * from "./useMultipleOrdersActions";

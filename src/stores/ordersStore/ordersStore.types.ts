@@ -5,19 +5,23 @@ export type OrdersStore = {
   selectedOrders: string[];
   itemsPerPage: number;
   status: string;
+  storeId: string;
   isAllOrdersSelected: boolean;
   isSomeOrdersSelected: boolean;
   search: string;
   sort: string;
   currentPage: number;
   isOrdersLoading: boolean;
+  orderOnReviewId: string;
 
   setCurrentPage: (currentPage: number) => void;
   setItemsPerPage: (itemsPerPage: number) => void;
   setOrders: (orders: Order[]) => void;
   setSelectedOrders: (selectedOrders: string[]) => void;
   setStatus: (status: string) => void;
+  setStoreId: (storeId: string) => void;
   setSearch: (search: string) => void;
+  setOrderOnReviewId: (search: string) => void;
   setSort: (sort: string) => void;
   checkIfAllOrdersSelected: () => void;
   checkIfSomeOrdersSelected: () => void;

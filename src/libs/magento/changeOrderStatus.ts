@@ -13,10 +13,10 @@ export const changeOrderStatus = async (
         state,
       },
     };
-    await axios.magentoClient.post("orders/create", data);
+    // await axios.magentoClient.post("orders/create", data);
   } catch (error) {
     process.env.NODE_ENV === "development" &&
-      console.error("Error fetching data:", error);
+      console.error("Error changing order status:", error);
     throw error;
   }
 };

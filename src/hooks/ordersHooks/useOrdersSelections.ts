@@ -6,8 +6,8 @@ interface UseOrdersSelection {
   setSelectedOrders: (selectedOrders: string[]) => void;
   isSomeOrdersSelected: boolean;
   isAllOrdersSelected: boolean;
-  onSelectAllClick: (isChecked: boolean) => void;
-  onSelectOrderClick: (isChecked: boolean, orderId: string) => void;
+  selectAllOrders: (isChecked: boolean) => void;
+  selectOrder: (isChecked: boolean, orderId: string) => void;
 }
 
 export const useOrdersSelection = (): UseOrdersSelection => {
@@ -47,7 +47,7 @@ export const useOrdersSelection = (): UseOrdersSelection => {
     setSelectedOrders,
     isSomeOrdersSelected,
     isAllOrdersSelected,
-    onSelectAllClick: selectAllOrders,
-    onSelectOrderClick: selectOrder,
+    selectAllOrders,
+    selectOrder,
   };
 };

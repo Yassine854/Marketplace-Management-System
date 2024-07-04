@@ -7,6 +7,7 @@ export const getOrdersBatch = (orders: any): Order[] =>
     return {
       id: String(order?.entity_id) || "",
       kamiounId: String(order?.extension_attributes?.kamioun_order_id) || "",
+      storeId: order?.store_id,
       state: order?.state || "",
       status: order?.status || "",
       total: order?.subtotal || 0,
