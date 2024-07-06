@@ -1,5 +1,5 @@
 import { useGenerateMultipleDeliveryNotes } from "./useGenerateMultipleDeliveryNotes";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useOrdersStore } from "@/stores/ordersStore";
 import { multipleOrdersActionsByStatus } from "./multipleOrdersActionsByStatus";
 import { useEditOrdersStatusesAndStates } from "./useEditMultipleOrdersStatusesAndStates";
@@ -8,6 +8,17 @@ import { useCancelMultipleOrders } from "./useCancelMultipleOrders";
 import { useGenerateMultiplePickLists } from "./useGenerateMultiplePickLists";
 
 export const useMultipleOrdersActions = () => {
+  const actionsRef = useRef(null);
+
+  const reset = () => {
+    console.log("🚀 ~ reset ~ reset:", actionsRef);
+
+    if (actionsRef.current) {
+      //@ts-ignore
+      actionsRef.current.reset();
+    }
+  };
+
   const { status, selectedOrders } = useOrdersStore();
   const { editStatusesAndStates, isPending: isEditingPending } =
     useEditOrdersStatusesAndStates();
@@ -31,6 +42,7 @@ export const useMultipleOrdersActions = () => {
 
   const cancelOrders = async () => {
     await cancelOrdersAsync(selectedOrders);
+
     onClose();
   };
 
@@ -51,6 +63,7 @@ export const useMultipleOrdersActions = () => {
       setIsPending(true);
     } else {
       setIsPending(false);
+      reset();
     }
   }, [
     isEditingPending,
@@ -69,5 +82,6 @@ export const useMultipleOrdersActions = () => {
     isCancelingPending,
     cancelOrders,
     generatePickLists,
+    actionsRef,
   };
 };

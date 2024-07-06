@@ -3,8 +3,14 @@ export type Item = {
   key: string;
 };
 
+// export type Props = {
+//   items: Item[];
+//   onSelectedChange?: (key: string) => void;
+//   label?: string;
+// };
+
 export type Props = {
-  items: Item[];
+  items: Array<{ name: string; key: string }>;
   onSelectedChange?: (key: string) => void;
-  label?: string;
+  placeholder?: string; // Add placeholder prop
 };

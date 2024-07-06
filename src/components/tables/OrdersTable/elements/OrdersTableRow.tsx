@@ -1,7 +1,7 @@
 import { IconPdf, IconTruck } from "@tabler/icons-react";
 import Checkbox from "@/components/inputs/Checkbox";
 import OrdersTableCell from "./OrdersTableCell";
-import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
+import { unixTimestampToDateDMY } from "@/utils/unixTimestamp";
 import TableActions from "./TableActions";
 import Loading from "@/components/elements/Loading";
 import { useRef } from "react";
@@ -49,7 +49,7 @@ const OrdersTableRow = ({
       </OrdersTableCell>
       <OrdersTableCell>{order?.total}</OrdersTableCell>
       <OrdersTableCell>
-        {unixTimestampToDate(order?.deliveryDate)}
+        {unixTimestampToDateDMY(order?.deliveryDate)}
       </OrdersTableCell>
       <OrdersTableCell>{order?.deliveryAgent || "***"}</OrdersTableCell>
       <OrdersTableCell>{order?.deliveryStatus || "***"}</OrdersTableCell>

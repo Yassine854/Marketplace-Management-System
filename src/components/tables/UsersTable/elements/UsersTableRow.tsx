@@ -1,6 +1,6 @@
 import { IconSettings } from "@tabler/icons-react";
 import UsersTableCell from "./UsersTableCell";
-import { unixTimestampToDate } from "@/utils/unixTimestampToDate";
+import { unixTimestampToDateDMY } from "@/utils/unixTimestamp";
 
 const UsersTableRow = ({ user }: any) => {
   return (
@@ -25,7 +25,7 @@ const UsersTableRow = ({ user }: any) => {
       <UsersTableCell>
         <span
           key={1}
-          className="text-secondary m-2 block w-16 overflow-hidden text-ellipsis rounded-xl border border-n30 bg-secondary1/10 p-1 py-2 text-center text-xs font-bold dark:border-n500 dark:bg-bg3 "
+          className="m-2 block w-16 overflow-hidden text-ellipsis rounded-xl border border-n30 bg-secondary1/10 p-1 py-2 text-center text-xs font-bold text-secondary dark:border-n500 dark:bg-bg3 "
         >
           {user.roleCode}
         </span>
@@ -35,7 +35,7 @@ const UsersTableRow = ({ user }: any) => {
         <div className="flex max-w-36 flex-grow flex-wrap items-center justify-center">
           <span
             key={1}
-            className="text-secondary m-2 block w-16 overflow-hidden text-ellipsis rounded-xl border border-n30 bg-secondary1/10 p-1 py-2 text-center text-xs font-bold dark:border-n500 dark:bg-bg3 "
+            className="m-2 block w-16 overflow-hidden text-ellipsis rounded-xl border border-n30 bg-secondary1/10 p-1 py-2 text-center text-xs font-bold text-secondary dark:border-n500 dark:bg-bg3 "
           >
             {user.warehouseCode}
           </span>
@@ -60,7 +60,7 @@ const UsersTableRow = ({ user }: any) => {
       {/* Created At */}
       <UsersTableCell>
         <p className="truncate ">
-          {unixTimestampToDate(Number(user.createdAt))}
+          {unixTimestampToDateDMY(Number(user.createdAt))}
         </p>
       </UsersTableCell>
       {/* Edit */}

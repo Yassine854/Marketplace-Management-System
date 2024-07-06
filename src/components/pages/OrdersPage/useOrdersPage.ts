@@ -30,6 +30,7 @@ export const useOrdersPage = () => {
     onClose,
     isCancelingPending,
     cancelOrders,
+    actionsRef,
   } = useMultipleOrdersActions();
 
   return {
@@ -51,5 +52,6 @@ export const useOrdersPage = () => {
     isPending,
     isCancelingPending,
     onClose,
+    actionsRef,
   };
 };

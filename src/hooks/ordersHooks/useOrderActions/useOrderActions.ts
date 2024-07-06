@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGeneratePickList } from "./useGeneratePickList";
 import { useOrdersStore } from "@/stores/ordersStore";
 import { useGenerateDeliveryNote } from "./useGenerateDeliveryNote";
@@ -12,6 +12,13 @@ import { useOrdersCount } from "../useOrdersCount";
 import { useGenerateOrderSummary } from "./useGenerateOrderSummary";
 
 export const useOrderActions = () => {
+  const dropRef = useRef();
+
+  const reset = () => {
+    //@ts-ignore
+    dropRef.current && dropRef.current?.reset();
+  };
+
   const {
     isOpen: isCancelingModalOpen,
     onOpen: openCancelingModal,
@@ -50,7 +57,7 @@ export const useOrderActions = () => {
     navigateToOrderDetails();
   };
 
-  const actions = orderActionsByStatus({
+  const { orderActions, orderDetailsPageActions } = orderActionsByStatus({
     navigateToManageMilkRun,
     navigateToOrderDetails,
     generateDeliveryNote,
@@ -66,6 +73,7 @@ export const useOrderActions = () => {
     if (!isEditingPending && !isCancelingPending) {
       refetch();
       refetchCount();
+      reset();
     }
   }, [
     isEditingPending,
@@ -96,7 +104,9 @@ export const useOrderActions = () => {
 
   return {
     //@ts-ignore
-    actions: actions[status],
+    actions: orderActions[status],
+    //@ts-ignore
+    editOrderActions: orderDetailsPageActions,
     onOrderClick,
     cancelOrder,
     isCancelingModalOpen,
@@ -105,6 +115,7 @@ export const useOrderActions = () => {
     isCancelingPending,
     orderToCancelId,
     generateSummary,
+    dropRef,
     pendingOrderId,
   };
 };

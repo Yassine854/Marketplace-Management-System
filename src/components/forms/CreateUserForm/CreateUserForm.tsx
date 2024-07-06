@@ -72,7 +72,6 @@ const CreateUserForm = () => {
               errorMessage={errors.lastName?.message}
             />
             <Dropdown
-              label="Role"
               items={roles}
               onSelectedChange={(selected) => {
                 setValue("roleCode", selected);
@@ -85,7 +84,7 @@ const CreateUserForm = () => {
               }}
             />
             <Dropdown
-              label="Warehouse"
+              //  label="Warehouse"
               ref={warehouseRef}
               items={warehouses}
               onSelectedChange={(selected) =>

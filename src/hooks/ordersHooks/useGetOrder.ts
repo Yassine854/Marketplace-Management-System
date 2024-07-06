@@ -55,7 +55,7 @@ const QUERY = gql`
 `;
 
 export const useGetOrder = (orderId: string) => {
-  const { data, loading, error } = useQuery(QUERY, {
+  const { data, loading, error, refetch } = useQuery(QUERY, {
     variables: {
       orderId,
     },
@@ -65,5 +65,6 @@ export const useGetOrder = (orderId: string) => {
     data: data?.getOrder,
     isLoading: loading,
     error,
+    refetch,
   };
 };

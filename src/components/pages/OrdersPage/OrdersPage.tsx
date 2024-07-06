@@ -26,12 +26,14 @@ const OrdersPage = () => {
     isPending,
     isCancelingPending,
     onClose,
+    actionsRef,
   } = useOrdersPage();
 
   return (
     <div className="flex h-full w-full flex-grow flex-col justify-between    ">
       <div className=" mt-[4.8rem]  flex  w-full items-center justify-center border-t-4  ">
         <OrdersToolBar
+          actionsRef={actionsRef}
           searchRef={searchRef}
           onSearch={setSearch}
           onSort={setSort}
