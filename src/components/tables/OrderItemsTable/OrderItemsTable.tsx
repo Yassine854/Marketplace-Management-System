@@ -228,6 +228,49 @@ const fakeItems = [
 
 import Head from "./OrderItemsTableHead";
 
+import { useCounter } from "@uidotdev/usehooks";
+
+import { Button } from "@nextui-org/react";
+import toast from "react-hot-toast";
+const ShippedCounter = () => {
+  const min = 0;
+  const max = 10;
+  const [count, { increment, decrement, set, reset }] = useCounter(5, {
+    min,
+    max,
+  });
+
+  return (
+    <div className="flex">
+      <Button
+        onClick={() => {
+          if (count === max) {
+            toast.error("You can't add more ");
+          }
+
+          increment();
+        }}
+        size="sm"
+      >
+        <p className="text-xl font-bold">+</p>
+      </Button>
+      <p className="flex w-12 justify-center text-2xl font-semibold">{count}</p>
+      <Button
+        className="link"
+        onClick={() => {
+          if (count === min) {
+            toast.error("You can't remove more");
+          }
+          decrement();
+        }}
+        size="sm"
+      >
+        <p className="text-xl font-bold">-</p>
+      </Button>
+    </div>
+  );
+};
+
 const OrderItemsTable = ({ items = fakeItems }: any) => {
   return (
     <div className="mb-6 w-full ">
@@ -255,12 +298,13 @@ const OrderItemsTable = ({ items = fakeItems }: any) => {
                     </div>
                   </div>
                 </td>
-                <td className="px-3 py-2">{shipped || "*****"}</td>
                 <td className="px-3 py-2">
-                  <input className="w-12" defaultValue={pcb} />
-                  {/* <div className="flex items-center gap-3">
+                  <ShippedCounter />
+                </td>
+                <td className="px-3 py-2">
+                  <div className="flex items-center gap-3">
                     {pcb || "*****"}
-                  </div> */}
+                  </div>
                 </td>
                 <td className="px-3 py-2">{quantity || "*****"}</td>
                 <td className="px-3 py-2">

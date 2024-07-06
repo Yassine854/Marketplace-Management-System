@@ -32,7 +32,7 @@ const RootLayout = ({
         <ThemeProvider>
           <Next13NProgress color="#5D69F4" height={3} />
           <LayoutProvider>
-            <NextUIProvider>{children}</NextUIProvider>
+            <NextUIProvider locale="fr-FR">{children}</NextUIProvider>
           </LayoutProvider>
         </ThemeProvider>
       </body>

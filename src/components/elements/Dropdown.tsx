@@ -39,6 +39,18 @@ const Dropdown = ({
             : "invisible scale-0 opacity-0"
         }`}
       >
+        <li
+          onClick={() => {
+            // setSelected(item);
+            toggleOpen();
+          }}
+          key={0}
+          className={`cursor-pointer rounded-md px-4 py-2 text-xs duration-300 hover:text-primary ${
+            false && "bg-primary text-n0 hover:!text-n0"
+          }`}
+        >
+          Select Action
+        </li>
         {items.map((item) => (
           <li
             onClick={() => {

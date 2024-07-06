@@ -1,7 +1,7 @@
 meta {
   name: Edit Order in Typesense
   type: http
-  seq: 3
+  seq: 1
 }
 
 put {
@@ -11,16 +11,52 @@ put {
 }
 
 headers {
-  X-API-Key: 
+  X-API-Key: HgomyMjEBfIAi0FukmGf5E65sKDhEy
 }
 
 body:json {
   {
-    
-  "order":{
-    
-    "id":"assadfsdf",
-    "safsadf":"asdfsdf"
-  }
+    "order": {
+      "id": "60028",
+      "kamiounId": "000050048",
+      "state": "valid",
+      "status": "Valid",
+      "total": 817.9,
+      "createdAt": 1720183297,
+      "customerId": 7043,
+      "storeId": 1,
+      "customerPhone": "50885777",
+      "customerFirstname": "najeh",
+      "customerLastname": "abassi",
+      "deliveryAgentId": 66,
+      "deliveryAgent": "Mehdi Alagui",
+      "deliveryDate": 1720224000,
+      "deliveryStatus": "test",
+      "source": "online",
+      "items": [
+        {
+          "id": "736819",
+          "orderId": "60028",
+          "kamiounOrderId": "000050048",
+          "productId": "5301",
+          "productName": "P6",
+          "productPrice": 500,
+          "totalPrice": 500,
+          "quantity": 1,
+          "sku": "P6-2"
+        },
+        {
+          "id": "736820",
+          "orderId": "60028",
+          "kamiounOrderId": "000050048",
+          "productId": "5306",
+          "productName": "Manar - Thon entier HO 160 g",
+          "productPrice": 317.9,
+          "totalPrice": 317.9,
+          "quantity": 1,
+          "sku": "T0160HOVENC-MN-FI1-5"
+        }
+      ]
+    }
   }
 }
