@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { redirect } from "next/navigation";
 import OrderItemsTable from "@/components/tables/OrderItemsTable";
 import { useGetOrder } from "@/hooks/ordersHooks/useGetOrder";
@@ -15,8 +15,15 @@ import OrderCancelingModal from "@/components/widgets/OrderCancelingModal";
 import { IconBrightnessAuto } from "@tabler/icons-react";
 
 const OrderDetailsPage = () => {
-  const { orderOnReviewId } = useOrdersStore();
+  const {
+    setOrderOnReviewItems,
+    orderOnReviewItems,
+    setOrderOnReviewItemsBeforeEdit,
+    orderOnReviewId,
+    setOrderOnReviewDeliveryDate,
+  } = useOrdersStore();
   const { data: order, refetch } = useGetOrder(orderOnReviewId);
+  const [total, setTotal] = useState(0);
 
   const {
     editOrderActions: actions,
@@ -30,14 +37,36 @@ const OrderDetailsPage = () => {
   } = useOrderActions();
 
   useEffect(() => {
+    let total = 0;
+    orderOnReviewItems.forEach((item: any) => {
+      total += item.shipped * item.productPrice;
+    });
+
+    setTotal(total);
+  }, [orderOnReviewItems]);
+
+  useEffect(() => {
+    if (order) {
+      setOrderOnReviewItems(order?.items);
+      setOrderOnReviewItemsBeforeEdit(order?.items);
+      setOrderOnReviewDeliveryDate(order?.deliveryDate);
+    }
+  }, [
+    order,
+    setOrderOnReviewItems,
+    setOrderOnReviewDeliveryDate,
+    setOrderOnReviewItemsBeforeEdit,
+  ]);
+
+  useEffect(() => {
     !orderUnderActionId && refetch();
-  }, [orderUnderActionId, refetch()]);
+  }, [orderUnderActionId, refetch]);
 
   useEffect(() => {
     if (!orderOnReviewId) {
       redirect("/orders");
     }
-  }, [orderOnReviewId, order]);
+  }, [orderOnReviewId]);
 
   return (
     <div className="l mt-20 flex flex-grow flex-col justify-between bg-n20 p-4 ">
@@ -60,7 +89,7 @@ const OrderDetailsPage = () => {
             id={order?.id}
             status={order?.status}
             createdAt={order?.createdAt}
-            total={order?.total}
+            total={total}
           />
           <CustomerInfo
             firstname={order?.customerFirstname}
@@ -93,7 +122,7 @@ const OrderDetailsPage = () => {
         </div>
         <Divider />
         <div className="relative mb-4 mt-1 flex flex-grow overflow-y-scroll">
-          <OrderItemsTable items={order?.lines} />
+          <OrderItemsTable items={orderOnReviewItems} />
         </div>
       </div>
       <OrderCancelingModal

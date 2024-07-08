@@ -11,8 +11,6 @@ export const useMultipleOrdersActions = () => {
   const actionsRef = useRef(null);
 
   const reset = () => {
-    console.log("🚀 ~ reset ~ reset:", actionsRef);
-
     if (actionsRef.current) {
       //@ts-ignore
       actionsRef.current.reset();

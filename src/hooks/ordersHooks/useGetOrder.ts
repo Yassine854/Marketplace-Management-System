@@ -40,7 +40,7 @@ const QUERY = gql`
       deliveryDate
       deliveryStatus
       source
-      lines {
+      items {
         id
         orderId
         productId
@@ -49,6 +49,8 @@ const QUERY = gql`
         productPrice
         totalPrice
         sku
+        shipped
+        pcb
       }
     }
   }

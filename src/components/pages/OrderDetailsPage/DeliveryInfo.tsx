@@ -1,10 +1,13 @@
 import { IconTruckDelivery } from "@tabler/icons-react";
 import DeliveryDatePicker from "./DeliveryDatePicker";
 import { unixTimestampToDateYMD } from "@/utils/unixTimestamp";
+import { useOrdersStore } from "@/stores/ordersStore";
 
 const DeliveryInfo = ({ deliveryAgent, deliveryDate }: any) => {
+  const { setOrderOnReviewDeliveryDate } = useOrdersStore();
+
   const onDeliveryDateChanged = (value: any) => {
-    console.log("🚀 ~ onDeliveryDateChanged ~ value:", value);
+    setOrderOnReviewDeliveryDate(value);
   };
 
   return (

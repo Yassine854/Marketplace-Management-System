@@ -1,5 +1,5 @@
 import { Order } from "@/types/order";
-import { getOrderLines } from "../getOrderLines";
+import { getOrderItems } from "../getOrderItems";
 import { getOrderSource } from "../getOrderSource";
 
 export const getOrdersBatch = (orders: any): Order[] =>
@@ -25,6 +25,6 @@ export const getOrdersBatch = (orders: any): Order[] =>
         !!order?.extension_attributes?.from_mobile,
         !!order?.extension_attributes?.verified,
       ),
-      lines: getOrderLines(order?.items),
+      items: getOrderItems(order?.items),
     };
   }) || [];

@@ -34,7 +34,7 @@ export const typeDefs = gql`
     message: String
   }
 
-  type OrderLine {
+  type OrderItem {
     id: ID
     orderId: ID
     productId: ID
@@ -43,6 +43,8 @@ export const typeDefs = gql`
     productPrice: Float
     totalPrice: Float
     sku: String
+    shipped: Float
+    pcb: Float
   }
 
   type Order {
@@ -61,7 +63,7 @@ export const typeDefs = gql`
     deliveryDate: Float!
     deliveryStatus: String
     source: String!
-    lines: [OrderLine!]!
+    items: [OrderItem]
   }
 
   type OrderList {

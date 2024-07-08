@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Dropdown from "@/components/inputs/Dropdown";
 import Loading from "@/components/elements/Loading";
 
@@ -26,7 +26,7 @@ const ActionsDropdown = ({ actions, isPending, dropRef, orderId }: any) => {
                   const selected = actions.find(
                     (action: any) => action.key === selectedAction,
                   );
-                  selected.action(orderId);
+                  selected?.action(orderId);
                 }}
               >
                 Confirm

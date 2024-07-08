@@ -6,7 +6,7 @@ import { convertToUnixTimestamp } from "./convertToUnixTimestamp";
 
 const DeliveryDatePicker = ({ onChange, defaultValue }: any) => {
   const formatter = useDateFormatter();
-  const [value, setValue] = useState(parseDate("2023-07-06"));
+  const [value, setValue] = useState(parseDate("2024-01-01"));
 
   useEffect(() => {
     if (defaultValue) {
@@ -16,7 +16,7 @@ const DeliveryDatePicker = ({ onChange, defaultValue }: any) => {
 
   useEffect(() => {
     onChange(convertToUnixTimestamp(value, formatter));
-  }, [value, onChange, formatter]);
+  }, [value]);
 
   return (
     <div className="flex flex-row gap-2">
