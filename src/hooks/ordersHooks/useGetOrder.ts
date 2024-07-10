@@ -35,12 +35,13 @@ const QUERY = gql`
       customerId
       customerFirstname
       customerLastname
+      customerPhone
       deliveryAgentId
       deliveryAgent
       deliveryDate
       deliveryStatus
       source
-      lines {
+      items {
         id
         orderId
         productId
@@ -49,6 +50,8 @@ const QUERY = gql`
         productPrice
         totalPrice
         sku
+        shipped
+        pcb
       }
     }
   }
@@ -56,6 +59,7 @@ const QUERY = gql`
 
 export const useGetOrder = (orderId: string) => {
   const { data, loading, error, refetch } = useQuery(QUERY, {
+    fetchPolicy: "no-cache",
     variables: {
       orderId,
     },

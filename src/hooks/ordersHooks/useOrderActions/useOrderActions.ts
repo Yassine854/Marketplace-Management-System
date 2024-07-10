@@ -10,6 +10,7 @@ import { useDisclosure } from "@nextui-org/react";
 import { orderActionsByStatus } from "./orderActionsByStatus";
 import { useOrdersCount } from "../useOrdersCount";
 import { useGenerateOrderSummary } from "./useGenerateOrderSummary";
+import { useEditOrderDetails } from "./useEditOrderDetails";
 
 export const useOrderActions = () => {
   const dropRef = useRef();
@@ -26,7 +27,16 @@ export const useOrderActions = () => {
     onClose,
   } = useDisclosure();
 
-  const { status, setOrderOnReviewId } = useOrdersStore();
+  const { editDetails, isPending: isEditingDetailsPending } =
+    useEditOrderDetails();
+
+  const {
+    status,
+    setOrderOnReviewId,
+    orderOnReviewItems,
+    orderOnReviewDeliveryDate,
+    orderOnReviewId,
+  } = useOrdersStore();
 
   const { refetch } = useOrdersData();
 
@@ -67,16 +77,21 @@ export const useOrderActions = () => {
     setOrderUnderActionId,
     setOrderToCancelId,
     setOrderOnReviewId,
+    editDetails,
+    orderOnReviewItems,
+    orderOnReviewId,
+    orderOnReviewDeliveryDate,
   });
 
   useEffect(() => {
-    if (!isEditingPending && !isCancelingPending) {
+    if (!isEditingPending && !isCancelingPending && !isEditingDetailsPending) {
       refetch();
       refetchCount();
       reset();
     }
   }, [
     isEditingPending,
+    isEditingDetailsPending,
     setOrderUnderActionId,
     isCancelingPending,
     refetchCount,
@@ -88,7 +103,8 @@ export const useOrderActions = () => {
       !isGeneratePickListPending &&
       !isGenerateDeliveryNotePending &&
       !isEditingPending &&
-      !isCancelingPending
+      !isCancelingPending &&
+      !isEditingDetailsPending
     ) {
       setOrderUnderActionId("");
     }
@@ -100,6 +116,7 @@ export const useOrderActions = () => {
     isCancelingPending,
     refetchCount,
     refetch,
+    isEditingDetailsPending,
   ]);
 
   return {

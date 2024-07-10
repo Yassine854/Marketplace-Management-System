@@ -1,22 +1,40 @@
 import { useEffect, useState } from "react";
 import { DatePicker } from "@nextui-org/react";
-import { parseDate } from "@internationalized/date";
+import { parseDate, getLocalTimeZone } from "@internationalized/date";
 import { useDateFormatter } from "@react-aria/i18n";
-import { convertToUnixTimestamp } from "./convertToUnixTimestamp";
+
+function formatUnixTimestamp(timestamp: number): string {
+  const date = new Date(timestamp * 1000); // Convert UNIX timestamp to milliseconds
+  const year = date.getFullYear();
+  const month = ("0" + (date.getMonth() + 1)).slice(-2); // Months are zero indexed
+  const day = ("0" + date.getDate()).slice(-2);
+
+  return `${year}-${month}-${day}`;
+}
 
 const DeliveryDatePicker = ({ onChange, defaultValue }: any) => {
-  const formatter = useDateFormatter();
+  const formatter = useDateFormatter({ dateStyle: "short" });
   const [value, setValue] = useState(parseDate("2023-07-06"));
 
   useEffect(() => {
     if (defaultValue) {
-      setValue(parseDate(defaultValue));
+      const date = formatUnixTimestamp(defaultValue);
+
+      setValue(parseDate(date));
     }
   }, [defaultValue, setValue]);
 
+  //To Refactor
   useEffect(() => {
-    onChange(convertToUnixTimestamp(value, formatter));
-  }, [value, onChange, formatter]);
+    if (value) {
+      const dateString = formatter.format(value.toDate(getLocalTimeZone()));
+      const [day, month, year] = dateString.split("/").map(Number);
+      const date = new Date(year, month - 1, day);
+      const unixTimestamp = Math.floor(date.getTime() / 1000);
+      onChange(unixTimestamp);
+    }
+    //adding onChange to dependency array cause a problem
+  }, [value]);
 
   return (
     <div className="flex flex-row gap-2">

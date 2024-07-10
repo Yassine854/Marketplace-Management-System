@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const orderLineSchema = z.object({
+export const orderItemschema = z.object({
   id: z.string(),
   orderId: z.string(),
   kamiounOrderId: z.string(),
@@ -10,6 +10,8 @@ export const orderLineSchema = z.object({
   productPrice: z.number(),
   totalPrice: z.number(),
   sku: z.string(),
+  pcb: z.number(),
+  shipped: z.number(),
 });
 
-export type OrderLine = z.infer<typeof orderLineSchema>;
+export type OrderLine = z.infer<typeof orderItemschema>;

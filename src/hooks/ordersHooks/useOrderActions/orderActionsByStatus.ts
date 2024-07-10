@@ -8,6 +8,10 @@ export const orderActionsByStatus = ({
   setOrderUnderActionId,
   setOrderToCancelId,
   setOrderOnReviewId,
+  orderOnReviewItems,
+  editDetails,
+  orderOnReviewId,
+  orderOnReviewDeliveryDate,
 }: any) => {
   const setToValid = {
     key: "setToValid",
@@ -89,14 +93,18 @@ export const orderActionsByStatus = ({
     key: "edit",
     name: "Edit",
     action: (orderId: any) => {
-      //  setOrderOnReviewId(orderId);
-      //  navigateToOrderDetails();
+      setOrderUnderActionId(orderId || "123");
+      editDetails({
+        orderId: orderOnReviewId,
+        items: orderOnReviewItems,
+        deliveryDate: orderOnReviewDeliveryDate,
+      });
     },
   };
 
   const gotToEdit = {
     key: "gotToEdit",
-    name: "Edit",
+    name: "Go To Edit",
     action: (orderId: any) => {
       setOrderOnReviewId(orderId);
       navigateToOrderDetails();

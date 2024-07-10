@@ -1,7 +1,6 @@
 import { IconShoppingCart } from "@tabler/icons-react";
-import { Chip } from "@nextui-org/react";
 
-const OrderInfo = ({ id, status, total }: any) => {
+const OrderInfo = ({ id, total }: any) => {
   return (
     <div className=" flex h-32">
       <div className="   flex  h-16 w-16  items-center justify-center rounded-full bg-n30 ">
@@ -16,7 +15,7 @@ const OrderInfo = ({ id, status, total }: any) => {
           </p>
           <p className="text-black  ">
             <span className="text-n90 ">Total : </span>
-            {total} TND
+            {total.toFixed(2)} TND
           </p>
         </div>
       </div>

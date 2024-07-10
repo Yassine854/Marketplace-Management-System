@@ -15,6 +15,9 @@ export const unixTimestampToDateYMD = (timestamp: number): string => {
 };
 
 export const unixTimestampToDateDMY = (timestamp: number): string => {
+  if (timestamp === 0) {
+    return "***";
+  }
   // Create a new Date object using the provided timestamp
   const dateObject = new Date(timestamp);
 
@@ -24,7 +27,7 @@ export const unixTimestampToDateDMY = (timestamp: number): string => {
   const year = dateObject.getFullYear();
 
   if (!day || !month || !year) {
-    return "";
+    return "***";
   }
 
   return `${day}-${month}-${year}`;
