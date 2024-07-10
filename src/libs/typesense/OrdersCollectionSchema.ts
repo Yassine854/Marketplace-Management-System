@@ -32,6 +32,7 @@ export const typesenseOrdersCollectionSchema: CollectionCreateSchema = {
     {
       name: "createdAt",
       type: "int64",
+      range_index: true,
     },
     {
       name: "customerId",
@@ -47,29 +48,40 @@ export const typesenseOrdersCollectionSchema: CollectionCreateSchema = {
       type: "string",
     },
     {
+      name: "customerPhone",
+      type: "string",
+    },
+    {
       name: "deliveryAgentId",
       type: "string",
+      optional: true,
     },
     {
       name: "deliveryAgent",
       type: "string",
+      optional: true,
+    },
+
+    {
+      name: "deliveryDate",
+      type: "int64",
+      optional: true,
     },
     {
       name: "deliveryStatus",
       type: "string",
-    },
-    {
-      name: "deliveryDate",
-      type: "int64",
+      optional: true,
     },
     {
       name: "source",
       type: "string",
+      optional: true,
     },
 
     {
       name: "items",
       type: "auto",
+      optional: true,
     },
   ],
 };

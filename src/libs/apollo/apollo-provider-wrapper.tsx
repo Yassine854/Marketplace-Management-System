@@ -35,7 +35,9 @@ export const ApolloProviderWrapper = ({
     return new ApolloClient({
       // link: from([authMiddleware, httpLink]),
       link: from([httpLink]),
-      cache: new InMemoryCache(),
+      cache: new InMemoryCache({
+        addTypename: false,
+      }),
     });
   }, []);
 

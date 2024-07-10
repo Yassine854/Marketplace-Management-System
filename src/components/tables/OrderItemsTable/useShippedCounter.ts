@@ -1,48 +1,52 @@
 import { useEffect, useState } from "react";
 import { useOrdersStore } from "@/stores/ordersStore";
+import toast from "react-hot-toast";
 
-export const useShippedCounter = ({ pcb, id }: any) => {
-  const {
-    orderOnReviewItems,
-    setOrderOnReviewItems,
-    orderOnReviewItemsBeforeEdit,
-  } = useOrdersStore();
-  const min = 0;
-  const [item, setItem] = useState();
-  const [itemBeforeEdit, setItemBeforeEdit] = useState();
+export const useShippedCounter = (id: string) => {
+  const { orderOnReviewItems, setOrderOnReviewItems } = useOrdersStore();
+  const [item, setItem] = useState<any>();
 
   const incrementShipped = (id: any) => {
-    const items: any = orderOnReviewItems.map((item: any) => {
-      if (item?.id === id) {
-        useShippedCounter;
-        const newShipped = item?.shipped + pcb;
+    if (item?.shipped === item.quantity) {
+      toast.error("You can't add more");
+    } else {
+      const items: any = orderOnReviewItems.map((item: any) => {
+        if (item?.id === id) {
+          useShippedCounter;
+          const newShipped = item?.shipped + item?.pcb;
 
-        return {
-          ...item,
-          shipped: newShipped,
-          totalPrice: newShipped * item.productPrice,
-        };
-      }
-      return item;
-    });
+          return {
+            ...item,
+            shipped: newShipped,
+            totalPrice: newShipped * item.productPrice,
+          };
+        }
+        return item;
+      });
 
-    setOrderOnReviewItems(items);
+      setOrderOnReviewItems(items);
+    }
   };
 
-  const decrementShipped = (id: any) => {
-    const items = orderOnReviewItems.map((item: any) => {
-      if (item?.id === id) {
-        const newShipped = item?.shipped - pcb;
-        return {
-          ...item,
-          shipped: newShipped,
-          totalPrice: newShipped * item.productPrice,
-        };
-      }
-      return item;
-    });
+  const decrementShipped = (id: string) => {
+    //@ts-ignore
+    if (item?.shipped === 0) {
+      toast.error("You can't remove more");
+    } else {
+      const items = orderOnReviewItems.map((item: any) => {
+        if (item?.id === id) {
+          const newShipped = item?.shipped - item?.pcb;
+          return {
+            ...item,
+            shipped: newShipped,
+            totalPrice: newShipped * item.productPrice,
+          };
+        }
+        return item;
+      });
 
-    setOrderOnReviewItems(items);
+      setOrderOnReviewItems(items);
+    }
   };
 
   useEffect(() => {
@@ -53,15 +57,5 @@ export const useShippedCounter = ({ pcb, id }: any) => {
     }
   }, [id, setItem, orderOnReviewItems]);
 
-  useEffect(() => {
-    if (orderOnReviewItemsBeforeEdit) {
-      const item = orderOnReviewItemsBeforeEdit.find(
-        (item: any) => item?.id === id,
-      );
-      setItemBeforeEdit(item);
-      //   //@ts-igno
-    }
-  }, [id, setItemBeforeEdit, orderOnReviewItemsBeforeEdit]);
-
-  return { incrementShipped, decrementShipped, item, itemBeforeEdit };
+  return { incrementShipped, decrementShipped, item };
 };

@@ -6,11 +6,18 @@ import { axios } from "@/libs/axios";
 export const useEditOrderDetails = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ orderId, items, deliveryDate }: any) => {
+      let total = 0;
+
+      items.forEach((item: any) => {
+        total += item?.totalPrice;
+      });
+
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
         order: {
           id: orderId,
           items,
           deliveryDate,
+          total,
         },
       });
     },

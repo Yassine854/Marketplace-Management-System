@@ -35,6 +35,7 @@ const QUERY = gql`
       customerId
       customerFirstname
       customerLastname
+      customerPhone
       deliveryAgentId
       deliveryAgent
       deliveryDate
@@ -58,6 +59,7 @@ const QUERY = gql`
 
 export const useGetOrder = (orderId: string) => {
   const { data, loading, error, refetch } = useQuery(QUERY, {
+    fetchPolicy: "no-cache",
     variables: {
       orderId,
     },

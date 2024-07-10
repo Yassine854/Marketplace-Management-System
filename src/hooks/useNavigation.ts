@@ -19,6 +19,10 @@ export const useNavigation = () => {
     push("/dashboard");
   };
 
+  const navigateToOrders = () => {
+    push("/orders");
+  };
+
   const navigateToUsersTable = () => {
     push("/access/users");
   };
@@ -39,6 +43,7 @@ export const useNavigation = () => {
     navigateToLogin,
     navigateToCreateUserForm,
     navigateToManageMilkRun,
+    navigateToOrders,
     locale: String(locale),
   };
 };

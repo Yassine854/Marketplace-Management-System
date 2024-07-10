@@ -33,13 +33,11 @@ const OrderItemsTable = ({ items }: any) => {
                   <ShippedCounter id={id} pcb={pcb} shipped={shipped} />
                 </td>
                 <td className="px-3 py-2">
-                  <div className="flex items-center gap-3">
-                    {pcb || "*****"}
-                  </div>
+                  <div className="flex items-center gap-3">{pcb || 0}</div>
                 </td>
-                <td className="px-3 py-2">{quantity || "*****"}</td>
+                <td className="px-3 py-2">{quantity || 0}</td>
                 <td className="px-3 py-2">
-                  <div className="flex gap-2">{totalPrice || "*****"} </div>
+                  <div className="flex gap-2">{totalPrice || 0} </div>
                 </td>
               </tr>
             ),

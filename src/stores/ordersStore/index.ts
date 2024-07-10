@@ -18,14 +18,12 @@ export const useOrdersStore = create<any>(
       isOrdersLoading: false,
       orderOnReviewId: "",
       orderOnReviewItems: [],
-      orderOnReviewItemsBeforeEdit: [],
       orderOnReviewDeliveryDate: null,
       setOrderOnReviewDeliveryDate: (orderOnReviewDeliveryDate: any) =>
         set({ orderOnReviewDeliveryDate }),
 
       setOrderOnReviewId: (orderOnReviewId: string) => set({ orderOnReviewId }),
-      setOrderOnReviewItemsBeforeEdit: (orderOnReviewItemsBeforeEdit: any) =>
-        set({ orderOnReviewItemsBeforeEdit }),
+
       setOrderOnReviewItems: (orderOnReviewItems: any[]) =>
         set({ orderOnReviewItems }),
       setItemsPerPage: (itemsPerPage: number) => set({ itemsPerPage }),

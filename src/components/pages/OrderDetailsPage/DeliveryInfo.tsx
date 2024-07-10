@@ -1,15 +1,11 @@
 import { IconTruckDelivery } from "@tabler/icons-react";
 import DeliveryDatePicker from "./DeliveryDatePicker";
-import { unixTimestampToDateYMD } from "@/utils/unixTimestamp";
-import { useOrdersStore } from "@/stores/ordersStore";
 
-const DeliveryInfo = ({ deliveryAgent, deliveryDate }: any) => {
-  const { setOrderOnReviewDeliveryDate } = useOrdersStore();
-
-  const onDeliveryDateChanged = (value: any) => {
-    setOrderOnReviewDeliveryDate(value);
-  };
-
+const DeliveryInfo = ({
+  deliveryAgent,
+  deliveryDate,
+  onDeliveryDateChange,
+}: any) => {
   return (
     <div className=" ml-12 flex h-32">
       <div className="">
@@ -25,11 +21,16 @@ const DeliveryInfo = ({ deliveryAgent, deliveryDate }: any) => {
           {deliveryAgent || "*****"}
         </p>
         <div className=" flex items-center justify-between   ">
-          <span className="  text-n90 ">Delivery Date :</span>
-          <DeliveryDatePicker
-            onChange={onDeliveryDateChanged}
-            defaultValue={unixTimestampToDateYMD(deliveryDate)}
-          />
+          <p className="text-black  ">
+            <span className="text-n90 ">Delivery Date :</span>{" "}
+            {!deliveryDate && "*****"}
+          </p>
+          {!!deliveryDate && (
+            <DeliveryDatePicker
+              onChange={onDeliveryDateChange}
+              defaultValue={deliveryDate}
+            />
+          )}
         </div>
       </div>
     </div>

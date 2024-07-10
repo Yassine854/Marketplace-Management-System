@@ -100,7 +100,7 @@ const SidebarVertical = ({
             selectedStatus={selectedStatus}
             items={statuses}
             isActive={
-              pathname?.includes("orders") && !pathname?.includes("logs")
+              pathname?.includes("order") && !pathname?.includes("logs")
             }
             onClick={() => {
               push("/orders");

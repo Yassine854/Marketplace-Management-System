@@ -84,13 +84,14 @@ export const useOrderActions = () => {
   });
 
   useEffect(() => {
-    if (!isEditingPending && !isCancelingPending) {
+    if (!isEditingPending && !isCancelingPending && !isEditingDetailsPending) {
       refetch();
       refetchCount();
       reset();
     }
   }, [
     isEditingPending,
+    isEditingDetailsPending,
     setOrderUnderActionId,
     isCancelingPending,
     refetchCount,

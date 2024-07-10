@@ -51,7 +51,6 @@ const OrdersTable = () => {
                     order={order}
                     onClick={() => {
                       onOrderClick(order.id);
-                      console.log("🚀 ~ OrdersTable ~ order.id:", order.id);
                     }}
                     onSelectClick={selectOrder}
                     onPDFIconClick={generateSummary}

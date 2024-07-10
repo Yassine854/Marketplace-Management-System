@@ -1,10 +1,33 @@
 import { IconPdf, IconTruck } from "@tabler/icons-react";
 import Checkbox from "@/components/inputs/Checkbox";
 import OrdersTableCell from "./OrdersTableCell";
-import { unixTimestampToDateDMY } from "@/utils/unixTimestamp";
 import TableActions from "./TableActions";
 import Loading from "@/components/elements/Loading";
 import { useRef } from "react";
+
+const unixTimeStampToStringDateYMD = (
+  unixTimestamp: number | undefined,
+): string => {
+  if (unixTimestamp) {
+    // Convert Unix timestamp to milliseconds
+    const milliseconds = unixTimestamp * 1000;
+
+    // Create a new Date object
+    const date = new Date(milliseconds);
+
+    // Get the date components
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed, so we add 1
+    const day = String(date.getDate()).padStart(2, "0");
+
+    // Form the date string in "YYYY-MM-DD" format
+    const formattedDate = `${year}-${month}-${day}`;
+
+    return formattedDate;
+  }
+
+  return "***";
+};
 
 const OrdersTableRow = ({
   onClick = () => console.log("Row clicked"),
@@ -49,7 +72,7 @@ const OrdersTableRow = ({
       </OrdersTableCell>
       <OrdersTableCell>{order?.total}</OrdersTableCell>
       <OrdersTableCell>
-        {unixTimestampToDateDMY(order?.deliveryDate)}
+        {unixTimeStampToStringDateYMD(order?.deliveryDate)}
       </OrdersTableCell>
       <OrdersTableCell>{order?.deliveryAgent || "***"}</OrdersTableCell>
       <OrdersTableCell>{order?.deliveryStatus || "***"}</OrdersTableCell>

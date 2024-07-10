@@ -1,33 +1,12 @@
 import { Button } from "@nextui-org/react";
-import toast from "react-hot-toast";
-
 import { useShippedCounter } from "./useShippedCounter";
 
-const ShippedCounter = ({ id, shipped, pcb }: any) => {
-  const max = shipped;
-
-  const { decrementShipped, incrementShipped, item, itemBeforeEdit } =
-    useShippedCounter({
-      pcb,
-      id,
-    });
-
-  const min = 0;
+const ShippedCounter = ({ id }: any) => {
+  const { decrementShipped, incrementShipped, item } = useShippedCounter(id);
 
   return (
     <div className="flex">
-      <Button
-        onClick={() => {
-          //@ts-ignore
-          if (item?.shipped === itemBeforeEdit.shipped) {
-            toast.error("You can't add more");
-          } else {
-            //@ts-ignore
-            incrementShipped(id, item?.pcb);
-          }
-        }}
-        size="sm"
-      >
+      <Button onClick={() => incrementShipped(id)} size="sm">
         <p className="text-xl font-bold">+</p>
       </Button>
       <input
@@ -35,20 +14,11 @@ const ShippedCounter = ({ id, shipped, pcb }: any) => {
         type="number"
         //@ts-ignore
         value={item?.shipped || 0}
-      />
-      <Button
-        className="link"
-        onClick={() => {
-          //@ts-ignore
-          if (item?.shipped === min) {
-            toast.error("You can't remove more");
-          } else {
-            //@ts-ignore
-            decrementShipped(id);
-          }
+        onChange={(v) => {
+          console.log("🚀 ~ ShippedCounter ~ v:", v);
         }}
-        size="sm"
-      >
+      />
+      <Button className="link" onClick={() => decrementShipped(id)} size="sm">
         <p className="text-xl font-bold">-</p>
       </Button>
     </div>
