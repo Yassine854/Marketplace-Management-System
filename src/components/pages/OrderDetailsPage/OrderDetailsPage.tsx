@@ -67,8 +67,8 @@ const OrderDetailsPage = () => {
         </div>
       </div>
       <OrderCancelingModal
-        onConfirm={cancelOrder}
-        message={" Are you sure you want to cancel those orders ? "}
+        onConfirm={() => cancelOrder(order?.id)}
+        message={" Are you sure you want to cancel this orders ? "}
         isOpen={isCancelingModalOpen}
         onOpenChange={onOpenChange}
         isPending={isCancelingPending}

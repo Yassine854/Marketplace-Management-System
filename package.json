@@ -21,7 +21,7 @@
     "prisma:push": "dotenv -e .env.local prisma db push",
     "prisma:generate": "dotenv -e .env.local npx prisma generate",
     "docker:build": "sudo docker build -t kamioun-oms-staging .",
-    "docker:start": "sudo docker run  -p 3000:3002 kamioun-oms:latest",
+    "docker:start": "sudo docker run  -p 3000:3002 kamioun-oms-staging:latest",
     "cypress:open": "cypress open",
     "e2e": "start-server-and-test dev http://localhost:3000 \"cypress open --e2e\"",
     "e2e:headless": "start-server-and-test dev http://localhost:3000 \"cypress run --e2e\"",

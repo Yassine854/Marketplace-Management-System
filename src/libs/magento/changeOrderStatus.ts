@@ -1,10 +1,10 @@
 import { axios } from "@/libs/axios";
 
-export const changeOrderStatus = async (
-  orderId: string,
-  status: string,
-  state: string,
-): Promise<any> => {
+export const changeOrderStatus = async ({
+  orderId,
+  status,
+  state,
+}: any): Promise<any> => {
   try {
     const data = {
       entity: {
@@ -13,7 +13,7 @@ export const changeOrderStatus = async (
         state,
       },
     };
-    // await axios.magentoClient.post("orders/create", data);
+    await axios.magentoClient.put("orders/create", data);
   } catch (error) {
     process.env.NODE_ENV === "development" &&
       console.error("Error changing order status:", error);

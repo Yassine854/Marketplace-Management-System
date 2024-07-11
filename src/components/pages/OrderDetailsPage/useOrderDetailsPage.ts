@@ -58,6 +58,10 @@ export const useOrderDetailsPage = () => {
   }, [orderUnderActionId, refetch]);
 
   useEffect(() => {
+    !isCancelingPending && refetch();
+  }, [isCancelingPending, refetch]);
+
+  useEffect(() => {
     if (!orderOnReviewId) {
       redirect("/orders");
     }
