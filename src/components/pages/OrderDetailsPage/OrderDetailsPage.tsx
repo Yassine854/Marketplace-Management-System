@@ -38,7 +38,7 @@ const OrderDetailsPage = () => {
             id={order?.id}
             status={order?.status}
             createdAt={order?.createdAt}
-            total={total}
+            total={total?.toFixed(2)}
           />
           <CustomerInfo
             firstname={order?.customerFirstname}

@@ -14,9 +14,7 @@ const ShippedCounter = ({ id }: any) => {
         type="number"
         //@ts-ignore
         value={item?.shipped || 0}
-        onChange={(v) => {
-          console.log("🚀 ~ ShippedCounter ~ v:", v);
-        }}
+        onChange={(v) => {}}
       />
       <Button className="link" onClick={() => decrementShipped(id)} size="sm">
         <p className="text-xl font-bold">-</p>

@@ -3,6 +3,7 @@ import Sidebar from "@/components/widgets/SidebarVertical";
 import TopNav from "@/components/widgets/TopNavbar";
 import { useOrdersStore } from "@/stores/ordersStore";
 import { useEffect, useState } from "react";
+import { useNavigation } from "@/hooks/useNavigation";
 
 export default function MainLayout({
   children,
@@ -11,6 +12,7 @@ export default function MainLayout({
 }) {
   const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
   const { setStatus } = useOrdersStore();
+  const { navigateToOrders } = useNavigation();
 
   const { user } = useAuth();
 
@@ -48,6 +50,7 @@ export default function MainLayout({
         isAdmin={isAdmin}
         onOrderStatusClick={(status: any) => {
           setStatus(status);
+          navigateToOrders();
         }}
       />
       <div className="flex h-full flex-grow ">

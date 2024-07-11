@@ -15,7 +15,7 @@ const OrderInfo = ({ id, total }: any) => {
           </p>
           <p className="text-black  ">
             <span className="text-n90 ">Total : </span>
-            {total.toFixed(2)} TND
+            {/* {total && total?.toFixed(2)} TND */}
           </p>
         </div>
       </div>

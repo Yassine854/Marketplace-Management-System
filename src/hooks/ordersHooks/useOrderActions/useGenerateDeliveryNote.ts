@@ -12,10 +12,6 @@ export const useGenerateDeliveryNote = () => {
       return deliveryNotesUrl;
     },
     onSuccess: (deliveryNotesUrl) => {
-      console.log(
-        "🚀 ~ useGenerateDeliveryNote ~ deliveryNotesUrl:",
-        deliveryNotesUrl,
-      );
       window.open(deliveryNotesUrl);
 
       toast.success(`Order Delivery Note Generated Successfully`, {
