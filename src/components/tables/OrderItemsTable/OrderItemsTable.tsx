@@ -37,7 +37,9 @@ const OrderItemsTable = ({ items }: any) => {
                 </td>
                 <td className="px-3 py-2">{quantity || 0}</td>
                 <td className="px-3 py-2">
-                  <div className="flex gap-2">{totalPrice || 0} </div>
+                  <div className="flex gap-2">
+                    {totalPrice.toFixed(2) || 0}{" "}
+                  </div>
                 </td>
               </tr>
             ),
