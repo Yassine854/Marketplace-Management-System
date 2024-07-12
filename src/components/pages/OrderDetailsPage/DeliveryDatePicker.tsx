@@ -31,7 +31,7 @@ const DeliveryDatePicker = ({ onChange, defaultValue }: any) => {
       const [day, month, year] = dateString.split("/").map(Number);
       const date = new Date(year, month - 1, day);
       const unixTimestamp = Math.floor(date.getTime() / 1000);
-      onChange(unixTimestamp);
+      onChange && onChange(unixTimestamp);
     }
     //adding onChange to dependency array cause a problem
   }, [value]);

@@ -50,6 +50,7 @@ export const typesenseOrdersCollectionSchema: CollectionCreateSchema = {
     {
       name: "customerPhone",
       type: "string",
+      optional: true,
     },
     {
       name: "deliveryAgentId",
@@ -66,6 +67,7 @@ export const typesenseOrdersCollectionSchema: CollectionCreateSchema = {
       name: "deliveryDate",
       type: "int64",
       optional: true,
+      range_index: true,
     },
     {
       name: "deliveryStatus",

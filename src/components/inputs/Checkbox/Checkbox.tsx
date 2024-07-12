@@ -17,7 +17,6 @@ const Checkbox = ({
       ref={checkboxRef}
       className="flex h-8 w-8 items-center justify-center rounded-full   hover:bg-n70"
       onClick={(event: any) => {
-        console.log("🚀 ~ event:", event);
         //  event.stopPropagation();
         onClick(!checked);
       }}

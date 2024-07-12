@@ -1,11 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-//import { magento } from "@/libs/magento";
 import { axios } from "@/libs/axios";
+import { magento } from "@/libs/magento";
 
 export const useEditOrderStatusAndState = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ orderId, status, state }: any) => {
+      await magento.changeOrderStatus({ orderId, status, state });
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
         order: {
           id: orderId,

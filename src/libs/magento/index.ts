@@ -5,6 +5,7 @@ import { getOrdersByBatch } from "./getOrdersByBatch";
 import { changeOrderStatus } from "./changeOrderStatus";
 import { generateOrderSummary } from "./generateOrderSummary";
 import { getPagesCount } from "./getPagesCount";
+import { editOrderDetails } from "./editOrderDetails";
 
 export const magento = {
   generateDeliveryNotes,
@@ -14,4 +15,5 @@ export const magento = {
   changeOrderStatus,
   generateOrderSummary,
   getPagesCount,
+  editOrderDetails,
 };
