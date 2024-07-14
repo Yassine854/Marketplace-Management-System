@@ -6,6 +6,8 @@ import { changeOrderStatus } from "./changeOrderStatus";
 import { generateOrderSummary } from "./generateOrderSummary";
 import { getPagesCount } from "./getPagesCount";
 import { editOrderDetails } from "./editOrderDetails";
+import { getDeliveryAgents } from "./getDeliveryAgents";
+import { getMilkRunOrdersPerDate } from "./getMilkRunOrdersPerDate";
 
 export const magento = {
   generateDeliveryNotes,
@@ -16,4 +18,6 @@ export const magento = {
   generateOrderSummary,
   getPagesCount,
   editOrderDetails,
+  getDeliveryAgents,
+  getMilkRunOrdersPerDate,
 };

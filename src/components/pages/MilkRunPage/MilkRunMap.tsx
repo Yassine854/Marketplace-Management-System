@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Image from "next/image";
-import axios from "axios";
-
+import { Marker, Popup } from "react-map-gl";
+import { IconMapPinFilled, IconMapPin } from "@tabler/icons-react";
 import Map, {
-  Marker,
-  Popup,
   NavigationControl,
   FullscreenControl,
   GeolocateControl,
@@ -15,74 +13,18 @@ const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 const tunisLat = 36.70972;
 const tunisLng = 10.174644;
 
-const prodBaseUrl = "https://debbou.kamioun.com";
-const magentoToken = process.env.NEXT_PUBLIC_MAGENTO_TOKEN;
-
-const magentoClient = axios.create({
-  baseURL: prodBaseUrl,
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${magentoToken}`,
-  },
-});
-
-const markers = [{ id: "1", lat: 36.70972, lng: 10.174644 }];
-const MapMarkers = () => {
-  const [dataMarkers, setDataMarkers] = useState<any[]>([]);
+const MilkRunMap = ({
+  children,
+  ordersMarkers,
+  onOrderMarkerClick,
+  selectedOrdersIds,
+}: any) => {
   const [popupInfo, setPopupInfo] = useState<any>(null);
 
   useEffect(() => {
-    magentoClient
-      .get(
-        "/rest/default/V1/orders/list/per_delivery_date?deliveryDate=15/07/2024",
-      )
-      .then((e) => {
-        setDataMarkers(e.data);
-        console.log("🚀 ~ useEffect ~ e:", e);
-      });
-  }, []);
+    console.log("🚀 ~ popupInfo:", popupInfo);
+  }, [popupInfo]);
 
-  return (
-    <div>
-      {dataMarkers.map((dataMarker) => (
-        <div className="cursor-pointer" key={dataMarker.id}>
-          <Marker
-            key={dataMarker.id}
-            longitude={dataMarker.longitude}
-            latitude={dataMarker.latitude}
-            onMarkerHover={(e: any) => {
-              // If we let the click event propagates to the map, it will immediately close the popup
-              // with `closeOnClick: true`
-              e.originalEvent.stopPropagation();
-              setPopupInfo(dataMarker);
-            }}
-          >
-            <Image
-              src="/marker.png"
-              className="rounded-full"
-              width={48}
-              height={48}
-              alt="marker"
-            />
-          </Marker>
-        </div>
-      ))}
-
-      {popupInfo && (
-        <Popup
-          anchor="top"
-          longitude={Number(popupInfo?.longitude)}
-          latitude={Number(popupInfo?.latitude)}
-          onClose={() => setPopupInfo(null)}
-        >
-          <div>Hello World from Popup</div>
-        </Popup>
-      )}
-    </div>
-  );
-};
-
-const MilkRunMap = () => {
   const [viewState, setViewState] = useState({
     latitude: tunisLat,
     longitude: tunisLng,
@@ -100,8 +42,76 @@ const MilkRunMap = () => {
       <GeolocateControl />
       <FullscreenControl />
       <NavigationControl />
+      <div>
+        {ordersMarkers?.map((marker: any) => (
+          <div
+            key={marker.order_id}
+            className="cursor-pointer"
+            onMouseEnter={() => {
+              setPopupInfo(marker);
+            }}
+            onMouseLeave={() => {
+              setPopupInfo(null);
+            }}
+          >
+            <Marker
+              cursor={"pointer"}
+              key={marker.order_id}
+              longitude={marker.longitude}
+              latitude={marker.latitude}
+              onClick={(e: any) => {
+                e.originalEvent.stopPropagation();
+                onOrderMarkerClick(marker.order_id);
+                console.log("🚀 ~ MapMarkers ~ marker:", marker);
+              }}
+            >
+              {selectedOrdersIds.includes(marker.order_id) && (
+                <IconMapPinFilled size={38} />
+              )}
+              {!selectedOrdersIds.includes(marker.order_id) && (
+                <IconMapPin size={38} />
+              )}
+            </Marker>
+          </div>
+        ))}
 
-      <MapMarkers />
+        {popupInfo && (
+          <Popup
+            className="w-96"
+            anchor="top"
+            longitude={Number(popupInfo?.longitude)}
+            latitude={Number(popupInfo?.latitude)}
+            onClose={() => setPopupInfo(null)}
+          >
+            <div className="text-lg font-semibold text-black">
+              Order Tech ID :{" "}
+              <span className="font-bold text-n90">#{popupInfo.order_id}</span>
+            </div>
+            <div className="text-lg font-semibold text-black">
+              Order ID :{" "}
+              <span className="font-bold text-n90">
+                #{popupInfo.kamioun_order_id}
+              </span>
+            </div>
+            <div className="text-lg font-semibold text-black">
+              Customer :{" "}
+              <span className="font-bold text-n90">{popupInfo.creator}</span>
+            </div>
+            <div className="text-lg font-semibold text-black">
+              Total :{" "}
+              <span className="font-bold text-n90">
+                {popupInfo.order_amount}
+              </span>
+            </div>
+            <div className="text-lg font-semibold text-black">
+              Delivery Agent :{" "}
+              <span className="font-bold text-n90">
+                {popupInfo.delivery_agent}
+              </span>
+            </div>
+          </Popup>
+        )}
+      </div>
     </Map>
   );
 };
