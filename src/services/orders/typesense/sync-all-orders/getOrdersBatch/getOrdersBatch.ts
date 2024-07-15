@@ -30,7 +30,7 @@ export const getOrdersBatch = (orders: any): Order[] =>
       customerPhone: order?.billing_address?.telephone || "",
       deliveryAgentId:
         String(order?.extension_attributes?.delivery_agent_id) || "",
-      deliveryAgent: order?.extension_attributes?.delivery_agent || "",
+      deliveryAgentName: order?.extension_attributes?.delivery_agent || "",
       deliveryStatus: order?.extension_attributes?.delivery_status || "",
       deliveryDate: deliveryDateToUnixTimeStamp(
         order?.extension_attributes?.delivery_date,

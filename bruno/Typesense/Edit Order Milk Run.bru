@@ -1,0 +1,26 @@
+meta {
+  name: Edit Order Milk Run
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/orders/typesense/edit-order
+  body: json
+  auth: none
+}
+
+headers {
+  X-API-Key: HgomyMjEBfIAi0FukmGf5E65sKDhEy
+}
+
+body:json {
+  {
+    "order": {
+      "id": "63416",
+      "deliveryAgentName": "Mariem Kedhiri",
+      "deliveryAgentId": 515,
+      "deliverySlot": "afternoon"
+    }
+  }
+}

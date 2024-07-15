@@ -2,7 +2,7 @@ import { IconTruckDelivery } from "@tabler/icons-react";
 import DeliveryDatePicker from "./DeliveryDatePicker";
 
 const DeliveryInfo = ({
-  deliveryAgent,
+  deliveryAgentName,
   deliveryDate,
   onDeliveryDateChange,
 }: any) => {
@@ -18,7 +18,7 @@ const DeliveryInfo = ({
         <p className=" pb-2 text-2xl font-bold text-black">Delivery Info</p>
         <p className="text-black  ">
           <span className="text-n90 ">Delivery Agent :</span>{" "}
-          {deliveryAgent || "*****"}
+          {deliveryAgentName || "*****"}
         </p>
         <div className=" flex items-center justify-between   ">
           <p className="text-black  ">

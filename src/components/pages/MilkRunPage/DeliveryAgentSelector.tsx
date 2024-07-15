@@ -1,6 +1,6 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
-import { IconChevronDown } from "@tabler/icons-react";
 import { useDropdown } from "@/hooks/useDropdown";
+import { IconChevronDown } from "@tabler/icons-react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 
 //@ts-ignore
 // eslint-disable-next-line react/display-name
@@ -46,9 +46,9 @@ const DeliveryAgentSelector = forwardRef(
           {deliveryAgents?.map((agent: any) => (
             <li
               onClick={() => {
-                onChange(agent?.id);
-                setLayout(agent?.name);
                 toggleOpen();
+                setLayout(agent?.name);
+                onChange({ id: agent?.id, name: agent?.name });
               }}
               className={`block cursor-pointer select-none rounded-md p-2 duration-300 hover:bg-slate-200 hover:text-primary ${
                 layout == agent.name ? "bg-primary text-n0 hover:!text-n0" : ""

@@ -49,7 +49,7 @@ const OrderDetailsPage = () => {
 
           <DeliveryInfo
             deliveryDate={order?.deliveryDate}
-            deliveryAgent={order?.deliveryAgent}
+            deliveryAgentName={order?.deliveryAgentName}
             onDeliveryDateChange={onDeliveryDateChange}
           />
 

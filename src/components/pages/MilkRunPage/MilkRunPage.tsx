@@ -1,25 +1,26 @@
-import { Button } from "@nextui-org/react";
-import { useMilkRun } from "@/hooks/milkRunHooks/useMilkRun";
 import MilRunMap from "./MilkRunMap";
-import DeliveryDatePicker from "../OrderDetailsPage/DeliveryDatePicker";
+import { Button } from "@nextui-org/react";
+import DeliverySlotSelector from "./DeliverySlotSelector";
 import DeliveryAgentSelector from "./DeliveryAgentSelector";
-import MilkRunSelector from "./MilkRunSelector";
+import { useMilkRun } from "@/hooks/milkRunHooks/useMilkRun";
+import DeliveryDatePicker from "../OrderDetailsPage/DeliveryDatePicker";
 
 const MilkRunPage = () => {
   const {
-    deliveryAgents,
     orders,
-    deliveryDate,
-    isLoading,
-    selectedOrdersIds,
-    onDeliveryDateChange,
-    onOrderMarkerClick,
-    onDeliveryAgentChange,
-    onMilkRunChange,
-    deliveryAgentSelectorRef,
-    milkRunSelectorRef,
     onReset,
+    isLoading,
+    onValidate,
     onEditClick,
+    deliveryDate,
+    deliveryAgents,
+    onMilkRunChange,
+    selectedOrdersIds,
+    onOrderMarkerClick,
+    onDeliveryDateChange,
+    onDeliveryAgentChange,
+    deliverySlotSelectorRef,
+    deliveryAgentSelectorRef,
   } = useMilkRun();
 
   return (
@@ -30,7 +31,6 @@ const MilkRunPage = () => {
         selectedOrdersIds={selectedOrdersIds}
         onOrderMarkerClick={onOrderMarkerClick}
       />
-
       <div className="absolute left-4 top-4 z-10 flex h-32  flex-col items-center justify-between rounded-xl p-4 ">
         <div className=" flex  h-10 w-full items-center  rounded-xl bg-n20 p-4 shadow-lg ">
           <p>
@@ -45,7 +45,6 @@ const MilkRunPage = () => {
           </p>
         </div>
       </div>
-
       <div className="absolute -right-4 bottom-0 left-1 z-10 flex h-20 w-full  justify-between bg-n20">
         {!isLoading && (
           <div className="flex">
@@ -66,8 +65,8 @@ const MilkRunPage = () => {
             </div>
             <div className=" mx-4 flex items-center justify-center ">
               <p className="mr-3 text-lg font-bold">Milk Run :</p>
-              <MilkRunSelector
-                ref={milkRunSelectorRef}
+              <DeliverySlotSelector
+                ref={deliverySlotSelectorRef}
                 onChange={onMilkRunChange}
               />
             </div>
@@ -76,7 +75,7 @@ const MilkRunPage = () => {
         {isLoading && <div>Loading ....</div>}
 
         <div className="flex h-full items-center justify-center  ">
-          <Button className="mx-4" color="primary">
+          <Button className="mx-4" color="primary" onClick={onValidate}>
             Validate
           </Button>
           <Button className="mx-4" color="danger" onClick={onReset}>

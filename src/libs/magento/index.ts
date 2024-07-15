@@ -1,23 +1,25 @@
-import { generatePickLists } from "./generatePickLists";
-import { generateDeliveryNotes } from "./generateDeliveryNotes";
 import { cancelOrder } from "./cancelOrder";
-import { getOrdersByBatch } from "./getOrdersByBatch";
-import { changeOrderStatus } from "./changeOrderStatus";
-import { generateOrderSummary } from "./generateOrderSummary";
 import { getPagesCount } from "./getPagesCount";
 import { editOrderDetails } from "./editOrderDetails";
+import { editOrderMilkRun } from "./editOrderMilkRun";
+import { getOrdersByBatch } from "./getOrdersByBatch";
+import { generatePickLists } from "./generatePickLists";
 import { getDeliveryAgents } from "./getDeliveryAgents";
+import { changeOrderStatus } from "./changeOrderStatus";
+import { generateOrderSummary } from "./generateOrderSummary";
+import { generateDeliveryNotes } from "./generateDeliveryNotes";
 import { getMilkRunOrdersPerDate } from "./getMilkRunOrdersPerDate";
 
 export const magento = {
-  generateDeliveryNotes,
-  generatePickLists,
   cancelOrder,
-  getOrdersByBatch,
-  changeOrderStatus,
-  generateOrderSummary,
   getPagesCount,
   editOrderDetails,
+  editOrderMilkRun,
+  getOrdersByBatch,
+  generatePickLists,
   getDeliveryAgents,
+  changeOrderStatus,
+  generateOrderSummary,
+  generateDeliveryNotes,
   getMilkRunOrdersPerDate,
 };

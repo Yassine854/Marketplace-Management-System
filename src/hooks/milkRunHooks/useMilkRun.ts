@@ -1,19 +1,25 @@
-import { useEffect, useState, useRef } from "react";
-import { useMilkRunStore } from "@/stores/milkRunStore";
-import { useGetDeliveryAgents } from "./useGetDeliveryAgents";
-import { useGetMilkRunOrders } from "./useGetMilkRunOrders";
+import { toast } from "react-hot-toast";
 import { useNavigation } from "../useNavigation";
+import { useEffect, useState, useRef } from "react";
 import { useOrdersStore } from "@/stores/ordersStore";
+import { useMilkRunStore } from "@/stores/milkRunStore";
+import { useGetMilkRunOrders } from "./useGetMilkRunOrders";
+import { useGetDeliveryAgents } from "./useGetDeliveryAgents";
+import { useEditOrdersMilkRun } from "./useEditOrdersMilkRun";
 
 export const useMilkRun = () => {
   const {
     reset,
-    setMilkRun,
+    deliverySlot,
     deliveryDate,
+    deliveryAgentId,
     setDeliveryDate,
+    setDeliverySlot,
     selectedOrdersIds,
     setDeliveryAgentId,
     setSelectedOrdersIds,
+    setDeliveryAgentName,
+    deliveryAgentName,
   } = useMilkRunStore();
 
   const { setOrderOnReviewId } = useOrdersStore();
@@ -26,11 +32,13 @@ export const useMilkRun = () => {
   const { orders, isLoading: isOrdersLoading } =
     useGetMilkRunOrders(deliveryDate);
 
+  const { editOrdersMilkRun, isPending } = useEditOrdersMilkRun();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const deliveryAgentSelectorRef = useRef(null);
 
-  const milkRunSelectorRef = useRef(null);
+  const deliverySlotSelectorRef = useRef(null);
 
   const onOrderMarkerClick = (orderId: string): void => {
     let list = selectedOrdersIds;
@@ -43,16 +51,48 @@ export const useMilkRun = () => {
   };
 
   const onEditClick = (orderId: string): void => {
-    console.log("🚀 ~ onEditClick ~ orderId:", orderId);
     setOrderOnReviewId(orderId);
     navigateToOrderDetails();
   };
+
+  const onDeliveryAgentChange = ({ name, id }: any) => {
+    setDeliveryAgentName(name);
+    setDeliveryAgentId(id);
+  };
+
   const onReset = () => {
+    toast.success("test");
     reset();
     //@ts-ignore
     deliveryAgentSelectorRef?.current?.reset();
     //@ts-ignore
-    milkRunSelectorRef?.current?.reset();
+    deliverySlotSelectorRef?.current?.reset();
+  };
+
+  const onValidate = (): void => {
+    if (!selectedOrdersIds?.length) {
+      toast.error("Please Select some Orders", { duration: 3000 });
+      return;
+    }
+
+    if (!deliveryAgentId) {
+      toast.error("Please Select Delivery Agent", { duration: 3000 });
+      return;
+    }
+
+    if (!deliverySlot) {
+      toast.error("Please Select Delivery Slot", { duration: 3000 });
+      return;
+    }
+
+    editOrdersMilkRun({
+      ordersIds: selectedOrdersIds,
+      deliverySlot,
+      deliveryAgentName,
+      deliveryAgentId,
+    });
+
+    onReset();
   };
 
   useEffect(() => {
@@ -67,15 +107,16 @@ export const useMilkRun = () => {
     orders,
     onReset,
     isLoading,
+    onValidate,
     onEditClick,
     deliveryDate,
     deliveryAgents,
     selectedOrdersIds,
     onOrderMarkerClick,
-    milkRunSelectorRef,
+    onDeliveryAgentChange,
+    deliverySlotSelectorRef,
     deliveryAgentSelectorRef,
-    onMilkRunChange: setMilkRun,
+    onMilkRunChange: setDeliverySlot,
     onDeliveryDateChange: setDeliveryDate,
-    onDeliveryAgentChange: setDeliveryAgentId,
   };
 };

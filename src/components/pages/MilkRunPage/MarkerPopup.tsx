@@ -1,6 +1,7 @@
 import { Button } from "@nextui-org/button";
 import { Popup } from "react-map-gl";
 import { IconSquareRoundedX } from "@tabler/icons-react";
+
 const MarkerPopup = ({
   longitude,
   latitude,
@@ -8,7 +9,7 @@ const MarkerPopup = ({
   orderKamiounId,
   customer,
   total,
-  deliveryAgent,
+  deliveryAgentName,
   onClose,
   onEditClick,
 }: any) => {
@@ -34,7 +35,7 @@ const MarkerPopup = ({
           color="primary"
           onClick={onEditClick}
         >
-          Edit
+          Details
         </Button>
       </div>
       <div className=" font-semibold text-black">
@@ -51,7 +52,7 @@ const MarkerPopup = ({
       </div>
       <div className=" font-semibold text-black">
         Delivery Agent :{" "}
-        <span className="font-bold text-n90">{deliveryAgent}</span>
+        <span className="font-bold text-n90">{deliveryAgentName}</span>
       </div>
     </Popup>
   );

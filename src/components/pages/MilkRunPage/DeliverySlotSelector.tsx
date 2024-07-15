@@ -1,15 +1,15 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
-
-import { useDropdown } from "@/hooks/useDropdown";
 import { IconChevronDown } from "@tabler/icons-react";
+import { useDropdown } from "@/hooks/useDropdown";
 
-export const layoutList = ["All", "Tunis", "Sousse", "Kamarket"];
-
-const options = ["Morning", "Afternoon"];
+const options = [
+  { name: "Morning", key: "morning" },
+  { name: "Afternoon", key: "afternoon" },
+];
 
 //@ts-ignore
 // eslint-disable-next-line react/display-name
-const MilkRunSelector = forwardRef(({ onChange }: any, ref) => {
+const DeliverySlotSelector = forwardRef(({ onChange }: any, ref) => {
   const { open, ref: dropDownRef, toggleOpen } = useDropdown();
 
   const [layout, setLayout] = useState("Select Milk Run");
@@ -47,15 +47,16 @@ const MilkRunSelector = forwardRef(({ onChange }: any, ref) => {
         {options?.map((option: any) => (
           <li
             onClick={() => {
-              setLayout(option);
+              onChange(option.key);
+              setLayout(option.name);
               toggleOpen();
             }}
             className={`block cursor-pointer select-none rounded-md p-2 duration-300 hover:bg-slate-200 hover:text-primary ${
-              layout == option ? "bg-primary text-n0 hover:!text-n0" : ""
+              layout == option.name ? "bg-primary text-n0 hover:!text-n0" : ""
             }`}
-            key={option}
+            key={option.key}
           >
-            {option}
+            {option.name}
           </li>
         ))}
       </ul>
@@ -63,4 +64,4 @@ const MilkRunSelector = forwardRef(({ onChange }: any, ref) => {
   );
 });
 
-export default MilkRunSelector;
+export default DeliverySlotSelector;

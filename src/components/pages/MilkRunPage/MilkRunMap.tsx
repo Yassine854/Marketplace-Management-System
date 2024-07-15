@@ -78,7 +78,7 @@ const MilkRunMap = ({
             orderKamiounId={popupInfo?.kamioun_order_id}
             total={popupInfo?.order_amount}
             customer={popupInfo?.creator}
-            deliveryAgent={popupInfo?.delivery_agent}
+            deliveryAgentName={popupInfo?.delivery_agent}
           />
         )}
       </div>

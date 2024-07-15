@@ -108,7 +108,7 @@ const TopNav = ({
         <button onClick={() => setSidebar(!sidebarIsOpen)}>
           <IconMenu2 />
         </button>
-        <form
+        {/* <form
           onSubmit={(e) => e.preventDefault()}
           className="hidden w-full max-w-[493px] items-center justify-between gap-3 rounded-[30px] border border-transparent bg-primary/5 px-6 focus-within:border-primary dark:bg-bg3 md:flex xxl:px-8"
         >
@@ -120,9 +120,9 @@ const TopNav = ({
           <button>
             <IconSearch />
           </button>
-        </form>
-        <SelectLayout />
+        </form> */}
       </div>
+      <SelectLayout />
       <div className="flex items-center gap-3 sm:gap-4 xxl:gap-6">
         {/* <ModeSwitcher /> */}
         <Notification />

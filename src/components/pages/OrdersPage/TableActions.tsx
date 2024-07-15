@@ -1,8 +1,7 @@
 "use client";
 import { useDropdown } from "@/hooks/useDropdown";
 import { IconDotsVertical } from "@tabler/icons-react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
 import Swal from "sweetalert2";
 
 const TableActions = ({
@@ -24,16 +23,16 @@ const TableActions = ({
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        toast.success("Item Deleted Successfully", {
-          position: "top-center",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        // toast.success("Item Deleted Successfully", {
+        //   position: "top-center",
+        //   autoClose: 2000,
+        //   hideProgressBar: false,
+        //   closeOnClick: true,
+        //   pauseOnHover: true,
+        //   draggable: true,
+        //   progress: undefined,
+        //   theme: "light",
+        // });
         onDelete();
       }
     });
@@ -72,7 +71,6 @@ const TableActions = ({
           </li>
         </ul>
       </div>
-      <ToastContainer />
     </>
   );
 };

@@ -64,7 +64,8 @@ const OrdersTableRow = ({
       </td>
       <OrdersTableCell>
         <div className="flex h-full w-full pl-6">
-          <IconTruck color="green" />-{order?.kamiounId}
+          {/* <IconTruck color="green" />- */}
+          {order?.kamiounId}
         </div>
       </OrdersTableCell>
       <OrdersTableCell>
@@ -74,7 +75,7 @@ const OrdersTableRow = ({
       <OrdersTableCell>
         {unixTimeStampToStringDateYMD(order?.deliveryDate)}
       </OrdersTableCell>
-      <OrdersTableCell>{order?.deliveryAgent || "***"}</OrdersTableCell>
+      <OrdersTableCell>{order?.deliveryAgentName || "***"}</OrdersTableCell>
       <OrdersTableCell>{order?.deliveryStatus || "***"}</OrdersTableCell>
       <OrdersTableCell>
         <div className=" flex justify-center">

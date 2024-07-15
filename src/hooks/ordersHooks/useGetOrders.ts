@@ -50,7 +50,7 @@ const QUERY = gql`
         customerFirstname
         customerLastname
         deliveryAgentId
-        deliveryAgent
+        deliveryAgentName
         deliveryDate
         source
       }

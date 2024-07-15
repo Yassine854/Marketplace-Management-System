@@ -60,7 +60,7 @@ export const typeDefs = gql`
     customerLastname: String
     customerPhone: String
     deliveryAgentId: String!
-    deliveryAgent: String!
+    deliveryAgentName: String!
     deliveryDate: Float!
     deliveryStatus: String
     source: String!

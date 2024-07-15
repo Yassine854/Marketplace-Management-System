@@ -1,34 +1,34 @@
-import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
-import OrdersTableRow from "./elements/OrdersTableRow";
-import TableRowSkeleton from "./elements/RowSkeleton";
-import OrderCancelingModal from "../../widgets/OrderCancelingModal";
 import { useOrdersTable } from "./useOrdersTable";
+import TableRowSkeleton from "./elements/RowSkeleton";
+import OrdersTableRow from "./elements/OrdersTableRow";
+import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
+import OrderCancelingModal from "@/components/widgets/OrderCancelingModal";
 
 const OrdersTable = () => {
   const {
-    onOrderClick,
-    orderUnderActionId,
-    isCancelingModalOpen,
-    onOpenChange,
-    cancelOrder,
-    isCancelingPending,
-    orderToCancelId,
-    actions,
-    generateSummary,
-    pendingOrderId,
     orders,
+    actions,
     isLoading,
-    isAllOrdersSelected,
-    selectAllOrders,
     selectOrder,
+    cancelOrder,
+    onOpenChange,
+    onOrderClick,
+    pendingOrderId,
+    orderToCancelId,
+    generateSummary,
+    selectAllOrders,
     changeSelectedSort,
+    isCancelingPending,
+    orderUnderActionId,
+    isAllOrdersSelected,
+    isCancelingModalOpen,
   } = useOrdersTable();
 
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>
       <OrdersTableHead
-        changeSelectedSort={changeSelectedSort}
         onSelectAllClick={selectAllOrders}
+        changeSelectedSort={changeSelectedSort}
         isAllOrdersSelected={isAllOrdersSelected}
       />
 
@@ -47,16 +47,16 @@ const OrdersTable = () => {
               {orders?.length > 0 &&
                 orders?.map((order: any) => (
                   <OrdersTableRow
-                    key={order.id}
                     order={order}
+                    key={order.id}
+                    actionsList={actions}
+                    onSelectClick={selectOrder}
+                    onPDFIconClick={generateSummary}
+                    isSomeActionPending={orderUnderActionId == order.id}
+                    isGenerateSummaryPending={pendingOrderId == order.id}
                     onClick={() => {
                       onOrderClick(order.id);
                     }}
-                    onSelectClick={selectOrder}
-                    onPDFIconClick={generateSummary}
-                    actionsList={actions}
-                    isGenerateSummaryPending={pendingOrderId == order.id}
-                    isSomeActionPending={orderUnderActionId == order.id}
                   />
                 ))}
             </>
@@ -64,11 +64,11 @@ const OrdersTable = () => {
         </>
       </tbody>
       <OrderCancelingModal
-        message={` Are you sure you want to cancel this order : ${orderToCancelId}? `}
-        isOpen={isCancelingModalOpen}
-        onConfirm={() => cancelOrder(orderToCancelId)}
         onOpenChange={onOpenChange}
+        isOpen={isCancelingModalOpen}
         isPending={isCancelingPending}
+        onConfirm={() => cancelOrder(orderToCancelId)}
+        message={` Are you sure you want to cancel this order : ${orderToCancelId}? `}
       />
     </table>
   );

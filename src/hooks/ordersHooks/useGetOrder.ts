@@ -37,7 +37,7 @@ const QUERY = gql`
       customerLastname
       customerPhone
       deliveryAgentId
-      deliveryAgent
+      deliveryAgentName
       deliveryDate
       deliveryStatus
       source

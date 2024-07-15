@@ -14,12 +14,6 @@ const formatUnixTimestamp = (unixTimestamp: number): string => {
 export const useEditOrderDetails = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ orderId, items, deliveryDate }: any) => {
-      // let total = 0;
-
-      // items.forEach((item: any) => {
-      //   total += item?.totalPrice;
-      // });
-
       const magentoItems: any[] = [];
 
       items.forEach((item: any) => {

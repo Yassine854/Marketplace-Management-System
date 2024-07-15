@@ -1,12 +1,12 @@
-import "@/public/styles/globals.css";
-import "@/public/styles/style.scss";
-
-import { Inter } from "next/font/google";
-import { LayoutProvider } from "@/utils/LayoutContext";
 import type { Metadata } from "next";
-import { Next13NProgress } from "nextjs13-progress";
+import { Inter } from "next/font/google";
 import ThemeProvider from "@/utils/ThemeProvider";
 import { NextUIProvider } from "@nextui-org/react";
+import { Next13NProgress } from "nextjs13-progress";
+import { LayoutProvider } from "@/utils/LayoutContext";
+
+import "@/public/styles/style.scss";
+import "@/public/styles/globals.css";
 
 type PageParamsType = {
   locale: string;
@@ -32,7 +32,11 @@ const RootLayout = ({
         <ThemeProvider>
           <Next13NProgress color="#5D69F4" height={3} />
           <LayoutProvider>
-            <NextUIProvider locale="fr-FR">{children}</NextUIProvider>
+            <NextUIProvider
+            ///  locale="fr-FR"
+            >
+              {children}
+            </NextUIProvider>
           </LayoutProvider>
         </ThemeProvider>
       </body>

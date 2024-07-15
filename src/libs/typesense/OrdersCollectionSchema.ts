@@ -58,11 +58,15 @@ export const typesenseOrdersCollectionSchema: CollectionCreateSchema = {
       optional: true,
     },
     {
-      name: "deliveryAgent",
+      name: "deliveryAgentName",
       type: "string",
       optional: true,
     },
-
+    {
+      name: "deliverySlot",
+      type: "string",
+      optional: true,
+    },
     {
       name: "deliveryDate",
       type: "int64",

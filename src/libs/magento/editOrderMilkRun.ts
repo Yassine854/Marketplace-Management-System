@@ -1,24 +1,26 @@
 import { axios } from "@/libs/axios";
 
-export const editOrderDetails = async ({
+export const editOrderMilkRun = async ({
   orderId,
-  deliveryDate,
-  items,
+  deliverySlot,
+  deliveryAgentName,
+  deliveryAgentId,
 }: any): Promise<any> => {
   try {
     const data = {
-      items: items,
       entity: {
         entity_id: orderId,
         extension_attributes: {
-          delivery_date: deliveryDate,
+          delivery_slot: deliverySlot,
+          delivery_agent: deliveryAgentName,
+          delivery_agent_id: deliveryAgentId,
         },
       },
     };
     await axios.magentoClient.put("orders/create", data);
   } catch (error) {
     process.env.NODE_ENV === "development" &&
-      console.error("Error changing order status:", error);
+      console.error("Error editing order milk run:", error);
     throw error;
   }
 };
