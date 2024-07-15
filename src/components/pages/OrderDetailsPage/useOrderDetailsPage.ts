@@ -1,28 +1,28 @@
-import { useEffect, useState } from "react";
 import { redirect } from "next/navigation";
-import { useGetOrder } from "@/hooks/ordersHooks/useGetOrder";
+import { useEffect, useState } from "react";
 import { useOrdersStore } from "@/stores/ordersStore";
 import { useOrderActions } from "@/hooks/ordersHooks";
 import { useNavigation } from "@/hooks/useNavigation";
+import { useGetOrder } from "@/hooks/ordersHooks/useGetOrder";
 
 export const useOrderDetailsPage = () => {
   const { navigateBack } = useNavigation();
 
   const {
-    setOrderOnReviewItems,
-    orderOnReviewItems,
     orderOnReviewId,
+    orderOnReviewItems,
+    setOrderOnReviewItems,
     setOrderOnReviewDeliveryDate,
   } = useOrdersStore();
 
   const {
-    editOrderActions: actions,
-    orderUnderActionId,
-    cancelOrder,
-    isCancelingModalOpen,
-    onOpenChange,
-    isCancelingPending,
     dropRef,
+    cancelOrder,
+    onOpenChange,
+    orderUnderActionId,
+    isCancelingPending,
+    isCancelingModalOpen,
+    editOrderActions: actions,
   } = useOrderActions();
 
   const { data: order, refetch } = useGetOrder(orderOnReviewId);
@@ -39,10 +39,8 @@ export const useOrderDetailsPage = () => {
   }, [orderOnReviewItems]);
 
   useEffect(() => {
-    if (order) {
-      setOrderOnReviewItems(order?.items);
-      setOrderOnReviewDeliveryDate(order?.deliveryDate);
-    }
+    order && setOrderOnReviewItems(order?.items);
+    order && setOrderOnReviewDeliveryDate(order?.deliveryDate);
   }, [order, setOrderOnReviewItems, setOrderOnReviewDeliveryDate]);
 
   useEffect(() => {
@@ -54,25 +52,21 @@ export const useOrderDetailsPage = () => {
   }, [isCancelingPending, refetch]);
 
   useEffect(() => {
-    if (!orderOnReviewId) {
-      console.log("🚀 ~ useEffect ~ orderOnReviewId:", orderOnReviewId);
-
-      redirect("/orders");
-    }
+    !orderOnReviewId && redirect("/orders");
   }, [orderOnReviewId]);
 
   return {
     order,
     total,
-    orderUnderActionId,
-    dropRef,
-    orderOnReviewItems,
-    cancelOrder,
-    isCancelingModalOpen,
-    onOpenChange,
-    isCancelingPending,
-    onDeliveryDateChange: setOrderOnReviewDeliveryDate,
-    onArrowClick: navigateBack,
     actions,
+    dropRef,
+    cancelOrder,
+    onOpenChange,
+    orderUnderActionId,
+    orderOnReviewItems,
+    isCancelingPending,
+    isCancelingModalOpen,
+    onArrowClick: navigateBack,
+    onDeliveryDateChange: setOrderOnReviewDeliveryDate,
   };
 };
