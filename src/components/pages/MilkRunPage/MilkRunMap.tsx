@@ -1,29 +1,24 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
-import Image from "next/image";
-import { Marker, Popup } from "react-map-gl";
 import { IconMapPinFilled, IconMapPin } from "@tabler/icons-react";
 import Map, {
   NavigationControl,
   FullscreenControl,
   GeolocateControl,
 } from "react-map-gl";
+import { Marker } from "react-map-gl";
+import MarkerPopup from "./MarkerPopup";
 
 const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 const tunisLat = 36.70972;
 const tunisLng = 10.174644;
 
 const MilkRunMap = ({
-  children,
   ordersMarkers,
   onOrderMarkerClick,
   selectedOrdersIds,
 }: any) => {
   const [popupInfo, setPopupInfo] = useState<any>(null);
-
-  useEffect(() => {
-    console.log("🚀 ~ popupInfo:", popupInfo);
-  }, [popupInfo]);
 
   const [viewState, setViewState] = useState({
     latitude: tunisLat,
@@ -44,25 +39,20 @@ const MilkRunMap = ({
       <NavigationControl />
       <div>
         {ordersMarkers?.map((marker: any) => (
-          <div
+          <Marker
+            cursor={"pointer"}
             key={marker.order_id}
-            className="cursor-pointer"
-            onMouseEnter={() => {
-              setPopupInfo(marker);
-            }}
-            onMouseLeave={() => {
-              setPopupInfo(null);
+            longitude={marker.longitude}
+            latitude={marker.latitude}
+            onClick={(e: any) => {
+              e.originalEvent.stopPropagation();
+              onOrderMarkerClick(marker.order_id);
             }}
           >
-            <Marker
-              cursor={"pointer"}
+            <div
               key={marker.order_id}
-              longitude={marker.longitude}
-              latitude={marker.latitude}
-              onClick={(e: any) => {
-                e.originalEvent.stopPropagation();
-                onOrderMarkerClick(marker.order_id);
-                console.log("🚀 ~ MapMarkers ~ marker:", marker);
+              onMouseEnter={() => {
+                setPopupInfo(marker);
               }}
             >
               {selectedOrdersIds.includes(marker.order_id) && (
@@ -71,45 +61,23 @@ const MilkRunMap = ({
               {!selectedOrdersIds.includes(marker.order_id) && (
                 <IconMapPin size={38} />
               )}
-            </Marker>
-          </div>
+            </div>
+          </Marker>
         ))}
 
         {popupInfo && (
-          <Popup
-            className="w-96"
-            anchor="top"
-            longitude={Number(popupInfo?.longitude)}
-            latitude={Number(popupInfo?.latitude)}
-            onClose={() => setPopupInfo(null)}
-          >
-            <div className="text-lg font-semibold text-black">
-              Order Tech ID :{" "}
-              <span className="font-bold text-n90">#{popupInfo.order_id}</span>
-            </div>
-            <div className="text-lg font-semibold text-black">
-              Order ID :{" "}
-              <span className="font-bold text-n90">
-                #{popupInfo.kamioun_order_id}
-              </span>
-            </div>
-            <div className="text-lg font-semibold text-black">
-              Customer :{" "}
-              <span className="font-bold text-n90">{popupInfo.creator}</span>
-            </div>
-            <div className="text-lg font-semibold text-black">
-              Total :{" "}
-              <span className="font-bold text-n90">
-                {popupInfo.order_amount}
-              </span>
-            </div>
-            <div className="text-lg font-semibold text-black">
-              Delivery Agent :{" "}
-              <span className="font-bold text-n90">
-                {popupInfo.delivery_agent}
-              </span>
-            </div>
-          </Popup>
+          <MarkerPopup
+            onClose={() => {
+              setPopupInfo(null);
+            }}
+            longitude={popupInfo?.longitude}
+            latitude={popupInfo?.latitude}
+            orderId={popupInfo?.order_id}
+            orderKamiounId={popupInfo?.kamioun_order_id}
+            total={popupInfo?.order_amount}
+            customer={popupInfo?.creator}
+            deliveryAgent={popupInfo?.delivery_agent}
+          />
         )}
       </div>
     </Map>

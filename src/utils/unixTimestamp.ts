@@ -56,3 +56,10 @@ export const unixTimestampToYMD = (timestamp: number): string => {
 
   return `${year}-${month}-${day}`;
 };
+
+export const getUnixTimestampForTomorrow = () => {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1); // Set date to tomorrow
+  return Math.floor(tomorrow.getTime() / 1000); // Convert to Unix timestamp (seconds since epoch)
+};

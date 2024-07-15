@@ -1,16 +1,9 @@
-import { useEffect, useState } from "react";
-
-import { useDropdown } from "@/hooks/useDropdown";
+import { useState } from "react";
 import { IconChevronDown } from "@tabler/icons-react";
+import { useDropdown } from "@/hooks/useDropdown";
 
-export const layoutList = ["All", "Tunis", "Sousse", "Kamarket"];
-
-const DeliveryAgentSelector = ({ list }: any) => {
+const DeliveryAgentSelector = ({ deliveryAgents, onChange }: any) => {
   const { open, ref, toggleOpen } = useDropdown();
-
-  useEffect(() => {
-    console.log("🚀 ~ DeliveryAgentSelector ~ list:", list?.length);
-  }, [list]);
 
   const [layout, setLayout] = useState("Select Delivery Agent");
 
@@ -37,10 +30,10 @@ const DeliveryAgentSelector = ({ list }: any) => {
           open ? "visible scale-100 opacity-100" : "invisible scale-0 opacity-0"
         }`}
       >
-        {list?.map((agent: any) => (
+        {deliveryAgents?.map((agent: any) => (
           <li
             onClick={() => {
-              //  changeLayout(item);
+              onChange(agent?.id);
               setLayout(agent?.name);
               toggleOpen();
             }}

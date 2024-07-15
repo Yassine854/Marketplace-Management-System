@@ -6,7 +6,7 @@ import { unixTimestampToYMD } from "@/utils/unixTimestamp";
 
 const placeholder = parseDate("2000-01-01");
 
-const DeliveryDatePicker = ({ onChange, defaultValue }: any) => {
+const DeliveryDatePicker = ({ onChange, selectedDate }: any) => {
   const formatter = useDateFormatter({ dateStyle: "short" });
   const [value, setValue] = useState(placeholder);
 
@@ -22,12 +22,13 @@ const DeliveryDatePicker = ({ onChange, defaultValue }: any) => {
   };
 
   useEffect(() => {
-    if (defaultValue) {
-      const date = unixTimestampToYMD(defaultValue);
+    if (selectedDate) {
+      console.log("🚀 ~ useEffect ~ defaultValue:", selectedDate);
+      const date = unixTimestampToYMD(selectedDate);
       const newValue = parseDate(date);
       setValue(newValue);
     }
-  }, [defaultValue, setValue]);
+  }, [selectedDate, setValue]);
 
   return (
     <div className="flex flex-row gap-2">

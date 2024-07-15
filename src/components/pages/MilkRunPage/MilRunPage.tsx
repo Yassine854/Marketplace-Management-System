@@ -1,16 +1,11 @@
-import MilRunMap from "./MilkRunMap";
-import Dropdown from "@/components/inputs/Dropdown";
-
-import DeliveryDatePicker from "../OrderDetailsPage/DeliveryDatePicker";
 import { Button } from "@nextui-org/react";
 import { useMilkRun } from "@/hooks/milkRunHooks/useMilkRun";
-import { useEffect, useState } from "react";
-import MapMarkers from "./MapMarkers";
+import MilRunMap from "./MilkRunMap";
+import DeliveryDatePicker from "../OrderDetailsPage/DeliveryDatePicker";
 import DeliveryAgentSelector from "./DeliveryAgentSelector";
 import MilkRunSelector from "./MilkRunSelector";
-const MilkRunPage = () => {
-  const [cursor, setCursor] = useState<string>("auto");
 
+const MilkRunPage = () => {
   const {
     deliveryAgents,
     orders,
@@ -19,6 +14,8 @@ const MilkRunPage = () => {
     selectedOrdersIds,
     onDeliveryDateChange,
     onOrderMarkerClick,
+    onDeliveryAgentChange,
+    reset,
   } = useMilkRun();
 
   return (
@@ -28,8 +25,6 @@ const MilkRunPage = () => {
         selectedOrdersIds={selectedOrdersIds}
         onOrderMarkerClick={onOrderMarkerClick}
       />
-      {/* <MapMarkers markers={orders} onMarkerClick={onOrderMarkerClick} /> */}
-      {/* </MilRunMap> */}
 
       <div className="absolute left-4 top-4 z-10 flex h-32  flex-col items-center justify-between rounded-xl p-4 ">
         <div className=" flex  h-10 w-full items-center  rounded-xl bg-n20 p-4 shadow-lg ">
@@ -53,17 +48,18 @@ const MilkRunPage = () => {
               <p className="mr-3 text-lg font-bold">Delivery Date :</p>
               <DeliveryDatePicker
                 onChange={onDeliveryDateChange}
-                defaultValue={deliveryDate}
+                selectedDate={deliveryDate}
               />
             </div>
             <div className=" mx-4 flex items-center justify-center ">
               <p className="mr-3 text-lg font-bold">Agent :</p>
-              {/* <Dropdown items={[]} /> */}
-              <DeliveryAgentSelector list={deliveryAgents} />
+              <DeliveryAgentSelector
+                deliveryAgents={deliveryAgents}
+                onChange={onDeliveryAgentChange}
+              />
             </div>
             <div className=" mx-4 flex items-center justify-center ">
               <p className="mr-3 text-lg font-bold">Milk Run :</p>
-              {/* <Dropdown items={[]} /> */}
               <MilkRunSelector />
             </div>
           </div>
@@ -74,7 +70,7 @@ const MilkRunPage = () => {
           <Button className="mx-4" color="primary">
             Validate
           </Button>
-          <Button className="mx-4" color="danger">
+          <Button className="mx-4" color="danger" onClick={reset}>
             Reset
           </Button>
         </div>

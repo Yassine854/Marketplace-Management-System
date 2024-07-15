@@ -11,6 +11,8 @@ export const useMilkRun = () => {
     selectedOrdersIds,
     setDeliveryDate,
     deliveryDate,
+    setDeliveryAgentId,
+    reset,
   } = useMilkRunStore();
 
   const { deliveryAgents, isLoading: isDeliveryAgentsLoading } =
@@ -20,7 +22,6 @@ export const useMilkRun = () => {
     useGetMilkRunOrders(deliveryDate);
 
   const onOrderMarkerClick = (orderId: string) => {
-    console.log("🚀 ~ onOrderMarkerClick ~ orderId:", orderId);
     let list = selectedOrdersIds;
 
     const index = list.indexOf(orderId);
@@ -35,6 +36,10 @@ export const useMilkRun = () => {
 
   const onDeliveryDateChange = (date: any) => {
     setDeliveryDate(date);
+  };
+
+  const onDeliveryAgentChange = (id: string): void => {
+    setDeliveryAgentId(id);
   };
 
   useEffect(() => {
@@ -53,5 +58,7 @@ export const useMilkRun = () => {
     deliveryDate,
     isLoading,
     onDeliveryDateChange,
+    onDeliveryAgentChange,
+    reset,
   };
 };
