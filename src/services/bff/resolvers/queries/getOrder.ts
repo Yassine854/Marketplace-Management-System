@@ -1,5 +1,5 @@
 import { Order } from "@/types/order";
-import { typesenseClient } from "@/libs/typesense";
+import { typesenseClient } from "@/clients/typesense";
 
 export const getOrder = async (
   orderId: string,

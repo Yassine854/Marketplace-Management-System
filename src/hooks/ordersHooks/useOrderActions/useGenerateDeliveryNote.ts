@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-import { magento } from "@/libs/magento";
+import { magento } from "@/clients/magento";
 
 export const useGenerateDeliveryNote = () => {
   const { mutate, isPending } = useMutation({

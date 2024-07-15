@@ -1,5 +1,5 @@
 import { Readable } from "stream";
-import { magento } from "@/libs/magento";
+import { magento } from "@/clients/magento";
 
 export const readingOrdersStream = () => {
   let page = 1;

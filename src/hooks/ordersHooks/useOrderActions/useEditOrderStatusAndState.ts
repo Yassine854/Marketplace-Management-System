@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { axios } from "@/libs/axios";
-import { magento } from "@/libs/magento";
+import { magento } from "@/clients/magento";
 
 export const useEditOrderStatusAndState = () => {
   const { mutate, isPending } = useMutation({

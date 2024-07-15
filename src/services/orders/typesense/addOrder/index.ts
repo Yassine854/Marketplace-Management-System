@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { typesenseClient } from "@/libs/typesense";
+import { typesenseClient } from "@/clients/typesense";
 import { checkApiKey } from "@/services/auth/checkApiKey";
 import { logError } from "@/utils/logError";
 import {

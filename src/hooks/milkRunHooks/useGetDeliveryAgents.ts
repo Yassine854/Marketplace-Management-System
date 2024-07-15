@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { magento } from "@/libs/magento";
+import { magento } from "@/clients/magento";
 
 const formatDeliveryAgentsArray = (deliveryAgents: any) => {
   const response: any[] = [];

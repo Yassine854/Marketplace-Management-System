@@ -30,7 +30,8 @@
       "@/libs*": ["src/libs/*"],
       "@/services*": ["./src/services/*"],
       "@/components*": ["./src/components/*"],
-      "@/stores*": ["./src/stores/*"]
+      "@/stores*": ["./src/stores/*"],
+      "@/clients*": ["./src/clients/*"]
     }
   },
   "include": [
@@ -39,7 +40,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/components/widgets/Sidebar/Sidebar.test.jsx",
-    "src/libs/typesense/typesenseClient.ts",
+    "src/clients/typesense/typesenseClient.ts",
     "src/hooks/ordersHooks/useGetOrders.ts",
     "src/services/auth/auth.js",
     ".next/types/app/[locale]/(subPages)/access/user/page.tsx"

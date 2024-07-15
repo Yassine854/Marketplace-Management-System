@@ -1,4 +1,4 @@
-import { getPrismaUser } from "@/libs/prisma";
+import { getPrismaUser } from "@/clients/prisma";
 import { isPasswordValid } from "@/utils/password/isPasswordValid";
 // // Method to set salt and hash the password for a user
 

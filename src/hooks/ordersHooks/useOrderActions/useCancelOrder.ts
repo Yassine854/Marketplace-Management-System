@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-import { magento } from "@/libs/magento";
+import { magento } from "@/clients/magento";
 import { axios } from "@/libs/axios";
 
 export const useCancelOrder = (closeModal: any) => {

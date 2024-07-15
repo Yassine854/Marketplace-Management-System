@@ -1,4 +1,4 @@
-import { typesenseClient } from "@/libs/typesense";
+import { typesenseClient } from "@/clients/typesense";
 
 export const deleteOrdersCollection = async () => {
   try {

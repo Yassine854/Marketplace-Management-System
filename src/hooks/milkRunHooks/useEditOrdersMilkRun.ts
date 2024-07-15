@@ -1,6 +1,6 @@
 import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
-import { magento } from "@/libs/magento";
+import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
 
 export const useEditOrdersMilkRun = () => {
