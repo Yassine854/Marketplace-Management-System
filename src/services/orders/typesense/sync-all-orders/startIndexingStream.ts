@@ -1,13 +1,21 @@
 import { Writable } from "stream";
-import { indexingOrders } from "./indexingOrders";
-import { ordersCollectionInit } from "./ordersCollectionInit";
-import { readingOrdersStream } from "./readingOrdersStream";
 import { NextResponse } from "next/server";
+import { typesense } from "@/clients/typesense";
+import { indexingOrders } from "./indexingOrders";
+import { readingOrdersStream } from "./readingOrdersStream";
 
 export const startIndexingStream = async () => {
   process.env.NODE_ENV === "development" && console.error("Syncing started");
   try {
-    await ordersCollectionInit();
+    const isOrdersCollectionExist = await typesense.isCollectionExist("orders");
+
+    if (!isOrdersCollectionExist) {
+      console.log("Creating orders Collection...");
+
+      await typesense.orders.createCollection();
+
+      console.log("orders collection created Successfully...");
+    }
 
     const readableStream = readingOrdersStream();
     const writableStream = new Writable({

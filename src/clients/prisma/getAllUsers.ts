@@ -1,6 +1,6 @@
 import { prismaClient } from "./prismaClient";
 
-export const getPrismaAllUsers = async () => {
+export const getAllUsers = async () => {
   try {
     const users = await prismaClient.user.findMany();
 

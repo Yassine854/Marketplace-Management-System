@@ -1,10 +1,10 @@
-import { typesenseClient } from "@/clients/typesense";
+import { typesense } from "@/clients/typesense";
 
 export const deleteOrdersCollection = async () => {
   try {
     console.log("Orders Collection delete ...");
 
-    await typesenseClient.collections("orders").delete();
+    await typesense.orders.deleteCollection();
 
     console.log("Orders Collection deleted successfully ");
   } catch (err) {

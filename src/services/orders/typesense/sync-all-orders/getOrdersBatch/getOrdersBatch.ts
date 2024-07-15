@@ -18,6 +18,7 @@ export const getOrdersBatch = (orders: any): Order[] =>
   orders?.map((order: any) => {
     return {
       id: String(order?.entity_id) || "",
+      orderId: String(order?.entity_id) || "",
       kamiounId: String(order?.extension_attributes?.kamioun_order_id) || "",
       storeId: order?.store_id,
       state: order?.state || "",

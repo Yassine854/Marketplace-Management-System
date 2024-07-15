@@ -10,6 +10,10 @@ export const typesenseOrdersCollectionSchema: CollectionCreateSchema = {
       type: "string",
     },
     {
+      name: "orderId",
+      type: "string",
+    },
+    {
       name: "kamiounId",
       type: "string",
     },

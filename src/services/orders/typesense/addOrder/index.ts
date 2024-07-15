@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { typesenseClient } from "@/clients/typesense";
+import { typesense } from "@/clients/typesense";
 import { checkApiKey } from "@/services/auth/checkApiKey";
 import { logError } from "@/utils/logError";
 import {
@@ -20,7 +20,7 @@ export const addOrder = async (request: NextRequest) => {
 
     const { order } = await request.json();
 
-    await typesenseClient.collections("orders").documents().create(order);
+    await typesense.orders.addOne(order);
 
     return successResponse(order.id);
   } catch (error: any) {
