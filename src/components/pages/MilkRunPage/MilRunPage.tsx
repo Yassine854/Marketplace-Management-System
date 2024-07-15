@@ -15,13 +15,18 @@ const MilkRunPage = () => {
     onDeliveryDateChange,
     onOrderMarkerClick,
     onDeliveryAgentChange,
-    reset,
+    onMilkRunChange,
+    deliveryAgentSelectorRef,
+    milkRunSelectorRef,
+    onReset,
+    onEditClick,
   } = useMilkRun();
 
   return (
     <div className="relative  mt-[4.8rem] flex  flex-grow p-2 ">
       <MilRunMap
         ordersMarkers={orders}
+        onEditClick={onEditClick}
         selectedOrdersIds={selectedOrdersIds}
         onOrderMarkerClick={onOrderMarkerClick}
       />
@@ -54,13 +59,17 @@ const MilkRunPage = () => {
             <div className=" mx-4 flex items-center justify-center ">
               <p className="mr-3 text-lg font-bold">Agent :</p>
               <DeliveryAgentSelector
+                ref={deliveryAgentSelectorRef}
                 deliveryAgents={deliveryAgents}
                 onChange={onDeliveryAgentChange}
               />
             </div>
             <div className=" mx-4 flex items-center justify-center ">
               <p className="mr-3 text-lg font-bold">Milk Run :</p>
-              <MilkRunSelector />
+              <MilkRunSelector
+                ref={milkRunSelectorRef}
+                onChange={onMilkRunChange}
+              />
             </div>
           </div>
         )}
@@ -70,7 +79,7 @@ const MilkRunPage = () => {
           <Button className="mx-4" color="primary">
             Validate
           </Button>
-          <Button className="mx-4" color="danger" onClick={reset}>
+          <Button className="mx-4" color="danger" onClick={onReset}>
             Reset
           </Button>
         </div>

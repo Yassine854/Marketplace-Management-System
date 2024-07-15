@@ -14,6 +14,7 @@ const tunisLat = 36.70972;
 const tunisLng = 10.174644;
 
 const MilkRunMap = ({
+  onEditClick,
   ordersMarkers,
   onOrderMarkerClick,
   selectedOrdersIds,
@@ -70,6 +71,7 @@ const MilkRunMap = ({
             onClose={() => {
               setPopupInfo(null);
             }}
+            onEditClick={() => onEditClick(popupInfo?.order_id)}
             longitude={popupInfo?.longitude}
             latitude={popupInfo?.latitude}
             orderId={popupInfo?.order_id}

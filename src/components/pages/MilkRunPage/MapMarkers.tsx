@@ -22,7 +22,6 @@ const MapMarkers = ({ markers, onMarkerClick, onMarkerHover }: any) => {
             onClick={(e: any) => {
               e.originalEvent.stopPropagation();
               onMarkerClick(marker.order_id);
-              console.log("🚀 ~ MapMarkers ~ marker:", marker);
             }}
           >
             <Image

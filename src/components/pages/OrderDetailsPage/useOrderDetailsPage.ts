@@ -6,7 +6,7 @@ import { useOrderActions } from "@/hooks/ordersHooks";
 import { useNavigation } from "@/hooks/useNavigation";
 
 export const useOrderDetailsPage = () => {
-  const { navigateToOrders } = useNavigation();
+  const { navigateBack } = useNavigation();
 
   const {
     setOrderOnReviewItems,
@@ -28,14 +28,6 @@ export const useOrderDetailsPage = () => {
   const { data: order, refetch } = useGetOrder(orderOnReviewId);
 
   const [total, setTotal] = useState(0);
-
-  const onArrowClick = () => {
-    navigateToOrders();
-  };
-
-  const onDeliveryDateChange = (value: any) => {
-    setOrderOnReviewDeliveryDate(value);
-  };
 
   useEffect(() => {
     let total = 0;
@@ -63,6 +55,8 @@ export const useOrderDetailsPage = () => {
 
   useEffect(() => {
     if (!orderOnReviewId) {
+      console.log("🚀 ~ useEffect ~ orderOnReviewId:", orderOnReviewId);
+
       redirect("/orders");
     }
   }, [orderOnReviewId]);
@@ -77,8 +71,8 @@ export const useOrderDetailsPage = () => {
     isCancelingModalOpen,
     onOpenChange,
     isCancelingPending,
-    onDeliveryDateChange,
-    onArrowClick,
+    onDeliveryDateChange: setOrderOnReviewDeliveryDate,
+    onArrowClick: navigateBack,
     actions,
   };
 };

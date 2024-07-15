@@ -23,7 +23,6 @@ const DeliveryDatePicker = ({ onChange, selectedDate }: any) => {
 
   useEffect(() => {
     if (selectedDate) {
-      console.log("🚀 ~ useEffect ~ defaultValue:", selectedDate);
       const date = unixTimestampToYMD(selectedDate);
       const newValue = parseDate(date);
       setValue(newValue);

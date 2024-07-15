@@ -10,6 +10,7 @@ const MarkerPopup = ({
   total,
   deliveryAgent,
   onClose,
+  onEditClick,
 }: any) => {
   return (
     <Popup
@@ -27,7 +28,12 @@ const MarkerPopup = ({
           onClick={onClose}
           className="cursor-pointer"
         />
-        <Button size="sm" className="font-bold" color="primary">
+        <Button
+          size="sm"
+          className="font-bold"
+          color="primary"
+          onClick={onEditClick}
+        >
           Edit
         </Button>
       </div>

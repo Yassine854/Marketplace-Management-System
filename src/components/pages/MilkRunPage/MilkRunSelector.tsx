@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 
 import { useDropdown } from "@/hooks/useDropdown";
 import { IconChevronDown } from "@tabler/icons-react";
@@ -7,14 +7,23 @@ export const layoutList = ["All", "Tunis", "Sousse", "Kamarket"];
 
 const options = ["Morning", "Afternoon"];
 
-const MilkRunSelector = () => {
-  const { open, ref, toggleOpen } = useDropdown();
+//@ts-ignore
+// eslint-disable-next-line react/display-name
+const MilkRunSelector = forwardRef(({ onChange }: any, ref) => {
+  const { open, ref: dropDownRef, toggleOpen } = useDropdown();
 
   const [layout, setLayout] = useState("Select Milk Run");
 
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      onChange("");
+      setLayout("Select Milk Run");
+    },
+  }));
+
   return (
     <div
-      ref={ref}
+      ref={dropDownRef}
       className="relative hidden min-w-[250px] lg:block xxl:min-w-[272px]"
     >
       <div
@@ -38,7 +47,6 @@ const MilkRunSelector = () => {
         {options?.map((option: any) => (
           <li
             onClick={() => {
-              //  changeLayout(item);
               setLayout(option);
               toggleOpen();
             }}
@@ -53,6 +61,6 @@ const MilkRunSelector = () => {
       </ul>
     </div>
   );
-};
+});
 
 export default MilkRunSelector;

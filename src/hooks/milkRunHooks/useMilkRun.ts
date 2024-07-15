@@ -1,19 +1,24 @@
+import { useEffect, useState, useRef } from "react";
 import { useMilkRunStore } from "@/stores/milkRunStore";
 import { useGetDeliveryAgents } from "./useGetDeliveryAgents";
 import { useGetMilkRunOrders } from "./useGetMilkRunOrders";
-import { useEffect, useState } from "react";
+import { useNavigation } from "../useNavigation";
+import { useOrdersStore } from "@/stores/ordersStore";
 
 export const useMilkRun = () => {
-  const [isLoading, setIsLoading] = useState(false);
-
   const {
-    setSelectedOrdersIds,
-    selectedOrdersIds,
-    setDeliveryDate,
-    deliveryDate,
-    setDeliveryAgentId,
     reset,
+    setMilkRun,
+    deliveryDate,
+    setDeliveryDate,
+    selectedOrdersIds,
+    setDeliveryAgentId,
+    setSelectedOrdersIds,
   } = useMilkRunStore();
+
+  const { setOrderOnReviewId } = useOrdersStore();
+
+  const { navigateToOrderDetails } = useNavigation();
 
   const { deliveryAgents, isLoading: isDeliveryAgentsLoading } =
     useGetDeliveryAgents();
@@ -21,25 +26,33 @@ export const useMilkRun = () => {
   const { orders, isLoading: isOrdersLoading } =
     useGetMilkRunOrders(deliveryDate);
 
-  const onOrderMarkerClick = (orderId: string) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const deliveryAgentSelectorRef = useRef(null);
+
+  const milkRunSelectorRef = useRef(null);
+
+  const onOrderMarkerClick = (orderId: string): void => {
     let list = selectedOrdersIds;
 
     const index = list.indexOf(orderId);
-    if (index !== -1) {
-      list.splice(index, 1);
-    } else {
-      list.push(orderId);
-    }
+
+    index !== -1 ? list.splice(index, 1) : list.push(orderId);
 
     setSelectedOrdersIds(list);
   };
 
-  const onDeliveryDateChange = (date: any) => {
-    setDeliveryDate(date);
+  const onEditClick = (orderId: string): void => {
+    console.log("🚀 ~ onEditClick ~ orderId:", orderId);
+    setOrderOnReviewId(orderId);
+    navigateToOrderDetails();
   };
-
-  const onDeliveryAgentChange = (id: string): void => {
-    setDeliveryAgentId(id);
+  const onReset = () => {
+    reset();
+    //@ts-ignore
+    deliveryAgentSelectorRef?.current?.reset();
+    //@ts-ignore
+    milkRunSelectorRef?.current?.reset();
   };
 
   useEffect(() => {
@@ -52,13 +65,17 @@ export const useMilkRun = () => {
 
   return {
     orders,
-    deliveryAgents,
-    onOrderMarkerClick,
-    selectedOrdersIds,
-    deliveryDate,
+    onReset,
     isLoading,
-    onDeliveryDateChange,
-    onDeliveryAgentChange,
-    reset,
+    onEditClick,
+    deliveryDate,
+    deliveryAgents,
+    selectedOrdersIds,
+    onOrderMarkerClick,
+    milkRunSelectorRef,
+    deliveryAgentSelectorRef,
+    onMilkRunChange: setMilkRun,
+    onDeliveryDateChange: setDeliveryDate,
+    onDeliveryAgentChange: setDeliveryAgentId,
   };
 };
