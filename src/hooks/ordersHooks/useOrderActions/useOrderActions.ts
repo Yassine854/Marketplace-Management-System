@@ -1,16 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { useGeneratePickList } from "./useGeneratePickList";
-import { useOrdersStore } from "@/stores/ordersStore";
-import { useGenerateDeliveryNote } from "./useGenerateDeliveryNote";
-import { useNavigation } from "@/hooks/useNavigation";
-import { useCancelOrder } from "./useCancelOrder";
-import { useOrdersData } from "../useOrdersData";
-import { useEditOrderStatusAndState } from "./useEditOrderStatusAndState";
+import { useRef } from "react";
+import { useCancelOrder } from "../../mutations/orderMutations/useCancelOrder";
 import { useDisclosure } from "@nextui-org/react";
-import { orderActionsByStatus } from "./orderActionsByStatus";
-import { useOrdersCount } from "../useOrdersCount";
-import { useGenerateOrderSummary } from "./useGenerateOrderSummary";
-import { useEditOrderDetails } from "./useEditOrderDetails";
+import { useOrdersStore } from "@/stores/ordersStore";
+import { useNavigation } from "@/hooks/useNavigation";
+import { useOrderActionsEffect } from "./useOrderActionsEffect";
+import { useOrderActionsByStatus } from "./useOrderActionsByStatus";
+import { useGenerateOrderSummary } from "../../mutations/orderMutations/useGenerateOrderSummary";
 
 export const useOrderActions = () => {
   const dropRef = useRef();
@@ -20,118 +15,56 @@ export const useOrderActions = () => {
     dropRef.current && dropRef.current?.reset();
   };
 
-  const {
-    isOpen: isCancelingModalOpen,
-    onOpen: openCancelingModal,
-    onOpenChange,
-    onClose,
-  } = useDisclosure();
-
-  const { editDetails, isPending: isEditingDetailsPending } =
-    useEditOrderDetails();
-
-  const {
-    status,
-    setOrderOnReviewId,
-    orderOnReviewItems,
-    orderOnReviewDeliveryDate,
-    orderOnReviewId,
-  } = useOrdersStore();
-
-  const { refetch } = useOrdersData();
-
-  const { refetch: refetchCount } = useOrdersCount();
+  const { setOrderOnReviewId, orderUnderActionId, setOrderUnderActionId } =
+    useOrdersStore();
 
   const { navigateToOrderDetails } = useNavigation();
 
-  const { generateSummary, pendingOrderId } = useGenerateOrderSummary();
+  const onOrderClick = (orderId: string) => {
+    navigateToOrderDetails();
+    setOrderOnReviewId(orderId);
+  };
 
-  const { generateDeliveryNote, isPending: isGenerateDeliveryNotePending } =
-    useGenerateDeliveryNote();
+  const {
+    onClose,
+    onOpenChange,
+    onOpen: openCancelingModal,
+    isOpen: isCancelingModalOpen,
+  } = useDisclosure();
 
-  const { generatePickList, isPending: isGeneratePickListPending } =
-    useGeneratePickList();
+  const {
+    isPending,
+    orderActions,
+    orderToCancelId,
+    isEditingPending,
+    orderDetailsActions,
+  } = useOrderActionsByStatus(openCancelingModal);
 
   const { cancelOrder, isPending: isCancelingPending } =
     useCancelOrder(onClose);
 
-  const { editStatusAndState, isPending: isEditingPending } =
-    useEditOrderStatusAndState();
+  const { generateSummary, pendingOrderId } = useGenerateOrderSummary();
 
-  const [orderToCancelId, setOrderToCancelId] = useState("");
-  const [orderUnderActionId, setOrderUnderActionId] = useState<string>("");
-
-  const onOrderClick = (orderId: string) => {
-    setOrderOnReviewId(orderId);
-
-    navigateToOrderDetails();
-  };
-
-  const { orderActions, orderDetailsPageActions } = orderActionsByStatus({
-    navigateToOrderDetails,
-    generateDeliveryNote,
-    generatePickList,
-    editStatusAndState,
-    openCancelingModal,
+  useOrderActionsEffect({
+    reset,
+    isPending,
+    isEditingPending,
+    isCancelingPending,
     setOrderUnderActionId,
-    setOrderToCancelId,
-    setOrderOnReviewId,
-    editDetails,
-    orderOnReviewItems,
-    orderOnReviewId,
-    orderOnReviewDeliveryDate,
   });
 
-  useEffect(() => {
-    if (!isEditingPending && !isCancelingPending && !isEditingDetailsPending) {
-      refetch();
-      refetchCount();
-      reset();
-    }
-  }, [
-    isEditingPending,
-    isEditingDetailsPending,
-    setOrderUnderActionId,
-    isCancelingPending,
-    refetchCount,
-    refetch,
-  ]);
-
-  useEffect(() => {
-    if (
-      !isGeneratePickListPending &&
-      !isGenerateDeliveryNotePending &&
-      !isEditingPending &&
-      !isCancelingPending &&
-      !isEditingDetailsPending
-    ) {
-      setOrderUnderActionId("");
-    }
-  }, [
-    isGeneratePickListPending,
-    isGenerateDeliveryNotePending,
-    isEditingPending,
-    setOrderUnderActionId,
-    isCancelingPending,
-    refetchCount,
-    refetch,
-    isEditingDetailsPending,
-  ]);
-
   return {
-    //@ts-ignore
-    actions: orderActions[status],
-    //@ts-ignore
-    editOrderActions: orderDetailsPageActions,
-    onOrderClick,
+    dropRef,
     cancelOrder,
-    isCancelingModalOpen,
-    orderUnderActionId,
+    onOrderClick,
     onOpenChange,
-    isCancelingPending,
+    pendingOrderId,
     orderToCancelId,
     generateSummary,
-    dropRef,
-    pendingOrderId,
+    orderUnderActionId,
+    isCancelingPending,
+    isCancelingModalOpen,
+    actions: orderActions,
+    editOrderActions: orderDetailsActions,
   };
 };

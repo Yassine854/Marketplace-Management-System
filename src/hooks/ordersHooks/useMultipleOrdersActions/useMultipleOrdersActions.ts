@@ -1,11 +1,11 @@
-import { useGenerateMultipleDeliveryNotes } from "./useGenerateMultipleDeliveryNotes";
+import { useGenerateMultipleDeliveryNotes } from "../../mutations/orderMutations/useGenerateMultipleDeliveryNotes";
 import { useEffect, useRef, useState } from "react";
 import { useOrdersStore } from "@/stores/ordersStore";
 import { multipleOrdersActionsByStatus } from "./multipleOrdersActionsByStatus";
-import { useEditOrdersStatusesAndStates } from "./useEditMultipleOrdersStatusesAndStates";
+import { useEditOrdersStatusesAndStates } from "../../mutations/orderMutations/useEditMultipleOrdersStatusesAndStates";
 import { useDisclosure } from "@nextui-org/react";
-import { useCancelMultipleOrders } from "./useCancelMultipleOrders";
-import { useGenerateMultiplePickLists } from "./useGenerateMultiplePickLists";
+import { useCancelMultipleOrders } from "../../mutations/orderMutations/useCancelMultipleOrders";
+import { useGenerateMultiplePickLists } from "../../mutations/orderMutations/useGenerateMultiplePickLists";
 
 export const useMultipleOrdersActions = () => {
   const actionsRef = useRef(null);

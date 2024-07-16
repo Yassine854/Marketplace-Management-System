@@ -41,7 +41,7 @@
     ".next/types/**/*.ts",
     "src/components/widgets/Sidebar/Sidebar.test.jsx",
     "src/clients/typesense/typesenseClient.ts",
-    "src/hooks/ordersHooks/useGetOrders.ts",
+    "src/hooks/queries/orderQuries/useGetOrders.ts",
     "src/services/auth/auth.js",
     ".next/types/app/[locale]/(subPages)/access/user/page.tsx"
   ],

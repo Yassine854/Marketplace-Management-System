@@ -3,9 +3,9 @@ import { useNavigation } from "../useNavigation";
 import { useEffect, useState, useRef } from "react";
 import { useOrdersStore } from "@/stores/ordersStore";
 import { useMilkRunStore } from "@/stores/milkRunStore";
-import { useGetMilkRunOrders } from "./useGetMilkRunOrders";
-import { useGetDeliveryAgents } from "./useGetDeliveryAgents";
-import { useEditOrdersMilkRun } from "./useEditOrdersMilkRun";
+import { useGetMilkRunOrders } from "../queries/milkRunQuries/useGetMilkRunOrders";
+import { useGetDeliveryAgents } from "../queries/milkRunQuries/useGetDeliveryAgents";
+import { useEditOrdersMilkRun } from "../mutations/milkRunMutations/useEditOrdersMilkRun";
 
 export const useMilkRun = () => {
   const {

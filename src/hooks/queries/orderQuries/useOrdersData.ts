@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import { useOrdersStore } from "@/stores/ordersStore";
 import { useGetOrders } from "./useGetOrders";
+import { useOrdersStore } from "@/stores/ordersStore";
 
 export const useOrdersData = () => {
   const {
-    search,
     sort,
+    search,
+    status,
+    orders,
+    storeId,
+    setOrders,
     currentPage,
     itemsPerPage,
-    status,
-    storeId,
-    orders,
-    setOrders,
     setIsOrdersLoading,
   } = useOrdersStore();
 

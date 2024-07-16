@@ -1,17 +1,22 @@
-export const orderActionsByStatus = ({
-  navigateToOrderDetails,
-  generateDeliveryNote,
-  generatePickList,
-  editStatusAndState,
-  openCancelingModal,
-  setOrderUnderActionId,
-  setOrderToCancelId,
-  setOrderOnReviewId,
-  orderOnReviewItems,
-  editDetails,
-  orderOnReviewId,
-  orderOnReviewDeliveryDate,
-}: any) => {
+import { useNavigation } from "@/hooks/useNavigation";
+import { useOrderActionsSomeBusinessLogic } from "./useOrderActionsSomeBusinessLogic";
+
+export const useOrderActionsFunctions = (openCancelingModal: any) => {
+  const {
+    editDetails,
+    orderOnReviewId,
+    generatePickList,
+    setOrderOnReviewId,
+    orderOnReviewItems,
+    editStatusAndState,
+    setOrderToCancelId,
+    generateDeliveryNote,
+    setOrderUnderActionId,
+    orderOnReviewDeliveryDate,
+  } = useOrderActionsSomeBusinessLogic();
+
+  const { navigateToOrderDetails } = useNavigation();
+
   const setToValid = {
     key: "setToValid",
     name: "Set To Valid",
@@ -128,55 +133,18 @@ export const orderActionsByStatus = ({
     },
   };
 
-  const orderActions = {
-    open: [setToValid, cancel, gotToEdit, pickList, deliveryNote],
-    valid: [
-      setToReadyToShip,
-      setBackToOpen,
-      cancel,
-      gotToEdit,
-      pickList,
-      deliveryNote,
-    ],
-    shipped: [
-      setToUnpaid,
-      setBackToValid,
-      cancel,
-      gotToEdit,
-      pickList,
-      deliveryNote,
-    ],
-    unpaid: [setToDelivered, pickList, deliveryNote],
-    delivered: [setToArchived, pickList, deliveryNote],
-    archived: [pickList, deliveryNote],
-    failed: [pickList, deliveryNote],
-    closed: [pickList, deliveryNote],
+  return {
+    edit,
+    cancel,
+    pickList,
+    gotToEdit,
+    setToValid,
+    setToUnpaid,
+    deliveryNote,
+    setToArchived,
+    setBackToOpen,
+    setToDelivered,
+    setBackToValid,
+    setToReadyToShip,
   };
-
-  const orderDetailsPageActions = {
-    open: [edit, setToValid, cancel, pickList, deliveryNote],
-    valid: [
-      edit,
-      setToReadyToShip,
-      setBackToOpen,
-      cancel,
-      pickList,
-      deliveryNote,
-    ],
-    shipped: [
-      edit,
-      setToUnpaid,
-      setBackToValid,
-      cancel,
-      pickList,
-      deliveryNote,
-    ],
-    unpaid: [setToDelivered, pickList, deliveryNote],
-    delivered: [setToArchived, pickList, deliveryNote],
-    archived: [pickList, deliveryNote],
-    failed: [pickList, deliveryNote],
-    closed: [pickList, deliveryNote],
-  };
-
-  return { orderActions, orderDetailsPageActions };
 };

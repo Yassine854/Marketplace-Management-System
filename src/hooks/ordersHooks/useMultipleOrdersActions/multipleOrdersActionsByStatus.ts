@@ -121,14 +121,14 @@ export const multipleOrdersActionsByStatus = ({
   };
 
   return {
-    open: [setToValid, cancel, pickList, deliveryNote],
-    valid: [setToReadyToShip, setBackToOpen, cancel, pickList, deliveryNote],
-    shipped: [setToUnpaid, setBackToValid, cancel, pickList, deliveryNote],
-    unpaid: [setToDelivered, pickList, deliveryNote],
-    delivered: [setToArchived, pickList, deliveryNote],
-    archived: [pickList, deliveryNote],
+    all: [pickList, deliveryNote],
     failed: [pickList, deliveryNote],
     closed: [pickList, deliveryNote],
-    all: [pickList, deliveryNote],
+    archived: [pickList, deliveryNote],
+    unpaid: [setToDelivered, pickList, deliveryNote],
+    delivered: [setToArchived, pickList, deliveryNote],
+    open: [setToValid, cancel, pickList, deliveryNote],
+    shipped: [setToUnpaid, setBackToValid, cancel, pickList, deliveryNote],
+    valid: [setToReadyToShip, setBackToOpen, cancel, pickList, deliveryNote],
   };
 };

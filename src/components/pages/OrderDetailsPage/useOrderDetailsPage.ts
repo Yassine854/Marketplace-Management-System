@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useOrdersStore } from "@/stores/ordersStore";
 import { useOrderActions } from "@/hooks/ordersHooks";
 import { useNavigation } from "@/hooks/useNavigation";
-import { useGetOrder } from "@/hooks/ordersHooks/useGetOrder";
+import { useGetOrder } from "@/hooks/queries/orderQuries/useGetOrder";
 
 export const useOrderDetailsPage = () => {
   const { navigateBack } = useNavigation();
