@@ -36,6 +36,7 @@ export const useMultipleOrdersActions = () => {
     onOpenChange,
     onClose,
   } = useDisclosure();
+
   const [isPending, setIsPending] = useState(false);
 
   const cancelOrders = async () => {

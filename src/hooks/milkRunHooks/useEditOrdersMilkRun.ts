@@ -11,22 +11,24 @@ export const useEditOrdersMilkRun = () => {
       deliveryAgentName,
       deliveryAgentId,
     }: any) => {
-      for (const orderId of ordersIds) {
-        await magento.editOrderMilkRun({
-          orderId,
-          deliverySlot,
-          deliveryAgentName,
-          deliveryAgentId,
-        });
-        await axios.servicesClient.put("/api/orders/typesense/edit-order", {
-          order: {
-            id: orderId,
+      Promise.all(
+        ordersIds.map(async (orderId: string) => {
+          await magento.editOrderMilkRun({
+            orderId,
             deliverySlot,
             deliveryAgentName,
-            deliveryAgentId: deliveryAgentId,
-          },
-        });
-      }
+            deliveryAgentId,
+          });
+          await axios.servicesClient.put("/api/orders/typesense/edit-order", {
+            order: {
+              id: orderId,
+              deliverySlot,
+              deliveryAgentName,
+              deliveryAgentId: deliveryAgentId,
+            },
+          });
+        }),
+      );
     },
     onSuccess: () => {
       toast.success(`Orders Milk Run Updated Successfully`, { duration: 5000 });

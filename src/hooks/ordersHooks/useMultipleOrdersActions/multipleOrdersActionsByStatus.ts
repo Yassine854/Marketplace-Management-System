@@ -4,7 +4,6 @@ export const multipleOrdersActionsByStatus = ({
   generateDeliveryNotes,
   selectedOrders,
   editStatusesAndStates,
-  navigateToManageMilkRun,
 }: any) => {
   const setToValid = {
     name: "Set To Valid",
@@ -121,34 +120,11 @@ export const multipleOrdersActionsByStatus = ({
     },
   };
 
-  const milkRun = {
-    name: "Manage Milk-Runs",
-    key: "11",
-
-    action: () => {
-      navigateToManageMilkRun();
-    },
-  };
-
   return {
-    open: [setToValid, cancel, pickList, deliveryNote, milkRun],
-    valid: [
-      setToReadyToShip,
-      setBackToOpen,
-      cancel,
-      pickList,
-      deliveryNote,
-      milkRun,
-    ],
-    shipped: [
-      setToUnpaid,
-      setBackToValid,
-      cancel,
-      pickList,
-      deliveryNote,
-      milkRun,
-    ],
-    unpaid: [setToDelivered, pickList, deliveryNote, milkRun],
+    open: [setToValid, cancel, pickList, deliveryNote],
+    valid: [setToReadyToShip, setBackToOpen, cancel, pickList, deliveryNote],
+    shipped: [setToUnpaid, setBackToValid, cancel, pickList, deliveryNote],
+    unpaid: [setToDelivered, pickList, deliveryNote],
     delivered: [setToArchived, pickList, deliveryNote],
     archived: [pickList, deliveryNote],
     failed: [pickList, deliveryNote],

@@ -42,7 +42,7 @@ export const useOrderActions = () => {
 
   const { refetch: refetchCount } = useOrdersCount();
 
-  const { navigateToOrderDetails, navigateToManageMilkRun } = useNavigation();
+  const { navigateToOrderDetails } = useNavigation();
 
   const { generateSummary, pendingOrderId } = useGenerateOrderSummary();
 
@@ -68,7 +68,6 @@ export const useOrderActions = () => {
   };
 
   const { orderActions, orderDetailsPageActions } = orderActionsByStatus({
-    navigateToManageMilkRun,
     navigateToOrderDetails,
     generateDeliveryNote,
     generatePickList,

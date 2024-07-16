@@ -1,5 +1,4 @@
 export const orderActionsByStatus = ({
-  navigateToManageMilkRun,
   navigateToOrderDetails,
   generateDeliveryNote,
   generatePickList,
@@ -129,17 +128,8 @@ export const orderActionsByStatus = ({
     },
   };
 
-  const milkRun = {
-    key: "milkRun",
-    name: "Manage Milk-Runs",
-    action: (orderId: string) => {
-      setOrderUnderActionId(orderId || "123");
-      navigateToManageMilkRun();
-    },
-  };
-
   const orderActions = {
-    open: [setToValid, cancel, gotToEdit, pickList, deliveryNote, milkRun],
+    open: [setToValid, cancel, gotToEdit, pickList, deliveryNote],
     valid: [
       setToReadyToShip,
       setBackToOpen,
@@ -147,7 +137,6 @@ export const orderActionsByStatus = ({
       gotToEdit,
       pickList,
       deliveryNote,
-      milkRun,
     ],
     shipped: [
       setToUnpaid,
@@ -156,9 +145,8 @@ export const orderActionsByStatus = ({
       gotToEdit,
       pickList,
       deliveryNote,
-      milkRun,
     ],
-    unpaid: [setToDelivered, pickList, deliveryNote, milkRun],
+    unpaid: [setToDelivered, pickList, deliveryNote],
     delivered: [setToArchived, pickList, deliveryNote],
     archived: [pickList, deliveryNote],
     failed: [pickList, deliveryNote],
@@ -166,7 +154,7 @@ export const orderActionsByStatus = ({
   };
 
   const orderDetailsPageActions = {
-    open: [edit, setToValid, cancel, pickList, deliveryNote, milkRun],
+    open: [edit, setToValid, cancel, pickList, deliveryNote],
     valid: [
       edit,
       setToReadyToShip,
@@ -174,7 +162,6 @@ export const orderActionsByStatus = ({
       cancel,
       pickList,
       deliveryNote,
-      milkRun,
     ],
     shipped: [
       edit,
@@ -183,9 +170,8 @@ export const orderActionsByStatus = ({
       cancel,
       pickList,
       deliveryNote,
-      milkRun,
     ],
-    unpaid: [setToDelivered, pickList, deliveryNote, milkRun],
+    unpaid: [setToDelivered, pickList, deliveryNote],
     delivered: [setToArchived, pickList, deliveryNote],
     archived: [pickList, deliveryNote],
     failed: [pickList, deliveryNote],

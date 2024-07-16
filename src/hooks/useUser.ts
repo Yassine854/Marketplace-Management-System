@@ -1,4 +1,4 @@
-import { useCreateUser } from "./mutations/useCrateUser";
+import { useCreateUser } from "./useCrateUser";
 
 export const useUser = () => {
   const { create, isLoading, data, error } = useCreateUser();
