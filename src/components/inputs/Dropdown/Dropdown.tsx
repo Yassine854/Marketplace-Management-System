@@ -1,47 +1,36 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { IconChevronDown } from "@tabler/icons-react";
-import { Props } from "./Dropdown.types";
-import { defaultProps } from "./Dropdown.defaultProps";
 import { tailwind } from "./Dropdown.styles";
 import useDropdown from "./useDropdown";
 
 export type DropRef = {
   reset: () => void;
-  changeSelected: (selected: string) => void;
+  changeSelected: (selected: any) => void;
 };
 
 // eslint-disable-next-line react/display-name
-const Dropdown = forwardRef<DropRef, Props>(
+const Dropdown = forwardRef<DropRef, any>(
   (
     {
-      items = defaultProps.items,
+      items,
       onSelectedChange,
       placeholder = "Choose Action",
+      selectedAction,
+      setSelectedAction,
     },
     ref,
   ) => {
     const { open, ref: dropRef, toggleOpen } = useDropdown();
-    const [selected, setSelected] = useState<{
-      name: string;
-      key: string;
-    } | null>(null);
-
-    const reset = () => {
-      setSelected(null);
-    };
-
-    useEffect(() => {
-      if (selected && onSelectedChange) {
-        onSelectedChange(selected.key);
-      }
-    }, [selected, onSelectedChange]);
+    // const [selected, setSelected] = useState<any>(null);
 
     useImperativeHandle(ref, () => ({
       reset: () => {
-        reset();
+        //  selected && setSelected(null);
       },
       changeSelected: (selected: any) => {
-        setSelected(selected);
+        console.log("🚀 ~ useImperativeHandle ~ selected:", selected);
+        // setSelected(selected);
+        // onSelectedChange(selected.key);
       },
     }));
 
@@ -49,8 +38,7 @@ const Dropdown = forwardRef<DropRef, Props>(
       <div className="col-span-2 flex items-center justify-center md:col-span-1">
         <div className="relative rounded-3xl bg-n20" ref={dropRef}>
           <div onClick={toggleOpen} className={tailwind.container("", "")}>
-            {selected?.name || placeholder}{" "}
-            {/* Show placeholder if nothing is selected */}
+            {selectedAction || placeholder}
             <IconChevronDown
               size={20}
               className={`duration-300 ${open && "rotate-180"}`}
@@ -60,12 +48,13 @@ const Dropdown = forwardRef<DropRef, Props>(
             {items.map(({ name, key }: any, i: number) => (
               <li
                 onClick={() => {
-                  setSelected(items[i]);
+                  setSelectedAction(items[i].key);
+                  // onSelectedChange(items[i].key);
                   toggleOpen();
                 }}
                 key={key}
                 className={`cursor-pointer rounded-md px-4 py-2 text-xs font-semibold duration-300 hover:text-primary ${
-                  selected?.key === key && "bg-primary text-n0 hover:!text-n0"
+                  selectedAction === key && "bg-primary text-n0 hover:!text-n0"
                 }`}
               >
                 {name}

@@ -1,51 +1,45 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { OrdersStore } from "./ordersStore.types";
 
 export const useOrdersStore = create<any>(
   persist(
     (set, get) => ({
       orders: [],
-      selectedOrders: [],
-      itemsPerPage: 10,
-      status: "open",
       storeId: "1",
+      status: "open",
+      selectedOrders: [],
+      isOrdersLoading: false,
       isAllOrdersSelected: false,
       isSomeOrdersSelected: false,
-      search: "",
-      sort: "",
-      currentPage: 1,
-      isOrdersLoading: false,
-      orderOnReviewId: "",
-      orderOnReviewItems: [],
-      orderOnReviewDeliveryDate: null,
-      setOrderOnReviewDeliveryDate: (orderOnReviewDeliveryDate: any) =>
-        set({ orderOnReviewDeliveryDate }),
 
-      setOrderOnReviewId: (orderOnReviewId: string) => set({ orderOnReviewId }),
+      setOrders: (orders: any[]) => set({ orders }),
+      setStatus: (status: string) => set({ status }),
+      setStoreId: (storeId: string) => set({ storeId }),
+      resetSelectedOrders: () => set({ selectedOrders: [] }),
+      setSelectedOrders: (selectedOrders: any) => set({ selectedOrders }),
 
       setOrderOnReviewItems: (orderOnReviewItems: any[]) =>
         set({ orderOnReviewItems }),
-      setItemsPerPage: (itemsPerPage: number) => set({ itemsPerPage }),
-      setCurrentPage: (currentPage: number) => set({ currentPage }),
-      setSort: (sort: string) => set({ sort }),
-      setSearch: (search: string) => set({ search }),
+
       setIsOrdersLoading: (loading: boolean) =>
         set(() => ({ isOrdersLoading: loading })),
-      setOrders: (orders: any[]) => set({ orders }),
-      setSelectedOrders: (selectedOrders: any) => set({ selectedOrders }),
-      setStatus: (status: string) => set({ status }),
-      setStoreId: (storeId: string) => set({ storeId }),
+
       checkIfAllOrdersSelected: () => {
+        //@ts-ignore
         const { selectedOrders, itemsPerPage } = get();
         set({ isAllOrdersSelected: selectedOrders.length === itemsPerPage });
       },
+
       checkIfSomeOrdersSelected: () => {
+        //@ts-ignore
+
         const { selectedOrders } = get();
         set({ isSomeOrdersSelected: selectedOrders.length > 0 });
       },
-      resetSelectedOrders: () => set({ selectedOrders: [] }),
+
       updateOrdersWithSelection: () => {
+        //@ts-ignore
+
         const { orders, selectedOrders } = get();
         const updatedOrders = orders.map((order: any) => ({
           ...order,
@@ -53,13 +47,17 @@ export const useOrdersStore = create<any>(
         }));
         set({ orders: updatedOrders });
       },
+
       selectAllOrders: (isChecked: boolean) => {
+        //@ts-ignore
         const { orders, setSelectedOrders } = get();
         isChecked
           ? setSelectedOrders(orders.map((order: any) => order.id))
           : setSelectedOrders([]);
       },
+
       selectOrder: (isChecked: boolean, orderId: string) => {
+        //@ts-ignore
         const { selectedOrders, setSelectedOrders } = get();
         const updatedSelectedOrders = isChecked
           ? [...selectedOrders, orderId]
@@ -68,8 +66,8 @@ export const useOrdersStore = create<any>(
       },
     }),
     {
-      name: "orders-store", // unique name
-      getStorage: () => localStorage, // (optional) by default, 'localStorage' is used
+      name: "ordersStore",
+      getStorage: () => localStorage,
     },
   ),
 );

@@ -1,4 +1,4 @@
-import Dropdown from "../../inputs/Dropdown";
+// import Dropdown from "../../inputs/Dropdown";
 import Loading from "@/components/elements/Loading";
 import PasswordInput from "@/components/inputs/PasswordInput";
 import TextInput from "@/components/inputs/TextInput";
@@ -71,7 +71,7 @@ const CreateUserForm = () => {
               isError={errors.lastName}
               errorMessage={errors.lastName?.message}
             />
-            <Dropdown
+            {/* <Dropdown
               items={roles}
               onSelectedChange={(selected) => {
                 setValue("roleCode", selected);
@@ -82,15 +82,15 @@ const CreateUserForm = () => {
 
                 setSelectedRole(result[0]);
               }}
-            />
-            <Dropdown
+            /> */}
+            {/* <Dropdown
               //  label="Warehouse"
               ref={warehouseRef}
               items={warehouses}
               onSelectedChange={(selected) =>
                 setValue("warehouseCode", selected)
               }
-            />
+            /> */}
           </div>
 
           <div className="mt-6">

@@ -38,16 +38,16 @@ export const ApolloProviderWrapper = ({
       cache: new InMemoryCache({
         addTypename: false,
       }),
-      defaultOptions: {
-        watchQuery: {
-          fetchPolicy: "no-cache",
-          errorPolicy: "ignore",
-        },
-        query: {
-          fetchPolicy: "no-cache",
-          errorPolicy: "all",
-        },
-      },
+      // defaultOptions: {
+      //   watchQuery: {
+      //     fetchPolicy: "no-cache",
+      //     errorPolicy: "ignore",
+      //   },
+      //   query: {
+      //     fetchPolicy: "no-cache",
+      //     errorPolicy: "all",
+      //   },
+      // },
     });
   }, []);
 

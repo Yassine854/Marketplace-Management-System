@@ -29,95 +29,95 @@ const SalesStatistics = () => {
   const [selected, setSelected] = useState(options[0]);
   const { theme } = useTheme();
   const { dir } = useLayout();
-  const chartData: ApexOptions = {
-    chart: {
-      type: "line",
-      toolbar: {
-        show: false,
-      },
-    },
-    forecastDataPoints: {
-      count: 3,
-    },
-    colors: ["#FFC861", "#00998B", "#5D69F4"],
-    stroke: {
-      width: 3,
-    },
-    xaxis: {
-      type: "category",
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-      ],
-      tickAmount: 9,
-      axisTicks: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      },
-      labels: {
-        style: {
-          colors: theme == "light" ? "#404A60" : "#EBECEF",
-        },
-      },
-    },
-    yaxis: {
-      min: 0,
-      max: 150,
-      tickAmount: 6,
-      labels: {
-        style: {
-          colors: theme == "light" ? "#404A60" : "#EBECEF",
-        },
-        offsetX: dir == "rtl" ? -30 : 0,
-      },
-    },
-    dataLabels: {
-      enabled: false,
-      enabledOnSeries: undefined,
-      textAnchor: "middle",
-      distributed: false,
-      offsetX: 0,
-      offsetY: 0,
-      background: {
-        enabled: true,
-        foreColor: "#fff",
-        padding: 6,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: "#fff",
-        opacity: 0.9,
-      },
-    },
-    legend: {
-      offsetY: 8,
-      markers: {
-        height: 4,
-        width: 4,
-        offsetX: dir == "rtl" ? 5 : -5,
-      },
-      itemMargin: {
-        horizontal: 20,
-      },
-      labels: {
-        colors: theme == "light" ? "#404A60" : "#EBECEF",
-      },
-    },
-    grid: {
-      borderColor: theme == "dark" ? "#404A60" : "#EBECEF",
-      padding: {
-        bottom: 16,
-      },
-    },
-  };
+  // const chartData: ApexOptions = {
+  //   chart: {
+  //     type: "line",
+  //     toolbar: {
+  //       show: false,
+  //     },
+  //   },
+  //   forecastDataPoints: {
+  //     count: 3,
+  //   },
+  //   colors: ["#FFC861", "#00998B", "#5D69F4"],
+  //   stroke: {
+  //     width: 3,
+  //   },
+  //   xaxis: {
+  //     type: "category",
+  //     categories: [
+  //       "Jan",
+  //       "Feb",
+  //       "Mar",
+  //       "Apr",
+  //       "May",
+  //       "Jun",
+  //       "Jul",
+  //       "Aug",
+  //       "Sep",
+  //     ],
+  //     tickAmount: 9,
+  //     axisTicks: {
+  //       show: false,
+  //     },
+  //     axisBorder: {
+  //       show: false,
+  //     },
+  //     labels: {
+  //       style: {
+  //         colors: theme == "light" ? "#404A60" : "#EBECEF",
+  //       },
+  //     },
+  //   },
+  //   yaxis: {
+  //     min: 0,
+  //     max: 150,
+  //     tickAmount: 6,
+  //     labels: {
+  //       style: {
+  //         colors: theme == "light" ? "#404A60" : "#EBECEF",
+  //       },
+  //       offsetX: dir == "rtl" ? -30 : 0,
+  //     },
+  //   },
+  //   dataLabels: {
+  //     enabled: false,
+  //     enabledOnSeries: undefined,
+  //     textAnchor: "middle",
+  //     distributed: false,
+  //     offsetX: 0,
+  //     offsetY: 0,
+  //     background: {
+  //       enabled: true,
+  //       foreColor: "#fff",
+  //       padding: 6,
+  //       borderRadius: 20,
+  //       borderWidth: 1,
+  //       borderColor: "#fff",
+  //       opacity: 0.9,
+  //     },
+  //   },
+  //   legend: {
+  //     offsetY: 8,
+  //     markers: {
+  //       height: 4,
+  //       width: 4,
+  //       offsetX: dir == "rtl" ? 5 : -5,
+  //     },
+  //     itemMargin: {
+  //       horizontal: 20,
+  //     },
+  //     labels: {
+  //       colors: theme == "light" ? "#404A60" : "#EBECEF",
+  //     },
+  //   },
+  //   grid: {
+  //     borderColor: theme == "dark" ? "#404A60" : "#EBECEF",
+  //     padding: {
+  //       bottom: 16,
+  //     },
+  //   },
+  // };
 
   return (
     <div className="box col-span-12 overflow-x-hidden lg:col-span-6">
@@ -132,13 +132,13 @@ const SalesStatistics = () => {
           />
         </div>
       </div>
-      <ReactApexChart
+      {/* <ReactApexChart
         height={400}
         width={"100%"}
         series={series}
         options={chartData}
         type="line"
-      />
+      /> */}
     </div>
   );
 };

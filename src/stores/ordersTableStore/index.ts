@@ -1,21 +1,22 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export const useOrdersTableStore = create(
+export const useOrdersTableStore = create<any>(
   persist(
     (set, get) => ({
-      itemsPerPage: 10,
-      currentPage: 1,
-      search: "",
       sort: "",
-      setItemsPerPage: (itemsPerPage: number) => set({ itemsPerPage }),
-      setCurrentPage: (currentPage: number) => set({ currentPage }),
+      search: "",
+      currentPage: 1,
+      itemsPerPage: 10,
+
       setSort: (sort: string) => set({ sort }),
       setSearch: (search: string) => set({ search }),
+      setCurrentPage: (currentPage: number) => set({ currentPage }),
+      setItemsPerPage: (itemsPerPage: number) => set({ itemsPerPage }),
     }),
     {
-      name: "ordersTableStore", // unique name
-      getStorage: () => localStorage, // (optional) by default, 'localStorage' is used
+      name: "ordersTableStore",
+      getStorage: () => localStorage,
     },
   ),
 );

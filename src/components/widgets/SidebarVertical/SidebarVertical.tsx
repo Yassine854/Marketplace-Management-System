@@ -15,7 +15,10 @@ import Link from "next/link";
 import SidebarButton from "@/components/elements/SidebarElements/SidebarButton";
 import SidebarOrdersSubMenu from "@/components/elements/SidebarElements/SidebarOrdersSubMenu";
 import SidebarSubMenu from "@/components/elements/SidebarElements/SidebarSubMenu";
-import { useOrdersData, useOrdersCount } from "@/hooks/ordersHooks";
+import {
+  useOrdersData,
+  useOrdersCount,
+} from "@/features/orderManagement/hooks";
 import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
 
 const SidebarVertical = ({
