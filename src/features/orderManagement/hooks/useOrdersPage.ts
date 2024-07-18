@@ -6,7 +6,7 @@ import {
   useMultipleOrdersActions,
   useOrdersTablePagination,
 } from "@/features/orderManagement/hooks";
-import { useOrdersStore } from "@/stores/ordersStore";
+import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 
 export const useOrdersPage = () => {
   const { status } = useOrdersStore();

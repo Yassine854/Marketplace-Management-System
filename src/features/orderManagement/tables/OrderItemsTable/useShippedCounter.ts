@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useOrderDetailsStore } from "@/stores/orderDetailsStore";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 import toast from "react-hot-toast";
 
 export const useShippedCounter = (id: string) => {

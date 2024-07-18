@@ -6,8 +6,8 @@ import {
   ModalFooter,
   Button,
 } from "@nextui-org/react";
-import Loading from "@/components/elements/Loading";
-import { useOrderCancelingModal } from "./useOrderCancelingModal";
+import Loading from "@/features/shared/elements/Loading";
+import { useOrderCancelingModal } from "../../hooks/useOrderCancelingModal";
 
 const message = " Are you sure you want to cancel those orders ? ";
 

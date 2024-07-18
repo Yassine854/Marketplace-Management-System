@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { IconChevronDown } from "@tabler/icons-react";
-import { useDropdown } from "@/hooks/useDropdown";
+import { useDropdown } from "@/features/shared/hooks/useDropdown";
 
 const placeholder = "Choose Action";
 

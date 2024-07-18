@@ -1,6 +1,6 @@
 import { useGenerateMultipleDeliveryNotes } from "../mutations/useGenerateMultipleDeliveryNotes";
 import { useEffect, useRef, useState } from "react";
-import { useOrdersStore } from "@/stores/ordersStore";
+import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 import { multipleOrdersActionsByStatus } from "./multipleOrdersActionsByStatus";
 import { useEditOrdersStatusesAndStates } from "../mutations/useEditMultipleOrdersStatusesAndStates";
 import { useDisclosure } from "@nextui-org/react";

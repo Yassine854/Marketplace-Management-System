@@ -1,6 +1,6 @@
-import Notification from "@/components/elements/TopNavBarElements/Notification";
-import Profile from "@/components/elements/TopNavBarElements/Profile";
-import WarehouseSelector from "@/components/elements/TopNavBarElements/WarehouseSelector";
+import Notification from "@/features/shared/elements/TopNavBarElements/Notification";
+import Profile from "@/features/shared/elements/TopNavBarElements/Profile";
+import WarehouseSelector from "@/features/shared/elements/TopNavBarElements/WarehouseSelector";
 
 const TopNavBar = () => {
   return (

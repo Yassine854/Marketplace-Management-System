@@ -1,6 +1,6 @@
-import Loading from "@/components/elements/Loading";
-import PasswordInput from "@/components/inputs/PasswordInput";
-import TextInput from "@/components/inputs/TextInput";
+import Loading from "@/features/shared/elements/Loading";
+import PasswordInput from "@/features/shared/inputs/PasswordInput";
+import TextInput from "@/features/shared/inputs/TextInput";
 import { useLoginForm } from "@/features/auth/hooks/useLoginForm";
 
 const LoginForm = () => {

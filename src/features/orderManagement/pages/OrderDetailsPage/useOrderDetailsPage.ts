@@ -1,5 +1,5 @@
-import { useNavigation } from "@/hooks/useNavigation";
-import { useOrderDetailsStore } from "@/stores/orderDetailsStore";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 import { useOrderDetailsEffect } from "./useOrderDetailsEffect";
 import { useGetOrder } from "@/features/orderManagement/hooks/queries/useGetOrder";
 import { useEffect } from "react";

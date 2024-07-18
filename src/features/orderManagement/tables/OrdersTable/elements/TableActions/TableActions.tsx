@@ -1,5 +1,5 @@
 import { IconDotsVertical } from "@tabler/icons-react";
-import { useDropdown } from "@/hooks/useDropdown";
+import { useDropdown } from "@/features/shared/hooks/useDropdown";
 
 const TableActions = ({
   actionsList,

@@ -1,5 +1,5 @@
 "use client";
-import { useDropdown } from "@/hooks/useDropdown";
+import { useDropdown } from "@/features/shared/hooks/useDropdown";
 import { IconChevronDown } from "@tabler/icons-react";
 type dropdownProps = {
   items: string[];

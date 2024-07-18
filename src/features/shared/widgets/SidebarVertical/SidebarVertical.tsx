@@ -9,12 +9,12 @@ import {
 
 import { useCallback, useEffect, useRef } from "react";
 import { statuses } from "./statuses";
-import Divider from "@/components/elements/SidebarElements/Divider";
+import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import Image from "next/image";
 import Link from "next/link";
-import SidebarButton from "@/components/elements/SidebarElements/SidebarButton";
-import SidebarOrdersSubMenu from "@/components/elements/SidebarElements/SidebarOrdersSubMenu";
-import SidebarSubMenu from "@/components/elements/SidebarElements/SidebarSubMenu";
+import SidebarButton from "@/features/shared/elements/SidebarElements/SidebarButton";
+import SidebarOrdersSubMenu from "@/features/shared/elements/SidebarElements/SidebarOrdersSubMenu";
+import SidebarSubMenu from "@/features/shared/elements/SidebarElements/SidebarSubMenu";
 import {
   useOrdersData,
   useOrdersCount,

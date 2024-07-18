@@ -1,7 +1,7 @@
 "use client";
 import { options } from "@/public/data/timesDropdown";
 import { useLayout } from "@/utils/LayoutContext";
-import { useWindowSize } from "@/hooks/useWindowSize";
+import { useWindowSize } from "@/features/shared/hooks/useWindowSize";
 import { ApexOptions } from "apexcharts";
 import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Dropdown from "./Dropdown";
-import Loading from "@/components/elements/Loading";
-import { useOrderDetailsStore } from "@/stores/orderDetailsStore";
+import Loading from "@/features/shared/elements/Loading";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 
 const ActionsDropdown = ({ actions, isPending, orderId }: any) => {
   const { selectedAction, setSelectedAction, isInEditMode } =

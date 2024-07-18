@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useOrdersStore } from "@/stores/ordersStore";
+import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 import { useGetOrders } from "./useGetOrders";
 
 export const useOrdersCount = () => {

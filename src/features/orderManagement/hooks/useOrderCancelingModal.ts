@@ -1,5 +1,5 @@
 import { useDisclosure } from "@nextui-org/react";
-import { useOrderActionsStore } from "@/stores/orderActionsStore";
+import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
 import { useCancelOrder } from "@/features/orderManagement/hooks/mutations/useCancelOrder";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";

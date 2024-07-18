@@ -1,6 +1,6 @@
-import { useOrdersTableStore } from "@/stores/ordersTableStore";
+import { useOrdersTableStore } from "@/features/orderManagement/stores/ordersTableStore";
 import { useRef, useEffect } from "react";
-import { useOrdersStore } from "@/stores/ordersStore";
+import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 
 export const useOrdersTablePagination = () => {
   const { status } = useOrdersStore();

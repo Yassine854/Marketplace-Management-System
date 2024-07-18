@@ -1,32 +1,30 @@
-import Divider from "@/components/elements/SidebarElements/Divider";
+import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import AnyMatchingResults from "../../widgets/AnyMatchingResults";
 import OrdersTable from "../../tables/OrdersTable";
 import OrdersToolBar from "../../widgets/OrdersToolBar";
 import Pagination from "../../widgets/Pagination";
 import OrderCancelingModal from "../../widgets/OrderCancelingModal/OrderCancelingModal";
-import { useOrdersPage } from "./useOrdersPage";
+import { useOrdersPage } from "../../hooks/useOrdersPage";
 
 const OrdersPage = () => {
   const {
+    orders,
+    status,
+    actions,
+    onClose,
     sortRef,
     setSort,
+    isPending,
+    searchRef,
+    setSearch,
+    actionsRef,
+    totalOrders,
     onOpenChange,
     cancelOrders,
     paginationRef,
     setCurrentPage,
     setItemsPerPage,
-    searchRef,
-    setSearch,
-    // isCancelingModalOpen,
     isSomeOrdersSelected,
-    orders,
-    totalOrders,
-    status,
-    actions,
-    isPending,
-    // isCancelingPending,
-    onClose,
-    actionsRef,
   } = useOrdersPage();
 
   return (
@@ -62,14 +60,7 @@ const OrdersPage = () => {
           />
         )}
       </div>
-      <OrderCancelingModal
-      // onConfirm={cancelOrders}
-      // message={" Are you sure you want to cancel those orders ? "}
-      // isOpen={isCancelingModalOpen}
-      // onOpenChange={onOpenChange}
-      // isPending={isCancelingPending}
-      // onClose={onClose}
-      />
+      <OrderCancelingModal />
     </div>
   );
 };

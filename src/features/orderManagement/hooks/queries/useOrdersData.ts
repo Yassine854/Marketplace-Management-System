@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGetOrders } from "./useGetOrders";
-import { useOrdersStore } from "@/stores/ordersStore";
-import { useOrdersTableStore } from "@/stores/ordersTableStore";
+import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
+import { useOrdersTableStore } from "@/features/orderManagement/stores/ordersTableStore";
 
 export const useOrdersData = () => {
   const { status, orders, storeId, setOrders, setIsOrdersLoading } =

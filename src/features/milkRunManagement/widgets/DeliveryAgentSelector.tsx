@@ -1,4 +1,4 @@
-import { useDropdown } from "@/hooks/useDropdown";
+import { useDropdown } from "@/features/shared/hooks/useDropdown";
 import { IconChevronDown } from "@tabler/icons-react";
 import { forwardRef, useImperativeHandle, useState } from "react";
 

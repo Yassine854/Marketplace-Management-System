@@ -4,15 +4,15 @@ import {
   IconBuildingWarehouse,
 } from "@tabler/icons-react";
 import { Dispatch, SetStateAction, useEffect } from "react";
-import Notification from "@/components/elements/TopNavBarElements/Notification";
-import Profile from "@/components/elements/TopNavBarElements/Profile";
+import Notification from "@/features/shared/elements/TopNavBarElements/Notification";
+import Profile from "@/features/shared/elements/TopNavBarElements/Profile";
 
 import { useState } from "react";
 
 import { useLayout } from "@/utils/LayoutContext";
-import { useDropdown } from "@/hooks/useDropdown";
+import { useDropdown } from "@/features/shared/hooks/useDropdown";
 import { IconChevronDown, IconLayoutSidebar } from "@tabler/icons-react";
-import { useOrdersStore } from "@/stores/ordersStore";
+import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 
 export const layoutList = ["All", "Tunis", "Sousse", "Kamarket"];
 

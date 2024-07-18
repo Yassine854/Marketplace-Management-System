@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useOrderMutations } from "./useOrderMutations";
-import { useOrderActionsStore } from "@/stores/orderActionsStore";
-import { useOrderDetailsStore } from "@/stores/orderDetailsStore";
+import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 
 export const useOrderActionsFunctions = () => {
   const { navigateToOrderDetails } = useNavigation();

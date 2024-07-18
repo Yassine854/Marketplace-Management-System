@@ -1,6 +1,6 @@
 "use client";
 
-import MainLayout from "@/components/layouts/MainLayout";
+import MainLayout from "@/features/shared/layouts/MainLayout";
 
 const MainLayoutRoute = ({ children }: any) => (
   <MainLayout>{children}</MainLayout>

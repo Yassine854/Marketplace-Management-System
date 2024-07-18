@@ -3,7 +3,7 @@ import MilRunMap from "../../widgets/MilkRunMap";
 import { useMilkRun } from "../../hooks/useMilkRun";
 import DeliverySlotSelector from "../../widgets/DeliverySlotSelector";
 import DeliveryAgentSelector from "../../widgets/DeliveryAgentSelector";
-import DeliveryDatePicker from "@/components/inputs/DeliveryDatePicker/DeliveryDatePicker";
+import DeliveryDatePicker from "@/features/shared/inputs/DeliveryDatePicker/DeliveryDatePicker";
 
 const MilkRunPage = () => {
   const {

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { redirect } from "next/navigation";
-import { useOrderDetailsStore } from "@/stores/orderDetailsStore";
-import { useOrderActionsStore } from "@/stores/orderActionsStore";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
+import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
 import { useGetOrder } from "@/features/orderManagement/hooks/queries/useGetOrder";
 
 export const useOrderDetailsEffect = () => {

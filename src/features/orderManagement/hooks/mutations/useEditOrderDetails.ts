@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
 import { axios } from "@/libs/axios";
-import { useOrderDetailsStore } from "@/stores/orderDetailsStore";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 
 const formatUnixTimestamp = (unixTimestamp: number): string => {
   const date = new Date(unixTimestamp * 1000); // Convert from seconds to milliseconds

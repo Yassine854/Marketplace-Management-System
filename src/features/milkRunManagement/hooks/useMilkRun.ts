@@ -1,11 +1,11 @@
 import { toast } from "react-hot-toast";
-import { useNavigation } from "../../../hooks/useNavigation";
 import { useEffect, useState, useRef } from "react";
-import { useOrdersStore } from "@/stores/ordersStore";
-import { useMilkRunStore } from "@/stores/milkRunStore";
+import { useMilkRunStore } from "../stores/milkRunStore";
+import { useNavigation } from "../../shared/hooks/useNavigation";
 import { useGetMilkRunOrders } from "./queries/useGetMilkRunOrders";
 import { useGetDeliveryAgents } from "./queries/useGetDeliveryAgents";
 import { useEditOrdersMilkRun } from "./mutations/useEditOrdersMilkRun";
+import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 
 export const useMilkRun = () => {
   const {
@@ -16,10 +16,10 @@ export const useMilkRun = () => {
     setDeliveryDate,
     setDeliverySlot,
     selectedOrdersIds,
+    deliveryAgentName,
     setDeliveryAgentId,
     setSelectedOrdersIds,
     setDeliveryAgentName,
-    deliveryAgentName,
   } = useMilkRunStore();
 
   const { setOrderOnReviewId } = useOrdersStore();
@@ -34,10 +34,6 @@ export const useMilkRun = () => {
     isLoading: isOrdersLoading,
     isError,
   } = useGetMilkRunOrders(deliveryDate);
-
-  useEffect(() => {
-    console.log("🚀 ~ useMilkRun ~ orders:", orders);
-  }, [orders]);
 
   const { editOrdersMilkRun, isPending } = useEditOrdersMilkRun();
 

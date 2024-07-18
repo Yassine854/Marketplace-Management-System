@@ -1,5 +1,5 @@
 import { IconTruckDelivery } from "@tabler/icons-react";
-import DeliveryDatePicker from "../../../../components/inputs/DeliveryDatePicker/DeliveryDatePicker";
+import DeliveryDatePicker from "../../../shared/inputs/DeliveryDatePicker/DeliveryDatePicker";
 
 const DeliveryInfo = ({
   deliveryAgentName,

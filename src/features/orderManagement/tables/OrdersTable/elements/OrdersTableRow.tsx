@@ -1,8 +1,8 @@
 import { IconPdf, IconTruck } from "@tabler/icons-react";
-import Checkbox from "@/components/inputs/Checkbox";
+import Checkbox from "@/features/shared/inputs/Checkbox";
 import OrdersTableCell from "./OrdersTableCell";
 import TableActions from "./TableActions";
-import Loading from "@/components/elements/Loading";
+import Loading from "@/features/shared/elements/Loading";
 import { useRef } from "react";
 
 const unixTimeStampToStringDateYMD = (

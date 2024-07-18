@@ -1,4 +1,4 @@
-import Box from "@/components/layouts/Box";
+import Box from "@/features/shared/layouts/Box";
 import CreateUserForm from "../../forms/CreateUserForm";
 
 const UserPage = () => {

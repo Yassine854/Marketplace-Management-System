@@ -3,7 +3,7 @@ import CustomerInfo from "../../widgets/CustomerInfo/CustomerInfo";
 import DeliveryInfo from "../../widgets/DeliveryInfo/DeliveryInfo";
 import OrderDetailsPageHeader from "../../widgets/OrderDetailsPageHeader/OrderDetailsPageHeader";
 import OrderItemsTable from "@/features/orderManagement/tables/OrderItemsTable";
-import Divider from "@/components/elements/SidebarElements/Divider";
+import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import OrderActions from "../../widgets/OrderDetailsActions/OrderDetailsActions";
 import OrderCancelingModal from "@/features/orderManagement/widgets/OrderCancelingModal/OrderCancelingModal";
 import { useOrderDetailsPage } from "@/features/orderManagement/pages/OrderDetailsPage/useOrderDetailsPage";

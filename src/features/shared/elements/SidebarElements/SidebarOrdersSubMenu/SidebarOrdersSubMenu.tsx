@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import AnimateHeight from "react-animate-height";
-import Divider from "@/components/elements/SidebarElements/Divider";
+import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import SidebarButton from "../SidebarButton";
 import SidebarSubMenuItem from "../SidebarSubMenuItem";
 

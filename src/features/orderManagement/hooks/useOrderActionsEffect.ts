@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useOrderActionsStore } from "@/stores/orderActionsStore";
+import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
 import { useOrdersData } from "./queries/useOrdersData";
 import { useOrdersCount } from "./queries/useOrdersCount";
 

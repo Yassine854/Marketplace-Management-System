@@ -1,9 +1,9 @@
 // import Dropdown from "../../inputs/Dropdown";
-import Loading from "@/components/elements/Loading";
-import PasswordInput from "@/components/inputs/PasswordInput";
-import TextInput from "@/components/inputs/TextInput";
+import Loading from "@/features/shared/elements/Loading";
+import PasswordInput from "@/features/shared/inputs/PasswordInput";
+import TextInput from "@/features/shared/inputs/TextInput";
 //import { useCreateUserForm } from "../../hooks/useCreateUserForm";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
 
 const CreateUserForm = () => {
   // const {

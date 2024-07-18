@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { FormSchema } from "./formSchema";
 import { toast } from "react-hot-toast";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useUser } from "@/features/usersManagement/hooks/mutations/useUser";
 import { zodResolver } from "@hookform/resolvers/zod";
 

@@ -1,9 +1,9 @@
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import Sidebar from "@/components/widgets/SidebarVertical";
-import TopNav from "@/components/widgets/TopNavbar";
-import { useOrdersStore } from "@/stores/ordersStore";
+import Sidebar from "@/features/shared/widgets/SidebarVertical";
+import TopNav from "@/features/shared/widgets/TopNavbar";
+import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 import { useEffect, useState } from "react";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
 
 export default function MainLayout({
   children,

@@ -1,6 +1,6 @@
-import { useNavigation } from "@/hooks/useNavigation";
-import { useOrderDetailsStore } from "@/stores/orderDetailsStore";
-import { useOrderActionsStore } from "@/stores/orderActionsStore";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
+import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
 import { useOrderActionsByStatus } from "./useOrderActionsByStatus";
 import { useOrderActionsFunctions } from "@/features/orderManagement/hooks/useOrderActionsFunctions";
 

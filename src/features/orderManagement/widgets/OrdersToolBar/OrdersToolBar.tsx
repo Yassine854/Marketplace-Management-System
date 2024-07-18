@@ -60,9 +60,9 @@
 
 // export default OrdersToolBar;
 
-import Loading from "@/components/elements/Loading";
-import Dropdown from "@/components/inputs/Dropdown";
-import SearchBar from "@/components/inputs/SearchBar";
+import Loading from "@/features/shared/elements/Loading";
+import Dropdown from "@/features/shared/inputs/Dropdown";
+import SearchBar from "@/features/shared/inputs/SearchBar";
 import { useState } from "react";
 import ActionsDropdown from "../OrderActionsDropdown";
 
