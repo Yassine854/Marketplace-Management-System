@@ -1,7 +1,7 @@
-import MilRunMap from "./MilkRunMap";
+import MilRunMap from "../../widgets/MilkRunMap";
 import { Button } from "@nextui-org/react";
-import DeliverySlotSelector from "./DeliverySlotSelector";
-import DeliveryAgentSelector from "./DeliveryAgentSelector";
+import DeliverySlotSelector from "../../widgets/DeliverySlotSelector";
+import DeliveryAgentSelector from "../../widgets/DeliveryAgentSelector";
 import { useMilkRun } from "../../hooks/useMilkRun";
 import DeliveryDatePicker from "@/components/inputs/DeliveryDatePicker/DeliveryDatePicker";
 

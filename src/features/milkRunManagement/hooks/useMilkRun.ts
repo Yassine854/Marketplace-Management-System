@@ -29,8 +29,15 @@ export const useMilkRun = () => {
   const { deliveryAgents, isLoading: isDeliveryAgentsLoading } =
     useGetDeliveryAgents();
 
-  const { orders, isLoading: isOrdersLoading } =
-    useGetMilkRunOrders(deliveryDate);
+  const {
+    orders,
+    isLoading: isOrdersLoading,
+    isError,
+  } = useGetMilkRunOrders(deliveryDate);
+
+  useEffect(() => {
+    console.log("🚀 ~ useMilkRun ~ orders:", orders);
+  }, [orders]);
 
   const { editOrdersMilkRun, isPending } = useEditOrdersMilkRun();
 
@@ -106,6 +113,7 @@ export const useMilkRun = () => {
   return {
     orders,
     onReset,
+    isError,
     isLoading,
     onValidate,
     onEditClick,

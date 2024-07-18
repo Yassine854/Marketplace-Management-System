@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { IconMapPinFilled, IconMapPin } from "@tabler/icons-react";
 import Map, {

@@ -65,7 +65,7 @@ const OrdersTableRow = ({
       <OrdersTableCell>
         <div className="flex h-full w-full pl-6">
           {/* <IconTruck color="green" />- */}
-          {order?.kamiounId}
+          {order?.id}
         </div>
       </OrdersTableCell>
       <OrdersTableCell>
