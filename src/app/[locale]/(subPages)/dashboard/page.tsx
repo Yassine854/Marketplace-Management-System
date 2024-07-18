@@ -1,2 +1,2 @@
 "use client";
-export { default } from "@/components/pages/Dashboard";
+export { default } from "@/features/analytics/pages/Dashboard";

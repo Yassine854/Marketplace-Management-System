@@ -5,7 +5,7 @@ import { faker } from "@faker-js/faker";
 import { IconSelector } from "@tabler/icons-react";
 import Image from "next/image";
 import { useState } from "react";
-import Dropdown from "../../elements/Dropdown";
+//import Dropdown from "../../elements/Dropdown";
 
 type ProjectType = {
   title: string;
@@ -40,11 +40,11 @@ const Projects = () => {
         <p className="font-medium">Projects Overview</p>
         <div className="flex items-center gap-2">
           <p className="text-xs sm:text-sm">Sort By : </p>
-          <Dropdown
+          {/* <Dropdown
             items={options}
             selected={selected}
             setSelected={setSelected}
-          />
+          /> */}
         </div>
       </div>
       <div className="w-full overflow-x-auto">

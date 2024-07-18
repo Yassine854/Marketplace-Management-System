@@ -1,2 +1,2 @@
 "use client";
-export { default } from "@/components/pages/LoginPage";
+export { default } from "@/features/auth/pages/LoginPage";

@@ -1,6 +1,6 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 
-import { useNavigation } from "./useNavigation";
+import { useNavigation } from "@/hooks/useNavigation";
 
 export const useAuth = () => {
   const { navigateToLogin } = useNavigation();

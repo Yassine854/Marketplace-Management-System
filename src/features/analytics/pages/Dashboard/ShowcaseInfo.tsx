@@ -6,7 +6,7 @@ import { ApexOptions } from "apexcharts";
 import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import Dropdown from "../../elements/Dropdown";
+//import Dropdown from "../../elements/Dropdown";
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
@@ -124,11 +124,11 @@ const ShowcaseInfo = () => {
         <p className="font-medium">Showcase Info</p>
         <div className="flex items-center gap-2">
           <p className="text-xs sm:text-sm">Sort By : </p>
-          <Dropdown
+          {/* <Dropdown
             selected={selected}
             setSelected={setSelected}
             items={options}
-          />
+          /> */}
         </div>
       </div>
       {/* <ReactApexChart

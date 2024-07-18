@@ -1,5 +1,5 @@
-import UsersTable from "@/components/tables/UsersTable";
-import UsersTableHeader from "@/components/widgets/UsersTableHeader";
+import UsersTable from "../../tables/UsersTable";
+import UsersTableHeader from "@/features/usersManagement/widgets/UsersTableHeader";
 import { useGetUsers } from "@/hooks/useGetUsers";
 import { useNavigation } from "@/hooks/useNavigation";
 

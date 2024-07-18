@@ -2,28 +2,30 @@
 import Loading from "@/components/elements/Loading";
 import PasswordInput from "@/components/inputs/PasswordInput";
 import TextInput from "@/components/inputs/TextInput";
-import { useCreateUserForm } from "../../../hooks/formsHooks/useCreateUserForm";
+//import { useCreateUserForm } from "../../hooks/useCreateUserForm";
 import { useNavigation } from "@/hooks/useNavigation";
 
 const CreateUserForm = () => {
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    errors,
-    setSelectedRole,
-    warehouseRef,
-    warehouses,
-    roles,
-    isLoading,
-  } = useCreateUserForm();
+  // const {
+  //   handleSubmit,
+  //   register,
+  //   setValue,
+  //   errors,
+  //   setSelectedRole,
+  //   warehouseRef,
+  //   warehouses,
+  //   roles,
+  //   isLoading,
+  // } = useCreateUserForm();
   const { navigateToUsersTable } = useNavigation();
+
+  const isLoading = false;
 
   return (
     <div className="grid h-full w-full items-center justify-center gap-4  xxxl:gap-6 ">
       <form
         className="w-full lg:col-span-7 xl:col-span-8"
-        onSubmit={handleSubmit}
+        //  onSubmit={handleSubmit}
       >
         <div className="box w-full min-w-[800px]  xl:p-8">
           <div className="bb-dashed mb-6 flex items-center justify-between pb-6">
@@ -33,43 +35,43 @@ const CreateUserForm = () => {
             <TextInput
               label="Username * "
               placeholder="Enter username"
-              register={register("username")}
-              isError={errors.username}
-              errorMessage={errors.username?.message}
+              // register={register("username")}
+              // isError={errors.username}
+              // errorMessage={errors.username?.message}
             />
             <TextInput
               label="Email"
               placeholder="Enter email"
-              register={register("email")}
-              isError={errors.email}
-              errorMessage={errors.email?.message}
+              //  register={register("email")}
+              //  isError={errors.email}
+              // errorMessage={errors.email?.message}
             />
             <PasswordInput
               label="Password"
-              register={register("password")}
-              isError={errors.password}
-              errorMessage={errors.password?.message}
+              // register={register("password")}
+              //isError={errors.password}
+              //errorMessage={errors.password?.message}
             />
             <PasswordInput
               label="Confirm Password"
-              register={register("confirmPassword")}
-              isError={errors.confirmPassword}
-              errorMessage={errors.confirmPassword?.message}
+              // register={register("confirmPassword")}
+              // isError={errors.confirmPassword}
+              // errorMessage={errors.confirmPassword?.message}
             />
 
             <TextInput
               label="First Name *"
               placeholder="Enter first name"
-              register={register("firstName")}
-              isError={errors.firstName}
-              errorMessage={errors.firstName?.message}
+              // register={register("firstName")}
+              // isError={errors.firstName}
+              //  errorMessage={errors.firstName?.message}
             />
             <TextInput
               label="Last Name *"
               placeholder="Enter lastName"
-              register={register("lastName")}
-              isError={errors.lastName}
-              errorMessage={errors.lastName?.message}
+              //register={register("lastName")}
+              //  isError={errors.lastName}
+              // errorMessage={errors.lastName?.message}
             />
             {/* <Dropdown
               items={roles}

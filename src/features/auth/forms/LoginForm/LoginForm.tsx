@@ -1,7 +1,7 @@
 import Loading from "@/components/elements/Loading";
 import PasswordInput from "@/components/inputs/PasswordInput";
 import TextInput from "@/components/inputs/TextInput";
-import { useLoginForm } from "@/hooks/formsHooks/useLoginForm";
+import { useLoginForm } from "@/features/auth/hooks/useLoginForm";
 
 const LoginForm = () => {
   const { handleSubmit, register, errors, isLoading } = useLoginForm();

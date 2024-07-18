@@ -1,8 +1,8 @@
-import MilRunMap from "../../widgets/MilkRunMap";
 import { Button } from "@nextui-org/react";
+import MilRunMap from "../../widgets/MilkRunMap";
+import { useMilkRun } from "../../hooks/useMilkRun";
 import DeliverySlotSelector from "../../widgets/DeliverySlotSelector";
 import DeliveryAgentSelector from "../../widgets/DeliveryAgentSelector";
-import { useMilkRun } from "../../hooks/useMilkRun";
 import DeliveryDatePicker from "@/components/inputs/DeliveryDatePicker/DeliveryDatePicker";
 
 const MilkRunPage = () => {
@@ -51,8 +51,8 @@ const MilkRunPage = () => {
             <div className=" mx-4 flex items-center justify-center ">
               <p className="mr-3 text-lg font-bold">Delivery Date :</p>
               <DeliveryDatePicker
-                onChange={onDeliveryDateChange}
                 selectedDate={deliveryDate}
+                onChange={onDeliveryDateChange}
               />
             </div>
             <div className=" mx-4 flex items-center justify-center ">
@@ -66,8 +66,8 @@ const MilkRunPage = () => {
             <div className=" mx-4 flex items-center justify-center ">
               <p className="mr-3 text-lg font-bold">Milk Run :</p>
               <DeliverySlotSelector
-                ref={deliverySlotSelectorRef}
                 onChange={onMilkRunChange}
+                ref={deliverySlotSelectorRef}
               />
             </div>
           </div>

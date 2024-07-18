@@ -1,5 +1,5 @@
 import Box from "@/components/layouts/Box";
-import CreateUserForm from "@/components/forms/CreateUserForm";
+import CreateUserForm from "../../forms/CreateUserForm";
 
 const UserPage = () => {
   return (

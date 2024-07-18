@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { FormSchema } from "./formSchema";
 import { toast } from "react-hot-toast";
 import { useNavigation } from "@/hooks/useNavigation";
-import { useUser } from "@/hooks/mutations/userMutations/useUser";
+import { useUser } from "@/features/usersManagement/hooks/mutations/useUser";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 type FormData = z.infer<typeof FormSchema>;

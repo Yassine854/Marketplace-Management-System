@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import MarkerPopup from "./MarkerPopup";
 import { IconMapPinFilled, IconMapPin } from "@tabler/icons-react";
 import Map, {
   NavigationControl,
   FullscreenControl,
   GeolocateControl,
 } from "react-map-gl";
-import { Marker } from "react-map-gl";
-import MarkerPopup from "./MarkerPopup";
 
-const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 const tunisLat = 36.70972;
 const tunisLng = 10.174644;
+const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 const MilkRunMap = ({
   onEditClick,
@@ -22,9 +22,9 @@ const MilkRunMap = ({
   const [popupInfo, setPopupInfo] = useState<any>(null);
 
   const [viewState, setViewState] = useState({
+    zoom: 10,
     latitude: tunisLat,
     longitude: tunisLng,
-    zoom: 10,
   });
 
   return (
@@ -43,8 +43,8 @@ const MilkRunMap = ({
           <Marker
             cursor={"pointer"}
             key={marker.order_id}
-            longitude={marker.longitude}
             latitude={marker.latitude}
+            longitude={marker.longitude}
             onClick={(e: any) => {
               e.originalEvent.stopPropagation();
               onOrderMarkerClick(marker.order_id);
@@ -71,14 +71,14 @@ const MilkRunMap = ({
             onClose={() => {
               setPopupInfo(null);
             }}
-            onEditClick={() => onEditClick(popupInfo?.order_id)}
-            longitude={popupInfo?.longitude}
-            latitude={popupInfo?.latitude}
             orderId={popupInfo?.order_id}
-            orderKamiounId={popupInfo?.kamioun_order_id}
-            total={popupInfo?.order_amount}
             customer={popupInfo?.creator}
+            latitude={popupInfo?.latitude}
+            total={popupInfo?.order_amount}
+            longitude={popupInfo?.longitude}
+            orderKamiounId={popupInfo?.kamioun_order_id}
             deliveryAgentName={popupInfo?.delivery_agent}
+            onEditClick={() => onEditClick(popupInfo?.order_id)}
           />
         )}
       </div>

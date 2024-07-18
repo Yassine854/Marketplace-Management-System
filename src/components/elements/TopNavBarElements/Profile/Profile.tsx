@@ -1,7 +1,7 @@
 import { IconLogout, IconSettings } from "@tabler/icons-react";
 
 import Image from "next/image";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useDropdown } from "@/hooks/useDropdown";
 
 const useList = () => {
