@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-//import { magento } from "@/libs/magento";
+import { magento } from "@/clients/magento";
 import { axios } from "@/libs/axios";
 
 export const useCancelMultipleOrders = () => {
@@ -8,16 +8,14 @@ export const useCancelMultipleOrders = () => {
     mutationFn: async (ordersIds: string[]) => {
       return Promise.all(
         ordersIds.map(async (orderId) => {
-          return await axios.servicesClient.put(
-            "/api/orders/typesense/edit-order",
-            {
-              order: {
-                id: orderId,
-                status: "failed",
-                state: "canceled",
-              },
+          await magento.cancelOrder(orderId);
+          await axios.servicesClient.put("/api/orders/typesense/edit-order", {
+            order: {
+              id: orderId,
+              status: "failed",
+              state: "canceled",
             },
-          );
+          });
         }),
       );
     },

@@ -1,17 +1,16 @@
-import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import AnyMatchingResults from "../../widgets/AnyMatchingResults";
+import Pagination from "../../widgets/Pagination";
 import OrdersTable from "../../tables/OrdersTable";
 import OrdersToolBar from "../../widgets/OrdersToolBar";
-import Pagination from "../../widgets/Pagination";
-import OrderCancelingModal from "../../widgets/OrderCancelingModal/OrderCancelingModal";
 import { useOrdersPage } from "../../hooks/useOrdersPage";
+import AnyMatchingResults from "../../widgets/AnyMatchingResults";
+import Divider from "@/features/shared/elements/SidebarElements/Divider";
+import OrderCancelingModal from "../../widgets/OrderCancelingModal/OrderCancelingModal";
 
 const OrdersPage = () => {
   const {
     orders,
     status,
     actions,
-    onClose,
     sortRef,
     setSort,
     isPending,
@@ -19,28 +18,29 @@ const OrdersPage = () => {
     setSearch,
     actionsRef,
     totalOrders,
-    onOpenChange,
     cancelOrders,
     paginationRef,
     setCurrentPage,
     setItemsPerPage,
+    isCancelingPending,
     isSomeOrdersSelected,
+    isCancelingModalOpen,
+    onCancelingModalClose,
   } = useOrdersPage();
 
   return (
     <div className="flex h-full w-full flex-grow flex-col justify-between    ">
       <div className=" mt-[4.8rem]  flex  w-full items-center justify-center border-t-4  ">
         <OrdersToolBar
-          actionsRef={actionsRef}
-          searchRef={searchRef}
-          onSearch={setSearch}
           onSort={setSort}
-          selectedStatus={status}
           sortRef={sortRef}
-          selectedOrders
-          isSomeOrdersSelected={isSomeOrdersSelected}
           actions={actions}
+          onSearch={setSearch}
+          searchRef={searchRef}
           isPending={isPending}
+          selectedStatus={status}
+          actionsRef={actionsRef}
+          isSomeOrdersSelected={isSomeOrdersSelected}
         />
       </div>
       <Divider />
@@ -55,12 +55,17 @@ const OrdersPage = () => {
             ref={paginationRef}
             selectedStatus={status}
             totalItems={totalOrders}
-            onItemsPerPageChanged={setItemsPerPage}
             onPageChanged={setCurrentPage}
+            onItemsPerPageChanged={setItemsPerPage}
           />
         )}
       </div>
-      <OrderCancelingModal />
+      <OrderCancelingModal
+        onConfirm={cancelOrders}
+        isOpen={isCancelingModalOpen}
+        isPending={isCancelingPending}
+        onClose={onCancelingModalClose}
+      />
     </div>
   );
 };

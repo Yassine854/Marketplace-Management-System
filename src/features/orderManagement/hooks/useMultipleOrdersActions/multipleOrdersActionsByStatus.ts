@@ -97,7 +97,7 @@ export const multipleOrdersActionsByStatus = ({
     name: "Cancel",
     key: "8",
 
-    action: async () => {
+    action: () => {
       openCancelingModal();
     },
   };

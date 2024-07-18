@@ -3,11 +3,15 @@ import { useOrderActionsStore } from "@/features/orderManagement/stores/orderAct
 import { useCancelOrder } from "@/features/orderManagement/hooks/mutations/useCancelOrder";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
+import { useCancelMultipleOrders } from "./mutations/useCancelMultipleOrders";
 
 export const useOrderCancelingModal = () => {
   const { onClose, onOpenChange, onOpen, isOpen } = useDisclosure();
   const { cancelOrder, isPending, isSuccess, isError } = useCancelOrder();
   const { orderToCancelId, setOrderToCancelId } = useOrderActionsStore();
+
+  const { cancelOrdersAsync, isPending: isCancelingPending } =
+    useCancelMultipleOrders();
 
   useEffect(() => {
     orderToCancelId && onOpen();
@@ -29,7 +33,11 @@ export const useOrderCancelingModal = () => {
     }
   }, [isError, setOrderToCancelId, onClose]);
 
-  const handelCanceling = (orderId: string) => (): void => {
+  const handelCanceling = async (orderId: string) => (): void => {
+    if (orderId === "test") {
+    } else {
+      //cancelOrdersAsync();
+    }
     cancelOrder(orderId);
   };
 

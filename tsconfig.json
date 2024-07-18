@@ -26,10 +26,10 @@
       "@/public/*": ["./public/*"],
       "@/utils*": ["./src/utils/*"],
       "@/hooks*": ["src/features/shared/hooks/*"],
+      "@/shared*": ["src/features/shared/*"],
       "@/types*": ["./src/types/*"],
       "@/libs*": ["src/libs/*"],
       "@/services*": ["./src/services/*"],
-      "@/components*": ["./src/components/*"],
       "@/stores*": ["./src/stores/*"],
       "@/clients*": ["./src/clients/*"],
       "@/features*": ["./src/features/*"]

@@ -1,28 +1,23 @@
-import { useGenerateMultipleDeliveryNotes } from "../mutations/useGenerateMultipleDeliveryNotes";
+import { useDisclosure } from "@nextui-org/react";
 import { useEffect, useRef, useState } from "react";
+import { useCancelMultipleOrders } from "../mutations/useCancelMultipleOrders";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 import { multipleOrdersActionsByStatus } from "./multipleOrdersActionsByStatus";
-import { useEditOrdersStatusesAndStates } from "../mutations/useEditMultipleOrdersStatusesAndStates";
-import { useDisclosure } from "@nextui-org/react";
-import { useCancelMultipleOrders } from "../mutations/useCancelMultipleOrders";
 import { useGenerateMultiplePickLists } from "../mutations/useGenerateMultiplePickLists";
+import { useGenerateMultipleDeliveryNotes } from "../mutations/useGenerateMultipleDeliveryNotes";
+import { useEditOrdersStatusesAndStates } from "../mutations/useEditMultipleOrdersStatusesAndStates";
 
 export const useMultipleOrdersActions = () => {
   const actionsRef = useRef(null);
-
-  const reset = () => {
-    if (actionsRef.current) {
-      //@ts-ignore
-      actionsRef.current.reset();
-    }
-  };
-
+  const [isPending, setIsPending] = useState(false);
+  const { onClose, onOpen, isOpen } = useDisclosure();
   const { status, selectedOrders } = useOrdersStore();
-  const { editStatusesAndStates, isPending: isEditingPending } =
-    useEditOrdersStatusesAndStates();
 
   const { cancelOrdersAsync, isPending: isCancelingPending } =
     useCancelMultipleOrders();
+
+  const { editStatusesAndStates, isPending: isEditingPending } =
+    useEditOrdersStatusesAndStates();
 
   const { generatePickLists, isPending: isGeneratingPickListPending } =
     useGenerateMultiplePickLists();
@@ -30,27 +25,22 @@ export const useMultipleOrdersActions = () => {
   const { generateDeliveryNotes, isPending: isGenerateDeliveryNotePending } =
     useGenerateMultipleDeliveryNotes();
 
-  const {
-    isOpen: isCancelingModalOpen,
-    onOpen: openCancelingModal,
-    onOpenChange,
-    onClose,
-  } = useDisclosure();
-
-  const [isPending, setIsPending] = useState(false);
-
   const cancelOrders = async () => {
     await cancelOrdersAsync(selectedOrders);
-
     onClose();
   };
 
+  const reset = () => {
+    //@ts-ignore
+    actionsRef.current && actionsRef.current.reset();
+  };
+
   const actions = multipleOrdersActionsByStatus({
-    editStatusesAndStates,
-    generatePickLists,
     selectedOrders,
+    generatePickLists,
     generateDeliveryNotes,
-    openCancelingModal,
+    editStatusesAndStates,
+    openCancelingModal: onOpen,
   });
 
   useEffect(() => {
@@ -71,16 +61,14 @@ export const useMultipleOrdersActions = () => {
   ]);
 
   return {
-    //@ts-ignore
-    actions: status ? actions[status] : actions["all"],
     isPending,
-    isCancelingModalOpen,
-    openCancelingModal,
-    onOpenChange,
-    onClose,
-    isCancelingPending,
+    actionsRef,
     cancelOrders,
     generatePickLists,
-    actionsRef,
+    isCancelingPending,
+    isCancelingModalOpen: isOpen,
+    onCancelingModalClose: onClose,
+    //@ts-ignore
+    actions: status ? actions[status] : actions["all"],
   };
 };

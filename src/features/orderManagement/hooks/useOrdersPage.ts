@@ -20,18 +20,18 @@ export const useOrdersPage = () => {
 
   const {
     actions,
-    onClose,
     isPending,
     actionsRef,
     cancelOrders,
-    onOpenChange,
+    isCancelingPending,
+    isCancelingModalOpen,
+    onCancelingModalClose,
   } = useMultipleOrdersActions();
 
   return {
     orders,
     status,
     actions,
-    onClose,
     sortRef,
     setSort,
     isPending,
@@ -39,11 +39,13 @@ export const useOrdersPage = () => {
     setSearch,
     actionsRef,
     totalOrders,
-    onOpenChange,
     cancelOrders,
     paginationRef,
     setCurrentPage,
     setItemsPerPage,
+    isCancelingPending,
+    isCancelingModalOpen,
     isSomeOrdersSelected,
+    onCancelingModalClose,
   };
 };

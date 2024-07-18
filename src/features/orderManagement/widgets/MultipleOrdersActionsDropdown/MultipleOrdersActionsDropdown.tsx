@@ -1,37 +1,46 @@
-import { useState, useEffect } from "react";
-import Dropdown from "./Dropdown";
+import ActionsDropdown from "../ActionsDropdown";
 import Loading from "@/features/shared/elements/Loading";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
+import { useState } from "react";
+
+export type Item = {
+  name: string;
+  key: string;
+  action: () => void;
+};
+
+const firstItem = {
+  name: "Select Action",
+  action: () => {},
+  key: "",
+};
 
 const MultipleOrdersActionsDropdown = ({
-  actions,
+  actions = [],
   isPending,
-  orderId,
+  actionsRef,
 }: any) => {
-  const { selectedAction, setSelectedAction, isInEditMode } =
-    useOrderDetailsStore();
+  const [selectedAction, setSelectedAction] = useState<Item>(firstItem);
 
-  // if (isInEditMode) {
-  //   const editAction = actions.find((action: any) => action?.key == "edit");
-  //   console.log("🚀 ~ useEffect ~ editAction:", editAction);
-  //   setSelectedAction(editAction);
-  // }
+  const onSelectedChange = (item: Item): void => {
+    setSelectedAction(item);
+  };
 
   return (
     <div className="flex items-center justify-center">
       <>
-        <Dropdown
-          items={actions}
-          selectedAction={selectedAction}
-          setSelectedAction={setSelectedAction}
+        <ActionsDropdown
+          items={[firstItem, ...actions]}
+          onSelectedChange={onSelectedChange}
+          ref={actionsRef}
         />
-        {selectedAction && (
+        {selectedAction?.key && (
           <>
             {!isPending && (
               <button
                 className="btn m-2 flex h-2 items-center  justify-center p-4"
                 onClick={() => {
-                  selectedAction.action(orderId);
+                  selectedAction.action();
                 }}
               >
                 Confirm
