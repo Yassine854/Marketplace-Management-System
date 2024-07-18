@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   useOrdersData,
   useOrdersSearch,
@@ -5,6 +6,7 @@ import {
   useOrdersSelection,
   useMultipleOrdersActions,
   useOrdersTablePagination,
+  useOrdersCount,
 } from "@/features/orderManagement/hooks";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 
@@ -27,6 +29,16 @@ export const useOrdersPage = () => {
     isCancelingModalOpen,
     onCancelingModalClose,
   } = useMultipleOrdersActions();
+
+  const { refetch } = useOrdersData();
+  const { refetch: refetchCount } = useOrdersCount();
+
+  useEffect(() => {
+    if (!isPending || !isCancelingPending) {
+      refetch();
+      refetchCount();
+    }
+  }, [isPending, isCancelingPending, refetchCount, refetch]);
 
   return {
     orders,

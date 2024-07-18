@@ -16,9 +16,13 @@ const deliveryDateToUnixTimeStamp = (deliveryDate: any) => {
 
 export const getOrdersBatch = (orders: any): Order[] =>
   orders?.map((order: any) => {
+    console.log("🚀 ~ orders?.map ~ order:", order);
+
     return {
       id: String(order?.entity_id) || "",
       orderId: String(order?.entity_id) || "",
+      incrementId: String(order?.increment_id) || "",
+
       kamiounId: String(order?.extension_attributes?.kamioun_order_id) || "",
       storeId: order?.store_id,
       state: order?.state || "",

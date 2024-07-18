@@ -1,9 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { magento } from "@/clients/magento";
 import { axios } from "@/libs/axios";
+import { toast } from "react-hot-toast";
 
 export const useCancelOrder = () => {
-  const { mutate, isPending, isSuccess, isError } = useMutation({
+  const { mutate, isPending, mutateAsync } = useMutation({
     mutationFn: async (orderId: string) => {
       await magento.cancelOrder(orderId);
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
@@ -14,7 +15,13 @@ export const useCancelOrder = () => {
         },
       });
     },
+    onSuccess: () => {
+      toast.success(`Order Canceled  Successfully`, { duration: 5000 });
+    },
+    onError: () => {
+      toast.error(`Something Went Wrong`, { duration: 5000 });
+    },
   });
 
-  return { cancelOrder: mutate, isPending, isSuccess, isError };
+  return { cancelOrder: mutate, cancelOrderAsync: mutateAsync, isPending };
 };

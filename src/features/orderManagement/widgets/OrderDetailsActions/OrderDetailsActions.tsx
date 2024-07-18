@@ -1,7 +1,6 @@
 import { IconBrightnessAuto } from "@tabler/icons-react";
-import { useOrderDetailsActions } from "../../hooks/useOrderDetailsActions";
 import OrderActionsDropdown from "../OrderActionsDropdown";
-import { useEffect } from "react";
+import { useOrderDetailsActions } from "../../hooks/useOrderDetailsActions";
 
 const OrderActions = ({ orderId }: any) => {
   const { isSomeActionPending, actions } = useOrderDetailsActions();

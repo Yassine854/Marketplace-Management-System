@@ -1,4 +1,4 @@
-export const multipleOrdersActionsByStatus = ({
+export const useMultipleOrdersActionsByStatus = ({
   generatePickLists,
   openCancelingModal,
   generateDeliveryNotes,

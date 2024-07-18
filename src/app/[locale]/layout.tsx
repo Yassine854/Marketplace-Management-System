@@ -10,12 +10,14 @@ import TanstackQueryProvider from "@/libs/tanstackQuery/TanstackQueryProvider";
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
-  const { setIsInEditMode } = useOrderDetailsStore();
+  const { setIsInEditMode, setSelectedAction } = useOrderDetailsStore();
   useEffect(() => {
     if (pathname !== "/en/order-details") {
       setIsInEditMode(false);
+      console.log("test");
+      setSelectedAction(null);
     }
-  }, [pathname, setIsInEditMode]);
+  }, [pathname, setIsInEditMode, setSelectedAction]);
 
   return (
     <AuthWrapper>

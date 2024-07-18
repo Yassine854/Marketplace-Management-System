@@ -1,11 +1,11 @@
 import { useDisclosure } from "@nextui-org/react";
 import { useEffect, useRef, useState } from "react";
-import { useCancelMultipleOrders } from "../mutations/useCancelMultipleOrders";
+import { useCancelMultipleOrders } from "./mutations/useCancelMultipleOrders";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
-import { multipleOrdersActionsByStatus } from "./multipleOrdersActionsByStatus";
-import { useGenerateMultiplePickLists } from "../mutations/useGenerateMultiplePickLists";
-import { useGenerateMultipleDeliveryNotes } from "../mutations/useGenerateMultipleDeliveryNotes";
-import { useEditOrdersStatusesAndStates } from "../mutations/useEditMultipleOrdersStatusesAndStates";
+import { useMultipleOrdersActionsByStatus } from "./useMultipleOrdersActionsByStatus";
+import { useGenerateMultiplePickLists } from "./mutations/useGenerateMultiplePickLists";
+import { useGenerateMultipleDeliveryNotes } from "./mutations/useGenerateMultipleDeliveryNotes";
+import { useEditOrdersStatusesAndStates } from "./mutations/useEditMultipleOrdersStatusesAndStates";
 
 export const useMultipleOrdersActions = () => {
   const actionsRef = useRef(null);
@@ -35,7 +35,7 @@ export const useMultipleOrdersActions = () => {
     actionsRef.current && actionsRef.current.reset();
   };
 
-  const actions = multipleOrdersActionsByStatus({
+  const actions = useMultipleOrdersActionsByStatus({
     selectedOrders,
     generatePickLists,
     generateDeliveryNotes,
@@ -59,6 +59,10 @@ export const useMultipleOrdersActions = () => {
     isGeneratingPickListPending,
     isGenerateDeliveryNotePending,
   ]);
+
+  useEffect(() => {
+    !isCancelingPending && reset();
+  }, [isCancelingPending]);
 
   return {
     isPending,

@@ -16,7 +16,7 @@ const Dropdown = ({ items, selectedAction, setSelectedAction }: any) => {
     <div className="col-span-2 flex items-center justify-center md:col-span-1">
       <div className="relative rounded-3xl bg-n20" ref={dropRef}>
         <div onClick={toggleOpen} className={tailwind.container("", "")}>
-          {selectedAction.name || placeholder}
+          {selectedAction?.name || placeholder}
           <IconChevronDown
             size={20}
             className={`duration-300 ${open && "rotate-180"}`}
@@ -27,8 +27,8 @@ const Dropdown = ({ items, selectedAction, setSelectedAction }: any) => {
             <li
               key={item.key}
               onClick={() => handleItemClick(item)}
-              className={`cursor-pointer rounded-md px-4 py-2 text-xs font-semibold duration-300 hover:text-primary ${
-                selectedAction.key === item.key &&
+              className={`cursor-pointer rounded-md px-4 py-2 text-xs font-semibold duration-300   hover:bg-slate-600 hover:text-white ${
+                selectedAction?.key === item.key &&
                 "bg-primary text-n0 hover:!text-n0"
               }`}
             >
@@ -54,7 +54,7 @@ const tailwind = {
   list(width: string, open: boolean): string {
     return `absolute z-20 flex-col rounded-md ${
       width ? width : "min-w-max sm:min-w-[140px]"
-    } top-full max-h-40 origin-top overflow-y-auto rounded-md border border-n30 bg-n0 p-1 shadow-md duration-300 dark:border-n500 dark:bg-bg4 ltr:right-0 rtl:left-0 ${
+    } top-full max-h-72 origin-top overflow-y-auto rounded-md border border-n30 bg-n0 p-1 shadow-md duration-300 dark:border-n500 dark:bg-bg4 ltr:right-0 rtl:left-0 ${
       open
         ? "visible flex scale-100 opacity-100"
         : "invisible scale-0 opacity-0"

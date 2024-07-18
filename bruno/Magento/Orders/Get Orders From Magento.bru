@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{magentoUrl}}/rest/default/V1/orders?searchCriteria[pageSize]=10&searchCriteria[currentPage]=1&searchCriteria[sortOrders][0][field]=entity_id&searchCriteria[sortOrders][0][direction]=DESC
+  url: {{magentoUrl}}/rest/default/V1/orders?searchCriteria[pageSize]=1&searchCriteria[currentPage]=1&searchCriteria[sortOrders][0][field]=entity_id&searchCriteria[sortOrders][0][direction]=DESC
   body: none
   auth: bearer
 }
 
 params:query {
-  searchCriteria[pageSize]: 10
+  searchCriteria[pageSize]: 1
   searchCriteria[currentPage]: 1
   searchCriteria[sortOrders][0][field]: entity_id
   searchCriteria[sortOrders][0][direction]: DESC

@@ -16,15 +16,15 @@ const Dropdown = forwardRef<DropRef, Props>(
 
     useEffect(() => {
       if (selected && onSelectedChange) {
-        onSelectedChange(selected);
+        onSelectedChange(selected.key);
       }
     }, [selected, onSelectedChange]);
 
     useImperativeHandle(ref, () => ({
       reset,
-      changeSelected: (selected: Item): void => {
-        setSelected(selected);
-      },
+      // changeSelected: (selected: Item): void => {
+      //   setSelected(selected);
+      // },
     }));
 
     return (

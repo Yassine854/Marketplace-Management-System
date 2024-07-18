@@ -1,5 +1,5 @@
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
-import { useOrderActionsFunctions } from "../../hooks/useOrderActionsFunctions";
+import { useOrderActionsFunctions } from "./useOrderActionsFunctions";
 
 export const useOrderActionsByStatus = () => {
   const { status } = useOrdersStore();

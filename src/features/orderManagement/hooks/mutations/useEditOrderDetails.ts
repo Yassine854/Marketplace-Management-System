@@ -39,7 +39,7 @@ export const useEditOrderDetails = () => {
       return orderId;
     },
     onSuccess: (orderId) => {
-      setIsInEditMode(false);
+      //   setIsInEditMode(false);
       toast.success(`Order Status Updated Successfully`, { duration: 5000 });
     },
 

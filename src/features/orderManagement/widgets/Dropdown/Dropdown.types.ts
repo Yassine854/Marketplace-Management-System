@@ -5,10 +5,10 @@ export type Item = {
 
 export type Props = {
   items: Array<Item>;
-  onSelectedChange?: (item: Item) => void;
+  onSelectedChange?: (key: string) => void;
 };
 
 export type DropRef = {
   reset: () => void;
-  changeSelected: (selected: Item) => void;
+  // changeSelected: (key: string) => void;
 };

@@ -3,8 +3,11 @@ import {
   useOrdersSelection,
   useOrdersSorting,
 } from "@/features/orderManagement/hooks";
+import { useDisclosure } from "@nextui-org/modal";
 
 export const useOrdersTable = () => {
+  const { onClose, onOpen, isOpen } = useDisclosure();
+
   const { orders, isLoading } = useOrdersData();
 
   const { changeSelectedSort } = useOrdersSorting();
@@ -19,5 +22,6 @@ export const useOrdersTable = () => {
     selectAllOrders,
     selectOrder,
     changeSelectedSort,
+    onClose,
   };
 };

@@ -26,6 +26,7 @@ const QUERY = gql`
   query GetOrder($orderId: ID!) {
     getOrder(orderId: $orderId) {
       id
+      incrementId
       kamiounId
       storeId
       state

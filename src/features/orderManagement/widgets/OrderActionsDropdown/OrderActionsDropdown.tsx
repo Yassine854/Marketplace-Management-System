@@ -1,17 +1,29 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Dropdown from "./Dropdown";
 import Loading from "@/features/shared/elements/Loading";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 
 const ActionsDropdown = ({ actions, isPending, orderId }: any) => {
-  const { selectedAction, setSelectedAction, isInEditMode } =
+  const { selectedAction, setSelectedAction, setIsInEditMode, isInEditMode } =
     useOrderDetailsStore();
 
-  // if (isInEditMode) {
-  //   const editAction = actions.find((action: any) => action?.key == "edit");
-  //   console.log("🚀 ~ useEffect ~ editAction:", editAction);
-  //   setSelectedAction(editAction);
-  // }
+  useEffect(() => {
+    if (isInEditMode) {
+      const item = actions.find((e: any) => {
+        return e.key === "edit";
+      });
+      setSelectedAction(item);
+    }
+    //D'ont add dependencies
+  }, []);
+
+  useEffect(() => {
+    if (selectedAction?.key === "edit") {
+      setIsInEditMode(true);
+    } else {
+      setIsInEditMode(false);
+    }
+  }, [selectedAction, setIsInEditMode]);
 
   return (
     <div className="flex items-center justify-center">
@@ -21,7 +33,7 @@ const ActionsDropdown = ({ actions, isPending, orderId }: any) => {
           selectedAction={selectedAction}
           setSelectedAction={setSelectedAction}
         />
-        {selectedAction && (
+        {selectedAction?.key && (
           <>
             {!isPending && (
               <button

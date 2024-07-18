@@ -1,8 +1,8 @@
-import { useOrdersTable } from "./useOrdersTable";
-import TableRowSkeleton from "./elements/RowSkeleton";
-import OrdersTableRow from "./elements/OrdersTableRow";
-import { useOrderTableActions } from "./useOrderTableActions";
-import OrdersTableHead from "./elements/OrdersTableHead/OrdersTableHead";
+import { useOrdersTable } from "../../hooks/useOrdersTable";
+import TableRowSkeleton from "../../elements/RowSkeleton";
+import OrdersTableRow from "../../elements/OrdersTableRow";
+import { useOrderTableActions } from "../../hooks/useOrderTableActions";
+import OrdersTableHead from "../../elements/OrdersTableHead/OrdersTableHead";
 import OrderCancelingModal from "@/features/orderManagement/widgets/OrderCancelingModal/OrderCancelingModal";
 
 const OrdersTable = () => {
@@ -21,6 +21,10 @@ const OrdersTable = () => {
     onOrderClick,
     orderUnderActionId,
     isSomeActionPending,
+    cancelOrder,
+    isCancelingModalOpen,
+    isCancelingPending,
+    onCancelingModalClose,
   } = useOrderTableActions();
 
   return (
@@ -64,7 +68,12 @@ const OrdersTable = () => {
           )}
         </>
       </tbody>
-      <OrderCancelingModal />
+      <OrderCancelingModal
+        onConfirm={cancelOrder}
+        isOpen={isCancelingModalOpen}
+        isPending={isCancelingPending}
+        onClose={onCancelingModalClose}
+      />
     </table>
   );
 };

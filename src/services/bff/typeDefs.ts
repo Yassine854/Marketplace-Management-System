@@ -49,6 +49,7 @@ export const typeDefs = gql`
 
   type Order {
     id: ID!
+    incrementId: String!
     kamiounId: String!
     storeId: String!
     state: String!
