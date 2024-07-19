@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 import { useGetOrders } from "./useGetOrders";
+import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 
 export const useOrdersCount = () => {
-  const [isLoading, setIsLoading] = useState(false);
-
   const { storeId } = useOrdersStore();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
+    refetch: r1,
     data: openOrders,
     isLoading: isOpenLoading,
-    refetch: r1,
   } = useGetOrders({
     page: 1,
     perPage: 1,
@@ -20,9 +20,9 @@ export const useOrdersCount = () => {
   });
 
   const {
+    refetch: r2,
     data: validOrders,
     isLoading: isValidLoading,
-    refetch: r2,
   } = useGetOrders({
     page: 1,
     perPage: 1,
@@ -32,9 +32,9 @@ export const useOrdersCount = () => {
   });
 
   const {
+    refetch: r3,
     data: readyOrders,
     isLoading: isReadyLoading,
-    refetch: r3,
   } = useGetOrders({
     page: 1,
     perPage: 1,
@@ -59,8 +59,8 @@ export const useOrdersCount = () => {
   };
 
   return {
-    refetch: handleRefetch,
     isLoading,
+    refetch: handleRefetch,
     openOrdersCount: openOrders?.totalOrders || 0,
     validOrdersCount: validOrders?.totalOrders || 0,
     readyOrdersCount: readyOrders?.totalOrders || 0,
