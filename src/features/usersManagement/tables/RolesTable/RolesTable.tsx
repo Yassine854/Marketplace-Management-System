@@ -1,5 +1,5 @@
-import Banner from "@/features/shared/widgets/Banner";
-import Box from "@/features/shared/layouts/Box";
+import Banner from "@/features/layout/widgets/Banner";
+import Box from "@/features/layout/Box";
 import Checkbox from "@/features/shared/inputs/Checkbox";
 
 const roles = ["manager", "ops", " customer service", "sales", "Finance"];

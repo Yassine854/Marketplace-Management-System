@@ -1,7 +1,7 @@
 import useDropdown from "./useDropdown";
 import { tailwind } from "./Dropdown.styles";
-import { IconChevronDown } from "@tabler/icons-react";
 import { Props, DropRef } from "./Dropdown.types";
+import { IconChevronDown } from "@tabler/icons-react";
 import { forwardRef, useEffect, useImperativeHandle } from "react";
 
 // eslint-disable-next-line react/display-name

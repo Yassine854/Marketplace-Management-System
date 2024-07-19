@@ -7,6 +7,7 @@ import { useGetDeliveryAgents } from "./queries/useGetDeliveryAgents";
 import { useEditOrdersMilkRun } from "./mutations/useEditOrdersMilkRun";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 
+//To Refactor
 export const useMilkRun = () => {
   const {
     reset,
@@ -113,7 +114,6 @@ export const useMilkRun = () => {
     isLoading,
     onValidate,
     onEditClick,
-    deliveryDate,
     deliveryAgents,
     selectedOrdersIds,
     onOrderMarkerClick,

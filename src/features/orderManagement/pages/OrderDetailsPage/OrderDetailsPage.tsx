@@ -22,8 +22,8 @@ const OrderDetailsPage = () => {
   } = useOrderDetailsPage();
 
   return (
-    <div className="l mt-20 flex flex-grow flex-col justify-between bg-n20 p-4 ">
-      <div className=" flex flex-grow flex-col overflow-hidden  rounded-2xl  bg-n10 p-2 text-8xl shadow-2xl ">
+    <div className="mt-20 flex flex-grow flex-col justify-between bg-n20 p-4 ">
+      <div className=" flex flex-grow flex-col overflow-hidden  rounded-2xl  bg-n10 p-2 shadow-2xl ">
         <OrderDetailsPageHeader
           status={order?.status}
           onArrowClick={onArrowClick}

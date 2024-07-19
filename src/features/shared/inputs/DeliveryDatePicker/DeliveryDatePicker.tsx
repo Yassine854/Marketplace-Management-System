@@ -1,83 +1,108 @@
-// import { useEffect, useState } from "react";
-// import { DatePicker } from "@nextui-org/react";
-// import { parseDate, getLocalTimeZone } from "@internationalized/date";
-// import { useDateFormatter } from "@react-aria/i18n";
-// import { unixTimestampToYMD } from "@/utils/unixTimestamp";
+import "react-day-picker/dist/style.css";
+import { DayPicker } from "react-day-picker";
+import { useDropdown } from "@/features/shared/hooks/useDropdown";
+import { IconCalendar } from "@tabler/icons-react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 
-// const placeholder = parseDate("2000-01-01");
+//To Refactor
 
-// const DeliveryDatePicker = ({ onChange, selectedDate, isReadOnly }: any) => {
-//   const formatter = useDateFormatter({ dateStyle: "short" });
-//   const [value, setValue] = useState(placeholder);
+const formatDate = (date: Date): string => {
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
 
-//   const handleChange = (newValue: any) => {
-//     if (newValue !== value) {
-//       setValue(newValue);
-//       const dateString = formatter.format(newValue.toDate(getLocalTimeZone()));
-//       const [day, month, year] = dateString.split("/").map(Number);
-//       const date = new Date(year, month - 1, day);
-//       const unixTimestamp = Math.floor(date.getTime() / 1000);
-//       onChange && onChange(unixTimestamp);
-//     }
-//   };
+  const formattedDay = day < 10 ? `0${day}` : day;
+  const formattedMonth = month < 10 ? `0${month}` : month;
 
-//   useEffect(() => {
-//     if (selectedDate) {
-//       const date = unixTimestampToYMD(selectedDate);
-//       const newValue = parseDate(date);
-//       setValue(newValue);
-//     }
-//   }, [selectedDate, setValue]);
+  return `${formattedDay}/${formattedMonth}/${year}`;
+};
 
-//   return (
-//     <div className="flex flex-row gap-2">
-//       <div className="flex w-full flex-col gap-y-2">
-//         <DatePicker
-//           isReadOnly={isReadOnly}
-//           className="max-w-[284px]"
-//           aria-label="delivery-date-picker"
-//           //@ts-ignore
-//           value={value}
-//           //@ts-ignore
-//           onChange={handleChange}
-//         />
-//       </div>
-//     </div>
-//   );
-// };
+const matcher = (day: Date) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return day <= today;
+};
 
-// export default DeliveryDatePicker;
+const today = new Date();
+const tomorrow = new Date(today);
 
-import React from "react";
-import { DatePicker } from "@nextui-org/react";
-import { today, getLocalTimeZone } from "@internationalized/date";
-import { useLocale } from "@react-aria/i18n";
+//@ts-ignore
+// eslint-disable-next-line react/display-name
+const DeliveryDatePicker = forwardRef(
+  ({ onChange, direction = "down", isReadOnly, defaultValue }: any, ref) => {
+    const defaultDate = new Date(defaultValue * 1000);
 
-export default function App() {
-  let now = today(getLocalTimeZone());
+    const { open, ref: dropDownRef, toggleOpen } = useDropdown();
+    const [selected, setSelected] = useState(defaultDate || tomorrow);
+    const [placeholder, setPlaceholder] = useState(formatDate(selected));
 
-  let disabledRanges = [
-    [now, now.add({ days: 5 })],
-    [now.add({ days: 14 }), now.add({ days: 16 })],
-    [now.add({ days: 23 }), now.add({ days: 24 })],
-  ];
+    const onSelect = (date: any) => {
+      toggleOpen();
+      setSelected(date);
+      setPlaceholder(formatDate(date));
+    };
 
-  let { locale } = useLocale();
+    useEffect(() => {
+      onChange && onChange(selected);
+    }, [selected]);
 
-  let isDateUnavailable = (date: any) =>
-    // isWeekend(date, locale) ||
-    disabledRanges.some(
-      (interval) =>
-        date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0,
+    // useEffect(() => {
+    //   console.log("🚀 ~ defaultValue:", defaultValue);
+
+    //   const date = new Date(defaultValue * 1000);
+
+    //   defaultValue && setSelected(date);
+    // }, [defaultValue]);
+
+    useImperativeHandle(ref, () => ({
+      reset: () => {
+        setSelected(tomorrow);
+        setPlaceholder(formatDate(tomorrow));
+      },
+    }));
+
+    return (
+      <div ref={dropDownRef} className="relative  block w-[180px] ">
+        <div
+          onClick={() => {
+            !isReadOnly && toggleOpen();
+          }}
+          className={` ${
+            true
+              ? "border border-n30 bg-n0 dark:border-n500 dark:bg-bg4"
+              : "bg-primary/5 dark:bg-bg3"
+          } flex w-full cursor-pointer items-center justify-between gap-2 rounded-[30px] px-4 py-3 xxl:px-6`}
+        >
+          <span className="flex select-none items-center gap-2">
+            {placeholder}
+          </span>
+          <div className="flex">
+            <IconCalendar />
+          </div>
+        </div>
+        <div
+          className={` absolute bottom-full z-20 h-80  w-80  origin-top rounded-lg bg-n0  shadow-md duration-300 dark:bg-n800
+                   
+           ${
+             open
+               ? "visible scale-100 opacity-100"
+               : "invisible scale-0 opacity-0"
+           }
+           ${direction === "up" && "bottom-full"}
+           ${direction === "down" && "top-full"}
+        
+        `}
+        >
+          <DayPicker
+            mode="single"
+            disabled={matcher}
+            selected={selected}
+            onSelect={onSelect}
+          />
+        </div>
+      </div>
     );
+  },
+);
 
-  return (
-    <DatePicker
-      label="Appointment date"
-      aria-label="Appointment date"
-      isDateUnavailable={isDateUnavailable}
-      //@ts-ignore
-      minValue={today(getLocalTimeZone())}
-    />
-  );
-}
+export default DeliveryDatePicker;

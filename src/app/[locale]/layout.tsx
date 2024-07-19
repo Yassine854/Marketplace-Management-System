@@ -7,6 +7,7 @@ import { ApolloProviderWrapper } from "@/libs/apollo/apollo-provider-wrapper";
 import TanstackQueryProvider from "@/libs/tanstackQuery/TanstackQueryProvider";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 
+//To Refactor
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
@@ -16,6 +17,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       setIsInEditMode(false);
     }
     //NO More Dependencies
+    //@ts-ignore
   }, [pathname]);
 
   return (

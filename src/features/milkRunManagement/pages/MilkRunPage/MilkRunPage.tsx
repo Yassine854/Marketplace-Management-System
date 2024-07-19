@@ -3,7 +3,7 @@ import MilRunMap from "../../widgets/MilkRunMap";
 import { useMilkRun } from "../../hooks/useMilkRun";
 import DeliverySlotSelector from "../../widgets/DeliverySlotSelector";
 import DeliveryAgentSelector from "../../widgets/DeliveryAgentSelector";
-import DeliveryDatePicker from "@/features/shared/inputs/DeliveryDatePicker/DeliveryDatePicker";
+import DeliveryDatePicker from "@/features/shared/inputs/DeliveryDatePicker";
 
 const MilkRunPage = () => {
   const {
@@ -12,7 +12,6 @@ const MilkRunPage = () => {
     isLoading,
     onValidate,
     onEditClick,
-    deliveryDate,
     deliveryAgents,
     onMilkRunChange,
     selectedOrdersIds,
@@ -51,7 +50,7 @@ const MilkRunPage = () => {
             <div className=" mx-4 flex items-center justify-center ">
               <p className="mr-3 text-lg font-bold">Delivery Date :</p>
               <DeliveryDatePicker
-                selectedDate={deliveryDate}
+                direction="up"
                 onChange={onDeliveryDateChange}
               />
             </div>

@@ -41,6 +41,7 @@ const MilkRunMap = ({
       <div>
         {ordersMarkers?.map((marker: any) => (
           <Marker
+            //@ts-ignore
             cursor={"pointer"}
             key={marker.order_id}
             latitude={marker.latitude}

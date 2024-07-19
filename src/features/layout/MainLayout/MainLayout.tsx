@@ -1,6 +1,6 @@
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import Sidebar from "@/features/shared/widgets/SidebarVertical";
-import TopNav from "@/features/shared/widgets/TopNavbar";
+import Sidebar from "@/features/layout/SidebarVertical";
+import TopNav from "@/features/layout/TopNavbar";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 import { useEffect, useState } from "react";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";

@@ -21,16 +21,17 @@ const DeliveryInfo = ({
           <span className="text-n90 ">Delivery Agent :</span>{" "}
           {deliveryAgentName || "*****"}
         </p>
-        <div className=" flex items-center justify-between   ">
+        <div className=" flex  items-center justify-center ">
           <p className="text-black  ">
             <span className="text-n90 ">Delivery Date :</span>{" "}
             {!deliveryDate && "*****"}
           </p>
           {!!deliveryDate && (
             <DeliveryDatePicker
+              defaultValue={deliveryDate}
+              direction="down"
               isReadOnly={!isInEditMode}
               onChange={onDeliveryDateChange}
-              defaultValue={deliveryDate}
             />
           )}
         </div>
