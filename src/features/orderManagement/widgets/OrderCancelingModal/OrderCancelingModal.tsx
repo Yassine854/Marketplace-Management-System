@@ -7,13 +7,13 @@ import {
   ModalContent,
 } from "@nextui-org/react";
 import Loading from "@/features/shared/elements/Loading";
-const message = " Are you sure you want to cancel those orders ? ";
 
 const OrderCancelingModal = ({
   isOpen,
   isPending,
   onConfirm,
   onClose,
+  message,
 }: any) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>

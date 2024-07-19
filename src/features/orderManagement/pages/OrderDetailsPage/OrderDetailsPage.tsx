@@ -4,18 +4,21 @@ import DeliveryInfo from "../../widgets/DeliveryInfo/DeliveryInfo";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import OrderItemsTable from "@/features/orderManagement/tables/OrderItemsTable";
 import OrderActions from "../../widgets/OrderDetailsActions/OrderDetailsActions";
+import { useOrderDetailsPage } from "@/features/orderManagement/hooks/useOrderDetailsPage";
 import OrderDetailsPageHeader from "../../widgets/OrderDetailsPageHeader/OrderDetailsPageHeader";
 import OrderCancelingModal from "@/features/orderManagement/widgets/OrderCancelingModal/OrderCancelingModal";
-import { useOrderDetailsPage } from "@/features/orderManagement/pages/OrderDetailsPage/useOrderDetailsPage";
 
 const OrderDetailsPage = () => {
   const {
     order,
     total,
+    dropRef,
     onArrowClick,
     isInEditMode,
     orderOnReviewItems,
     onDeliveryDateChange,
+    actions,
+    isSomeActionPending,
   } = useOrderDetailsPage();
 
   return (
@@ -48,7 +51,13 @@ const OrderDetailsPage = () => {
             onDeliveryDateChange={onDeliveryDateChange}
           />
 
-          <OrderActions orderId={order?.id} />
+          <OrderActions
+            dropRef={dropRef}
+            actions={actions}
+            orderId={order?.id}
+            isInEditMode={isInEditMode}
+            isPending={isSomeActionPending}
+          />
         </div>
         <Divider />
         <div className="relative mb-4 mt-1 flex flex-grow overflow-y-scroll ">

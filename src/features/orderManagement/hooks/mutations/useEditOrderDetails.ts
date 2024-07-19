@@ -1,11 +1,10 @@
-import { useMutation } from "@tanstack/react-query";
+import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
-import { axios } from "@/libs/axios";
-import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
+import { useMutation } from "@tanstack/react-query";
 
 const formatUnixTimestamp = (unixTimestamp: number): string => {
-  const date = new Date(unixTimestamp * 1000); // Convert from seconds to milliseconds
+  const date = new Date(unixTimestamp * 1000);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
@@ -13,7 +12,6 @@ const formatUnixTimestamp = (unixTimestamp: number): string => {
 };
 
 export const useEditOrderDetails = () => {
-  const { setIsInEditMode } = useOrderDetailsStore();
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ orderId, items, deliveryDate }: any) => {
       const magentoItems: any[] = [];
@@ -39,7 +37,6 @@ export const useEditOrderDetails = () => {
       return orderId;
     },
     onSuccess: (orderId) => {
-      //   setIsInEditMode(false);
       toast.success(`Order Status Updated Successfully`, { duration: 5000 });
     },
 

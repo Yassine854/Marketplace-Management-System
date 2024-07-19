@@ -65,6 +65,7 @@ const OrdersPage = () => {
         isOpen={isCancelingModalOpen}
         isPending={isCancelingPending}
         onClose={onCancelingModalClose}
+        message=" Are you sure you want to cancel those orders ? "
       />
     </div>
   );

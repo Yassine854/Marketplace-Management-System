@@ -1,38 +1,23 @@
-import ActionsDropdown from "../ActionsDropdown";
-import Loading from "@/features/shared/elements/Loading";
-import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 import { useState } from "react";
-
-export type Item = {
-  name: string;
-  key: string;
-  action: () => void;
-};
-
-const firstItem = {
-  name: "Select Action",
-  action: () => {},
-  key: "",
-};
+import Dropdown from "../Dropdown";
+import Loading from "@/features/shared/elements/Loading";
 
 const MultipleOrdersActionsDropdown = ({
   actions = [],
   isPending,
   actionsRef,
 }: any) => {
-  const [selectedAction, setSelectedAction] = useState<Item>(firstItem);
-
-  const onSelectedChange = (item: Item): void => {
-    setSelectedAction(item);
-  };
+  const [selectedAction, setSelectedAction] = useState<any>();
 
   return (
     <div className="flex items-center justify-center">
       <>
-        <ActionsDropdown
-          items={[firstItem, ...actions]}
-          onSelectedChange={onSelectedChange}
+        <Dropdown
+          items={actions}
           ref={actionsRef}
+          selected={selectedAction}
+          placeholder="Select Action"
+          onSelect={setSelectedAction}
         />
         {selectedAction?.key && (
           <>

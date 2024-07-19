@@ -4,11 +4,9 @@ import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDet
 import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
 import { useGetOrder } from "@/features/orderManagement/hooks/queries/useGetOrder";
 
-export const useOrderDetailsEffect = () => {
+export const useOrderDetailsEffect = (reset: any) => {
   const {
-    isInEditMode,
     orderOnReviewId,
-    setIsInEditMode,
     setOrderOnReviewItems,
     setOrderOnReviewDeliveryDate,
   } = useOrderDetailsStore();
@@ -20,10 +18,10 @@ export const useOrderDetailsEffect = () => {
 
   useEffect(() => {
     if (!orderUnderActionId) {
-      //   reset();
+      reset();
       refetch();
     }
-  }, [orderUnderActionId, refetch]);
+  }, [orderUnderActionId, refetch, reset]);
 
   useEffect(() => {
     !orderOnReviewId && redirect("/orders");

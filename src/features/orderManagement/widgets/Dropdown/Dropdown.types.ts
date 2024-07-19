@@ -1,14 +1,16 @@
 export type Item = {
   name: string;
   key: string;
+  action?: (orderId?: string) => void;
 };
 
 export type Props = {
   items: Array<Item>;
-  onSelectedChange?: (key: string) => void;
+  onSelect?: (item: any) => void;
+  selected: Item | undefined;
+  placeholder?: string;
 };
 
 export type DropRef = {
   reset: () => void;
-  // changeSelected: (key: string) => void;
 };

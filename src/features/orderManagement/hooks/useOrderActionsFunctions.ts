@@ -161,10 +161,10 @@ export const useOrderActionsFunctions = () => {
     key: "gotToEdit",
     name: "Edit",
     action: (orderId: string): void => {
+      navigateToOrderDetails();
       setIsInEditMode(true);
       setOrderUnderActionId(orderId);
       setOrderOnReviewId(orderId);
-      navigateToOrderDetails();
     },
   };
 

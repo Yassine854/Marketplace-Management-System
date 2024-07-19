@@ -11,7 +11,7 @@ export const useMultipleOrdersActions = () => {
   const actionsRef = useRef(null);
   const [isPending, setIsPending] = useState(false);
   const { onClose, onOpen, isOpen } = useDisclosure();
-  const { status, selectedOrders } = useOrdersStore();
+  const { status, selectedOrders, or } = useOrdersStore();
 
   const { cancelOrdersAsync, isPending: isCancelingPending } =
     useCancelMultipleOrders();

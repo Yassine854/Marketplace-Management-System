@@ -9,11 +9,7 @@ export const useOrderDetailsStore = create<any>(
       orderOnReviewDeliveryDate: null,
       isInEditMode: false,
       total: 0,
-      selectedAction: "",
-      setSelectedAction: (selectedAction: string) =>
-        set({
-          selectedAction,
-        }),
+
       setTotal: (total: number) => set({ total }),
 
       setOrderOnReviewItems: (orderOnReviewItems: any[]) =>

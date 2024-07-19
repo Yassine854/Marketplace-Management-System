@@ -29,6 +29,7 @@ export const useOrderTableActions = () => {
     orderUnderActionId,
     isSomeActionPending,
     setOrderUnderActionId,
+    setOrderToCancelId,
   } = useOrderActionsStore();
 
   const onOrderClick = (orderId: string) => {
@@ -45,14 +46,19 @@ export const useOrderTableActions = () => {
   }, [isSomeActionPending, refetch, refetchCount]);
 
   useEffect(() => {
-    orderToCancelId && onOpen();
-  }, [orderToCancelId, onOpen]);
+    if (orderToCancelId) {
+      onOpen();
+    } else {
+      onCancelingModalClose();
+    }
+  }, [orderToCancelId, onOpen, onCancelingModalClose]);
 
   return {
     actions,
     summary,
     cancelOrder: async () => {
       await cancelOrderAsync(orderToCancelId);
+      setOrderToCancelId("");
       onCancelingModalClose();
     },
     onOrderClick,
