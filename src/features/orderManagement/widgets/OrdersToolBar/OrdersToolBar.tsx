@@ -4,19 +4,23 @@ import MultipleOrdersActionsDropdown from "../MultipleOrdersActionsDropdown";
 
 const OrdersToolBar = ({
   onSort,
-  onSearch,
   sortRef,
   actions,
+  onSearch,
   isPending,
   searchRef,
   actionsRef,
+  ordersCount,
   selectedStatus,
   isSomeOrdersSelected,
 }: any) => {
   return (
     <div className=" flex flex-grow flex-wrap items-center justify-between gap-3  bg-n0 px-4">
       <div className="flex items-center justify-center">
-        <p className="m-4 text-xl font-bold capitalize ">{`${selectedStatus} Orders `}</p>
+        <p className="m-4 text-xl font-bold capitalize ">
+          {`${selectedStatus} Orders  `}
+          {!!ordersCount && <span>: {ordersCount}</span>}
+        </p>
         {isSomeOrdersSelected && (
           <MultipleOrdersActionsDropdown
             actions={actions}

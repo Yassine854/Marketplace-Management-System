@@ -3,9 +3,9 @@ import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { usePathname } from "next/navigation";
 import AuthWrapper from "@/libs/next-auth/authWrapper";
-import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 import { ApolloProviderWrapper } from "@/libs/apollo/apollo-provider-wrapper";
 import TanstackQueryProvider from "@/libs/tanstackQuery/TanstackQueryProvider";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();

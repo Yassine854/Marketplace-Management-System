@@ -20,6 +20,7 @@ const OrdersPage = () => {
     totalOrders,
     cancelOrders,
     paginationRef,
+    ordersCount,
     setCurrentPage,
     setItemsPerPage,
     isCancelingPending,
@@ -40,6 +41,7 @@ const OrdersPage = () => {
           isPending={isPending}
           selectedStatus={status}
           actionsRef={actionsRef}
+          ordersCount={ordersCount}
           isSomeOrdersSelected={isSomeOrdersSelected}
         />
       </div>
