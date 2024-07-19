@@ -17,6 +17,19 @@ const inter = Inter({
 });
 export const metadata: Metadata = {
   title: "Kamioun - Order Management System",
+  robots: {
+    index: false,
+    follow: true,
+    nocache: true,
+    googleBot: {
+      index: true,
+      follow: false,
+      noimageindex: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 const RootLayout = ({
@@ -28,6 +41,7 @@ const RootLayout = ({
 }) => {
   return (
     <html suppressHydrationWarning lang={locale} className="!scroll-smooth">
+      <meta name="robots" content="noindex,nofollow" />
       <body className={`${inter.className}   text-n500  dark:text-n30 `}>
         <ThemeProvider>
           <Next13NProgress color="#5D69F4" height={3} />
