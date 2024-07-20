@@ -1,6 +1,3 @@
 "use client";
 
-import UsersPage from "@/components/pages/UsersPage";
-
-const Users = () => <UsersPage />;
-export default Users;
+export { default } from "@/features/usersManagement/pages/UsersPage";

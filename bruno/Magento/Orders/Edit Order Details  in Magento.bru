@@ -1,0 +1,34 @@
+meta {
+  name: Edit Order Details  in Magento
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{magentoUrl}}/rest/default/V1/orders/create
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: pd2as4cqycmj671bga4egknw2csoa9b6
+}
+
+body:json {
+  {
+    "entity": {
+      "entity_id": 59883,
+      "state": "new",
+      "status": "open",
+      "extension_attributes": {
+        "delivery_date": "2024-06-30"
+      },
+      "items": [
+        {
+          "item_id": 736776,
+          "weight": 8
+        }
+      ]
+    }
+  }
+}

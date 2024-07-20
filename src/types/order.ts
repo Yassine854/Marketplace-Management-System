@@ -12,7 +12,7 @@ const orderSchema = z.object({
   customerFirstname: z.string(),
   customerLastname: z.string(),
   deliveryAgentId: z.string(),
-  deliveryAgent: z.string(),
+  deliveryAgentName: z.string(),
   deliveryDate: z.number(),
   deliveryStatus: z.string(),
   source: z.string(),

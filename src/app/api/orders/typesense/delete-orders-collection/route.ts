@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { deleteOrdersCollection } from "@/services/orders/typesense/delete-orders-collection";
-
+import { logError } from "@/utils/logError";
 export async function DELETE(Request: any) {
   try {
     await deleteOrdersCollection();
@@ -8,7 +8,7 @@ export async function DELETE(Request: any) {
       status: 200,
     });
   } catch (err) {
-    process.env.NODE_ENV === "development" && console.error(err);
+    logError(err);
     return NextResponse.json("Error", {
       status: 500,
     });

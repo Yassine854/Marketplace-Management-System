@@ -1,5 +1,5 @@
 import { UserPayload } from "../resolvers.types";
-import { prismaClient } from "@/libs/prisma/prismaClient";
+import { prismaClient } from "@/clients/prisma/prismaClient";
 
 export const deleteUser = async (userId: string): Promise<UserPayload> => {
   try {

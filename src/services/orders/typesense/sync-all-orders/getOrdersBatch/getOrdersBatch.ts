@@ -18,6 +18,9 @@ export const getOrdersBatch = (orders: any): Order[] =>
   orders?.map((order: any) => {
     return {
       id: String(order?.entity_id) || "",
+      orderId: String(order?.entity_id) || "",
+      incrementId: String(order?.increment_id) || "",
+
       kamiounId: String(order?.extension_attributes?.kamioun_order_id) || "",
       storeId: order?.store_id,
       state: order?.state || "",
@@ -30,7 +33,7 @@ export const getOrdersBatch = (orders: any): Order[] =>
       customerPhone: order?.billing_address?.telephone || "",
       deliveryAgentId:
         String(order?.extension_attributes?.delivery_agent_id) || "",
-      deliveryAgent: order?.extension_attributes?.delivery_agent || "",
+      deliveryAgentName: order?.extension_attributes?.delivery_agent || "",
       deliveryStatus: order?.extension_attributes?.delivery_status || "",
       deliveryDate: deliveryDateToUnixTimeStamp(
         order?.extension_attributes?.delivery_date,

@@ -1,13 +1,13 @@
-import { getPrismaUser } from "@/libs/prisma";
+import { prisma } from "@/clients/prisma";
 import { isPasswordValid } from "@/utils/password/isPasswordValid";
-// // Method to set salt and hash the password for a user
+import { logError } from "@/utils/logError";
 
 export const handleAuthentication = async (
   username: string,
   password: string,
 ): Promise<any> => {
   try {
-    const user = await getPrismaUser(username);
+    const user = await prisma.getUser(username);
 
     if (!user) {
       process.env.NODE_ENV === "development" && console.error("User Not Found");
@@ -22,8 +22,7 @@ export const handleAuthentication = async (
     process.env.NODE_ENV === "development" && console.error("Wrong Password");
     return null;
   } catch (error) {
-    process.env.NODE_ENV === "development" &&
-      console.error("Error authenticating user:", error);
+    logError(error);
     return null;
   }
 };

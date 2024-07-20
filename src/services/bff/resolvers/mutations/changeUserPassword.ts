@@ -1,6 +1,6 @@
 import { UserPayload } from "../resolvers.types";
 import { hashPassword } from "@/utils/password";
-import { prismaClient } from "@/libs/prisma/prismaClient";
+import { prismaClient } from "@/clients/prisma/prismaClient";
 
 export const changeUserPassword = async (
   userId: string,

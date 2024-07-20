@@ -1,14 +1,11 @@
 import { getOrdersBatch } from "./getOrdersBatch";
-import { typesenseClient } from "@/libs/typesense";
+import { typesense } from "@/clients/typesense";
 
 export const indexingOrders = async (magentoOrders: any, callback: any) => {
   try {
     const ordersBatch = getOrdersBatch(magentoOrders);
 
-    await typesenseClient
-      .collections("orders")
-      .documents()
-      .import(ordersBatch, { action: "upsert" });
+    await typesense.orders.addMany(ordersBatch);
 
     callback();
   } catch (err) {

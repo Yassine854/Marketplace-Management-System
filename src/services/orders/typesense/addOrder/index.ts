@@ -1,10 +1,10 @@
 import type { NextRequest } from "next/server";
-import { typesenseClient } from "@/libs/typesense";
+import { typesense } from "@/clients/typesense";
 import { checkApiKey } from "@/services/auth/checkApiKey";
 import { logError } from "@/utils/logError";
 import {
   successResponse,
-  conflictResponse,
+  addOrderConflictResponse,
   invalidRequestResponse,
   internalServerErrorResponse,
   unauthorizedErrorResponse,
@@ -20,7 +20,7 @@ export const addOrder = async (request: NextRequest) => {
 
     const { order } = await request.json();
 
-    await typesenseClient.collections("orders").documents().create(order);
+    await typesense.orders.addOne(order);
 
     return successResponse(order.id);
   } catch (error: any) {
@@ -29,7 +29,7 @@ export const addOrder = async (request: NextRequest) => {
     const message: string = error?.message ?? "";
 
     if (message.includes("Request failed with HTTP code 409")) {
-      return conflictResponse();
+      return addOrderConflictResponse();
     }
 
     if (message.includes("Request failed with HTTP code 400"))

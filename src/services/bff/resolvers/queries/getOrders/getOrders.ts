@@ -1,9 +1,6 @@
 import { GetOrdersParams } from "./getOrders.types";
 import { Order } from "@/types/order";
-import { typesenseClient } from "@/libs/typesense";
-
-const createOrdersList = (typesenseHits: any): Order[] =>
-  typesenseHits.map(({ document }: any): Order => document);
+import { typesense } from "@/clients/typesense";
 
 export const getOrders = async ({
   sortBy,
@@ -15,25 +12,17 @@ export const getOrders = async ({
   { orders: Order[]; totalOrders: number } | undefined
 > => {
   try {
-    const searchParams = {
-      q: search,
-      query_by: "customerFirstname,customerLastname,kamiounId",
-      page: page,
-      per_page: perPage,
-      sort_by: sortBy,
-      filter_by: filterBy,
-    };
-
-    const typesenseResponse = await typesenseClient
-      .collections("orders")
-      .documents()
-      .search(searchParams);
-
-    const orders: Order[] = createOrdersList(typesenseResponse?.hits);
+    const { orders, count } = await typesense.orders.getMany({
+      sortBy,
+      page,
+      perPage,
+      search,
+      filterBy,
+    });
 
     return {
       orders,
-      totalOrders: typesenseResponse.found,
+      totalOrders: count,
     };
   } catch (error) {
     process.env.NODE_ENV === "development" &&

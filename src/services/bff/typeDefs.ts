@@ -49,6 +49,7 @@ export const typeDefs = gql`
 
   type Order {
     id: ID!
+    incrementId: String!
     kamiounId: String!
     storeId: String!
     state: String!
@@ -60,7 +61,7 @@ export const typeDefs = gql`
     customerLastname: String
     customerPhone: String
     deliveryAgentId: String!
-    deliveryAgent: String!
+    deliveryAgentName: String!
     deliveryDate: Float!
     deliveryStatus: String
     source: String!

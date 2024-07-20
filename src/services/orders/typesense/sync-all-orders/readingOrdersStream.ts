@@ -1,5 +1,5 @@
 import { Readable } from "stream";
-import { magento } from "@/libs/magento";
+import { magento } from "@/clients/magento";
 
 export const readingOrdersStream = () => {
   let page = 1;
@@ -16,7 +16,13 @@ export const readingOrdersStream = () => {
         const { pagesCount } = await magento.getPagesCount();
 
         if (page <= pagesCount) {
-          console.log("Fetching orders from page", page, "...");
+          console.info(
+            "Fetching orders from page",
+            page,
+            "of",
+            pagesCount,
+            "total pages ...",
+          );
 
           const { items } = await magento.getOrdersByBatch(page);
 
@@ -26,7 +32,7 @@ export const readingOrdersStream = () => {
         }
 
         isEnd = true;
-        console.log("Orders fetching completed successfully");
+        console.info("Orders fetching completed successfully");
       } catch (error) {
         this.emit("error", error);
       }

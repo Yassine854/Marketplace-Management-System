@@ -1,4 +1,4 @@
 export const logError = (error: unknown): void => {
-  console.log("logError:  ");
+  console.error("Error Log :  ");
   process.env.NODE_ENV === "development" && console.error(error);
 };
