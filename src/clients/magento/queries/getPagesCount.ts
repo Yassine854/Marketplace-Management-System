@@ -1,4 +1,5 @@
 import { axios } from "@/libs/axios";
+import { logError } from "@/utils/logError";
 
 const batchSize = 250;
 
@@ -11,8 +12,7 @@ export const getPagesCount = async () => {
       pagesCount: Math.ceil(response.data.total_count / batchSize),
     };
   } catch (error) {
-    process.env.NODE_ENV === "development" &&
-      console.error("Error fetching data:", error);
+    logError(error);
     throw error;
   }
 };

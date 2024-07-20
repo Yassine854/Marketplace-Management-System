@@ -30,7 +30,7 @@ const unixTimeStampToStringDateYMD = (
 };
 
 const OrdersTableRow = ({
-  onClick = () => console.log("Row clicked"),
+  onClick,
   order,
   onSelectClick,
   onPDFIconClick,

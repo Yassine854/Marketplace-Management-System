@@ -12,7 +12,6 @@ const DeliveryAgentSelector = forwardRef(
 
     useImperativeHandle(ref, () => ({
       reset: () => {
-        console.log("selectotr");
         onChange("");
         setLayout("Select Delivery Agent");
       },

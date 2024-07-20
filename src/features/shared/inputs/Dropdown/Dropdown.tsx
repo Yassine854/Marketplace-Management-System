@@ -28,7 +28,6 @@ const Dropdown = forwardRef<DropRef, any>(
         //  selected && setSelected(null);
       },
       changeSelected: (selected: any) => {
-        console.log("🚀 ~ useImperativeHandle ~ selected:", selected);
         // setSelected(selected);
         // onSelectedChange(selected.key);
       },

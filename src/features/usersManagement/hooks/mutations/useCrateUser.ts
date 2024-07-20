@@ -1,4 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
+import { logError } from "@/utils/logError";
 
 const MUTATION = gql`
   mutation CreateUser($input: CreateUserInput) {
@@ -33,7 +34,7 @@ export const useCreateUser = () => {
         message: "User Created Successfully !",
       };
     } catch (err) {
-      process.env.NODE_ENV === "development" && console.error(err);
+      logError(err);
 
       return {
         success: false,

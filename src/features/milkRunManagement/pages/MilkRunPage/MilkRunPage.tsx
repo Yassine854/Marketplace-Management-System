@@ -8,6 +8,7 @@ import DeliveryDatePicker from "@/features/shared/inputs/DeliveryDatePicker";
 const MilkRunPage = () => {
   const {
     orders,
+    ordersCount,
     onReset,
     isLoading,
     onValidate,
@@ -33,8 +34,7 @@ const MilkRunPage = () => {
       <div className="absolute left-4 top-4 z-10 flex h-32  flex-col items-center justify-between rounded-xl p-4 ">
         <div className=" flex  h-10 w-full items-center  rounded-xl bg-n20 p-4 shadow-lg ">
           <p>
-            Number of Orders :{" "}
-            <span className="font-bold">{orders?.length}</span>{" "}
+            Number of Orders : <span className="font-bold">{ordersCount}</span>{" "}
           </p>
         </div>
         <div className="flex  h-10 w-full items-center  rounded-xl bg-n20 p-4 shadow-lg  ">

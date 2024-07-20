@@ -1,4 +1,5 @@
 import { axios } from "@/libs/axios";
+import { logError } from "@/utils/logError";
 
 export const generateOrderSummary = async (
   orderId: string,
@@ -11,8 +12,7 @@ export const generateOrderSummary = async (
     const res = await axios.magentoClient.post("order_summary/generate", data);
     return res?.data;
   } catch (error) {
-    process.env.NODE_ENV === "development" &&
-      console.error("Error generating Order Summary :", error);
+    logError(error);
     throw error;
   }
 };

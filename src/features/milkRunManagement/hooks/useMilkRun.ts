@@ -32,9 +32,9 @@ export const useMilkRun = () => {
 
   const {
     orders,
+    count: ordersCount,
     isLoading: isOrdersLoading,
-    isError,
-  } = useGetMilkRunOrders(deliveryDate);
+  } = useGetMilkRunOrders(Number(deliveryDate));
 
   const { editOrdersMilkRun, isPending } = useEditOrdersMilkRun();
 
@@ -110,10 +110,10 @@ export const useMilkRun = () => {
   return {
     orders,
     onReset,
-    isError,
     isLoading,
     onValidate,
     onEditClick,
+    ordersCount,
     deliveryAgents,
     selectedOrdersIds,
     onOrderMarkerClick,

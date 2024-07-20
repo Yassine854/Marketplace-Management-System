@@ -9,5 +9,5 @@ export const typesenseClient = new typesense.Client({
     },
   ],
   apiKey: String(process.env.TYPESENSE_KEY),
-  connectionTimeoutSeconds: 5,
+  connectionTimeoutSeconds: 60,
 });

@@ -15,9 +15,6 @@ const OrderDetailsActions = ({
   const { setIsInEditMode } = useOrderDetailsStore();
 
   // useEffect(() => {
-  //   console.log("🚀 ~ actions:", actions);
-
-  //   console.log("🚀 ~ setIsInEditMode:", setIsInEditMode);
 
   //   if (isInEditMode) {
   //     const item = actions.find((e: any) => e.key === "edit");

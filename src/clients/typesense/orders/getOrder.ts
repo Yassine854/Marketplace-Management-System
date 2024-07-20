@@ -1,5 +1,6 @@
 import { Order } from "@/types/order";
 import { typesenseClient } from "../typesenseClient";
+import { logError } from "@/utils/logError";
 
 export const getOrder = async (
   id: string,
@@ -23,6 +24,6 @@ export const getOrder = async (
 
     return order;
   } catch (error) {
-    process.env.NODE_ENV === "development" && console.error(error);
+    logError(error);
   }
 };

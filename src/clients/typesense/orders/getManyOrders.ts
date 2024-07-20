@@ -1,5 +1,6 @@
 import { Order } from "@/types/order";
 import { typesenseClient } from "../typesenseClient";
+import { logError } from "@/utils/logError";
 
 export const getManyOrders = async ({
   sortBy,
@@ -10,12 +11,13 @@ export const getManyOrders = async ({
 }: any): Promise<any> => {
   try {
     const searchParams = {
-      q: search,
-      query_by: "customerFirstname,customerLastname,kamiounId,orderId",
-      page: page,
-      per_page: perPage,
-      sort_by: sortBy,
-      filter_by: filterBy,
+      q: search || "",
+      query_by:
+        "customerFirstname,customerLastname,kamiounId,orderId,incrementId",
+      page: page || 1,
+      per_page: perPage || 250,
+      sort_by: sortBy || "",
+      filter_by: filterBy || "",
     };
 
     const typesenseResponse = await typesenseClient
@@ -30,8 +32,7 @@ export const getManyOrders = async ({
       count: typesenseResponse.found,
     };
   } catch (error) {
-    process.env.NODE_ENV === "development" &&
-      console.error("getOrders resolver Error ", error);
+    logError(error);
   }
 };
 

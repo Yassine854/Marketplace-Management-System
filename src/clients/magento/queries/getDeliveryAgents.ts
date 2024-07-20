@@ -1,4 +1,5 @@
 import { axios } from "@/libs/axios";
+import { logError } from "@/utils/logError";
 
 export const getDeliveryAgents = async () => {
   try {
@@ -9,8 +10,7 @@ export const getDeliveryAgents = async () => {
       deliveryAgents: response.data.items,
     };
   } catch (error) {
-    process.env.NODE_ENV === "development" &&
-      console.error("Error fetching data:", error);
+    logError(error);
     throw error;
   }
 };

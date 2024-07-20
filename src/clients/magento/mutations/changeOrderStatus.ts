@@ -1,4 +1,5 @@
 import { axios } from "@/libs/axios";
+import { logError } from "@/utils/logError";
 
 export const changeOrderStatus = async ({
   orderId,
@@ -15,8 +16,7 @@ export const changeOrderStatus = async ({
     };
     await axios.magentoClient.put("orders/create", data);
   } catch (error) {
-    process.env.NODE_ENV === "development" &&
-      console.error("Error changing order status:", error);
+    logError(error);
     throw error;
   }
 };

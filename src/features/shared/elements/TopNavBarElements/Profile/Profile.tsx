@@ -1,4 +1,5 @@
 import { IconLogout, IconSettings } from "@tabler/icons-react";
+import { logError } from "@/utils/logError";
 
 import Image from "next/image";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -22,7 +23,7 @@ const useList = () => {
         try {
           await logout();
         } catch (error: any) {
-          process.env.NODE_ENV === "development" && console.error(error);
+          logError(error);
         }
       },
     },

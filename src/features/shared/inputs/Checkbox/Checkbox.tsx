@@ -2,11 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Props } from "./Checkbox.types";
 
-const Checkbox = ({
-  checkboxRef,
-  isChecked = false,
-  onClick = (isChecked: boolean) => console.log("is checked", isChecked),
-}: any) => {
+const Checkbox = ({ checkboxRef, isChecked = false, onClick }: any) => {
   const [checked, setChecked] = useState(isChecked);
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 import { axios } from "@/libs/axios";
+import { logError } from "@/utils/logError";
 
 export const editOrderMilkRun = async ({
   orderId,
@@ -19,8 +20,7 @@ export const editOrderMilkRun = async ({
     };
     await axios.magentoClient.put("orders/create", data);
   } catch (error) {
-    process.env.NODE_ENV === "development" &&
-      console.error("Error editing order milk run:", error);
+    logError(error);
     throw error;
   }
 };

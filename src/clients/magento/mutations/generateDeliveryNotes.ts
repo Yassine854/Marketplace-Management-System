@@ -1,4 +1,5 @@
 import { axios } from "@/libs/axios";
+import { logError } from "@/utils/logError";
 
 export const generateDeliveryNotes = async (
   ordersIdsString: string,
@@ -14,8 +15,7 @@ export const generateDeliveryNotes = async (
     );
     return res?.data;
   } catch (error) {
-    process.env.NODE_ENV === "development" &&
-      console.error("Error generating Delivery Notes :", error);
+    logError(error);
     throw error;
   }
 };

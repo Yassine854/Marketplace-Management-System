@@ -4,7 +4,7 @@ import { checkApiKey } from "@/services/auth/checkApiKey";
 import { logError } from "@/utils/logError";
 import {
   successResponse,
-  conflictResponse,
+  addOrderConflictResponse,
   invalidRequestResponse,
   internalServerErrorResponse,
   unauthorizedErrorResponse,
@@ -29,7 +29,7 @@ export const addOrder = async (request: NextRequest) => {
     const message: string = error?.message ?? "";
 
     if (message.includes("Request failed with HTTP code 409")) {
-      return conflictResponse();
+      return addOrderConflictResponse();
     }
 
     if (message.includes("Request failed with HTTP code 400"))

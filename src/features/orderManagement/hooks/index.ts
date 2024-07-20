@@ -1,5 +1,5 @@
 export * from "./queries/useOrdersData";
-export * from "./queries/useOrdersSearch";
+export * from "./useOrdersSearch";
 export * from "./useOrdersSelections";
 export * from "./useOrdersSorting";
 export * from "./useOrdersTablePagination";

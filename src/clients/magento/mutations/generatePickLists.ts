@@ -1,4 +1,5 @@
 import { axios } from "@/libs/axios";
+import { logError } from "@/utils/logError";
 
 export const generatePickLists = async (
   ordersIdsString: string,
@@ -9,8 +10,7 @@ export const generatePickLists = async (
     );
     return res?.data;
   } catch (error) {
-    process.env.NODE_ENV === "development" &&
-      console.error("Error generating Pick List :", error);
+    logError(error);
     throw error;
   }
 };

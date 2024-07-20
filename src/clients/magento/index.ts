@@ -8,7 +8,7 @@ import { generatePickLists } from "./mutations/generatePickLists";
 import { changeOrderStatus } from "./mutations/changeOrderStatus";
 import { generateOrderSummary } from "./mutations/generateOrderSummary";
 import { generateDeliveryNotes } from "./mutations/generateDeliveryNotes";
-import { getMilkRunOrdersPerDate } from "./queries/getMilkRunOrdersPerDate";
+import { getMilkRunOrdersByDate } from "./queries/getMilkRunOrdersByDate";
 
 export const magento = {
   cancelOrder,
@@ -21,5 +21,5 @@ export const magento = {
   changeOrderStatus,
   generateOrderSummary,
   generateDeliveryNotes,
-  getMilkRunOrdersPerDate,
+  getMilkRunOrdersByDate,
 };

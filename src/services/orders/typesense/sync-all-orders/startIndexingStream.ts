@@ -1,20 +1,21 @@
 import { Writable } from "stream";
 import { NextResponse } from "next/server";
+import { logError } from "@/utils/logError";
 import { typesense } from "@/clients/typesense";
 import { indexingOrders } from "./indexingOrders";
 import { readingOrdersStream } from "./readingOrdersStream";
 
 export const startIndexingStream = async () => {
-  process.env.NODE_ENV === "development" && console.error("Syncing started");
+  console.info("Syncing started");
   try {
     const isOrdersCollectionExist = await typesense.isCollectionExist("orders");
 
     if (!isOrdersCollectionExist) {
-      console.log("Creating orders Collection...");
+      console.info("Creating orders Collection...");
 
       await typesense.orders.createCollection();
 
-      console.log("orders collection created Successfully...");
+      console.info("orders collection created Successfully...");
     }
 
     const readableStream = readingOrdersStream();
@@ -39,6 +40,6 @@ export const startIndexingStream = async () => {
 
     return NextResponse.json("Orders Syncing ...", { status: 202 });
   } catch (err) {
-    process.env.NODE_ENV === "development" && console.error(err);
+    logError(err);
   }
 };

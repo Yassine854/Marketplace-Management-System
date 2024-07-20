@@ -1,5 +1,7 @@
 import { axios } from "@/libs/axios";
 
+import { logError } from "@/utils/logError";
+
 const batchSize = 250;
 
 export const getOrdersByBatch = async (page: any) => {
@@ -11,8 +13,7 @@ export const getOrdersByBatch = async (page: any) => {
       items: response.data.items,
     };
   } catch (error) {
-    process.env.NODE_ENV === "development" &&
-      console.error("Error fetching data:", error);
+    logError(error);
     throw error;
   }
 };

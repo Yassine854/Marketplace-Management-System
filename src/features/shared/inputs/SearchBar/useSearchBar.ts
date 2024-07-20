@@ -9,7 +9,7 @@ export const useSearchBar = (
   const reset = () => setText("");
 
   const handleSubmit = () => {
-    !isWithInstantSearch && onSearch(text);
+    !isWithInstantSearch && onSearch && onSearch(text);
   };
 
   const handleInputChange = (e: any) => {
@@ -18,7 +18,7 @@ export const useSearchBar = (
   useEffect(() => {
     if (isWithInstantSearch) {
       const timer = setTimeout(() => {
-        onSearch(text);
+        onSearch && onSearch(text);
       }, 500);
 
       return () => clearTimeout(timer);

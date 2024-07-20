@@ -10,9 +10,7 @@ export const useOrderActionsStore = create<any>(
           orderUnderActionId,
         }),
 
-      openCancelingModal: () => {
-        console.log("open modal");
-      },
+      openCancelingModal: () => {},
 
       isSomeActionPending: false,
       setIsSomeActionPending: (isSomeActionPending: boolean): void =>

@@ -1,23 +1,21 @@
+import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
-import { magento } from "@/clients/magento";
-import { useEffect } from "react";
 
 export const useGetMilkRunOrders = (deliveryDate: number) => {
-  const { isLoading, data, isError } = useQuery({
-    queryKey: ["milkRunOrders", deliveryDate.toString()],
+  const { isLoading, data } = useQuery({
+    queryKey: ["milkRunOrders", deliveryDate?.toString()],
     queryFn: async () => {
-      const { orders } = await magento.getMilkRunOrdersPerDate(deliveryDate);
-      return Array.isArray(orders) ? orders : [];
+      const { data } = await axios.servicesClient(
+        `/api/orders/magento/getOrdersByDeliveryDate?deliveryDate=${deliveryDate}`,
+      );
+
+      return data;
     },
   });
 
-  useEffect(() => {
-    console.log("something went wrong on useGetMilkRunOrders");
-  }, [isError]);
-
   return {
-    orders: data || [],
-    isError,
+    orders: data?.orders || [],
+    count: data?.count || 0,
     isLoading,
   };
 };
