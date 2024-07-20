@@ -1,9 +1,11 @@
-import { useNavigation } from "@/features/shared/hooks/useNavigation";
-import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 import { useOrderDetailsEffect } from "./useOrderDetailsEffect";
-import { useGetOrder } from "@/features/orderManagement/hooks/queries/useGetOrder";
 import { useEffect, useRef } from "react";
 import { useOrderDetailsActions } from "./useOrderDetailsActions";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
+import { useGetOrder } from "@/features/orderManagement/hooks/queries/useGetOrder";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
+import { useCancelOrder } from "./mutations/useCancelOrder";
+import { useDisclosure } from "@nextui-org/modal";
 
 export const useOrderDetailsPage = () => {
   const { navigateBack } = useNavigation();
@@ -17,7 +19,18 @@ export const useOrderDetailsPage = () => {
     setOrderOnReviewDeliveryDate,
   } = useOrderDetailsStore();
 
-  const { actions, isSomeActionPending } = useOrderDetailsActions();
+  const { actions, isSomeActionPending, orderToCancelId, setOrderToCancelId } =
+    useOrderDetailsActions();
+  const {
+    onOpen,
+    isOpen: isCancelingModalOpen,
+    onClose: onCancelingModalClose,
+  } = useDisclosure();
+  const {
+    cancelOrderAsync,
+    isPending: isCancelingPending,
+    isError,
+  } = useCancelOrder();
 
   const { data: order } = useGetOrder(orderOnReviewId);
 
@@ -26,13 +39,32 @@ export const useOrderDetailsPage = () => {
     dropRef.current && dropRef.current?.reset();
   };
 
+  const { refetch } = useGetOrder(orderOnReviewId);
+
   useEffect(() => {
     if (!isSomeActionPending) {
       reset();
     }
   }, [isSomeActionPending]);
 
-  // useOrderDetailsEffect(reset);
+  useOrderDetailsEffect(reset);
+
+  useEffect(() => {
+    if (orderToCancelId) {
+      onOpen();
+    } else {
+      onCancelingModalClose();
+      refetch();
+    }
+  }, [orderToCancelId, onOpen, onCancelingModalClose]);
+
+  useEffect(() => {
+    if (isError) {
+      setOrderToCancelId("");
+      onCancelingModalClose();
+      reset();
+    }
+  }, [isError]);
 
   return {
     order,
@@ -41,8 +73,18 @@ export const useOrderDetailsPage = () => {
     isInEditMode,
     orderOnReviewItems,
     onArrowClick: navigateBack,
-    actions,
+    cancelOrder: async () => {
+      await cancelOrderAsync(orderOnReviewId);
+      setOrderToCancelId("");
+      onCancelingModalClose();
+      reset();
+    },
+    //@ts-ignore
+    actions: actions[order?.status],
     isSomeActionPending,
     onDeliveryDateChange: setOrderOnReviewDeliveryDate,
+    isCancelingModalOpen,
+    onCancelingModalClose,
+    isCancelingPending,
   };
 };

@@ -2,7 +2,7 @@ import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 import { useOrderActionsFunctions } from "./useOrderActionsFunctions";
 
 export const useOrderDetailsActionsByStatus = () => {
-  const { status } = useOrdersStore();
+  // const { status } = useOrdersStore();
 
   const {
     edit,
@@ -48,6 +48,6 @@ export const useOrderDetailsActionsByStatus = () => {
 
   return {
     //@ts-ignore
-    actions: actions[status],
+    actions,
   };
 };

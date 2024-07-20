@@ -9,6 +9,8 @@ export const useOrderDetailsEffect = (reset: any) => {
     orderOnReviewId,
     setOrderOnReviewItems,
     setOrderOnReviewDeliveryDate,
+    orderOnReviewItems,
+    setTotal,
   } = useOrderDetailsStore();
 
   const { orderUnderActionId } = useOrderActionsStore();
@@ -17,24 +19,24 @@ export const useOrderDetailsEffect = (reset: any) => {
   const { data: order } = useGetOrder(orderOnReviewId);
 
   useEffect(() => {
-    if (!orderUnderActionId) {
-      reset();
-      refetch();
-    }
+    // if (!orderUnderActionId) {
+    //   reset();
+    //   refetch();
+    // }
   }, [orderUnderActionId, refetch, reset]);
 
   useEffect(() => {
     !orderOnReviewId && redirect("/orders");
   }, [orderOnReviewId]);
 
-  // useEffect(() => {
-  //   let total = 0;
-  //   orderOnReviewItems.forEach((item: any) => {
-  //     total += item.shipped * item.productPrice;
-  //   });
+  useEffect(() => {
+    let total = 0;
+    orderOnReviewItems.forEach((item: any) => {
+      total += item.shipped * item.productPrice;
+    });
 
-  //   setTotal(total);
-  // }, [orderOnReviewItems, setTotal]);
+    setTotal(total);
+  }, [orderOnReviewItems]);
 
   useEffect(() => {
     order && setOrderOnReviewItems(order?.items);

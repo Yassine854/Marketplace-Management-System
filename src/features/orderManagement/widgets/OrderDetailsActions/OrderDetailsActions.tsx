@@ -4,6 +4,7 @@ import Dropdown from "../Dropdown";
 import { useEffect, useState } from "react";
 import { useOrderDetailsStore } from "../../stores/orderDetailsStore";
 
+//To Refactor
 const OrderDetailsActions = ({
   orderId,
   dropRef,
@@ -55,13 +56,15 @@ const OrderDetailsActions = ({
         <p className=" ml-2 pb-2 text-2xl font-bold text-black">Actions </p>
         <div className="flex items-center justify-center">
           <>
-            <Dropdown
-              ref={dropRef}
-              items={actions}
-              selected={selectedAction}
-              onSelect={setSelectedAction}
-              placeholder={!isInEditMode ? "Select Action" : undefined}
-            />
+            {actions && (
+              <Dropdown
+                ref={dropRef}
+                items={actions}
+                selected={selectedAction}
+                onSelect={setSelectedAction}
+                placeholder={!isInEditMode ? "Select Action" : undefined}
+              />
+            )}
 
             {selectedAction?.key && (
               <>

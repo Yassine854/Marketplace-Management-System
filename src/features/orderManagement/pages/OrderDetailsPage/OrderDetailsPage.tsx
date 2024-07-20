@@ -7,6 +7,7 @@ import OrderActions from "../../widgets/OrderDetailsActions/OrderDetailsActions"
 import { useOrderDetailsPage } from "@/features/orderManagement/hooks/useOrderDetailsPage";
 import OrderDetailsPageHeader from "../../widgets/OrderDetailsPageHeader/OrderDetailsPageHeader";
 import OrderCancelingModal from "@/features/orderManagement/widgets/OrderCancelingModal/OrderCancelingModal";
+import { useEffect } from "react";
 
 const OrderDetailsPage = () => {
   const {
@@ -19,6 +20,10 @@ const OrderDetailsPage = () => {
     onDeliveryDateChange,
     actions,
     isSomeActionPending,
+    cancelOrder,
+    isCancelingModalOpen,
+    onCancelingModalClose,
+    isCancelingPending,
   } = useOrderDetailsPage();
 
   return (
@@ -67,7 +72,13 @@ const OrderDetailsPage = () => {
           />
         </div>
       </div>
-      <OrderCancelingModal />
+      <OrderCancelingModal
+        onConfirm={cancelOrder}
+        isOpen={isCancelingModalOpen}
+        isPending={isCancelingPending}
+        onClose={onCancelingModalClose}
+        message=" Are you sure you want to cancel this orders ? "
+      />
     </div>
   );
 };

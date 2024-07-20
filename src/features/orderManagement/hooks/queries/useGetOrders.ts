@@ -68,7 +68,7 @@ export const useGetOrders = ({
   search,
 }: Params): Res => {
   const { data, loading, error, refetch } = useQuery(QUERY, {
-    fetchPolicy: "network-only",
+    fetchPolicy: "no-cache",
     variables: {
       filterBy,
       page,

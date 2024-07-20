@@ -57,9 +57,14 @@ export const useOrderTableActions = () => {
     actions,
     summary,
     cancelOrder: async () => {
-      await cancelOrderAsync(orderToCancelId);
-      setOrderToCancelId("");
-      onCancelingModalClose();
+      try {
+        await cancelOrderAsync(orderToCancelId);
+        setOrderToCancelId("");
+        onCancelingModalClose();
+      } catch {
+        setOrderToCancelId("");
+        onCancelingModalClose();
+      }
     },
     onOrderClick,
     orderUnderActionId,

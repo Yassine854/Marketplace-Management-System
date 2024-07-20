@@ -24,7 +24,7 @@ const QUERY = gql`
 
 export const useGetOrders = ({ status, page, perPage }: Params) => {
   const { data, loading, error } = useQuery(QUERY, {
-    fetchPolicy: "network-only",
+    fetchPolicy: "no-cache",
 
     variables: {
       status,

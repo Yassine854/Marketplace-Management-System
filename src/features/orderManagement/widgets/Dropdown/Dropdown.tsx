@@ -23,6 +23,8 @@ const Dropdown = forwardRef<DropRef, Props>(
       if (!placeholder) {
         onSelect && onSelect(items[0]);
       }
+
+      //Problem in Dependencies
     }, []);
 
     return (

@@ -4,7 +4,7 @@ import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
 
 export const useCancelOrder = () => {
-  const { mutate, isPending, mutateAsync } = useMutation({
+  const { mutate, isPending, mutateAsync, isError } = useMutation({
     mutationFn: async (orderId: string) => {
       await magento.cancelOrder(orderId);
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
@@ -23,5 +23,10 @@ export const useCancelOrder = () => {
     },
   });
 
-  return { cancelOrder: mutate, cancelOrderAsync: mutateAsync, isPending };
+  return {
+    cancelOrder: mutate,
+    cancelOrderAsync: mutateAsync,
+    isPending,
+    isError,
+  };
 };

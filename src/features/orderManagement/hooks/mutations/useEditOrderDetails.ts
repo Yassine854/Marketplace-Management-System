@@ -17,14 +17,14 @@ export const useEditOrderDetails = () => {
       const magentoItems: any[] = [];
 
       items.forEach((item: any) => {
-        magentoItems.push({ item_id: item.is, weight: item.shipped });
+        magentoItems.push({ item_id: item.id, weight: item.shipped });
       });
 
-      await magento.editOrderDetails({
-        orderId,
-        deliveryDate: formatUnixTimestamp(deliveryDate),
-        items: magentoItems,
-      });
+      // await magento.editOrderDetails({
+      //   orderId,
+      //   deliveryDate: formatUnixTimestamp(deliveryDate),
+      //   items: magentoItems,
+      // });
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
         order: {
           id: orderId,
@@ -36,8 +36,8 @@ export const useEditOrderDetails = () => {
 
       return orderId;
     },
-    onSuccess: (orderId) => {
-      toast.success(`Order Status Updated Successfully`, { duration: 5000 });
+    onSuccess: () => {
+      toast.success(`Order Details Updated Successfully`, { duration: 5000 });
     },
 
     onError: () => {

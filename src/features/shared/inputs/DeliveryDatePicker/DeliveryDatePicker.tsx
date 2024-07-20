@@ -3,17 +3,20 @@ import { DayPicker } from "react-day-picker";
 import { IconCalendar } from "@tabler/icons-react";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { select } from "@nextui-org/theme";
 
 //To Refactor
-const formatDate = (date: Date): string => {
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
+const formatDate = (date: Date): string | undefined => {
+  if (date) {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
 
-  const formattedDay = day < 10 ? `0${day}` : day;
-  const formattedMonth = month < 10 ? `0${month}` : month;
+    const formattedDay = day < 10 ? `0${day}` : day;
+    const formattedMonth = month < 10 ? `0${month}` : month;
 
-  return `${formattedDay}/${formattedMonth}/${year}`;
+    return `${formattedDay}/${formattedMonth}/${year}`;
+  }
 };
 
 const matcher = (day: Date) => {
@@ -53,13 +56,18 @@ const DeliveryDatePicker = forwardRef(
     };
 
     useEffect(() => {
-      onChange && onChange(jsDateToUnixTimestamp(selected));
+      onChange && selected && onChange(jsDateToUnixTimestamp(selected));
+    }, [selected, onChange]);
+
+    useEffect(() => {
+      selected && setPlaceholder(formatDate(selected));
     }, [selected, onChange]);
 
     useEffect(() => {
       if (defaultValue) {
         const defaultDate = new Date(defaultValue * 1000);
-        defaultValue && setSelected(defaultDate);
+        console.log("🚀 ~ useEffect ~ defaultDate:", defaultDate);
+        setSelected(defaultDate);
       }
     }, [defaultValue]);
 

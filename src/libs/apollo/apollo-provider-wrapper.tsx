@@ -40,11 +40,11 @@ export const ApolloProviderWrapper = ({
       }),
       defaultOptions: {
         watchQuery: {
-          fetchPolicy: "network-only",
+          fetchPolicy: "no-cache",
           errorPolicy: "ignore",
         },
         query: {
-          fetchPolicy: "network-only",
+          fetchPolicy: "no-cache",
           errorPolicy: "all",
         },
       },
