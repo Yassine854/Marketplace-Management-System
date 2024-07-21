@@ -2,6 +2,7 @@ import { gql, useQuery } from "@apollo/client";
 
 import { ApolloError } from "@apollo/client";
 import { Order } from "@/types/order";
+import { useOrderDetailsStore } from "../../stores/orderDetailsStore";
 
 export type Params = {
   status: string;
@@ -58,10 +59,13 @@ const QUERY = gql`
   }
 `;
 
-export const useGetOrder = (orderId?: string) => {
+export const useGetOrder = () => {
+  const { orderOnReviewId } = useOrderDetailsStore();
   const { data, loading, error, refetch } = useQuery(QUERY, {
+    fetchPolicy: "network-only",
+    pollInterval: 10000,
     variables: {
-      orderId,
+      orderId: orderOnReviewId,
     },
   });
 

@@ -32,7 +32,7 @@ export const useOrderDetailsPage = () => {
     isError,
   } = useCancelOrder();
 
-  const { data: order } = useGetOrder(orderOnReviewId);
+  const { data: order } = useGetOrder();
 
   const reset = () => {
     //@ts-ignore

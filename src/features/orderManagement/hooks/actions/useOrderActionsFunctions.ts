@@ -21,6 +21,7 @@ export const useOrderActionsFunctions = () => {
     setOrderOnReviewId,
     orderOnReviewItems,
     orderOnReviewDeliveryDate,
+    total,
   } = useOrderDetailsStore();
 
   const { setOrderToCancelId, setIsSomeActionPending, setOrderUnderActionId } =
@@ -177,6 +178,7 @@ export const useOrderActionsFunctions = () => {
         orderId,
         items: orderOnReviewItems,
         deliveryDate: orderOnReviewDeliveryDate,
+        total,
       });
     },
   };

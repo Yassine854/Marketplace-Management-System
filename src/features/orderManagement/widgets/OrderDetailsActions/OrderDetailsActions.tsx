@@ -5,15 +5,9 @@ import { useEffect, useState } from "react";
 import { useOrderDetailsStore } from "../../stores/orderDetailsStore";
 
 //To Refactor
-const OrderDetailsActions = ({
-  orderId,
-  dropRef,
-  isPending,
-  actions,
-  isInEditMode,
-}: any) => {
+const OrderDetailsActions = ({ orderId, dropRef, isPending, actions }: any) => {
   const [selectedAction, setSelectedAction] = useState<any>();
-  const { setIsInEditMode } = useOrderDetailsStore();
+  const { setIsInEditMode, isInEditMode } = useOrderDetailsStore();
 
   // useEffect(() => {
 
@@ -24,14 +18,22 @@ const OrderDetailsActions = ({
   // }, []);
 
   useEffect(() => {
-    if (selectedAction && selectedAction?.key === "edit") {
-      // setIsInEditMode(true);
+    if (
+      isInEditMode === false &&
+      selectedAction &&
+      selectedAction?.key === "edit"
+    ) {
+      setIsInEditMode(true);
     }
 
-    if (selectedAction && selectedAction?.key !== "edit") {
-      //  setIsInEditMode(false);
+    if (
+      isInEditMode === true &&
+      selectedAction &&
+      selectedAction?.key !== "edit"
+    ) {
+      setIsInEditMode(false);
     }
-  }, [selectedAction]);
+  }, [selectedAction, isInEditMode, setIsInEditMode]);
 
   // useEffect(() => {
   //   if (isInEditMode) {
