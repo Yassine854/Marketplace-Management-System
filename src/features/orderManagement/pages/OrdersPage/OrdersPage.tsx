@@ -1,7 +1,7 @@
+import { useOrdersPage } from "./OrderPage.hooks";
 import Pagination from "../../widgets/Pagination";
 import OrdersTable from "../../tables/OrdersTable";
 import OrdersToolBar from "../../widgets/OrdersToolBar";
-import { useOrdersPage } from "../../hooks/useOrdersPage";
 import AnyMatchingResults from "../../widgets/AnyMatchingResults";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import OrderCancelingModal from "../../widgets/OrderCancelingModal/OrderCancelingModal";
