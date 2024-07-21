@@ -2,20 +2,27 @@ import useDropdown from "./useDropdown";
 import { useEffect, useState } from "react";
 import { IconChevronDown } from "@tabler/icons-react";
 import { tailwind } from "./ItemsPerPageSelector.styles";
+import { useOrdersStore } from "../../stores/ordersStore";
+import { useOrdersTableStore } from "../../stores/ordersTableStore";
 
 const options = [10, 25, 50];
 
-const ItemsPerPageSelector = ({ onChange, selectedStatus }: any) => {
+const ItemsPerPageSelector = () => {
+  const { status } = useOrdersStore();
+
   const [selected, setSelected] = useState(10);
+
   const { open, ref, toggleOpen } = useDropdown();
 
-  useEffect(() => {
-    onChange(selected);
-  }, [selected, onChange]);
+  const { setItemsPerPage } = useOrdersTableStore();
 
   useEffect(() => {
     setSelected(10);
-  }, [selectedStatus]);
+  }, [status]);
+
+  useEffect(() => {
+    setItemsPerPage(selected);
+  }, [selected, setItemsPerPage]);
 
   return (
     <div className={tailwind.container} ref={ref}>
@@ -43,4 +50,5 @@ const ItemsPerPageSelector = ({ onChange, selectedStatus }: any) => {
     </div>
   );
 };
+
 export default ItemsPerPageSelector;

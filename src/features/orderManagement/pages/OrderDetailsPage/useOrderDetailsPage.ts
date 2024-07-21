@@ -1,10 +1,10 @@
-import { useOrderDetailsEffect } from "./useOrderDetailsEffect";
+import { useOrderDetailsEffect } from "../../hooks/useOrderDetailsEffect";
 import { useEffect, useRef } from "react";
-import { useOrderDetailsActions } from "./useOrderDetailsActions";
+import { useOrderDetailsActions } from "../../hooks/actions/useOrderDetailsActions";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useGetOrder } from "@/features/orderManagement/hooks/queries/useGetOrder";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
-import { useCancelOrder } from "./mutations/useCancelOrder";
+import { useCancelOrder } from "../../hooks/mutations/oneOrder/useCancelOrder";
 import { useDisclosure } from "@nextui-org/modal";
 
 export const useOrderDetailsPage = () => {
@@ -32,14 +32,12 @@ export const useOrderDetailsPage = () => {
     isError,
   } = useCancelOrder();
 
-  const { data: order } = useGetOrder(orderOnReviewId);
+  const { data: order } = useGetOrder();
 
   const reset = () => {
     //@ts-ignore
     dropRef.current && dropRef.current?.reset();
   };
-
-  const { refetch } = useGetOrder(orderOnReviewId);
 
   useEffect(() => {
     if (!isSomeActionPending) {
@@ -54,7 +52,6 @@ export const useOrderDetailsPage = () => {
       onOpen();
     } else {
       onCancelingModalClose();
-      refetch();
     }
   }, [orderToCancelId, onOpen, onCancelingModalClose]);
 

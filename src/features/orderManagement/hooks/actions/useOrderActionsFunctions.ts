@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
-import { useOrderMutations } from "./useOrderMutations";
+import { useOrderMutations } from "../useOrderMutations";
 import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 
@@ -21,6 +21,7 @@ export const useOrderActionsFunctions = () => {
     setOrderOnReviewId,
     orderOnReviewItems,
     orderOnReviewDeliveryDate,
+    total,
   } = useOrderDetailsStore();
 
   const { setOrderToCancelId, setIsSomeActionPending, setOrderUnderActionId } =
@@ -177,6 +178,7 @@ export const useOrderActionsFunctions = () => {
         orderId,
         items: orderOnReviewItems,
         deliveryDate: orderOnReviewDeliveryDate,
+        total,
       });
     },
   };

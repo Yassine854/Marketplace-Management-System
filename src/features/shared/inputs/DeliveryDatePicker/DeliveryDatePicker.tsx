@@ -66,7 +66,6 @@ const DeliveryDatePicker = forwardRef(
     useEffect(() => {
       if (defaultValue) {
         const defaultDate = new Date(defaultValue * 1000);
-        console.log("🚀 ~ useEffect ~ defaultDate:", defaultDate);
         setSelected(defaultDate);
       }
     }, [defaultValue]);

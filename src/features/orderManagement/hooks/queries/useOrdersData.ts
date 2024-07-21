@@ -36,10 +36,7 @@ export const useOrdersData = () => {
 
   useEffect(() => {
     if (isLoading) {
-      //   const timer = setTimeout(() => {
       setIsOrdersLoading(true);
-      //   }, 500);
-      //  return () => clearTimeout(timer);
     }
     setIsOrdersLoading(false);
   }, [isLoading, setIsOrdersLoading]);

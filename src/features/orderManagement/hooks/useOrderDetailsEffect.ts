@@ -15,15 +15,13 @@ export const useOrderDetailsEffect = (reset: any) => {
 
   const { orderUnderActionId } = useOrderActionsStore();
 
-  const { refetch } = useGetOrder(orderOnReviewId);
   const { data: order } = useGetOrder(orderOnReviewId);
 
   useEffect(() => {
-    // if (!orderUnderActionId) {
-    //   reset();
-    //   refetch();
-    // }
-  }, [orderUnderActionId, refetch, reset]);
+    if (!orderUnderActionId) {
+      reset();
+    }
+  }, [orderUnderActionId, reset]);
 
   useEffect(() => {
     !orderOnReviewId && redirect("/orders");
@@ -36,7 +34,7 @@ export const useOrderDetailsEffect = (reset: any) => {
     });
 
     setTotal(total);
-  }, [orderOnReviewItems]);
+  }, [orderOnReviewItems, setTotal]);
 
   useEffect(() => {
     order && setOrderOnReviewItems(order?.items);

@@ -1,24 +1,31 @@
 import SortByDropdown from "../SortByDropdown";
+import { useOrdersToolbar } from "./useOrdersToolBar";
 import SearchBar from "@/features/shared/inputs/SearchBar";
 import MultipleOrdersActionsDropdown from "../MultipleOrdersActionsDropdown";
+import OrderCancelingModal from "../OrderCancelingModal";
 
-const OrdersToolBar = ({
-  onSort,
-  sortRef,
-  actions,
-  onSearch,
-  isPending,
-  searchRef,
-  actionsRef,
-  ordersCount,
-  selectedStatus,
-  isSomeOrdersSelected,
-}: any) => {
+const OrdersToolBar = () => {
+  const {
+    status,
+    actions,
+    sortRef,
+    setSort,
+    isPending,
+    searchRef,
+    setSearch,
+    actionsRef,
+    ordersCount,
+    isCancelingModalOpen,
+    cancelOrders,
+    onCancelingModalClose,
+    isSomeOrdersSelected,
+    isCancelingPending,
+  } = useOrdersToolbar();
   return (
     <div className=" flex flex-grow flex-wrap items-center justify-between gap-3  bg-n0 px-4">
       <div className="flex items-center justify-center">
         <p className="m-4 text-xl font-bold capitalize ">
-          {`${selectedStatus} Orders  `}
+          {`${status} Orders  `}
           {!!ordersCount && <span>: {ordersCount}</span>}
         </p>
         {isSomeOrdersSelected && (
@@ -31,9 +38,17 @@ const OrdersToolBar = ({
       </div>
 
       <div className="flex items-center justify-center gap-4 lg:gap-8 xl:gap-10">
-        <SearchBar ref={searchRef} onSearch={onSearch} isWithInstantSearch />
-        <SortByDropdown onSort={onSort} sortRef={sortRef} />
+        <SearchBar ref={searchRef} onSearch={setSearch} isWithInstantSearch />
+        <SortByDropdown onSort={setSort} sortRef={sortRef} />
       </div>
+
+      <OrderCancelingModal
+        onConfirm={cancelOrders}
+        isOpen={isCancelingModalOpen}
+        isPending={isCancelingPending}
+        onClose={onCancelingModalClose}
+        message=" Are you sure you want to cancel those orders ? "
+      />
     </div>
   );
 };

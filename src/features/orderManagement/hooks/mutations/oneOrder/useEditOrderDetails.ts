@@ -2,6 +2,10 @@ import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
+import { useGetOrder } from "../../queries/useGetOrder";
+import { useOrdersData } from "../../queries/useOrdersData";
+import { useOrdersCount } from "../../queries/useOrdersCount";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 
 const formatUnixTimestamp = (unixTimestamp: number): string => {
   const date = new Date(unixTimestamp * 1000);
@@ -12,31 +16,44 @@ const formatUnixTimestamp = (unixTimestamp: number): string => {
 };
 
 export const useEditOrderDetails = () => {
+  const { refetch } = useOrdersData();
+
+  const { refetch: refetchOrder } = useGetOrder();
+
+  const { refetch: refetchCount } = useOrdersCount();
+
+  const { setIsInEditMode } = useOrderDetailsStore();
+
   const { mutate, isPending } = useMutation({
-    mutationFn: async ({ orderId, items, deliveryDate }: any) => {
+    mutationFn: async ({ orderId, items, deliveryDate, total }: any) => {
       const magentoItems: any[] = [];
 
       items.forEach((item: any) => {
         magentoItems.push({ item_id: item.id, weight: item.shipped });
       });
 
-      // await magento.editOrderDetails({
-      //   orderId,
-      //   deliveryDate: formatUnixTimestamp(deliveryDate),
-      //   items: magentoItems,
-      // });
+      await magento.editOrderDetails({
+        orderId,
+        deliveryDate: formatUnixTimestamp(deliveryDate),
+        items: magentoItems,
+        total,
+      });
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
         order: {
           id: orderId,
           items,
           deliveryDate,
-          // total,
+          total,
         },
       });
 
       return orderId;
     },
     onSuccess: () => {
+      refetch();
+      refetchCount();
+      refetchOrder();
+      setIsInEditMode(false);
       toast.success(`Order Details Updated Successfully`, { duration: 5000 });
     },
 

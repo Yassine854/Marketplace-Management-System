@@ -22,7 +22,7 @@ const QUERY = gql`
 
 export const useGetUsers = () => {
   const { data, loading, error } = useQuery(QUERY, {
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
   });
 
   return {

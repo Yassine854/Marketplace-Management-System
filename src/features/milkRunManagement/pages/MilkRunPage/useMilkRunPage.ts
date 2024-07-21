@@ -1,14 +1,14 @@
 import { toast } from "react-hot-toast";
 import { useEffect, useState, useRef } from "react";
-import { useMilkRunStore } from "../stores/milkRunStore";
-import { useNavigation } from "../../shared/hooks/useNavigation";
-import { useGetMilkRunOrders } from "./queries/useGetMilkRunOrders";
-import { useGetDeliveryAgents } from "./queries/useGetDeliveryAgents";
-import { useEditOrdersMilkRun } from "./mutations/useEditOrdersMilkRun";
+import { useMilkRunStore } from "../../stores/milkRunStore";
+import { useNavigation } from "../../../shared/hooks/useNavigation";
+import { useGetMilkRunOrders } from "../../hooks/queries/useGetMilkRunOrders";
+import { useGetDeliveryAgents } from "../../hooks/queries/useGetDeliveryAgents";
+import { useEditOrdersMilkRun } from "../../hooks/mutations/useEditOrdersMilkRun";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 
 //To Refactor
-export const useMilkRun = () => {
+export const useMilkRunPage = () => {
   const {
     reset,
     deliverySlot,

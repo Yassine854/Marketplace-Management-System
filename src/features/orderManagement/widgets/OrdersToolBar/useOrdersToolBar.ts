@@ -1,27 +1,19 @@
 import {
-  useOrdersData,
   useOrdersCount,
   useOrdersSearch,
   useOrdersSorting,
   useOrdersSelection,
   useMultipleOrdersActions,
-  useOrdersTablePagination,
 } from "@/features/orderManagement/hooks";
 import { useEffect, useState } from "react";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 
-export const useOrdersPage = () => {
+export const useOrdersToolbar = () => {
   const { status } = useOrdersStore();
-
-  const { refetch } = useOrdersData();
-
-  const { orders, totalOrders } = useOrdersData();
 
   const { setSort, sortRef } = useOrdersSorting();
 
   const { searchRef, setSearch } = useOrdersSearch();
-
-  const { refetch: refetchCount } = useOrdersCount();
 
   const { isSomeOrdersSelected } = useOrdersSelection();
 
@@ -29,9 +21,6 @@ export const useOrdersPage = () => {
 
   const { openOrdersCount, validOrdersCount, readyOrdersCount } =
     useOrdersCount();
-
-  const { paginationRef, setCurrentPage, setItemsPerPage } =
-    useOrdersTablePagination();
 
   const {
     actions,
@@ -44,13 +33,6 @@ export const useOrdersPage = () => {
   } = useMultipleOrdersActions();
 
   useEffect(() => {
-    if (!isPending || !isCancelingPending) {
-      refetch();
-      refetchCount();
-    }
-  }, [isPending, isCancelingPending, refetchCount, refetch]);
-
-  useEffect(() => {
     setOrdersCount(0);
     status === "open" && setOrdersCount(openOrdersCount);
     status === "valid" && setOrdersCount(validOrdersCount);
@@ -58,7 +40,6 @@ export const useOrdersPage = () => {
   }, [openOrdersCount, validOrdersCount, readyOrdersCount, status]);
 
   return {
-    orders,
     status,
     actions,
     sortRef,
@@ -67,15 +48,11 @@ export const useOrdersPage = () => {
     searchRef,
     setSearch,
     actionsRef,
-    totalOrders,
     ordersCount,
-    cancelOrders,
-    paginationRef,
-    setCurrentPage,
-    setItemsPerPage,
-    isCancelingPending,
     isCancelingModalOpen,
-    isSomeOrdersSelected,
+    cancelOrders,
     onCancelingModalClose,
+    isSomeOrdersSelected,
+    isCancelingPending,
   };
 };

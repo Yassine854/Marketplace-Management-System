@@ -1,19 +1,16 @@
 import { useEffect } from "react";
-import { useOrdersCount, useOrdersData } from ".";
 import { useDisclosure } from "@nextui-org/modal";
-import { useCancelOrder } from "./mutations/useCancelOrder";
-import { useOrderActionsByStatus } from "./useOrderActionsByStatus";
+import { useCancelOrder } from "../../hooks/mutations/oneOrder/useCancelOrder";
+import { useOrderActionsByStatus } from "../../hooks/actions/useOrderActionsByStatus";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
-import { useOrderActionsFunctions } from "@/features/orderManagement/hooks/useOrderActionsFunctions";
+import { useOrderActionsFunctions } from "@/features/orderManagement/hooks/actions/useOrderActionsFunctions";
 
 export const useOrderTableActions = () => {
-  const { refetch } = useOrdersData();
   const { actions } = useOrderActionsByStatus();
   const { summary } = useOrderActionsFunctions();
   const { navigateToOrderDetails } = useNavigation();
-  const { refetch: refetchCount } = useOrdersCount();
   const { setOrderOnReviewId } = useOrderDetailsStore();
 
   const { cancelOrderAsync, isPending: isCancelingPending } = useCancelOrder();
@@ -38,12 +35,16 @@ export const useOrderTableActions = () => {
     setOrderUnderActionId(orderId);
   };
 
-  useEffect(() => {
-    if (!isSomeActionPending) {
-      refetch();
-      refetchCount();
+  const cancelOrder = async () => {
+    try {
+      await cancelOrderAsync(orderToCancelId);
+      setOrderToCancelId("");
+      onCancelingModalClose();
+    } catch {
+      setOrderToCancelId("");
+      onCancelingModalClose();
     }
-  }, [isSomeActionPending, refetch, refetchCount]);
+  };
 
   useEffect(() => {
     if (orderToCancelId) {
@@ -56,16 +57,7 @@ export const useOrderTableActions = () => {
   return {
     actions,
     summary,
-    cancelOrder: async () => {
-      try {
-        await cancelOrderAsync(orderToCancelId);
-        setOrderToCancelId("");
-        onCancelingModalClose();
-      } catch {
-        setOrderToCancelId("");
-        onCancelingModalClose();
-      }
-    },
+    cancelOrder,
     onOrderClick,
     orderUnderActionId,
     isCancelingPending,

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useGeneratePickList } from "./mutations/useGeneratePickList";
-import { useEditOrderDetails } from "./mutations/useEditOrderDetails";
-import { useGenerateDeliveryNote } from "./mutations/useGenerateDeliveryNote";
-import { useEditOrderStatusAndState } from "./mutations/useEditOrderStatusAndState";
-import { useGenerateOrderSummary } from "@/features/orderManagement/hooks/mutations/useGenerateOrderSummary";
+import { useGeneratePickList } from "./mutations/oneOrder/useGeneratePickList";
+import { useEditOrderDetails } from "./mutations/oneOrder/useEditOrderDetails";
+import { useGenerateDeliveryNote } from "./mutations/oneOrder/useGenerateDeliveryNote";
+import { useEditOrderStatusAndState } from "./mutations/oneOrder/useEditOrderStatusAndState";
+import { useGenerateOrderSummary } from "@/features/orderManagement/hooks/mutations/oneOrder/useGenerateOrderSummary";
 
 export const useOrderMutations = () => {
   const { editDetails, isPending: isEditingDetailsPending } =

@@ -1,7 +1,7 @@
-import { useOrdersTable } from "../../hooks/useOrdersTable";
+import { useOrdersTable } from "./useOrdersTable";
 import TableRowSkeleton from "../../elements/RowSkeleton";
 import OrdersTableRow from "../../elements/OrdersTableRow";
-import { useOrderTableActions } from "../../hooks/useOrderTableActions";
+import { useOrderTableActions } from "./useOrderTableActions";
 import OrdersTableHead from "../../elements/OrdersTableHead/OrdersTableHead";
 import OrderCancelingModal from "@/features/orderManagement/widgets/OrderCancelingModal/OrderCancelingModal";
 
