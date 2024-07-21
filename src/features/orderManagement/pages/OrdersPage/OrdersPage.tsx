@@ -1,7 +1,7 @@
 import { useOrdersPage } from "./OrderPage.hooks";
-import Pagination from "../../widgets/Pagination";
 import OrdersTable from "../../tables/OrdersTable";
 import OrdersToolBar from "../../widgets/OrdersToolBar";
+import OrdersPagination from "../../widgets/OrdersPagination";
 import AnyMatchingResults from "../../widgets/AnyMatchingResults";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import OrderCancelingModal from "../../widgets/OrderCancelingModal/OrderCancelingModal";
@@ -9,12 +9,7 @@ import OrderCancelingModal from "../../widgets/OrderCancelingModal/OrderCancelin
 const OrdersPage = () => {
   const {
     orders,
-    status,
-    totalOrders,
     cancelOrders,
-    paginationRef,
-    setCurrentPage,
-    setItemsPerPage,
     isCancelingPending,
     isCancelingModalOpen,
     onCancelingModalClose,
@@ -32,15 +27,7 @@ const OrdersPage = () => {
       </div>
       <Divider />
       <div className=" flex  w-full items-center justify-center bg-n0 ">
-        {orders?.length !== 0 && (
-          <Pagination
-            ref={paginationRef}
-            selectedStatus={status}
-            totalItems={totalOrders}
-            onPageChanged={setCurrentPage}
-            onItemsPerPageChanged={setItemsPerPage}
-          />
-        )}
+        {orders?.length !== 0 && <OrdersPagination />}
       </div>
       <OrderCancelingModal
         onConfirm={cancelOrders}

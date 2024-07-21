@@ -1,23 +1,16 @@
-import { useEffect } from "react";
 import {
   useOrdersData,
   useOrdersCount,
   useMultipleOrdersActions,
-  useOrdersTablePagination,
 } from "@/features/orderManagement/hooks";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
+import { useEffect } from "react";
 
 export const useOrdersPage = () => {
-  const { status } = useOrdersStore();
-
   const { refetch } = useOrdersData();
 
-  const { orders, totalOrders } = useOrdersData();
+  const { orders } = useOrdersData();
 
   const { refetch: refetchCount } = useOrdersCount();
-
-  const { paginationRef, setCurrentPage, setItemsPerPage } =
-    useOrdersTablePagination();
 
   const {
     isPending,
@@ -36,12 +29,7 @@ export const useOrdersPage = () => {
 
   return {
     orders,
-    status,
-    totalOrders,
     cancelOrders,
-    paginationRef,
-    setCurrentPage,
-    setItemsPerPage,
     isCancelingPending,
     isCancelingModalOpen,
     onCancelingModalClose,
