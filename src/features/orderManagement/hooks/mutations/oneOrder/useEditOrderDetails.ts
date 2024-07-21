@@ -2,10 +2,10 @@ import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
+import { useGetOrder } from "../../queries/useGetOrder";
 import { useOrdersData } from "../../queries/useOrdersData";
 import { useOrdersCount } from "../../queries/useOrdersCount";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
-import { useGetOrder } from "../../queries/useGetOrder";
 
 const formatUnixTimestamp = (unixTimestamp: number): string => {
   const date = new Date(unixTimestamp * 1000);
