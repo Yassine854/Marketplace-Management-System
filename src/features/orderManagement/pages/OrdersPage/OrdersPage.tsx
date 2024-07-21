@@ -3,17 +3,11 @@ import OrdersTable from "../../tables/OrdersTable";
 import OrdersToolBar from "../../widgets/OrdersToolBar";
 import OrdersPagination from "../../widgets/OrdersPagination";
 import AnyMatchingResults from "../../widgets/AnyMatchingResults";
+import { useOrdersData } from "../../hooks/queries/useOrdersData";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import OrderCancelingModal from "../../widgets/OrderCancelingModal/OrderCancelingModal";
 
 const OrdersPage = () => {
-  const {
-    orders,
-    cancelOrders,
-    isCancelingPending,
-    isCancelingModalOpen,
-    onCancelingModalClose,
-  } = useOrdersPage();
+  const { orders } = useOrdersData();
 
   return (
     <div className="flex h-full w-full flex-grow flex-col justify-between    ">
@@ -29,13 +23,6 @@ const OrdersPage = () => {
       <div className=" flex  w-full items-center justify-center bg-n0 ">
         {orders?.length !== 0 && <OrdersPagination />}
       </div>
-      <OrderCancelingModal
-        onConfirm={cancelOrders}
-        isOpen={isCancelingModalOpen}
-        isPending={isCancelingPending}
-        onClose={onCancelingModalClose}
-        message=" Are you sure you want to cancel those orders ? "
-      />
     </div>
   );
 };

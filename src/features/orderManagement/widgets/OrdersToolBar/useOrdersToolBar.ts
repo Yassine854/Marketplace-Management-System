@@ -5,7 +5,6 @@ import {
   useOrdersSorting,
   useOrdersSelection,
   useMultipleOrdersActions,
-  useOrdersTablePagination,
 } from "@/features/orderManagement/hooks";
 import { useEffect, useState } from "react";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
@@ -62,6 +61,10 @@ export const useOrdersToolbar = () => {
     setSearch,
     actionsRef,
     ordersCount,
+    isCancelingModalOpen,
+    cancelOrders,
+    onCancelingModalClose,
     isSomeOrdersSelected,
+    isCancelingPending,
   };
 };

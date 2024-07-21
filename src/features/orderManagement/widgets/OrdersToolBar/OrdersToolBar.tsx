@@ -1,7 +1,8 @@
 import SortByDropdown from "../SortByDropdown";
-import { useOrdersToolbar } from "./OrdersToolBar.hooks";
+import { useOrdersToolbar } from "./useOrdersToolBar";
 import SearchBar from "@/features/shared/inputs/SearchBar";
 import MultipleOrdersActionsDropdown from "../MultipleOrdersActionsDropdown";
+import OrderCancelingModal from "../OrderCancelingModal";
 
 const OrdersToolBar = () => {
   const {
@@ -14,7 +15,11 @@ const OrdersToolBar = () => {
     setSearch,
     actionsRef,
     ordersCount,
+    isCancelingModalOpen,
+    cancelOrders,
+    onCancelingModalClose,
     isSomeOrdersSelected,
+    isCancelingPending,
   } = useOrdersToolbar();
   return (
     <div className=" flex flex-grow flex-wrap items-center justify-between gap-3  bg-n0 px-4">
@@ -36,6 +41,14 @@ const OrdersToolBar = () => {
         <SearchBar ref={searchRef} onSearch={setSearch} isWithInstantSearch />
         <SortByDropdown onSort={setSort} sortRef={sortRef} />
       </div>
+
+      <OrderCancelingModal
+        onConfirm={cancelOrders}
+        isOpen={isCancelingModalOpen}
+        isPending={isCancelingPending}
+        onClose={onCancelingModalClose}
+        message=" Are you sure you want to cancel those orders ? "
+      />
     </div>
   );
 };
