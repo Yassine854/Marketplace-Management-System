@@ -25,11 +25,11 @@ const OrderDetailsActions = ({
 
   useEffect(() => {
     if (selectedAction && selectedAction?.key === "edit") {
-      setIsInEditMode(true);
+      // setIsInEditMode(true);
     }
 
     if (selectedAction && selectedAction?.key !== "edit") {
-      setIsInEditMode(false);
+      //  setIsInEditMode(false);
     }
   }, [selectedAction]);
 

@@ -1,17 +1,17 @@
 import { useDisclosure } from "@nextui-org/react";
 import { useEffect, useRef, useState } from "react";
-import { useCancelMultipleOrders } from "./mutations/useCancelMultipleOrders";
+import { useCancelMultipleOrders } from "../mutations/multipleOrders/useCancelMultipleOrders";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 import { useMultipleOrdersActionsByStatus } from "./useMultipleOrdersActionsByStatus";
-import { useGenerateMultiplePickLists } from "./mutations/useGenerateMultiplePickLists";
-import { useGenerateMultipleDeliveryNotes } from "./mutations/useGenerateMultipleDeliveryNotes";
-import { useEditOrdersStatusesAndStates } from "./mutations/useEditMultipleOrdersStatusesAndStates";
+import { useGenerateMultiplePickLists } from "../mutations/multipleOrders/useGenerateMultiplePickLists";
+import { useGenerateMultipleDeliveryNotes } from "../mutations/multipleOrders/useGenerateMultipleDeliveryNotes";
+import { useEditOrdersStatusesAndStates } from "../mutations/multipleOrders/useEditMultipleOrdersStatusesAndStates";
 
 export const useMultipleOrdersActions = () => {
   const actionsRef = useRef(null);
   const [isPending, setIsPending] = useState(false);
   const { onClose, onOpen, isOpen } = useDisclosure();
-  const { status, selectedOrders, or } = useOrdersStore();
+  const { status, selectedOrders } = useOrdersStore();
 
   const { cancelOrdersAsync, isPending: isCancelingPending } =
     useCancelMultipleOrders();

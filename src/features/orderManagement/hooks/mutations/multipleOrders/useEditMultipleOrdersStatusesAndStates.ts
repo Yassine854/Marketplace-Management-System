@@ -2,8 +2,12 @@ import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
+import { useOrdersCount } from "../../queries/useOrdersCount";
+import { useOrdersData } from "../../queries/useOrdersData";
 
 export const useEditOrdersStatusesAndStates = () => {
+  const { refetch } = useOrdersData();
+  const { refetch: refetchCount } = useOrdersCount();
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ ordersIds, status, state }: any) => {
       return Promise.all(
@@ -20,6 +24,8 @@ export const useEditOrdersStatusesAndStates = () => {
       );
     },
     onSuccess: () => {
+      refetch();
+      refetchCount();
       toast.success(`Orders Statuses Updated Successfully`, { duration: 5000 });
     },
     onError: () => {

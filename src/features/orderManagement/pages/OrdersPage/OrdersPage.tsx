@@ -1,4 +1,3 @@
-import { useOrdersPage } from "./OrderPage.hooks";
 import OrdersTable from "../../tables/OrdersTable";
 import OrdersToolBar from "../../widgets/OrdersToolBar";
 import OrdersPagination from "../../widgets/OrdersPagination";

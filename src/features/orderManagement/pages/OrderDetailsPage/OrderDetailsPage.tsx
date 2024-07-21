@@ -4,7 +4,7 @@ import DeliveryInfo from "../../widgets/DeliveryInfo/DeliveryInfo";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import OrderItemsTable from "@/features/orderManagement/tables/OrderItemsTable";
 import OrderActions from "../../widgets/OrderDetailsActions/OrderDetailsActions";
-import { useOrderDetailsPage } from "@/features/orderManagement/hooks/useOrderDetailsPage";
+import { useOrderDetailsPage } from "@/features/orderManagement/pages/OrderDetailsPage/useOrderDetailsPage";
 import OrderDetailsPageHeader from "../../widgets/OrderDetailsPageHeader/OrderDetailsPageHeader";
 import OrderCancelingModal from "@/features/orderManagement/widgets/OrderCancelingModal/OrderCancelingModal";
 import { useEffect } from "react";

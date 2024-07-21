@@ -2,8 +2,12 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
 import { axios } from "@/libs/axios";
+import { useOrdersCount } from "../../queries/useOrdersCount";
+import { useOrdersData } from "../../queries/useOrdersData";
 
 export const useCancelMultipleOrders = () => {
+  const { refetch } = useOrdersData();
+  const { refetch: refetchCount } = useOrdersCount();
   const { mutate, isPending, mutateAsync } = useMutation({
     mutationFn: async (ordersIds: string[]) => {
       return Promise.all(
@@ -20,7 +24,9 @@ export const useCancelMultipleOrders = () => {
       );
     },
     onSuccess: () => {
-      toast.success(`Order Canceled  Successfully`, { duration: 5000 });
+      refetch();
+      refetchCount();
+      toast.success(`Orders Canceled  Successfully`, { duration: 5000 });
     },
     onError: () => {
       toast.error(`Something Went Wrong`, { duration: 5000 });

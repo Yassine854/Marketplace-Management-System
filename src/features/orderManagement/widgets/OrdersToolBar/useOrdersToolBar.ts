@@ -1,5 +1,4 @@
 import {
-  useOrdersData,
   useOrdersCount,
   useOrdersSearch,
   useOrdersSorting,
@@ -12,13 +11,9 @@ import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 export const useOrdersToolbar = () => {
   const { status } = useOrdersStore();
 
-  const { refetch } = useOrdersData();
-
   const { setSort, sortRef } = useOrdersSorting();
 
   const { searchRef, setSearch } = useOrdersSearch();
-
-  const { refetch: refetchCount } = useOrdersCount();
 
   const { isSomeOrdersSelected } = useOrdersSelection();
 
@@ -36,13 +31,6 @@ export const useOrdersToolbar = () => {
     isCancelingModalOpen,
     onCancelingModalClose,
   } = useMultipleOrdersActions();
-
-  useEffect(() => {
-    if (!isPending || !isCancelingPending) {
-      refetch();
-      refetchCount();
-    }
-  }, [isPending, isCancelingPending, refetchCount, refetch]);
 
   useEffect(() => {
     setOrdersCount(0);

@@ -2,6 +2,8 @@ import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
+import { useOrdersData } from "../../queries/useOrdersData";
+import { useOrdersCount } from "../../queries/useOrdersCount";
 
 const formatUnixTimestamp = (unixTimestamp: number): string => {
   const date = new Date(unixTimestamp * 1000);
@@ -12,6 +14,8 @@ const formatUnixTimestamp = (unixTimestamp: number): string => {
 };
 
 export const useEditOrderDetails = () => {
+  const { refetch } = useOrdersData();
+  const { refetch: refetchCount } = useOrdersCount();
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ orderId, items, deliveryDate }: any) => {
       const magentoItems: any[] = [];
@@ -37,6 +41,8 @@ export const useEditOrderDetails = () => {
       return orderId;
     },
     onSuccess: () => {
+      refetch();
+      refetchCount();
       toast.success(`Order Details Updated Successfully`, { duration: 5000 });
     },
 
