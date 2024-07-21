@@ -10,21 +10,12 @@ const OrdersPage = () => {
   const {
     orders,
     status,
-    actions,
-    sortRef,
-    setSort,
-    isPending,
-    searchRef,
-    setSearch,
-    actionsRef,
     totalOrders,
     cancelOrders,
     paginationRef,
-    ordersCount,
     setCurrentPage,
     setItemsPerPage,
     isCancelingPending,
-    isSomeOrdersSelected,
     isCancelingModalOpen,
     onCancelingModalClose,
   } = useOrdersPage();
@@ -32,18 +23,7 @@ const OrdersPage = () => {
   return (
     <div className="flex h-full w-full flex-grow flex-col justify-between    ">
       <div className=" mt-[4.8rem]  flex  w-full items-center justify-center border-t-4  ">
-        <OrdersToolBar
-          onSort={setSort}
-          sortRef={sortRef}
-          actions={actions}
-          onSearch={setSearch}
-          searchRef={searchRef}
-          isPending={isPending}
-          selectedStatus={status}
-          actionsRef={actionsRef}
-          ordersCount={ordersCount}
-          isSomeOrdersSelected={isSomeOrdersSelected}
-        />
+        <OrdersToolBar />
       </div>
       <Divider />
       <div className="    relative  flex w-full  flex-grow flex-col overflow-y-scroll  bg-n10 px-3 pb-24">

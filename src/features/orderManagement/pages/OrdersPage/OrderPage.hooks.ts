@@ -1,13 +1,10 @@
+import { useEffect } from "react";
 import {
   useOrdersData,
   useOrdersCount,
-  useOrdersSearch,
-  useOrdersSorting,
-  useOrdersSelection,
   useMultipleOrdersActions,
   useOrdersTablePagination,
 } from "@/features/orderManagement/hooks";
-import { useEffect, useState } from "react";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 
 export const useOrdersPage = () => {
@@ -17,26 +14,13 @@ export const useOrdersPage = () => {
 
   const { orders, totalOrders } = useOrdersData();
 
-  const { setSort, sortRef } = useOrdersSorting();
-
-  const { searchRef, setSearch } = useOrdersSearch();
-
   const { refetch: refetchCount } = useOrdersCount();
-
-  const { isSomeOrdersSelected } = useOrdersSelection();
-
-  const [ordersCount, setOrdersCount] = useState<number>();
-
-  const { openOrdersCount, validOrdersCount, readyOrdersCount } =
-    useOrdersCount();
 
   const { paginationRef, setCurrentPage, setItemsPerPage } =
     useOrdersTablePagination();
 
   const {
-    actions,
     isPending,
-    actionsRef,
     cancelOrders,
     isCancelingPending,
     isCancelingModalOpen,
@@ -50,32 +34,16 @@ export const useOrdersPage = () => {
     }
   }, [isPending, isCancelingPending, refetchCount, refetch]);
 
-  useEffect(() => {
-    setOrdersCount(0);
-    status === "open" && setOrdersCount(openOrdersCount);
-    status === "valid" && setOrdersCount(validOrdersCount);
-    status === "shipped" && setOrdersCount(openOrdersCount);
-  }, [openOrdersCount, validOrdersCount, readyOrdersCount, status]);
-
   return {
     orders,
     status,
-    actions,
-    sortRef,
-    setSort,
-    isPending,
-    searchRef,
-    setSearch,
-    actionsRef,
     totalOrders,
-    ordersCount,
     cancelOrders,
     paginationRef,
     setCurrentPage,
     setItemsPerPage,
     isCancelingPending,
     isCancelingModalOpen,
-    isSomeOrdersSelected,
     onCancelingModalClose,
   };
 };
