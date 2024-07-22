@@ -15,7 +15,7 @@ export const useOrderDetailsEffect = (reset: any) => {
 
   const { orderUnderActionId } = useOrderActionsStore();
 
-  const { data: order } = useGetOrder(orderOnReviewId);
+  const { data: order } = useGetOrder();
 
   useEffect(() => {
     if (!orderUnderActionId) {

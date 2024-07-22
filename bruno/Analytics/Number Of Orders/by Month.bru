@@ -1,0 +1,15 @@
+meta {
+  name: by Month
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/analytics/numberOfOrders/byMonth?month=2024-04
+  body: none
+  auth: none
+}
+
+params:query {
+  month: 2024-04
+}

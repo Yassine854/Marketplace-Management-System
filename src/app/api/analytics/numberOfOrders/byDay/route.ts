@@ -2,4 +2,4 @@ import { NextRequest } from "next/server";
 import { nextRoute } from "@/clients/nextRoutes";
 
 export const GET = async (request: NextRequest) =>
-  nextRoute.orders.magento.getMany.byDeliveryDate(request);
+  nextRoute.analytics.numberOfOrders.byMonth(request);
