@@ -28,7 +28,8 @@ export const numberOfOrderByMonthAnalytics = async (date: string) => {
     }
     list.push({
       numberOfOrders: numberOfOrders.toString(),
-      day: dayDate,
+      date: dayDate,
+      day,
     });
   }
 
