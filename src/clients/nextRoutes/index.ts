@@ -1,7 +1,18 @@
-import { getOrdersByDeliveryDateRoute } from "./magento/getOrdersByDeliveryDateRoute";
+import { getOrdersByDeliveryDateRoute } from "./orders/magento/getOrdersByDeliveryDateRoute";
+import { getNumberOfOrdersByDayRoute } from "./orders/typesense/getNumberOfOrdersByDayRoute";
 
 export const nextRoute = {
   orders: {
-    byDeliveryDate: getOrdersByDeliveryDateRoute,
+    magento: {
+      getMany: {
+        byDeliveryDate: getOrdersByDeliveryDateRoute,
+      },
+    },
+
+    typesense: {
+      numberOfOrders: {
+        byDay: getNumberOfOrdersByDayRoute,
+      },
+    },
   },
 };
