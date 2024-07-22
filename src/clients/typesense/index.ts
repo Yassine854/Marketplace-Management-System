@@ -6,6 +6,7 @@ import { addOrdersBatch } from "./orders/addOrdersBatch";
 import { isCollectionExist } from "./isCollectionExist";
 import { createOrdersCollection } from "./orders/createOrdersCollection";
 import { deleteOrdersCollection } from "./orders/deleteOrdersCollection";
+import { getNumberOfOrdersByDay } from "./orders/numberOfOrders/getNumberOfOrdersByDay";
 
 export const typesense = {
   isCollectionExist,
@@ -17,5 +18,8 @@ export const typesense = {
     addMany: addOrdersBatch,
     createCollection: createOrdersCollection,
     deleteCollection: deleteOrdersCollection,
+    numberOfOrders: {
+      byDay: getNumberOfOrdersByDay,
+    },
   },
 };

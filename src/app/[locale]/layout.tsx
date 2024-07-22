@@ -11,11 +11,7 @@ import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDet
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
-  const { setIsInEditMode, isInEditMode } = useOrderDetailsStore();
-
-  useEffect(() => {
-    console.log("🚀 ~ RootLayout ~ isInEditMode:", isInEditMode);
-  }, [isInEditMode]);
+  const { setIsInEditMode } = useOrderDetailsStore();
 
   useEffect(() => {
     if (pathname !== "/en/order-details") {

@@ -1,14 +1,10 @@
 import { NextResponse } from "next/server";
 
-export const invalidRequestErrorResponse = (message: string) => {
-  const parts = message.split("Server said:");
-
-  const serverSaidPart = parts[1].trim();
-
+export const invalidRequestErrorResponse = (details?: string) => {
   return NextResponse.json(
     {
       error: "Invalid request.",
-      details: serverSaidPart,
+      details,
     },
     {
       status: 400,
