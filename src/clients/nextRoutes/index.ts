@@ -1,6 +1,7 @@
-import { numberOfOrdersByMonthAnalyticsRoute } from "./analytics/numberOfOrdersByMonthAnalyticsRoute";
-import { getOrdersByDeliveryDateRoute } from "./orders/magento/getOrdersByDeliveryDateRoute";
+import { getOrderItemsRoute } from "./orders/magento/getOrderItemsRoute";
 import { getNumberOfOrdersByDayRoute } from "./orders/typesense/getNumberOfOrdersByDayRoute";
+import { getOrdersByDeliveryDateRoute } from "./orders/magento/getOrdersByDeliveryDateRoute";
+import { numberOfOrdersByMonthAnalyticsRoute } from "./analytics/numberOfOrdersByMonthAnalyticsRoute";
 
 export const nextRoute = {
   analytics: {
@@ -13,6 +14,9 @@ export const nextRoute = {
     magento: {
       getMany: {
         byDeliveryDate: getOrdersByDeliveryDateRoute,
+      },
+      getOne: {
+        items: getOrderItemsRoute,
       },
     },
 

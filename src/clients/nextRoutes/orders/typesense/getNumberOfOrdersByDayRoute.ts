@@ -10,7 +10,7 @@ export const getNumberOfOrdersByDayRoute = async (request: NextRequest) => {
     const date = searchParams.get("date");
 
     if (!date) {
-      return responses.typesense.invalidRequest("Date Parameter is Required");
+      return responses.invalidRequest("Date Parameter is Required");
     }
 
     const numberOfOrders: number | undefined = await getNumberOfOrdersByDay(

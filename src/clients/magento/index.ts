@@ -9,15 +9,15 @@ import { changeOrderStatus } from "./mutations/changeOrderStatus";
 import { generateOrderSummary } from "./mutations/generateOrderSummary";
 import { generateDeliveryNotes } from "./mutations/generateDeliveryNotes";
 import { getMilkRunOrdersByDate } from "./queries/getMilkRunOrdersByDate";
-import { getOrderDetails } from "./queries/getOrderDetails";
+import { getOrderItems } from "./queries/getOrderItems";
 
 export const magento = {
   queries: {
+    getOrderItems,
     getOrdersByBatch,
     getDeliveryAgents,
     getMilkRunOrdersByDate,
     getAllOrdersPagesCount,
-    getOrderDetails,
   },
 
   mutations: {
