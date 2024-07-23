@@ -1,5 +1,5 @@
 import { Order } from "@/types/order";
-//import { getOrderItems } from "../getOrderItems";
+import { getOrderItems } from "../getOrderItems";
 import { getOrderSource } from "../getOrderSource";
 
 const deliveryDateToUnixTimeStamp = (
@@ -20,7 +20,6 @@ export const getOrdersBatch = (orders: any): Order[] =>
       id: String(order?.entity_id) || "",
       orderId: String(order?.entity_id) || "",
       incrementId: String(order?.increment_id) || "",
-
       kamiounId: String(order?.extension_attributes?.kamioun_order_id) || "",
       storeId: order?.store_id,
       state: order?.state || "",
@@ -42,6 +41,6 @@ export const getOrdersBatch = (orders: any): Order[] =>
         !!order?.extension_attributes?.from_mobile,
         !!order?.extension_attributes?.verified,
       ),
-      //  items: getOrderItems(order?.items),
+      items: getOrderItems(order?.items),
     };
   }) || [];

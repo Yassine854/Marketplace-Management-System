@@ -1,13 +1,15 @@
 import { useOrderDetailsEffect } from "../../hooks/useOrderDetailsEffect";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useOrderDetailsActions } from "../../hooks/actions/useOrderDetailsActions";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useGetOrder } from "@/features/orderManagement/hooks/queries/useGetOrder";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 import { useCancelOrder } from "../../hooks/mutations/oneOrder/useCancelOrder";
 import { useDisclosure } from "@nextui-org/modal";
+import { useGetOrderItems } from "../../hooks/queries/useGetOrderItems";
 
 export const useOrderDetailsPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const { navigateBack } = useNavigation();
   const dropRef = useRef();
 
@@ -17,6 +19,7 @@ export const useOrderDetailsPage = () => {
     orderOnReviewId,
     orderOnReviewItems,
     setOrderOnReviewDeliveryDate,
+    setOrderOnReviewItems,
   } = useOrderDetailsStore();
 
   const { actions, isSomeActionPending, orderToCancelId, setOrderToCancelId } =
@@ -32,7 +35,10 @@ export const useOrderDetailsPage = () => {
     isError,
   } = useCancelOrder();
 
-  const { data: order } = useGetOrder();
+  const { data: order, isLoading: isOrderLoading } = useGetOrder();
+
+  const { data: orderItems, isLoading: isOrderItemsLoading } =
+    useGetOrderItems(orderOnReviewId);
 
   const reset = () => {
     //@ts-ignore
@@ -63,10 +69,33 @@ export const useOrderDetailsPage = () => {
     }
   }, [isError]);
 
+  useEffect(() => {
+    if (order && orderItems) {
+      const mergedItems = order?.items.map((item: any) => {
+        const product = orderItems?.find(
+          (p: any) => p.id === parseInt(item.productId),
+        );
+
+        return { ...item, ...product };
+      });
+
+      setOrderOnReviewItems(mergedItems);
+    }
+  }, [order, orderItems, setOrderOnReviewItems]);
+
+  useEffect(() => {
+    if (isOrderItemsLoading || isOrderItemsLoading) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [isOrderLoading, isOrderItemsLoading]);
+
   return {
     order,
     total,
     dropRef,
+    isLoading,
     isInEditMode,
     orderOnReviewItems,
     onArrowClick: navigateBack,

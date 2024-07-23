@@ -48,12 +48,14 @@ const QUERY = gql`
         orderId
         productId
         productName
-        quantity
         productPrice
         totalPrice
         sku
-        shipped
-        pcb
+        weight
+        orderedQuantity
+        #  quantity
+        # shipped
+        # pcb
       }
     }
   }

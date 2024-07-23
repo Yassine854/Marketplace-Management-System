@@ -24,6 +24,7 @@ const OrderDetailsPage = () => {
     isCancelingModalOpen,
     onCancelingModalClose,
     isCancelingPending,
+    isLoading,
   } = useOrderDetailsPage();
 
   return (
@@ -66,10 +67,12 @@ const OrderDetailsPage = () => {
         </div>
         <Divider />
         <div className="relative mb-4 mt-1 flex flex-grow overflow-y-scroll ">
-          <OrderItemsTable
-            items={orderOnReviewItems}
-            isInEditMode={isInEditMode}
-          />
+          {!isLoading && orderOnReviewItems && (
+            <OrderItemsTable
+              items={orderOnReviewItems}
+              isInEditMode={isInEditMode}
+            />
+          )}
         </div>
       </div>
       <OrderCancelingModal
