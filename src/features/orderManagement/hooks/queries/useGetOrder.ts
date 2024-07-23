@@ -63,7 +63,7 @@ export const useGetOrder = () => {
   const { orderOnReviewId } = useOrderDetailsStore();
   const { data, loading, error, refetch } = useQuery(QUERY, {
     fetchPolicy: "network-only",
-    pollInterval: 10000,
+    pollInterval: 300000,
     variables: {
       orderId: orderOnReviewId,
     },

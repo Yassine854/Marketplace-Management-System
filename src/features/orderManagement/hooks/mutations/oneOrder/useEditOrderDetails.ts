@@ -32,7 +32,7 @@ export const useEditOrderDetails = () => {
         magentoItems.push({ item_id: item.id, weight: item.shipped });
       });
 
-      await magento.editOrderDetails({
+      await magento.mutations.editOrderDetails({
         orderId,
         deliveryDate: formatUnixTimestamp(deliveryDate),
         items: magentoItems,
