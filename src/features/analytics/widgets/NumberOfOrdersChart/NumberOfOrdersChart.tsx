@@ -7,12 +7,10 @@ import MonthPicker from "../MonthPicker";
 
 const NumberOfOrdersChart = () => {
   // const { theme } = useTheme();
+  // const [month, setMonth] = useState(`${new Date().getFullYear()}-01-01`);
+  const [date, setDate] = useState(`${new Date().getFullYear()}-01-01`);
 
-  const [month, setMonth] = useState(`${new Date().getFullYear()}-01-01`);
-
-  const { data, isLoading } = useGetNumberOfOrdersByMonthAnalytics(
-    `2024-${month}`,
-  );
+  const { data, isLoading } = useGetNumberOfOrdersByMonthAnalytics(date);
   const [xAxis, setXaxis] = useState([]);
   const [yAxis, setYaxis] = useState([]);
 
@@ -96,7 +94,8 @@ const NumberOfOrdersChart = () => {
           </div>
           <p className="text-2xl font-bold">Number of Orders Chart </p>
         </div>
-        <MonthPicker onMonthChange={(month: any) => setMonth(month?.key)} />
+        {/* <MonthPicker onMonthChange={(month: any) => setMonth(month?.key)} /> */}
+        <MonthPicker onMonthChange={(date: string) => setDate(date)} />
       </div>
       <div className="h-[320px]">
         <ReactApexChart

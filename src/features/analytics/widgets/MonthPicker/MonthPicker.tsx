@@ -37,15 +37,14 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
 
   useEffect(() => {
     toggleOpen();
-    onMonthChange && onMonthChange(selectedMonth);
-  }, [selectedMonth, onMonthChange]);
+    //   onMonthChange && onMonthChange(selectedMonth);
+    // }, [selectedMonth, onMonthChange]);
 
-  //   if (onMonthChange) {
-  //     const formattedDate = `${String(year)}-${selectedMonth.key}-01`;
-  //     onMonthChange(formattedDate);
-
-  //   }
-  // }, [selectedMonth, year, onMonthChange]);
+    if (onMonthChange) {
+      const formattedDate = `${year}-${selectedMonth.key}-01`;
+      onMonthChange(formattedDate);
+    }
+  }, [selectedMonth, year, onMonthChange]);
 
   const handleYearChange = (indicator: number) => {
     setYear((year) => year + indicator);
@@ -55,7 +54,7 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
   const isNextYearDisabled = year >= new Date().getFullYear();
 
   return (
-    <div ref={dropDownRef} className="relative  block w-[180px] ">
+    <div ref={dropDownRef} className="relative  block w-[200px] ">
       <div
         onClick={() => {
           toggleOpen();
@@ -65,7 +64,7 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
             dark:bg-bg4 xxl:px-6"
       >
         <span className="flex select-none items-center gap-2">
-          {selectedMonth.name}
+          {selectedMonth.name} {year}
         </span>
         <div className="flex">
           <IconCalendar />
