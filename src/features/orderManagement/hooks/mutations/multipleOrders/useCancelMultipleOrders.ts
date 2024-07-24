@@ -12,7 +12,7 @@ export const useCancelMultipleOrders = () => {
     mutationFn: async (ordersIds: string[]) => {
       return Promise.all(
         ordersIds.map(async (orderId) => {
-          await magento.cancelOrder(orderId);
+          await magento.mutations.cancelOrder(orderId);
           await axios.servicesClient.put("/api/orders/typesense/edit-order", {
             order: {
               id: orderId,

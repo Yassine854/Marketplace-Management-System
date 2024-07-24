@@ -13,7 +13,7 @@ export const useEditOrdersMilkRun = () => {
     }: any) => {
       Promise.all(
         ordersIds.map(async (orderId: string) => {
-          await magento.editOrderMilkRun({
+          await magento.mutations.editOrderMilkRun({
             orderId,
             deliverySlot,
             deliveryAgentName,

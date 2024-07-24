@@ -23,11 +23,7 @@ export const numberOfOrderByMonthAnalytics = async (date: string) => {
 
     const numberOfOrders = await getNumberOfOrdersByDay(dayDate);
 
-    // if (!numberOfOrders) {
-    //   continue;
-    // }
     list.push({
-      // numberOfOrders: numberOfOrders.toString(),
       numberOfOrders: !!numberOfOrders ? numberOfOrders : 0,
       date: dayDate,
       day,

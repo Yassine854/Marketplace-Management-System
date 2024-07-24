@@ -12,7 +12,7 @@ export const numberOfOrdersByMonthAnalyticsRoute = async (
     const month = searchParams.get("month");
 
     if (!month) {
-      return responses.typesense.invalidRequest("Date Parameter is Required");
+      return responses.invalidRequest("Date Parameter is Required");
     }
 
     const res = await numberOfOrderByMonthAnalytics(month);
