@@ -27,6 +27,7 @@ export const nextRoute = {
     typesense: {
       numberOfOrders: {
         byDay: getNumberOfOrdersByDayRoute,
+        byMonth: getNumberOfOrdersByMonthRoute,
       },
     },
   },
