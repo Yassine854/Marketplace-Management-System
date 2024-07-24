@@ -44,7 +44,8 @@
     "src/clients/typesense/typesenseClient.ts",
     "src/features/orderManagement/hooks/queries/useGetOrders.ts",
     "src/services/auth/auth.js",
-    ".next/types/app/[locale]/(subPages)/access/user/page.tsx"
+    ".next/types/app/[locale]/(subPages)/access/user/page.tsx",
+    "src/services/analytics/numberOfOrdersByMonthAnalytics"
   ],
 
   "exclude": [

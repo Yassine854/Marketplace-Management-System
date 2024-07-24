@@ -1,21 +1,20 @@
 import { responses } from "../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { numberOfOrderByMonthAnalytics } from "@/services/analytics/numberOfOrdersByMonthAnalytics";
+import { numberOfOrderByWeekAnalytics } from "@/services/analytics/numberOfOrdersByWeekAnalytics";
 
-export const numberOfOrdersByMonthAnalyticsRoute = async (
+export const numberOfOrdersByWeekAnalyticsRoute = async (
   request: NextRequest,
 ) => {
   try {
     const { searchParams } = new URL(request.url);
 
-    const month = searchParams.get("month");
+    const week = searchParams.get("week");
 
-    if (!month) {
+    if (!week) {
       return responses.typesense.invalidRequest("Date Parameter is Required");
     }
-
-    const res = await numberOfOrderByMonthAnalytics(month);
+    const res = await numberOfOrderByWeekAnalytics(week);
     return NextResponse.json(
       {
         message: "success",
