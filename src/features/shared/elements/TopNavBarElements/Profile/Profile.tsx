@@ -4,9 +4,10 @@ import { logError } from "@/utils/logError";
 import Image from "next/image";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
+import { useEffect } from "react";
 
 const useList = () => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   const list = [
     {
@@ -34,12 +35,17 @@ const useList = () => {
 const Profile = () => {
   const { list } = useList();
   const { open, ref, toggleOpen } = useDropdown();
+  const { logout, user } = useAuth();
+
+  useEffect(() => {
+    console.log("🚀 ~ Profile ~ user:", user);
+  }, [user]);
 
   return (
     <div className="relative shrink-0" ref={ref}>
       <div className="w-10 cursor-pointer sm:w-12" onClick={toggleOpen}>
         <Image
-          src="/images/unnamed.png"
+          src="/profile.png"
           className="rounded-full"
           width={48}
           height={48}
@@ -53,14 +59,24 @@ const Profile = () => {
       >
         <div className="flex flex-col items-center border-b p-3 text-center dark:border-n500 lg:p-4">
           <Image
-            src="/images/unnamed.png"
+            src="/profile.png"
             width={60}
             height={60}
             className="rounded-full"
             alt="profile img"
           />
-          <h6 className="h6 mt-2">Mohamed Jrad</h6>
-          <span className="text-sm">mjrad@kamioun.tn</span>
+
+          <h6 className="h6 mt-2">
+            {
+              //@ts-ignore
+              user?.firstName
+            }{" "}
+            {
+              //@ts-ignore
+              user?.lastName
+            }
+          </h6>
+          {/* <span className="text-sm">username@kamioun.tn</span> */}
         </div>
         <ul className="flex w-[250px] flex-col p-4">
           {list.map(({ icon, title, url, onClick }) => (
