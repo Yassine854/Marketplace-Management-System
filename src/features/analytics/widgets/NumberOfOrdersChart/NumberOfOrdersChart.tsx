@@ -3,14 +3,14 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useGetNumberOfOrdersByMonthAnalytics } from "../../hooks/useGetNumberOfOrdersByMonthAnalytics";
 import Loading from "@/features/shared/elements/Loading";
-
 import MonthPicker from "../MonthPicker";
+
 const NumberOfOrdersChart = () => {
   // const { theme } = useTheme();
+  // const [month, setMonth] = useState(`${new Date().getFullYear()}-01-01`);
+  const [date, setDate] = useState(`${new Date().getFullYear()}-01-01`);
 
-  const [month, setMonth] = useState("01");
-
-  const { data } = useGetNumberOfOrdersByMonthAnalytics(`2024-${month}`);
+  const { data, isLoading } = useGetNumberOfOrdersByMonthAnalytics(date);
   const [xAxis, setXaxis] = useState([]);
   const [yAxis, setYaxis] = useState([]);
 
@@ -90,11 +90,12 @@ const NumberOfOrdersChart = () => {
       <div className=" bb-dashed mb-4 flex flex-wrap items-center justify-between gap-3 pb-4 lg:mb-6 lg:pb-6">
         <div className="flex items-center justify-center ">
           <div className=" mx-4 h-8 w-8 items-center justify-center ">
-            {!data && <Loading />}
+            {isLoading && <Loading />}
           </div>
           <p className="text-2xl font-bold">Number of Orders Chart </p>
         </div>
-        <MonthPicker onMonthChange={(month: any) => setMonth(month?.key)} />
+        {/* <MonthPicker onMonthChange={(month: any) => setMonth(month?.key)} /> */}
+        <MonthPicker onMonthChange={(date: string) => setDate(date)} />
       </div>
       <div className="h-[320px]">
         <ReactApexChart
