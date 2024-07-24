@@ -12,7 +12,7 @@ export const numberOfOrdersByWeekAnalyticsRoute = async (
     const week = searchParams.get("week");
 
     if (!week) {
-      return responses.typesense.invalidRequest("Date Parameter is Required");
+      return responses.invalidRequest("Date Parameter is Required");
     }
     const res = await numberOfOrderByWeekAnalytics(week);
     return NextResponse.json(
