@@ -1,16 +1,18 @@
 import { getOrderItemsRoute } from "./orders/magento/getOrderItemsRoute";
-import { getNumberOfOrdersByDayRoute } from "./orders/typesense/getNumberOfOrdersByDayRoute";
-import { getOrdersByDeliveryDateRoute } from "./orders/magento/getOrdersByDeliveryDateRoute";
 import { numberOfOrdersByMonthAnalyticsRoute } from "./analytics/numberOfOrdersByMonthAnalyticsRoute";
-import { numberOfOrdersByWeekAnalyticsRoute } from "./analytics/numberOfOrdersByWeekAnalyticsRoute";
-import { getNumberOfOrdersByMonthRoute } from "./orders/typesense/getNumberOfOrdersByMonthRoute";
-// import { getOrdersByDeliveryDateRoute } from "./orders/magento/getOrdersByDeliveryDateRoute";
-// import { getNumberOfOrdersByDayRoute } from "./orders/typesense/getNumberOfOrdersByDayRoute";
+import { numberOfOrdersByQuarterAnalyticsRoute } from "./analytics/numberOfOrdersByQuarterAnalyticsRoute copy";
+import { numberOfOrdersLifetimeAnalyticsRoute } from "./analytics/numberOfOrdersLifetimeAnalyticsRoute";
+import { getOrdersByDeliveryDateRoute } from "./orders/magento/getOrdersByDeliveryDateRoute";
+import { getNumberOfOrdersByDayRoute } from "./orders/typesense/numberOfOrders/getNumberOfOrdersByDayRoute";
+import { getNumberOfOrdersByMonthRoute } from "./orders/typesense/numberOfOrders/getNumberOfOrdersByMonthRoute";
+import { getNumberOfOrdersByQuarterRoute } from "./orders/typesense/numberOfOrders/getNumberOfOrdersByQuarterRoute";
+
 export const nextRoute = {
   analytics: {
     numberOfOrders: {
       byMonth: numberOfOrdersByMonthAnalyticsRoute,
-      byWeek:numberOfOrdersByWeekAnalyticsRoute
+      byQuarter: numberOfOrdersByQuarterAnalyticsRoute,
+      lifetime: numberOfOrdersLifetimeAnalyticsRoute,
     },
   },
 
@@ -28,6 +30,7 @@ export const nextRoute = {
       numberOfOrders: {
         byDay: getNumberOfOrdersByDayRoute,
         byMonth: getNumberOfOrdersByMonthRoute,
+        byQuarter: getNumberOfOrdersByQuarterRoute,
       },
     },
   },
