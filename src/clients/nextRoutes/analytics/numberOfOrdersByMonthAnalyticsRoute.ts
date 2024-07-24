@@ -16,6 +16,7 @@ export const numberOfOrdersByMonthAnalyticsRoute = async (
     }
 
     const res = await numberOfOrderByMonthAnalytics(month);
+
     return NextResponse.json(
       {
         message: "success",

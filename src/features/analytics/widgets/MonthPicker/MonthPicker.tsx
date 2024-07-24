@@ -33,12 +33,26 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
   const { open, ref: dropDownRef, toggleOpen } = useDropdown();
 
   const [selectedMonth, setSelectedMonth] = useState(months[0]);
+  const [year, setYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     toggleOpen();
-
     onMonthChange && onMonthChange(selectedMonth);
   }, [selectedMonth, onMonthChange]);
+
+  //   if (onMonthChange) {
+  //     const formattedDate = `${String(year)}-${selectedMonth.key}-01`;
+  //     onMonthChange(formattedDate);
+
+  //   }
+  // }, [selectedMonth, year, onMonthChange]);
+
+  const handleYearChange = (indicator: number) => {
+    setYear((year) => year + indicator);
+  };
+
+  const isPrevYearDisabled = year <= 2020;
+  const isNextYearDisabled = year >= new Date().getFullYear();
 
   return (
     <div ref={dropDownRef} className="relative  block w-[180px] ">
@@ -71,7 +85,29 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
            }`}
       >
         <div className="flex h-8 w-full items-center justify-center bg-n30 text-xl font-bold">
-          2024
+          <button
+            onClick={() => handleYearChange(-1)}
+            disabled={isPrevYearDisabled}
+            className={`px-2 py-1 ${
+              isPrevYearDisabled
+                ? "cursor-not-allowed text-gray-400"
+                : "text-blue-500"
+            }`}
+          >
+            &lt;
+          </button>
+          <span className="mx-4">{year}</span>
+          <button
+            onClick={() => handleYearChange(1)}
+            disabled={isNextYearDisabled}
+            className={`px-2 py-1 ${
+              isNextYearDisabled
+                ? "cursor-not-allowed text-gray-400"
+                : "text-blue-500"
+            }`}
+          >
+            &gt;
+          </button>
         </div>
         <div className="flex h-full w-full flex-grow flex-wrap items-center justify-center bg-n10 ">
           {months.map((month: any) => (
