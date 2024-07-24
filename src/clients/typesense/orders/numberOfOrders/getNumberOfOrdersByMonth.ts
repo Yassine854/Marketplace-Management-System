@@ -7,9 +7,8 @@ export const getNumberOfOrdersByMonth = async (
   try {
     const [year, month] = isoDate.split("-").map(Number);
     const startDate = Math.floor(new Date(year, month - 1, 1).getTime());
-    console.log("🚀 ~ startDate:", startDate);
+
     const endDate = Math.floor(new Date(year, month, 0, 23, 59, 59).getTime());
-    console.log("🚀 ~ endDate:", endDate);
 
     const searchParams = {
       filter_by: `createdAt:=[${startDate}..${endDate}]`,

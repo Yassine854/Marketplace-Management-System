@@ -10,19 +10,16 @@ export const getNumberOfOrdersByMonthRoute = async (request: NextRequest) => {
     const date = searchParams.get("date");
 
     if (!date) {
-      return responses.typesense.invalidRequest("Date Parameter is Required");
+      return responses.invalidRequest("Date Parameter is Required");
     }
 
     const numberOfOrders: number | undefined = await getNumberOfOrdersByMonth(
       date,
     );
-    console.log(
-      "🚀 ~ getNumberOfOrdersByMonthRoute ~ numberOfOrders:",
-      numberOfOrders,
-    );
-    /*if (!numberOfOrders) {
+
+    if (!numberOfOrders) {
       return responses.internalServerError("Number of Orders is Undefined");
-    }*/
+    }
     return NextResponse.json(
       {
         message: "success",
