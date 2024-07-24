@@ -1,8 +1,6 @@
 import { getOrderItemsRoute } from "./orders/magento/getOrderItemsRoute";
-import { getNumberOfOrdersByDayRoute } from "./orders/typesense/getNumberOfOrdersByDayRoute";
-import { getOrdersByDeliveryDateRoute } from "./orders/magento/getOrdersByDeliveryDateRoute";
 import { numberOfOrdersByMonthAnalyticsRoute } from "./analytics/numberOfOrdersByMonthAnalyticsRoute";
-import { numberOfOrdersByQuarterAnalyticsRoute } from "./analytics/numberOfOrdersByQuarterAnalyticsRoute";
+import { numberOfOrdersByQuarterAnalyticsRoute } from "./analytics/numberOfOrdersByQuarterAnalyticsRoute copy";
 import { numberOfOrdersLifetimeAnalyticsRoute } from "./analytics/numberOfOrdersLifetimeAnalyticsRoute";
 import { getOrdersByDeliveryDateRoute } from "./orders/magento/getOrdersByDeliveryDateRoute";
 import { getNumberOfOrdersByDayRoute } from "./orders/typesense/numberOfOrders/getNumberOfOrdersByDayRoute";

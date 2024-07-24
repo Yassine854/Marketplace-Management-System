@@ -1,33 +1,34 @@
 import { responses } from "../../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getNumberOfOrdersByQuarter } from "@/services/orders/typesense/numberOfOrders/getNumberOfOrdersByQuarter";
+import { getNumberOfOrdersByMonth } from "@/services/orders/typesense/numberOfOrders/getNumberOfOrdersByMonth";
 
-export const getNumberOfOrdersByQuarterRoute = async (request: NextRequest) => {
+export const getNumberOfOrdersByMonthRoute = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
 
     const yearString = searchParams.get("year");
-    const quarter = searchParams.get("quarter");
+    const monthString = searchParams.get("month");
 
     if (!yearString) {
       return responses.invalidRequest("Year Parameter is Required");
     }
-    if (!quarter) {
-      return responses.invalidRequest("Quarter Parameter is Required");
+    if (!monthString) {
+      return responses.invalidRequest("Month Parameter is Required");
     }
     const year = parseInt(yearString, 10);
+    const month = parseInt(monthString, 10);
 
-    const numberOfOrders: number | undefined = await getNumberOfOrdersByQuarter(
+    const numberOfOrders: number | undefined = await getNumberOfOrdersByMonth(
       year,
-      quarter,
+      month,
     );
 
     if (!numberOfOrders) {
       return responses.internalServerError("Number of Orders is Undefined");
     }
 
-    const date = year + "-" + quarter;
+    const date = year + "-" + month;
 
     return NextResponse.json(
       {

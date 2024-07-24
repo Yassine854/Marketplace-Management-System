@@ -12,7 +12,7 @@ export const numberOfOrdersByQuarterAnalyticsRoute = async (
     const yearString = searchParams.get("date");
 
     if (!yearString) {
-      return responses.typesense.invalidRequest("Date Parameter is Required");
+      return responses.invalidRequest("Date Parameter is Required");
     }
 
     const year = parseInt(yearString, 10);
