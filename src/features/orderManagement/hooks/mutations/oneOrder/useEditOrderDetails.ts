@@ -29,10 +29,10 @@ export const useEditOrderDetails = () => {
       const magentoItems: any[] = [];
 
       items.forEach((item: any) => {
-        magentoItems.push({ item_id: item.id, weight: item.shipped });
+        magentoItems.push({ item_id: item.id, weight: item.weight });
       });
 
-      await magento.editOrderDetails({
+      await magento.mutations.editOrderDetails({
         orderId,
         deliveryDate: formatUnixTimestamp(deliveryDate),
         items: magentoItems,

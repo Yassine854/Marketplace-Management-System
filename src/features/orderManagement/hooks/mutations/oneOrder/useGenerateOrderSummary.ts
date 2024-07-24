@@ -5,7 +5,7 @@ import { magento } from "@/clients/magento";
 export const useGenerateOrderSummary = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (orderId: string) => {
-      const pdfUrl = await magento.generateOrderSummary(orderId);
+      const pdfUrl = await magento.mutations.generateOrderSummary(orderId);
       return pdfUrl;
     },
     onSuccess: (pdfUrl) => {

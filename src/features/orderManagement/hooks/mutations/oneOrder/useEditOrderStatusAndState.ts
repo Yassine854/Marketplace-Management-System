@@ -15,7 +15,7 @@ export const useEditOrderStatusAndState = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ orderId, status, state }: any) => {
-      await magento.changeOrderStatus({ orderId, status, state });
+      await magento.mutations.changeOrderStatus({ orderId, status, state });
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
         order: {
           id: orderId,

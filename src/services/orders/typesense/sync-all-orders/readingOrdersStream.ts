@@ -13,7 +13,7 @@ export const readingOrdersStream = () => {
           return;
         }
 
-        const { pagesCount } = await magento.getPagesCount();
+        const { pagesCount } = await magento.queries.getAllOrdersPagesCount();
 
         if (page <= pagesCount) {
           console.info(
@@ -24,7 +24,7 @@ export const readingOrdersStream = () => {
             "total pages ...",
           );
 
-          const { items } = await magento.getOrdersByBatch(page);
+          const { items } = await magento.queries.getOrdersByBatch(page);
 
           this.push(JSON.stringify(items));
           page++;

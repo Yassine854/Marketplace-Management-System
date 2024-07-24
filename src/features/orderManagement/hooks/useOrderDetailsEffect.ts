@@ -30,14 +30,14 @@ export const useOrderDetailsEffect = (reset: any) => {
   useEffect(() => {
     let total = 0;
     orderOnReviewItems.forEach((item: any) => {
-      total += item.shipped * item.productPrice;
+      total += item.weight * item.productPrice;
     });
 
     setTotal(total);
   }, [orderOnReviewItems, setTotal]);
 
   useEffect(() => {
-    order && setOrderOnReviewItems(order?.items);
+    //  order && setOrderOnReviewItems(order?.items);
     order && setOrderOnReviewDeliveryDate(order?.deliveryDate);
   }, [order, setOrderOnReviewItems, setOrderOnReviewDeliveryDate]);
 };
