@@ -13,7 +13,7 @@ export const useCancelOrder = () => {
 
   const { mutate, isPending, mutateAsync, isError } = useMutation({
     mutationFn: async (orderId: string) => {
-      await magento.cancelOrder(orderId);
+      await magento.mutations.cancelOrder(orderId);
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
         order: {
           id: orderId,

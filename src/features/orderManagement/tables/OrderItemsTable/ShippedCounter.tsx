@@ -1,24 +1,45 @@
-import { Button } from "@nextui-org/react";
-import { useShippedCounter } from "./useShippedCounter";
+import { useEffect, useState } from "react";
+import CustomNumberInput from "./CustomNumberInput";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 
 const ShippedCounter = ({ id }: any) => {
-  const { decrementShipped, incrementShipped, item } = useShippedCounter(id);
+  const { orderOnReviewItems, setOrderOnReviewItems } = useOrderDetailsStore();
+  const [item, setItem] = useState<any>();
+
+  const onValueChange = (value: number) => {
+    if (item && item.weight != value) {
+      const items: any = orderOnReviewItems.map((item: any) => {
+        if (item?.id === id) {
+          return {
+            ...item,
+            weight: value,
+            totalPrice: value * item.productPrice,
+          };
+        }
+        return item;
+      });
+      setOrderOnReviewItems(items);
+    }
+  };
+
+  useEffect(() => {
+    if (orderOnReviewItems) {
+      const item = orderOnReviewItems.find((item: any) => item?.id === id);
+      setItem(item); //   //@ts-igno
+    }
+  }, [id, setItem, orderOnReviewItems]);
 
   return (
     <div className="flex">
-      <Button onClick={() => incrementShipped(id)} size="sm">
-        <p className="text-xl font-bold">+</p>
-      </Button>
-      <input
-        className="mx-2 w-8 rounded-lg text-center font-bold"
-        type="number"
-        //@ts-ignore
-        value={item?.shipped || 0}
-        onChange={(v) => {}}
-      />
-      <Button className="link" onClick={() => decrementShipped(id)} size="sm">
-        <p className="text-xl font-bold">-</p>
-      </Button>
+      {item && (
+        <CustomNumberInput
+          max={item?.orderedQuantity}
+          min={0}
+          step={item?.orderOrdered}
+          defaultValue={item?.weight}
+          onChange={onValueChange}
+        />
+      )}
     </div>
   );
 };

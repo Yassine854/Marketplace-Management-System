@@ -14,9 +14,9 @@ const OrderItemsTable = ({ items, isInEditMode }: any) => {
               sku,
               productName,
               totalPrice,
-              shipped,
+              weight,
               pcb,
-              quantity,
+              orderedQuantity,
             }: any) => (
               <tr key={id} className="even:bg-primary/5 dark:even:bg-bg3">
                 <td className="px-3 py-2 text-center">{sku || "*****"}</td>
@@ -30,19 +30,19 @@ const OrderItemsTable = ({ items, isInEditMode }: any) => {
                   </div>
                 </td>
                 <td className="px-3 py-2">
-                  {isInEditMode && (
-                    <ShippedCounter id={id} pcb={pcb} shipped={shipped} />
-                  )}
+                  {isInEditMode && <ShippedCounter id={id} />}
 
-                  {!isInEditMode && <div>{shipped}</div>}
+                  {!isInEditMode && <div>{weight}</div>}
                 </td>
                 <td className="px-3 py-2">
-                  <div className="flex items-center gap-3">{pcb || 0}</div>
+                  <div className="flex items-center gap-3">
+                    {orderedQuantity || 0}
+                  </div>
                 </td>
-                <td className="px-3 py-2">{quantity || 0}</td>
+                <td className="px-3 py-2">{orderedQuantity * pcb || "****"}</td>
                 <td className="px-3 py-2">
                   <div className="flex gap-2">
-                    {totalPrice.toFixed(2) || 0}{" "}
+                    {totalPrice?.toFixed(2) || 0}{" "}
                   </div>
                 </td>
               </tr>

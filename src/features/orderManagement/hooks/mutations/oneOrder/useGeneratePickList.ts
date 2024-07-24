@@ -5,7 +5,9 @@ import { magento } from "@/clients/magento";
 export const useGeneratePickList = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (orderId: string) => {
-      const pickListUrl = await magento.generatePickLists([orderId].toString());
+      const pickListUrl = await magento.mutations.generatePickLists(
+        [orderId].toString(),
+      );
       return pickListUrl;
     },
     onSuccess: (pickListUrl) => {

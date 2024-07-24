@@ -2,16 +2,16 @@ import { Order } from "@/types/order";
 import { getOrderItems } from "../getOrderItems";
 import { getOrderSource } from "../getOrderSource";
 
-const deliveryDateToUnixTimeStamp = (deliveryDate: any) => {
-  if (deliveryDate) {
-    // Create a new Date object from the date string
-    const date = new Date(deliveryDate);
-
-    // Get the Unix timestamp (in seconds)
-    return Math.floor(date.getTime() / 1000);
+const deliveryDateToUnixTimeStamp = (
+  deliveryDate: string,
+): number | undefined => {
+  if (!deliveryDate) {
+    return undefined;
   }
 
-  return undefined;
+  const date = new Date(deliveryDate);
+  const unixTimestampToDate = Math.floor(date.getTime() / 1000);
+  return unixTimestampToDate;
 };
 
 export const getOrdersBatch = (orders: any): Order[] =>
@@ -20,7 +20,6 @@ export const getOrdersBatch = (orders: any): Order[] =>
       id: String(order?.entity_id) || "",
       orderId: String(order?.entity_id) || "",
       incrementId: String(order?.increment_id) || "",
-
       kamiounId: String(order?.extension_attributes?.kamioun_order_id) || "",
       storeId: order?.store_id,
       state: order?.state || "",

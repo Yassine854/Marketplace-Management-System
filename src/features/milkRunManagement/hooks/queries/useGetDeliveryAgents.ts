@@ -27,7 +27,7 @@ export const useGetDeliveryAgents = () => {
   const { isLoading, data } = useQuery({
     queryKey: ["deliveryAgents"],
     queryFn: async () => {
-      const { deliveryAgents } = await magento.getDeliveryAgents();
+      const { deliveryAgents } = await magento.queries.getDeliveryAgents();
       return formatDeliveryAgentsArray(deliveryAgents);
     },
   });

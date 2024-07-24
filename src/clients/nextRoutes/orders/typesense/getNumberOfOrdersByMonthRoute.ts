@@ -1,9 +1,9 @@
 import { responses } from "../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getNumberOfOrdersByDay } from "@/services/orders/typesense/numberOfOrders/getNumberOfOrdersByDay";
+import { getNumberOfOrdersByMonth } from "@/services/orders/typesense/numberOfOrders/getNumberOfOredersByMonth";
 
-export const getNumberOfOrdersByDayRoute = async (request: NextRequest) => {
+export const getNumberOfOrdersByMonthRoute = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
 
@@ -13,7 +13,7 @@ export const getNumberOfOrdersByDayRoute = async (request: NextRequest) => {
       return responses.invalidRequest("Date Parameter is Required");
     }
 
-    const numberOfOrders: number | undefined = await getNumberOfOrdersByDay(
+    const numberOfOrders: number | undefined = await getNumberOfOrdersByMonth(
       date,
     );
 
