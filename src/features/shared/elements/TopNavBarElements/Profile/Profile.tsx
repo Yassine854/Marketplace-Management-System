@@ -1,13 +1,11 @@
-import { IconLogout, IconSettings } from "@tabler/icons-react";
-import { logError } from "@/utils/logError";
-
 import Image from "next/image";
+import { logError } from "@/utils/logError";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { IconLogout, IconSettings } from "@tabler/icons-react";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
-import { useEffect } from "react";
 
 const useList = () => {
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
 
   const list = [
     {
@@ -35,11 +33,7 @@ const useList = () => {
 const Profile = () => {
   const { list } = useList();
   const { open, ref, toggleOpen } = useDropdown();
-  const { logout, user } = useAuth();
-
-  useEffect(() => {
-    console.log("🚀 ~ Profile ~ user:", user);
-  }, [user]);
+  const { user } = useAuth();
 
   return (
     <div className="relative shrink-0" ref={ref}>
