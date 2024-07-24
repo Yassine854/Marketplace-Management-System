@@ -1,11 +1,10 @@
-import Notifications from "./NotificationsComponent";
+"use client";
 
-const NotificationPage = () => {
+const Page = () => {
   return (
-    <>
-      <Notifications />
-    </>
+    <div className=" f flex h-full w-full items-center justify-center text-2xl">
+      Notifications
+    </div>
   );
 };
-
-export default NotificationPage;
+export default Page;
