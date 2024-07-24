@@ -39,12 +39,14 @@ export const typeDefs = gql`
     orderId: ID
     productId: ID
     productName: String
-    quantity: Float
     productPrice: Float
     totalPrice: Float
     sku: String
-    shipped: Float
-    pcb: Float
+    weight: Float
+    orderedQuantity: Float
+    #  quantity: Float
+    # shipped: Float
+    #   pcb: Float
   }
 
   type Order {
@@ -60,9 +62,9 @@ export const typeDefs = gql`
     customerFirstname: String
     customerLastname: String
     customerPhone: String
-    deliveryAgentId: String!
-    deliveryAgentName: String!
-    deliveryDate: Float!
+    deliveryAgentId: String
+    deliveryAgentName: String
+    deliveryDate: Float
     deliveryStatus: String
     source: String!
     items: [OrderItem]

@@ -5,7 +5,7 @@ import { magento } from "@/clients/magento";
 export const useGenerateDeliveryNote = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (orderId: string) => {
-      const deliveryNotesUrl = await magento.generateDeliveryNotes(
+      const deliveryNotesUrl = await magento.mutations.generateDeliveryNotes(
         [orderId].toString(),
       );
 
