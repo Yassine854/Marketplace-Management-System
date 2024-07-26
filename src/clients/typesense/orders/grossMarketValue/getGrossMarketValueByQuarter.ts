@@ -59,8 +59,6 @@ export const getGrossMarketValueByQuarter = async (
       }
       return sum;
     }, 0);
-    console.log("All orders:", allOrders.length);
-    console.log("Total GMV:", totalGMV);
     return totalGMV;
   } catch (error) {
     logError(error);

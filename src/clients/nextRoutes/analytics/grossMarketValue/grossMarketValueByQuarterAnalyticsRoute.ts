@@ -9,7 +9,7 @@ export const grossMarketValueByQuarterAnalyticsRoute = async (
   try {
     const { searchParams } = new URL(request.url);
 
-    const yearString = searchParams.get("date");
+    const yearString = searchParams.get("year");
 
     if (!yearString) {
       return responses.invalidRequest("Date Parameter is Required");
