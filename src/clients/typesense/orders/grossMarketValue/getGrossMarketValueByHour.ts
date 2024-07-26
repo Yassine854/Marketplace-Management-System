@@ -3,10 +3,11 @@ import { typesenseClient } from "../../typesenseClient";
 import dayjs from "dayjs";
 
 export const getGrossMarketValueByHour = async (
-  isoDate: string,
+  year: number,
+  month: number,
+  day: number,
 ): Promise<Array<[string, number]> | undefined> => {
   try {
-    const [year, month, day] = isoDate.split("-").map(Number);
     const resultTable: Array<[number, number]> = [];
 
     const currentTimestamp = dayjs().unix() * 1000;
@@ -61,11 +62,8 @@ export const getGrossMarketValueByHour = async (
         }, 0);
         totalGMV += hourGMV;
         nbreOrders += allOrders.length;
-        console.log("All orders:", nbreOrders);
-        console.log("Hour GMV:", hourGMV);
-        console.log("Total GMV:", totalGMV);
         const hourString: string = `${String(index).padStart(2, "0")}:00`;
-        return [hourString, hourGMV] as [string, number];
+        return [hourString, parseFloat(hourGMV.toFixed(3))] as [string, number];
       }),
     );
     return allOrdersTable;
