@@ -1,36 +1,35 @@
 import { responses } from "../../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getGrossMarketValueByQuarter } from "@/services/orders/typesense/grossMarketValue/getGrossMarketValueByQuarter";
-export const getGrossMarketValueByQuarterRoute = async (
-  request: NextRequest,
-) => {
+import { getGrossMarketValueByMonth } from "@/services/orders/typesense/grossMarketValue/getGrossMarketValueByMonth";
+export const getGrossMarketValueByMonthRoute = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
 
     const yearString = searchParams.get("year");
-    const quarter = searchParams.get("quarter");
+    const monthString = searchParams.get("month");
 
     if (!yearString) {
       return responses.invalidRequest("Year Parameter is Required");
     }
-    if (!quarter) {
-      return responses.invalidRequest("Quarter Parameter is Required");
+    if (!monthString) {
+      return responses.invalidRequest("Month Parameter is Required");
     }
     const year = parseInt(yearString, 10);
+    const month = parseInt(monthString, 10);
 
-    const gmv: number | undefined = await getGrossMarketValueByQuarter(
+    const gmv: number | undefined = await getGrossMarketValueByMonth(
       year,
-      quarter,
+      month,
     );
 
     if (!gmv) {
       return responses.internalServerError(
-        "Gross Market Value By Quarter is Undefined",
+        "Gross Market Value By Month is Undefined",
       );
     }
 
-    const date = year + "-" + quarter;
+    const date = year + "-M" + month;
 
     return NextResponse.json(
       {

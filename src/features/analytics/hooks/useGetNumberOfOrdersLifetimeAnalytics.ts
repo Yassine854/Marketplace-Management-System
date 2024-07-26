@@ -1,17 +1,16 @@
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
 
-export const useGetNumberOfOrdersByMonthAnalytics = (
-  year: number,
-  month: string,
+export const useGetNumberOfOrdersLifetimeAnalytics = (
+  startYear: number,
+  endYear: number,
 ) => {
   const { isLoading, data } = useQuery({
-    queryKey: ["numberOfOrdersByMonthAnalytics", year, month],
+    queryKey: ["numberOfOrdersLifetimeAnalytics", startYear, endYear],
     queryFn: async () => {
       const { data } = await axios.servicesClient(
-        `/api/analytics/numberOfOrders/byMonth?year=${year}&month=${month}`,
+        `/api/analytics/numberOfOrders/lifetime?startYear=${startYear}&endYear=${endYear}`,
       );
-      console.log("API response for", month, ":", data); // Log API response
       return data?.data;
     },
   });
