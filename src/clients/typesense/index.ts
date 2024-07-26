@@ -10,6 +10,7 @@ import { getNumberOfOrdersByDay } from "./orders/numberOfOrders/getNumberOfOrder
 import { getNumberOfOrdersByQuarter } from "./orders/numberOfOrders/getNumberOfOrdersByQuarter";
 import { getNumberOfOrdersByMonth } from "./orders/numberOfOrders/getNumberOfOrdersByMonth";
 import { getGrossMarketValueByQuarter } from "./orders/grossMarketValue/getGrossMarketValueByQuarter";
+import { getGrossMarketValueByMonth } from "./orders/grossMarketValue/getGrossMarketValueByMonth";
 
 export const typesense = {
   isCollectionExist,
@@ -28,6 +29,7 @@ export const typesense = {
     },
     grossMarketValue: {
       byQuarter: getGrossMarketValueByQuarter,
+      byMonth: getGrossMarketValueByMonth,
     },
   },
 };

@@ -1,31 +1,20 @@
 import { logError } from "@/utils/logError";
 import { typesenseClient } from "../../typesenseClient";
 
-export const getGrossMarketValueByQuarter = async (
+export const getGrossMarketValueByMonth = async (
   yearArg: number,
-  quarter: string,
+  monthArg: number,
 ): Promise<number | undefined> => {
   try {
     const year = Number(yearArg);
+    const month = Number(monthArg);
 
-    const quarterMonths: { [key: string]: [number, number] } = {
-      Q1: [0, 2],
-      Q2: [3, 5],
-      Q3: [6, 8],
-      Q4: [9, 11],
-    };
-
-    const selectedQuarter = quarterMonths[quarter];
-    if (!selectedQuarter) {
-      throw new Error("Invalid quarter parameter");
+    if (month < 1 || month > 12) {
+      throw new Error("Invalid month parameter");
     }
 
-    const [startMonth, endMonth] = selectedQuarter;
-
-    const startDate = Math.floor(new Date(year, startMonth, 1).getTime());
-    const endDate = Math.floor(
-      new Date(year, endMonth + 1, 0, 23, 59, 59).getTime(),
-    );
+    const startDate = Math.floor(new Date(year, month - 1, 1).getTime());
+    const endDate = Math.floor(new Date(year, month, 0, 23, 59, 59).getTime());
 
     const pageSize = 250;
     let currentPage = 1;

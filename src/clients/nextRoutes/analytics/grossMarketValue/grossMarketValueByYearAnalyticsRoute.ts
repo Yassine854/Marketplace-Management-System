@@ -1,9 +1,9 @@
-import { grossMarketValueByQuarterAnalytics } from "@/services/analytics/grossMarketValue/grossMarketValueByQuarterAnalytics";
+import { grossMarketValueByYearAnalytics } from "@/services/analytics/grossMarketValue/grossMarketValueByYearAnalytics";
 import { responses } from "../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
 
-export const grossMarketValueByQuarterAnalyticsRoute = async (
+export const grossMarketValueByYearAnalyticsRoute = async (
   request: NextRequest,
 ) => {
   try {
@@ -17,7 +17,7 @@ export const grossMarketValueByQuarterAnalyticsRoute = async (
 
     const year = parseInt(yearString, 10);
 
-    const res = await grossMarketValueByQuarterAnalytics(year);
+    const res = await grossMarketValueByYearAnalytics(year);
     return NextResponse.json(
       {
         message: "success",

@@ -11,6 +11,8 @@ import { numberOfOrdersByWeekAnalyticsRoute } from "./analytics/numberOfOrders/n
 import { getGrossMarketValueByQuarterRoute } from "./orders/typesense/grossMarketValue/getGrossMarketValueByQuarterRoute";
 import { grossMarketValueByQuarterAnalyticsRoute } from "./analytics/grossMarketValue/grossMarketValueByQuarterAnalyticsRoute";
 import { grossMarketValueLifetimeAnalyticsRoute } from "./analytics/grossMarketValue/grossMarketValueLifetimeAnalyticsRoute";
+import { getGrossMarketValueByMonthRoute } from "./orders/typesense/grossMarketValue/getGrossMarketValueByMonthRoute";
+import { grossMarketValueByYearAnalyticsRoute } from "./analytics/grossMarketValue/grossMarketValueByYearAnalyticsRoute";
 
 export const nextRoute = {
   analytics: {
@@ -22,6 +24,7 @@ export const nextRoute = {
       byWeek: numberOfOrdersByWeekAnalyticsRoute,
     },
     grossMarketValue: {
+      byYear: grossMarketValueByYearAnalyticsRoute,
       byQuarter: grossMarketValueByQuarterAnalyticsRoute,
       lifetime: grossMarketValueLifetimeAnalyticsRoute,
     },
@@ -45,6 +48,7 @@ export const nextRoute = {
       },
       grossMarketValue: {
         byQuarter: getGrossMarketValueByQuarterRoute,
+        byMonth: getGrossMarketValueByMonthRoute,
       },
     },
   },
