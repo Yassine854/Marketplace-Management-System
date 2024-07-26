@@ -1,6 +1,6 @@
-import { getNumberOfOrdersByMonth } from "@/services/orders/typesense/numberOfOrders/getNumberOfOrdersByMonth";
+import { getNumberOfOrdersByMonth } from "@/services/orders/typesense/numberOfOrders/getNumberOfOredersByMonth";
 
-export const numberOfOrderByQuarterAnalytics = async (year: number) => {
+export const numberOfOrderByQuarterAnalytics = async (year: string) => {
   const quarterMonths: { [key: string]: [number, number] } = {
     Q1: [0, 2],
     Q2: [3, 5],
@@ -15,7 +15,7 @@ export const numberOfOrderByQuarterAnalytics = async (year: number) => {
     let totalOrders = 0;
 
     for (const month of months) {
-      const numberOfOrders = await getNumberOfOrdersByMonth(year, month);
+      const numberOfOrders = await getNumberOfOrdersByMonth(year);
       if (numberOfOrders) {
         totalOrders += numberOfOrders;
       }
