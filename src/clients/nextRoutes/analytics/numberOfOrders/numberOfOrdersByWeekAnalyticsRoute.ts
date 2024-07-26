@@ -1,7 +1,7 @@
-import { responses } from "../responses";
+import { responses } from "../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { numberOfOrderByWeekAnalytics } from "@/services/analytics/numberOfOrdersByWeekAnalytics";
+import { numberOfOrderByWeekAnalytics } from "@/services/analytics/numberOfOrders/numberOfOrdersByWeekAnalytics";
 
 export const numberOfOrdersByWeekAnalyticsRoute = async (
   request: NextRequest,
