@@ -2,14 +2,11 @@ import { logError } from "@/utils/logError";
 import { typesenseClient } from "../../typesenseClient";
 
 export const getGrossMarketValueByDay = async (
-  yearArg: number,
-  monthArg: number,
-  dayArg: number,
+  year: number,
+  month: number,
+  day: number,
 ): Promise<number | undefined> => {
   try {
-    const year = Number(yearArg);
-    const month = Number(monthArg);
-    const day = Number(dayArg);
     if (month < 1 || month > 12) {
       throw new Error("Invalid month parameter");
     }
