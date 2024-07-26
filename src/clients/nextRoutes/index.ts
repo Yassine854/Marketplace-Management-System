@@ -1,16 +1,16 @@
 import { getOrderItemsRoute } from "./orders/magento/getOrderItemsRoute";
 import { numberOfOrdersByMonthAnalyticsRoute } from "./analytics/numberOfOrders/numberOfOrdersByMonthAnalyticsRoute";
-import { numberOfOrdersByQuarterAnalyticsRoute } from "./analytics/numberOfOrders/numberOfOrdersByQuarterAnalyticsRoute";
 import { numberOfOrdersLifetimeAnalyticsRoute } from "./analytics/numberOfOrders/numberOfOrdersLifetimeAnalyticsRoute";
+import { numberOfOrdersByQuarterAnalyticsRoute } from "./analytics/numberOfOrders/numberOfOrdersByQuarterAnalyticsRoute";
 import { getOrdersByDeliveryDateRoute } from "./orders/magento/getOrdersByDeliveryDateRoute";
 import { getNumberOfOrdersByDayRoute } from "./orders/typesense/numberOfOrders/getNumberOfOrdersByDayRoute";
 import { getNumberOfOrdersByMonthRoute } from "./orders/typesense/numberOfOrders/getNumberOfOrdersByMonthRoute";
 import { getNumberOfOrdersByQuarterRoute } from "./orders/typesense/numberOfOrders/getNumberOfOrdersByQuarterRoute";
-import { numberOfOrdersByYearAnalyticsRoute } from "./analytics/numberOfOrdersByYearAnalyticsRoute";
+import { numberOfOrdersByYearAnalyticsRoute } from "./analytics/numberOfOrders/numberOfOrdersByYearAnalyticsRoute";
 import { numberOfOrdersByWeekAnalyticsRoute } from "./analytics/numberOfOrders/numberOfOrdersByWeekAnalyticsRoute";
 import { getGrossMarketValueByQuarterRoute } from "./orders/typesense/grossMarketValue/getGrossMarketValueByQuarterRoute";
 import { grossMarketValueByQuarterAnalyticsRoute } from "./analytics/grossMarketValue/grossMarketValueByQuarterAnalyticsRoute";
-import { grossMarketValueLifetimeAnalyticsRoute } from "./analytics/grossMarketValue/grossMarketValueLifetimeAnalyticsRoute";
+//import { grossMarketValueLifetimeAnalyticsRoute } from "./analytics/grossMarketValue/grossMarketValueLifetimeAnalyticsRoute";
 
 export const nextRoute = {
   analytics: {
@@ -23,7 +23,7 @@ export const nextRoute = {
     },
     grossMarketValue: {
       byQuarter: grossMarketValueByQuarterAnalyticsRoute,
-      lifetime: grossMarketValueLifetimeAnalyticsRoute,
+      //lifetime: grossMarketValueLifetimeAnalyticsRoute,
     },
   },
 
