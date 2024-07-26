@@ -10,9 +10,6 @@ const UsersTable = ({
   onSelectAllClick,
   isAllOrdersSelected,
 }: any) => {
-  useEffect(() => {
-    console.log("🚀 ~ users:", users);
-  }, [users]);
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>
       <UsersTableHead
