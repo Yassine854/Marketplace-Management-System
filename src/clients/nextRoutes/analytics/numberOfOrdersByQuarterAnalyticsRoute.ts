@@ -9,13 +9,13 @@ export const numberOfOrdersByQuarterAnalyticsRoute = async (
   try {
     const { searchParams } = new URL(request.url);
 
-    const year = searchParams.get("year");
+    const yearString = searchParams.get("year");
 
-    if (!year) {
+    if (!yearString) {
       return responses.invalidRequest("Date Parameter is Required");
     }
 
-    //const year = parseInt(yearString, 10);
+    const year = parseInt(yearString, 10);
 
     const res = await numberOfOrderByQuarterAnalytics(year);
     return NextResponse.json(
