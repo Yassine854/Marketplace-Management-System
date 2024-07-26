@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import TableRowSkeleton from "./elements/RowSkeleton";
 import UsersTableHead from "./elements/UsersTableHead/UsersTableHead";
 import UsersTableRow from "./elements/UsersTableRow";
