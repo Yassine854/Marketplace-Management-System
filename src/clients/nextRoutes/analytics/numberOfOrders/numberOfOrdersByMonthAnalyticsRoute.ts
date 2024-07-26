@@ -1,4 +1,4 @@
-import { responses } from "../responses";
+import { responses } from "../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
 import { numberOfOrderByMonthAnalytics } from "@/services/analytics/numberOfOrdersByMonthAnalytics";

@@ -6,11 +6,11 @@ export const numberOfOrdersLifetimeAnalytics = async (
 ) => {
   const lifetimeList: any[] = [];
 
-  /*for (let year = startYear; year <= endYear; year++) {
+  for (let year = startYear; year <= endYear; year++) {
     const yearlyAnalytics = await numberOfOrderByQuarterAnalytics(year);
 
     lifetimeList.push(...yearlyAnalytics);
-  }*/
+  }
 
   return lifetimeList;
 };
