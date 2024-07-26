@@ -2,28 +2,32 @@ import { logError } from "@/utils/logError";
 import { typesenseClient } from "../../typesenseClient";
 
 export const getNumberOfOrdersByMonth = async (
-  isoDate: string,
+  year: number,
+  month: number,
 ): Promise<number | undefined> => {
   try {
-    const [year, month] = isoDate.split("-").map(Number);
-    const startDate = Math.floor(new Date(year, month - 1, 1).getTime());
+    const startTime = new Date(year, month - 1, 1).getTime();
+    const endTime = new Date(year, month, 0, 23, 59, 59).getTime();
 
-    const endDate = Math.floor(new Date(year, month, 0, 23, 59, 59).getTime());
+    const startTimestamp = Math.floor(startTime);
+    const endTimestamp = Math.floor(endTime);
+
+    /* const currentDate = dayjs().unix() * 1000
+    if (startDate > currentDate) {
+      return NextResponse.json({ noo: null });
+    } */
 
     const searchParams = {
-      filter_by: `createdAt:=[${startDate}..${endDate}]`,
       q: "",
       query_by: "*",
-      page: 1,
-      per_page: 1,
+      filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]`,
     };
 
-    const { found } = await typesenseClient
+    const allorders = await typesenseClient
       .collections("orders")
       .documents()
       .search(searchParams);
-
-    return found;
+    return allorders.found;
   } catch (error) {
     logError(error);
   }
