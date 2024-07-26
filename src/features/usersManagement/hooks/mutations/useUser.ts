@@ -6,10 +6,10 @@ export const useUser = () => {
   const user = {
     mutation: {
       create: {
-        newUser: create,
-        isLoading,
         data,
         error,
+        isLoading,
+        newUser: create,
       },
     },
   };

@@ -1,32 +1,23 @@
 import * as z from "zod";
-
-import { SubmitHandler, useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
-
-import { FormSchema } from "./formSchema";
 import { toast } from "react-hot-toast";
+import { FormSchema } from "./formSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useUser } from "@/features/usersManagement/hooks/mutations/useUser";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 type FormData = z.infer<typeof FormSchema>;
 
-const roles = [
-  { name: "Admin", key: "1" },
-  { name: "Agent-Tunis", key: "2" },
-  { name: "Agent-Sousse", key: "3" },
-];
-
 export const useCreateUserForm = () => {
-  const { navigateToUsersTable } = useNavigation();
-  const [selectedRoleId, setSelectedRoleId] = useState(roles[0]);
-
   const user = useUser();
+
+  const { navigateToUsersTable } = useNavigation();
+
   const {
     handleSubmit,
     register,
-    formState: { errors },
     setValue,
+    formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(FormSchema),
   });
@@ -35,11 +26,11 @@ export const useCreateUserForm = () => {
     const { username, firstName, lastName, roleId, password } = data;
 
     const { message, success } = await user.mutation.create.newUser({
-      username,
-      firstName,
-      lastName,
       roleId,
+      username,
+      lastName,
       password,
+      firstName,
     });
 
     if (success) {
@@ -52,26 +43,12 @@ export const useCreateUserForm = () => {
     }
   };
 
-  useEffect(() => {
-    console.log("🚀 ~ useCreateUserForm ~ selectedRoleId:", selectedRoleId);
-
-    //@ts-ignore
-    // const changeSelected = warehouseRef.current?.changeSelected;
-    // if (selectedRole?.key == "ADMIN") {
-    //   changeSelected({ name: "All", key: "all" });
-    // } else {
-    //   changeSelected(warehouses[0]);
-    // }
-  }, [selectedRoleId]);
-
   return {
+    errors,
     onSubmit,
-    handleSubmit: handleSubmit(onSubmit),
     register,
     setValue,
-    errors,
-    setSelectedRoleId,
-    roles,
+    handleSubmit: handleSubmit(onSubmit),
     isLoading: user.mutation.create.isLoading,
   };
 };

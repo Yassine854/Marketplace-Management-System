@@ -1,29 +1,21 @@
-import Dropdown from "@/features/shared/inputs/Dropdown";
+import RoleSelector from "../../widgets/RoleSelector";
 import Loading from "@/features/shared/elements/Loading";
-import PasswordInput from "@/features/shared/inputs/PasswordInput";
 import TextInput from "@/features/shared/inputs/TextInput";
 import { useCreateUserForm } from "../../hooks/useCreateUserForm";
+import PasswordInput from "@/features/shared/inputs/PasswordInput";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 
 const CreateUserForm = () => {
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    errors,
-    // setSelectedRole,
-    // warehouseRef,
-    // warehouses,
-    roles,
-    isLoading,
-  } = useCreateUserForm();
   const { navigateToUsersTable } = useNavigation();
+
+  const { handleSubmit, register, setValue, errors, isLoading } =
+    useCreateUserForm();
 
   return (
     <div className="grid h-full w-full items-center justify-center gap-4  xxxl:gap-6 ">
       <form
         className="w-full lg:col-span-7 xl:col-span-8"
-        //  onSubmit={handleSubmit}
+        onSubmit={handleSubmit}
       >
         <div className="box w-full min-w-[800px]  xl:p-8">
           <div className="bb-dashed mb-6 flex items-center justify-between pb-6">
@@ -32,89 +24,43 @@ const CreateUserForm = () => {
           <div className="box mb-6 grid grid-cols-2 gap-4 bg-primary/5 dark:bg-bg3 md:p-4 xl:p-6 xxxl:gap-6">
             <TextInput
               label="Username * "
+              isError={errors.username}
               placeholder="Enter username"
-              // register={register("username")}
-              // isError={errors.username}
-              // errorMessage={errors.username?.message}
+              register={register("username")}
+              errorMessage={errors.username?.message}
             />
-
-            <Dropdown
-              items={[
-                { name: "Test1", key: "test" },
-                { name: "Test2", key: "test" },
-                { name: "Test3", key: "test" },
-                { name: "Test4", key: "test" },
-              ]}
-              // onSelectedChange={(selected) => {
-              //   setValue("roleCode", selected);
-
-              //   var result = roles.filter((obj: any) => {
-              //     return obj.key === selected;
-              //   });
-
-              //   setSelectedRole(result[0]);
-              // }}
+            <RoleSelector
+              isError={errors.roleId}
+              errorMessage={errors.roleId?.message}
+              onChange={(roleId: string) => setValue("roleId", roleId)}
             />
-            {/* <TextInput
-              label="Email"
-              placeholder="Enter email"
-              //  register={register("email")}
-              //  isError={errors.email}
-              // errorMessage={errors.email?.message}
-            /> */}
-
             <TextInput
               label="First Name *"
+              isError={errors.firstName}
               placeholder="Enter first name"
               register={register("firstName")}
-              isError={errors.firstName}
               errorMessage={errors.firstName?.message}
             />
             <TextInput
               label="Last Name *"
+              isError={errors.lastName}
               placeholder="Enter lastName"
               register={register("lastName")}
-              isError={errors.lastName}
               errorMessage={errors.lastName?.message}
             />
 
             <PasswordInput
-              label="Password"
-              register={register("password")}
+              label="Password *"
               isError={errors.password}
+              register={register("password")}
               errorMessage={errors.password?.message}
             />
             <PasswordInput
-              label="Confirm Password"
-              register={register("confirmPassword")}
+              label="Confirm Password *"
               isError={errors.confirmPassword}
+              register={register("confirmPassword")}
               errorMessage={errors.confirmPassword?.message}
             />
-            {/* <Dropdown
-              items={[]}
-              // onSelectedChange={(selected) => {
-              //   setValue("roleCode", selected);
-
-              //   var result = roles.filter((obj: any) => {
-              //     return obj.key === selected;
-              //   });
-
-              //   setSelectedRole(result[0]);
-              // }}
-            /> */}
-            {/* <Dropdown
-              //  label="Warehouse"
-              // ref={warehouseRef}
-              items={[
-                { name: "Test1", key: "test" },
-                { name: "Test2", key: "test" },
-                { name: "Test3", key: "test" },
-                { name: "Test4", key: "test" },
-              ]}
-              // onSelectedChange={(selected) =>
-              //   setValue("warehouseCode", selected)
-              // }
-            /> */}
           </div>
 
           <div className="mt-6">
