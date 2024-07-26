@@ -3,8 +3,10 @@ import { roles } from "../../../staticRoles";
 import UsersTableCell from "./UsersTableCell";
 import { IconSettings } from "@tabler/icons-react";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
+import { useUsersStore } from "@/features/usersManagement/stores/usersStore";
 
 const UsersTableRow = ({ user }: any) => {
+  const { setUserOnReviewId } = useUsersStore();
   const [role, setRole] = useState<any>("");
   const { navigateToEditUserForm } = useNavigation();
 
@@ -40,7 +42,7 @@ const UsersTableRow = ({ user }: any) => {
       <UsersTableCell>
         <IconSettings
           onClick={() => {
-            console.log("click");
+            setUserOnReviewId(user.id);
             navigateToEditUserForm();
           }}
           string={2}
