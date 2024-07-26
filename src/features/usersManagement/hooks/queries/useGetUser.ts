@@ -21,7 +21,7 @@ const QUERY = gql`
 
 export const useGetUser = () => {
   const { userOnReviewUsername } = useUsersStore();
-  const { data, loading, error } = useQuery(QUERY, {
+  const { data, loading, error, refetch } = useQuery(QUERY, {
     fetchPolicy: "network-only",
     variables: {
       username: userOnReviewUsername,
@@ -32,5 +32,6 @@ export const useGetUser = () => {
     user: data?.getUser.user,
     isLoading: loading,
     error,
+    refetch,
   };
 };

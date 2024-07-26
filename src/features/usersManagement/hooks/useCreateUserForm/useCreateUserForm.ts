@@ -28,7 +28,7 @@ export const useCreateUserForm = () => {
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     const { username, firstName, lastName, roleId, password } = data;
 
-    const { message, success } = await user.mutation.create.newUser({
+    const { message, success } = await userClient.mutation.create.newUser({
       roleId,
       username,
       lastName,

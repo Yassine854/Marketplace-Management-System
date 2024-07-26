@@ -7,12 +7,17 @@ import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useUser } from "@/features/usersManagement/hooks/useUser";
 import { useEffect } from "react";
 import { useGetUser } from "../queries/useGetUser";
+import { useEditUser } from "../mutations/useEditUser";
+import { useUsersStore } from "../../stores/usersStore";
+import { useGetUsers } from "../queries/useGetUsers";
 
 type FormData = z.infer<typeof editUserFormSchema>;
 
 export const useEditUserForm = () => {
+  const { userOnReviewUsername } = useUsersStore();
   const userClient = useUser();
-  const { user } = useGetUser();
+  const { user, refetch } = useGetUser();
+  const { refetch: refetchAll } = useGetUsers();
 
   const { navigateToUsersTable } = useNavigation();
 
@@ -25,25 +30,24 @@ export const useEditUserForm = () => {
     resolver: zodResolver(editUserFormSchema),
   });
 
+  const { edit } = useEditUser();
+
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    const { firstName, lastName, roleId, password } = data;
-    console.log("🚀 ~ constonSubmit:SubmitHandler<FormData>= ~ data:", data);
-
-    // const { message, success } = await user.mutation.create.newUser({
-    //   roleId,
-    //   lastName,
-    //   password,
-    //   firstName,
-    // });
-
-    // if (success) {
-    //   toast.success(message, {
-    //     duration: 2000,
-    //   });
-    //   navigateToUsersTable();
-    // } else {
-    //   toast.error(message, { duration: 2000 });
-    // }
+    const {
+      success,
+      //   data: a,
+      message,
+    } = await edit({ username: userOnReviewUsername, ...data });
+    if (success) {
+      refetch();
+      refetchAll();
+      toast.success(message, {
+        duration: 2000,
+      });
+      navigateToUsersTable();
+    } else {
+      toast.error(message, { duration: 2000 });
+    }
   };
 
   useEffect(() => {
