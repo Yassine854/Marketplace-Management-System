@@ -11,7 +11,14 @@ export const getGrossMarketValueByHourRoute = async (request: NextRequest) => {
     if (!date || typeof date !== "string") {
       throw new Error("Date parameter is required");
     }
-    const gmv: number[] | undefined = await getGrossMarketValueByHour(date);
+
+    const [year, month, day] = date.split("-").map(Number);
+
+    const gmv: [string, number][] | undefined = await getGrossMarketValueByHour(
+      year,
+      month,
+      day,
+    );
 
     if (!gmv) {
       return responses.internalServerError(
