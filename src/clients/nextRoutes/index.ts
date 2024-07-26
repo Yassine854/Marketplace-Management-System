@@ -7,12 +7,14 @@ import { getNumberOfOrdersByDayRoute } from "./orders/typesense/numberOfOrders/g
 import { getNumberOfOrdersByMonthRoute } from "./orders/typesense/numberOfOrders/getNumberOfOrdersByMonthRoute";
 import { getNumberOfOrdersByQuarterRoute } from "./orders/typesense/numberOfOrders/getNumberOfOrdersByQuarterRoute";
 
+import { numberOfOrdersByWeekAnalyticsRoute } from "./analytics/numberOfOrdersByWeekAnalyticsRoute";
 export const nextRoute = {
   analytics: {
     numberOfOrders: {
       byMonth: numberOfOrdersByMonthAnalyticsRoute,
       byQuarter: numberOfOrdersByQuarterAnalyticsRoute,
       lifetime: numberOfOrdersLifetimeAnalyticsRoute,
+      byWeek: numberOfOrdersByWeekAnalyticsRoute,
     },
   },
 
