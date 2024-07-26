@@ -1,7 +1,6 @@
 import { typesense } from "@/clients/typesense";
 
 export const getNumberOfOrdersByMonth = (
-  year: number,
-  month: number,
+  isoDate: string,
 ): Promise<number | undefined> =>
-  typesense.orders.numberOfOrders.byMonth(year, month);
+  typesense.orders.numberOfOrders.byMonth(isoDate);
