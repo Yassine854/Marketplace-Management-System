@@ -1,3 +1,4 @@
+import GoBackArrow from "../../widgets/GoBackArrow";
 import RoleSelector from "../../widgets/RoleSelector";
 import Loading from "@/features/shared/elements/Loading";
 import TextInput from "@/features/shared/inputs/TextInput";
@@ -6,7 +7,7 @@ import PasswordInput from "@/features/shared/inputs/PasswordInput";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 
 const EditUserForm = () => {
-  const { navigateToUsersTable } = useNavigation();
+  const { navigateToUsersTable, navigateBack } = useNavigation();
 
   const { handleSubmit, register, setValue, errors, isLoading } =
     useCreateUserForm();
@@ -18,17 +19,18 @@ const EditUserForm = () => {
         onSubmit={handleSubmit}
       >
         <div className="box w-full min-w-[800px]  xl:p-8">
-          <div className="bb-dashed mb-6 flex items-center justify-between pb-6">
-            <p className="text-xl font-bold">Create User</p>
+          <div className="bb-dashed mb-6 flex items-center  pb-6">
+            <GoBackArrow onClick={navigateBack} />
+            <p className="ml-4 text-xl font-bold">Create User</p>
           </div>
           <div className="box mb-6 grid grid-cols-2 gap-4 bg-primary/5 dark:bg-bg3 md:p-4 xl:p-6 xxxl:gap-6">
-            <TextInput
+            {/* <TextInput
               label="Username * "
               isError={errors.username}
               placeholder="Enter username"
               register={register("username")}
               errorMessage={errors.username?.message}
-            />
+            /> */}
             <RoleSelector
               isError={errors.roleId}
               errorMessage={errors.roleId?.message}
