@@ -1,23 +1,20 @@
 import { responses } from "../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { numberOfOrderByQuarterAnalytics } from "@/services/analytics/numberOfOrdersByQuarterAnalytics";
+import { numberOfOrderByCurrentDayAnalytics } from "@/services/analytics/numberOfOrdersByCurrentDayAnalytics";
 
-export const numberOfOrdersByQuarterAnalyticsRoute = async (
+export const numberOfOrdersByCurrentDayAnalyticsRoute = async (
   request: NextRequest,
 ) => {
   try {
     const { searchParams } = new URL(request.url);
 
-    const yearString = searchParams.get("date");
+    const currentDay = searchParams.get("day");
 
-    if (!yearString) {
+    if (!currentDay) {
       return responses.invalidRequest("Date Parameter is Required");
     }
-
-    const year = parseInt(yearString, 10);
-
-    const res = await numberOfOrderByQuarterAnalytics(year);
+    const res = await numberOfOrderByCurrentDayAnalytics(currentDay);
     return NextResponse.json(
       {
         message: "success",

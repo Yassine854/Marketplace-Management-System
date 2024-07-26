@@ -45,7 +45,10 @@
     "src/features/orderManagement/hooks/queries/useGetOrders.ts",
     "src/services/auth/auth.js",
     ".next/types/app/[locale]/(subPages)/access/user/page.tsx",
-    "src/services/analytics/numberOfOrdersByMonthAnalytics"
+    "src/services/analytics/numberOfOrdersByMonthAnalytics",
+    "src/services/analytics/numberOfOrdersByQuarterAnalytics",
+    "src/services/analytics/numberOfOrdersLifetimeAnalytics.ts",
+    "src/services/analytics/numberOfOrdersByWeekAnalytics"
   ],
 
   "exclude": [

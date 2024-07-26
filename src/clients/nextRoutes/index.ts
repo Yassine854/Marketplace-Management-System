@@ -6,6 +6,8 @@ import { getOrdersByDeliveryDateRoute } from "./orders/magento/getOrdersByDelive
 import { getNumberOfOrdersByDayRoute } from "./orders/typesense/numberOfOrders/getNumberOfOrdersByDayRoute";
 import { getNumberOfOrdersByMonthRoute } from "./orders/typesense/numberOfOrders/getNumberOfOrdersByMonthRoute";
 import { getNumberOfOrdersByQuarterRoute } from "./orders/typesense/numberOfOrders/getNumberOfOrdersByQuarterRoute";
+import { numberOfOrdersByWeekAnalyticsRoute } from "./analytics/numberOfOrdersByWeekAnalyticsRoute";
+import { numberOfOrdersByCurrentDayAnalyticsRoute } from "./analytics/numberOfOrdersByCurrentDayAnalyticsRoute";
 
 export const nextRoute = {
   analytics: {
@@ -13,6 +15,8 @@ export const nextRoute = {
       byMonth: numberOfOrdersByMonthAnalyticsRoute,
       byQuarter: numberOfOrdersByQuarterAnalyticsRoute,
       lifetime: numberOfOrdersLifetimeAnalyticsRoute,
+      byWeek: numberOfOrdersByWeekAnalyticsRoute,
+      byCurrentDay:numberOfOrdersByCurrentDayAnalyticsRoute
     },
   },
 
