@@ -1,4 +1,5 @@
 import EditUserForm from "../../forms/EditUserForm";
+import { useGetUser } from "../../hooks/queries/useGetUser";
 
 const EditUserPage = () => {
   return (

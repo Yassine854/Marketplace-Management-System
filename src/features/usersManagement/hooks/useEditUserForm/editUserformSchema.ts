@@ -1,13 +1,12 @@
 import * as z from "zod";
 
-export const FormSchema = z
+export const editUserFormSchema = z
   .object({
     roleId: z.string({ required_error: "Required" }),
     lastName: z.string().min(1, { message: "Required" }),
     firstName: z.string().min(1, { message: "Required" }),
-    password: z
-      .string()
-      .min(6, { message: "Password must be at least 6 characters" }),
+    password: z.string().optional(),
+    // .min(6, { message: "Password must be at least 6 characters" }),
     confirmPassword: z.string(),
   })
 

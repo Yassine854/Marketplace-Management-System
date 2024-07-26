@@ -21,7 +21,7 @@ const middleware = auth((req: any) => {
   const session = req?.auth;
 
   const isLoginPage = req.nextUrl.pathname.includes("/login");
-  const isAdmin = session?.user?.roleCode === "ADMIN";
+  const isAdmin = session?.user?.roleId === "1";
 
   if (!session && !isLoginPage) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));

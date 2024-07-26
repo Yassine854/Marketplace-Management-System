@@ -6,7 +6,7 @@ import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useUsersStore } from "@/features/usersManagement/stores/usersStore";
 
 const UsersTableRow = ({ user }: any) => {
-  const { setUserOnReviewId } = useUsersStore();
+  const { setUserOnReviewUsername } = useUsersStore();
   const [role, setRole] = useState<any>("");
   const { navigateToEditUserForm } = useNavigation();
 
@@ -42,7 +42,7 @@ const UsersTableRow = ({ user }: any) => {
       <UsersTableCell>
         <IconSettings
           onClick={() => {
-            setUserOnReviewId(user.id);
+            setUserOnReviewUsername(user.username);
             navigateToEditUserForm();
           }}
           string={2}

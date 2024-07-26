@@ -4,8 +4,9 @@ import { persist } from "zustand/middleware";
 export const useUsersStore: any = create(
   persist(
     (set) => ({
-      userOnReviewId: "",
-      setUserOnReviewId: (userOnReviewId: string) => set({ userOnReviewId }),
+      userOnReviewUsername: "",
+      setUserOnReviewUsername: (userOnReviewUsername: string) =>
+        set({ userOnReviewUsername }),
     }),
     {
       name: "usersStore",

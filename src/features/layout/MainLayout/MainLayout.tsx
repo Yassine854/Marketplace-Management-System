@@ -4,6 +4,7 @@ import TopNav from "@/features/layout/TopNavbar";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 import { useEffect, useState } from "react";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
+import { useUsersStore } from "@/features/usersManagement/stores/usersStore";
 
 export default function MainLayout({
   children,
@@ -17,7 +18,7 @@ export default function MainLayout({
   const { user } = useAuth();
 
   //@ts-ignore
-  const isAdmin = user?.roleCode === "ADMIN";
+  const isAdmin = user?.roleId === "1";
 
   useEffect(() => {
     if (window.innerWidth > 1400) {
