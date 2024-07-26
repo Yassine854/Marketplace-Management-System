@@ -1,4 +1,4 @@
-import { numberOfOrderByQuarterAnalytics } from "../numberOfOrdersByQuarterAnalytics/index.js";
+import { numberOfOrderByQuarterAnalytics } from "../numberOfOrdersByQuarterAnalytics";
 
 export const numberOfOrdersLifetimeAnalytics = async (
   startYear: number,
