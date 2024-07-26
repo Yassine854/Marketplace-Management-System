@@ -94,7 +94,6 @@ const NumberOfOrdersChart = () => {
           </div>
           <p className="text-2xl font-bold">Number of Orders Chart </p>
         </div>
-        {/* <MonthPicker onMonthChange={(month: any) => setMonth(month?.key)} /> */}
         <MonthPicker onMonthChange={(date: string) => setDate(date)} />
       </div>
       <div className="h-[320px]">

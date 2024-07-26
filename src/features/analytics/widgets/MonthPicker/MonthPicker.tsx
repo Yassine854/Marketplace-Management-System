@@ -5,40 +5,40 @@ import { useEffect, useState } from "react";
 const Month = ({ name, onClick, selectedMonth }: any) => (
   <div
     onClick={onClick}
-    className={`btn m-2 flex h-12 w-20 cursor-pointer items-center justify-center rounded-xl bg-blue-700 p-2
-      ${selectedMonth.name === name && `bg-emerald-700`}
-      
-      `}
+    className={` m-1 flex h-12 w-20 cursor-pointer items-center justify-center rounded-md
+      ${
+        selectedMonth.name === name
+          ? "bg-blue-950 text-white"
+          : "border-none bg-slate-50 text-blue-950"
+      } 
+      transition duration-150 hover:bg-gray-200`}
   >
-    <p className=" text-sm font-bold">{name}</p>
+    <p className="text-sm">{name}</p>
   </div>
 );
 
 const months = [
-  { name: "January", key: "01" },
-  { name: "February", key: "02" },
-  { name: "March", key: "03" },
-  { name: "April", key: "04" },
+  { name: "Jan", key: "01" },
+  { name: "Feb", key: "02" },
+  { name: "Mar", key: "03" },
+  { name: "Apr", key: "04" },
   { name: "May", key: "05" },
-  { name: "June", key: "06" },
-  { name: "July", key: "07" },
-  { name: "August", key: "08" },
-  { name: "September", key: "09" },
-  { name: "October", key: "10" },
-  { name: "November", key: "11" },
-  { name: "December", key: "12" },
+  { name: "Jun", key: "06" },
+  { name: "Jul", key: "07" },
+  { name: "Aug", key: "08" },
+  { name: "Sep", key: "09" },
+  { name: "Oct", key: "10" },
+  { name: "Nov", key: "11" },
+  { name: "Dec", key: "12" },
 ];
 
 const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
   const { open, ref: dropDownRef, toggleOpen } = useDropdown();
-
   const [selectedMonth, setSelectedMonth] = useState(months[0]);
   const [year, setYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     toggleOpen();
-    //   onMonthChange && onMonthChange(selectedMonth);
-    // }, [selectedMonth, onMonthChange]);
 
     if (onMonthChange) {
       const formattedDate = `${year}-${selectedMonth.key}-01`;
@@ -59,8 +59,8 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
         onClick={() => {
           toggleOpen();
         }}
-        className="flex w-full cursor-pointer items-center justify-between gap-2
-           rounded-[30px] border border-n30 bg-n0 px-4 py-3 dark:border-n500
+        className="border-50 flex w-full cursor-pointer items-center justify-between
+           gap-2 rounded-[30px] border bg-slate-100 px-4 py-3 dark:border-n500
             dark:bg-bg4 xxl:px-6"
       >
         <span className="flex select-none items-center gap-2">
@@ -73,7 +73,7 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
       <div
         className={` 
            absolute right-5 z-20 h-80  w-80  origin-top
-           rounded-lg bg-n0  shadow-md duration-300 dark:bg-n800
+           rounded-lg bg-white  duration-300 
                   
            ${direction === "up" && "bottom-full"}
            ${direction === "down" && "top-full"}
@@ -83,26 +83,26 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
                : "invisible scale-0 opacity-0"
            }`}
       >
-        <div className="flex h-8 w-full items-center justify-center bg-n30 text-xl font-bold">
+        <div className="flex h-10 w-full items-center justify-center bg-white text-xl font-semibold">
           <button
             onClick={() => handleYearChange(-1)}
             disabled={isPrevYearDisabled}
             className={`px-2 py-1 ${
               isPrevYearDisabled
                 ? "cursor-not-allowed text-gray-400"
-                : "text-blue-500"
+                : "text-blue-950"
             }`}
           >
             &lt;
           </button>
-          <span className="mx-4">{year}</span>
+          <span className="mx-4 text-xl">{year}</span>
           <button
             onClick={() => handleYearChange(1)}
             disabled={isNextYearDisabled}
             className={`px-2 py-1 ${
               isNextYearDisabled
                 ? "cursor-not-allowed text-gray-400"
-                : "text-blue-500"
+                : "text-blue-950"
             }`}
           >
             &gt;
