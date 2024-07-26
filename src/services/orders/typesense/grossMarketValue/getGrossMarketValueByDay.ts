@@ -1,7 +1,7 @@
 import { typesense } from "@/clients/typesense";
 
 export const getGrossMarketValueByDay = (
-  yearArg: number,
+  yearArg: any,
   month: number,
   dayArg: number,
 ): Promise<number | undefined> =>
