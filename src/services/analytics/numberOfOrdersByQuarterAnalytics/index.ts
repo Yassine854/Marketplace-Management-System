@@ -1,4 +1,4 @@
-import { getNumberOfOrdersByMonth } from "@/services/orders/typesense/numberOfOrders/getNumberOfOredersByMonth";
+import { getNumberOfOrdersByMonth } from "@/services/orders/typesense/numberOfOrders/getNumberOfOrdersByMonth";
 
 export const numberOfOrderByQuarterAnalytics = async (year: string) => {
   const quarterMonths: { [key: string]: [number, number] } = {

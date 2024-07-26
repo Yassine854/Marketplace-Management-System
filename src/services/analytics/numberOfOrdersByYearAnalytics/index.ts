@@ -1,4 +1,4 @@
-import { getNumberOfOrdersByMonth } from "@/services/orders/typesense/numberOfOrders/getNumberOfOredersByMonth";
+import { getNumberOfOrdersByMonth } from "@/services/orders/typesense/numberOfOrders/getNumberOfOrdersByMonth";
 
 function generateMonthsArray() {
   return Array.from({ length: 12 }, (_, i) => i + 1);

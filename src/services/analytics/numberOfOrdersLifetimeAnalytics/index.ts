@@ -1,4 +1,4 @@
-import { numberOfOrderByQuarterAnalytics } from "../numberOfOrdersByQuarterAnalytics.ts";
+import { numberOfOrderByQuarterAnalytics } from "../numberOfOrdersByQuarterAnalytics/index.js";
 
 export const numberOfOrdersLifetimeAnalytics = async (
   startYear: number,
@@ -6,11 +6,11 @@ export const numberOfOrdersLifetimeAnalytics = async (
 ) => {
   const lifetimeList: any[] = [];
 
-  for (let year = startYear; year <= endYear; year++) {
+  /*for (let year = startYear; year <= endYear; year++) {
     const yearlyAnalytics = await numberOfOrderByQuarterAnalytics(year);
 
     lifetimeList.push(...yearlyAnalytics);
-  }
+  }*/
 
   return lifetimeList;
 };
