@@ -1,11 +1,11 @@
 import GoBackArrow from "../../widgets/GoBackArrow";
 import RoleSelector from "../../widgets/RoleSelector";
+import { useUsersStore } from "../../stores/usersStore";
 import Loading from "@/features/shared/elements/Loading";
 import TextInput from "@/features/shared/inputs/TextInput";
 import { useCreateUserForm } from "../../hooks/useCreateUserForm";
 import PasswordInput from "@/features/shared/inputs/PasswordInput";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
-import { useUsersStore } from "../../stores/usersStore";
 
 const EditUserForm = () => {
   const { navigateToUsersTable, navigateBack } = useNavigation();
