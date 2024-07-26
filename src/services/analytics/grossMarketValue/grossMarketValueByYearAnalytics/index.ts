@@ -1,4 +1,4 @@
-import { getGrossMarketValueByMonth } from "@/services/orders/typesense/grossMarketValue/getGrossMarketValueByMonth";
+import { getGrossMarketValueByMonth } from "@/clients/typesense/orders/grossMarketValue/getGrossMarketValueByMonth";
 export const grossMarketValueByYearAnalytics = async (year: number) => {
   const list: any[] = [];
 
