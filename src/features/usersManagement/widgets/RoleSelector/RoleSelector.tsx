@@ -1,3 +1,4 @@
+import { roles } from "../../staticRoles";
 import useDropdown from "./useRoleSelector";
 import { tailwind } from "./RoleSelector.styles";
 import { IconChevronDown } from "@tabler/icons-react";
@@ -8,12 +9,6 @@ export type DropRef = {
   changeSelected: (selected: any) => void;
 };
 
-const roles = [
-  { name: "Admin", key: "1" },
-  { name: "Agent-Tunis", key: "2" },
-  { name: "Agent-Kmarket", key: "3" },
-  { name: "Agent-Sousse", key: "4" },
-];
 // eslint-disable-next-line react/display-name
 const RoleSelector = forwardRef<DropRef, any>(
   ({ isError, errorMessage, onChange, placeholder = "Choose Role" }, ref) => {

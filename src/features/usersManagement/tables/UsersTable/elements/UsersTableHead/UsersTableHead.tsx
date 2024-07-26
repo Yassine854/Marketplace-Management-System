@@ -23,21 +23,15 @@ const OrdersTableHead = ({ changeSelectedSort }: any) => {
         <OrdersTableHeadCell onClick={onCustomerClick}>
           <Sort>Name</Sort>
         </OrdersTableHeadCell>
-        <OrdersTableHeadCell onClick={onCustomerClick}>
+        {/* <OrdersTableHeadCell onClick={onCustomerClick}>
           <Sort>Email</Sort>
-        </OrdersTableHeadCell>
+        </OrdersTableHeadCell> */}
         <OrdersTableHeadCell onClick={onTotalClick}>
           <Sort>Role</Sort>
         </OrdersTableHeadCell>
-        <OrdersTableHeadCell onClick={onTotalClick}>
-          Warehouse
-        </OrdersTableHeadCell>
-        <OrdersTableHeadCell onClick={onTotalClick}>
-          <Sort>Status</Sort>
-        </OrdersTableHeadCell>
-        <OrdersTableHeadCell onClick={onTotalClick}>
+        {/* <OrdersTableHeadCell onClick={onTotalClick}>
           <Sort>Created at</Sort>
-        </OrdersTableHeadCell>
+        </OrdersTableHeadCell> */}
         <OrdersTableHeadCell onClick={onTotalClick}>Edit</OrdersTableHeadCell>
       </tr>
     </thead>
