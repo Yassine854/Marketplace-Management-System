@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { FormSchema } from "./formSchema";
 import { toast } from "react-hot-toast";
@@ -12,24 +12,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 type FormData = z.infer<typeof FormSchema>;
 
 const roles = [
-  { name: "Agent", key: "AGENT" },
-  { name: "Ops", key: "OPS" },
-  { name: "Admin", key: "ADMIN" },
-];
-
-const warehouses = [
-  { name: "Mghira", key: "1001" },
-  { name: "Shargia", key: "1002" },
-  { name: "Mnihla", key: "1003" },
-  { name: "Ariana", key: "1004" },
-  { name: "sousse", key: "2001" },
-  { name: "Mounastir", key: "3001" },
+  { name: "Admin", key: "1" },
+  { name: "Agent-Tunis", key: "2" },
+  { name: "Agent-Sousse", key: "3" },
 ];
 
 export const useCreateUserForm = () => {
   const { navigateToUsersTable } = useNavigation();
-  const [selectedRole, setSelectedRole] = useState(roles[0]);
-  const warehouseRef = useRef(null);
+  const [selectedRoleId, setSelectedRoleId] = useState(roles[0]);
+
   const user = useUser();
   const {
     handleSubmit,
@@ -41,23 +32,13 @@ export const useCreateUserForm = () => {
   });
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    const {
-      username,
-      email,
-      firstName,
-      lastName,
-      roleCode,
-      warehouseCode,
-      password,
-    } = data;
+    const { username, firstName, lastName, roleId, password } = data;
 
     const { message, success } = await user.mutation.create.newUser({
       username,
-      email,
       firstName,
       lastName,
-      roleCode,
-      warehouseCode,
+      roleId,
       password,
     });
 
@@ -72,14 +53,16 @@ export const useCreateUserForm = () => {
   };
 
   useEffect(() => {
+    console.log("🚀 ~ useCreateUserForm ~ selectedRoleId:", selectedRoleId);
+
     //@ts-ignore
-    const changeSelected = warehouseRef.current?.changeSelected;
-    if (selectedRole?.key == "ADMIN") {
-      changeSelected({ name: "All", key: "all" });
-    } else {
-      changeSelected(warehouses[0]);
-    }
-  }, [selectedRole]);
+    // const changeSelected = warehouseRef.current?.changeSelected;
+    // if (selectedRole?.key == "ADMIN") {
+    //   changeSelected({ name: "All", key: "all" });
+    // } else {
+    //   changeSelected(warehouses[0]);
+    // }
+  }, [selectedRoleId]);
 
   return {
     onSubmit,
@@ -87,10 +70,8 @@ export const useCreateUserForm = () => {
     register,
     setValue,
     errors,
-    setSelectedRole,
-    warehouseRef,
+    setSelectedRoleId,
     roles,
-    warehouses,
     isLoading: user.mutation.create.isLoading,
   };
 };

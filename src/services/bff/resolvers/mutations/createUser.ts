@@ -20,7 +20,6 @@ export const createUser = async (
       data: {
         ...newUser,
         password: hashedPassword,
-        status: "pending",
       },
     });
 

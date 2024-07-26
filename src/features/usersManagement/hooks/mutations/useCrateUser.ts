@@ -14,10 +14,8 @@ type CreateUserInput = {
   username: string;
   firstName: string;
   lastName: string;
-  email: string;
   password: string;
-  role: string;
-  storId: string;
+  roleId: string;
 };
 
 export const useCreateUser = () => {

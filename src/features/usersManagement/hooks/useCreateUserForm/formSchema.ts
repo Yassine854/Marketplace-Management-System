@@ -3,15 +3,14 @@ import * as z from "zod";
 export const FormSchema = z
   .object({
     username: z.string().min(4, { message: "Required, at least 4 characters" }),
-    email: z
-      .string()
-      .email()
-      .email({ message: "Invalid email address" })
-      .or(z.literal("")),
+    // email: z
+    //   .string()
+    //   .email()
+    //   .email({ message: "Invalid email address" })
+    //   .or(z.literal("")),
     firstName: z.string().min(1, { message: "Required" }),
     lastName: z.string().min(1, { message: "Required" }),
-    roleCode: z.string(),
-    warehouseCode: z.string(),
+    roleId: z.string(),
     password: z
       .string()
       .min(6, { message: "Password must be at least 6 characters" }),

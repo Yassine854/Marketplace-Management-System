@@ -1,25 +1,23 @@
-// import Dropdown from "../../inputs/Dropdown";
+import Dropdown from "@/features/shared/inputs/Dropdown";
 import Loading from "@/features/shared/elements/Loading";
 import PasswordInput from "@/features/shared/inputs/PasswordInput";
 import TextInput from "@/features/shared/inputs/TextInput";
-//import { useCreateUserForm } from "../../hooks/useCreateUserForm";
+import { useCreateUserForm } from "../../hooks/useCreateUserForm";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 
 const CreateUserForm = () => {
-  // const {
-  //   handleSubmit,
-  //   register,
-  //   setValue,
-  //   errors,
-  //   setSelectedRole,
-  //   warehouseRef,
-  //   warehouses,
-  //   roles,
-  //   isLoading,
-  // } = useCreateUserForm();
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    errors,
+    // setSelectedRole,
+    // warehouseRef,
+    // warehouses,
+    roles,
+    isLoading,
+  } = useCreateUserForm();
   const { navigateToUsersTable } = useNavigation();
-
-  const isLoading = false;
 
   return (
     <div className="grid h-full w-full items-center justify-center gap-4  xxxl:gap-6 ">
@@ -39,59 +37,83 @@ const CreateUserForm = () => {
               // isError={errors.username}
               // errorMessage={errors.username?.message}
             />
-            <TextInput
+
+            <Dropdown
+              items={[
+                { name: "Test1", key: "test" },
+                { name: "Test2", key: "test" },
+                { name: "Test3", key: "test" },
+                { name: "Test4", key: "test" },
+              ]}
+              // onSelectedChange={(selected) => {
+              //   setValue("roleCode", selected);
+
+              //   var result = roles.filter((obj: any) => {
+              //     return obj.key === selected;
+              //   });
+
+              //   setSelectedRole(result[0]);
+              // }}
+            />
+            {/* <TextInput
               label="Email"
               placeholder="Enter email"
               //  register={register("email")}
               //  isError={errors.email}
               // errorMessage={errors.email?.message}
-            />
-            <PasswordInput
-              label="Password"
-              // register={register("password")}
-              //isError={errors.password}
-              //errorMessage={errors.password?.message}
-            />
-            <PasswordInput
-              label="Confirm Password"
-              // register={register("confirmPassword")}
-              // isError={errors.confirmPassword}
-              // errorMessage={errors.confirmPassword?.message}
-            />
+            /> */}
 
             <TextInput
               label="First Name *"
               placeholder="Enter first name"
-              // register={register("firstName")}
-              // isError={errors.firstName}
-              //  errorMessage={errors.firstName?.message}
+              register={register("firstName")}
+              isError={errors.firstName}
+              errorMessage={errors.firstName?.message}
             />
             <TextInput
               label="Last Name *"
               placeholder="Enter lastName"
-              //register={register("lastName")}
-              //  isError={errors.lastName}
-              // errorMessage={errors.lastName?.message}
+              register={register("lastName")}
+              isError={errors.lastName}
+              errorMessage={errors.lastName?.message}
+            />
+
+            <PasswordInput
+              label="Password"
+              register={register("password")}
+              isError={errors.password}
+              errorMessage={errors.password?.message}
+            />
+            <PasswordInput
+              label="Confirm Password"
+              register={register("confirmPassword")}
+              isError={errors.confirmPassword}
+              errorMessage={errors.confirmPassword?.message}
             />
             {/* <Dropdown
-              items={roles}
-              onSelectedChange={(selected) => {
-                setValue("roleCode", selected);
+              items={[]}
+              // onSelectedChange={(selected) => {
+              //   setValue("roleCode", selected);
 
-                var result = roles.filter((obj: any) => {
-                  return obj.key === selected;
-                });
+              //   var result = roles.filter((obj: any) => {
+              //     return obj.key === selected;
+              //   });
 
-                setSelectedRole(result[0]);
-              }}
+              //   setSelectedRole(result[0]);
+              // }}
             /> */}
             {/* <Dropdown
               //  label="Warehouse"
-              ref={warehouseRef}
-              items={warehouses}
-              onSelectedChange={(selected) =>
-                setValue("warehouseCode", selected)
-              }
+              // ref={warehouseRef}
+              items={[
+                { name: "Test1", key: "test" },
+                { name: "Test2", key: "test" },
+                { name: "Test3", key: "test" },
+                { name: "Test4", key: "test" },
+              ]}
+              // onSelectedChange={(selected) =>
+              //   setValue("warehouseCode", selected)
+              // }
             /> */}
           </div>
 
