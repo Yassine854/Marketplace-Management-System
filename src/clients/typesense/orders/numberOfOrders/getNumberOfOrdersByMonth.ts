@@ -2,20 +2,15 @@ import { logError } from "@/utils/logError";
 import { typesenseClient } from "../../typesenseClient";
 
 export const getNumberOfOrdersByMonth = async (
-  year: number,
-  month: number,
+  isoDate: string,
 ): Promise<number | undefined> => {
   try {
+    const [year, month] = isoDate.split("-").map(Number);
     const startTime = new Date(year, month - 1, 1).getTime();
     const endTime = new Date(year, month, 0, 23, 59, 59).getTime();
 
     const startTimestamp = Math.floor(startTime);
     const endTimestamp = Math.floor(endTime);
-
-    /* const currentDate = dayjs().unix() * 1000
-    if (startDate > currentDate) {
-      return NextResponse.json({ noo: null });
-    } */
 
     const searchParams = {
       q: "",

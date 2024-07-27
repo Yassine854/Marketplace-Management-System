@@ -15,7 +15,8 @@ export const numberOfOrderByQuarterAnalytics = async (year: number) => {
     let totalOrders = 0;
 
     for (const month of months) {
-      const numberOfOrders = await getNumberOfOrdersByMonth(year, month);
+      const date = year + "-" + month;
+      const numberOfOrders = await getNumberOfOrdersByMonth(date);
       if (numberOfOrders) {
         totalOrders += numberOfOrders;
       }

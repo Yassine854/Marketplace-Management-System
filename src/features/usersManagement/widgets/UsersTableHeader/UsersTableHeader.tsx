@@ -2,7 +2,7 @@ const UsersTableHeader = ({ onButtonClick }: any) => {
   return (
     <div className=" flex w-full flex-wrap items-center justify-between gap-3 bg-n10  p-1">
       <div className="flex items-center justify-center">
-        <p className="text-xl font-bold capitalize ">Users Table</p>
+        <p className="ml-6 text-xl font-bold capitalize">Users Table</p>
       </div>
 
       <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
