@@ -10,10 +10,7 @@ const QUERY = gql`
         username
         firstName
         lastName
-        email
-        status
-        roleCode
-        warehouseCode
+        roleId
         createdAt
       }
     }

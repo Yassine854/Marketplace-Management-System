@@ -3,17 +3,10 @@ import { gql } from "graphql-tag";
 export const typeDefs = gql`
   input CreateUserInput {
     username: String!
-    email: String
     password: String!
     firstName: String!
     lastName: String!
-    roleCode: String!
-    warehouseCode: String!
-  }
-
-  type Warehouse {
-    code: String!
-    name: String!
+    roleId: String!
   }
 
   type UserPayload {
@@ -28,12 +21,6 @@ export const typeDefs = gql`
     message: String
   }
 
-  type WarehousesPayload {
-    warehouses: [Warehouse]!
-    success: Boolean!
-    message: String
-  }
-
   type OrderItem {
     id: ID
     orderId: ID
@@ -44,9 +31,6 @@ export const typeDefs = gql`
     sku: String
     weight: Float
     orderedQuantity: Float
-    #  quantity: Float
-    # shipped: Float
-    #   pcb: Float
   }
 
   type Order {
@@ -80,18 +64,9 @@ export const typeDefs = gql`
     firstName: String!
     lastName: String!
     username: String!
-    email: String
     password: String!
-    status: String!
-    roleCode: String!
-    warehouseCode: String!
+    roleId: String!
     createdAt: String!
-  }
-
-  type Role {
-    id: ID!
-    name: String!
-    permissions: [String]!
   }
 
   type Query {
@@ -106,7 +81,6 @@ export const typeDefs = gql`
 
     getUser(username: String!): UserPayload!
     getUsers: UsersPayload!
-    getWarehouses: WarehousesPayload!
   }
 
   type Mutation {
@@ -115,6 +89,5 @@ export const typeDefs = gql`
     changeUserPassword(userId: ID!, newPassword: String!): UserPayload!
     changeUserEmail(userId: ID!, newEmail: String!): UserPayload!
     changeUserRole(userId: ID!, newRole: String!): UserPayload!
-    changeUserWarehouses(userId: ID!, newWarehouses: [String]!): UserPayload!
   }
 `;

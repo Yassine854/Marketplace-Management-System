@@ -10,15 +10,13 @@ const MUTATION = gql`
   }
 `;
 
-interface CreateUserInput {
+type CreateUserInput = {
   username: string;
   firstName: string;
   lastName: string;
-  email: string;
   password: string;
-  roleCode: string;
-  warehouseCode: string;
-}
+  roleId: string;
+};
 
 export const useCreateUser = () => {
   const [mutate, { data, loading, error }] = useMutation(MUTATION);
