@@ -26,6 +26,7 @@ export const nextRoute = {
       byQuarter: numberOfOrdersByQuarterAnalyticsRoute,
       lifetime: numberOfOrdersLifetimeAnalyticsRoute,
       byWeek: numberOfOrdersByWeekAnalyticsRoute,
+      byCurrentDay:numberOfOrdersByCurrentDayAnalyticsRoute
     },
     grossMarketValue: {
       byMonth: grossMarketValueByMonthAnalyticsRoute,
