@@ -3,5 +3,5 @@ export const roles = [
   { name: "Agent-Tunis", key: "2" },
   { name: "Agent-Kmarket", key: "3" },
   { name: "Agent-Sousse", key: "4" },
-  { name: "Finance", key: "5" },
+  { name: "Read-Only", key: "5" },
 ];

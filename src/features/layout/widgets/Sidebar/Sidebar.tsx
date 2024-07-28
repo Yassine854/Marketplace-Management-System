@@ -17,7 +17,7 @@ import SidebarOrdersSubMenu from "@/features/shared/elements/SidebarElements/Sid
 
 const Sidebar = ({
   isAdmin,
-  isNoEdit,
+  isNoEditUser,
   setSidebar,
   sidebarIsOpen,
   onOrderStatusClick,
@@ -82,7 +82,7 @@ const Sidebar = ({
             }}
             onSubMenuItemClick={onOrderStatusClick}
           />
-          {!isNoEdit && (
+          {!isNoEditUser && (
             <>
               <Divider />
               <SidebarButton
