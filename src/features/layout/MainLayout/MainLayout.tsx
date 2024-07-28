@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Sidebar from "@/features/layout/widgets/Sidebar";
 import TopNav from "@/features/layout/widgets/TopNavbar";
-import { useAuth } from "@/features/shared/hooks/useAuth";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
@@ -11,15 +10,10 @@ export default function MainLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user } = useAuth();
   const { setStatus } = useOrdersStore();
   const { navigateToOrders } = useNavigation();
   const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
-
-  //@ts-ignore
-  const isAdmin = user?.roleId === "1";
-  //@ts-ignore
-  const isNoEdit = user?.roleId === "5";
+  const { isAdmin, isNoEdit } = useGlobalStore();
 
   useEffect(() => {
     if (window.innerWidth > 1400) {
@@ -47,10 +41,10 @@ export default function MainLayout({
       <TopNav setSidebar={setSidebarIsOpen} sidebarIsOpen={sidebarIsOpen} />
 
       <Sidebar
-        sidebarIsOpen={sidebarIsOpen}
-        setSidebar={setSidebarIsOpen}
         isAdmin={isAdmin}
         isNoEdit={isNoEdit}
+        sidebarIsOpen={sidebarIsOpen}
+        setSidebar={setSidebarIsOpen}
         onOrderStatusClick={(status: any) => {
           setStatus(status);
           navigateToOrders();

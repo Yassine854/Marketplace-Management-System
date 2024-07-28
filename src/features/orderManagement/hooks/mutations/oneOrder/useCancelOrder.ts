@@ -1,18 +1,27 @@
-import { useMutation } from "@tanstack/react-query";
-import { magento } from "@/clients/magento";
 import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
+import { magento } from "@/clients/magento";
+import { useMutation } from "@tanstack/react-query";
+import { useGetOrder } from "../../queries/useGetOrder";
 import { useOrdersData } from "../../queries/useOrdersData";
 import { useOrdersCount } from "../../queries/useOrdersCount";
-import { useGetOrder } from "../../queries/useGetOrder";
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
 export const useCancelOrder = () => {
   const { refetch } = useOrdersData();
+
   const { refetch: refetchOrder } = useGetOrder();
+
   const { refetch: refetchCount } = useOrdersCount();
+
+  const { isNoEditUser } = useGlobalStore();
 
   const { mutate, isPending, mutateAsync, isError } = useMutation({
     mutationFn: async (orderId: string) => {
+      if (isNoEditUser) {
+        toast.error(`Action not allowed`, { duration: 5000 });
+        throw new Error();
+      }
       await magento.mutations.cancelOrder(orderId);
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
         order: {
@@ -34,9 +43,9 @@ export const useCancelOrder = () => {
   });
 
   return {
+    isError,
+    isPending,
     cancelOrder: mutate,
     cancelOrderAsync: mutateAsync,
-    isPending,
-    isError,
   };
 };

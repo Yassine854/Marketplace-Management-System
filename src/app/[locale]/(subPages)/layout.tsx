@@ -7,16 +7,18 @@ import { useEffect } from "react";
 
 const MainLayoutRoute = ({ children }: any) => {
   const { user } = useAuth();
-  const { setStoreId } = useGlobalStore();
+  const { setStoreId, setIsNoEditUser, setIsAdmin } = useGlobalStore();
 
   useEffect(() => {
     //@ts-ignore
     switch (user?.roleId) {
       case "1":
         setStoreId("1");
+        setIsAdmin(true);
         break;
       case "5":
         setStoreId("1");
+        setIsNoEditUser(true);
         break;
       case "2":
         setStoreId("2");

@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useGetOrder } from "../../queries/useGetOrder";
 import { useOrdersData } from "../../queries/useOrdersData";
 import { useOrdersCount } from "../../queries/useOrdersCount";
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 
 const formatUnixTimestamp = (unixTimestamp: number): string => {
@@ -24,8 +25,15 @@ export const useEditOrderDetails = () => {
 
   const { setIsInEditMode } = useOrderDetailsStore();
 
+  const { isNoEditUser } = useGlobalStore();
+
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ orderId, items, deliveryDate, total }: any) => {
+      if (isNoEditUser) {
+        toast.error(`Action not allowed`, { duration: 5000 });
+        throw new Error();
+      }
+
       const magentoItems: any[] = [];
 
       items.forEach((item: any) => {
