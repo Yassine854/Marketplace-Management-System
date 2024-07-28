@@ -59,7 +59,7 @@ const StoreSelector = ({ isWhite }: { isWhite?: boolean }) => {
           className={`shrink-0 ${open && "rotate-180"} duration-300`}
         />
       </div>
-      <ul
+      {/* <ul
         className={`absolute left-0 top-full z-20 w-full origin-top rounded-lg bg-n0 p-2 shadow-md duration-300 dark:bg-n800 ${
           open ? "visible scale-100 opacity-100" : "invisible scale-0 opacity-0"
         }`}
@@ -79,7 +79,7 @@ const StoreSelector = ({ isWhite }: { isWhite?: boolean }) => {
             {item}
           </li>
         ))}
-      </ul>
+      </ul> */}
     </div>
   );
 };
