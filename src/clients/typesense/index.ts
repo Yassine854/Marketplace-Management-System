@@ -6,7 +6,12 @@ import { addOrdersBatch } from "./orders/addOrdersBatch";
 import { isCollectionExist } from "./isCollectionExist";
 import { createOrdersCollection } from "./orders/createOrdersCollection";
 import { deleteOrdersCollection } from "./orders/deleteOrdersCollection";
-import { getNumberOfOrdersByDay } from "./orders/numberOfOrders/getNumberOfOrdersByDay";
+import { getNumberOfOrdersByDay } from "./orders/numberOfOrders/getNumberOfOrdersByDay ";
+import { getNumberOfOrdersByQuarter } from "./orders/numberOfOrders/getNumberOfOrdersByQuarter";
+import { getNumberOfOrdersByMonth } from "./orders/numberOfOrders/getNumberOfOrdersByMonth";
+import { getGrossMarketValueByQuarter } from "./orders/grossMarketValue/getGrossMarketValueByQuarter";
+import { getGrossMarketValueByMonth } from "./orders/grossMarketValue/getGrossMarketValueByMonth";
+import { getGrossMarketValueByDay } from "./orders/grossMarketValue/getGrossMarketValueByDay";
 
 export const typesense = {
   isCollectionExist,
@@ -20,6 +25,13 @@ export const typesense = {
     deleteCollection: deleteOrdersCollection,
     numberOfOrders: {
       byDay: getNumberOfOrdersByDay,
+      byMonth: getNumberOfOrdersByMonth,
+      byQuarter: getNumberOfOrdersByQuarter,
+    },
+    grossMarketValue: {
+      byDay: getGrossMarketValueByDay,
+      byQuarter: getGrossMarketValueByQuarter,
+      byMonth: getGrossMarketValueByMonth,
     },
   },
 };

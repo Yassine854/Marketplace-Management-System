@@ -1,30 +1,27 @@
+import { grossMarketValueByQuarterAnalytics } from "@/services/analytics/grossMarketValue/grossMarketValueByQuarterAnalytics";
 import { responses } from "../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getNumberOfOrdersByDay } from "@/services/orders/typesense/numberOfOrders/getNumberOfOrdersByDay";
 
-export const getNumberOfOrdersByDayRoute = async (request: NextRequest) => {
+export const grossMarketValueByQuarterAnalyticsRoute = async (
+  request: NextRequest,
+) => {
   try {
     const { searchParams } = new URL(request.url);
 
-    const date = searchParams.get("date");
+    const yearString = searchParams.get("year");
 
-    if (!date) {
+    if (!yearString) {
       return responses.invalidRequest("Date Parameter is Required");
     }
 
-    const numberOfOrders: number | undefined = await getNumberOfOrdersByDay(
-      date,
-    );
+    const year = parseInt(yearString, 10);
 
-    if (!numberOfOrders) {
-      return responses.internalServerError("Number of Orders is Undefined");
-    }
+    const res = await grossMarketValueByQuarterAnalytics(year);
     return NextResponse.json(
       {
         message: "success",
-        numberOfOrders,
-        date,
+        data: res,
       },
       {
         status: 200,

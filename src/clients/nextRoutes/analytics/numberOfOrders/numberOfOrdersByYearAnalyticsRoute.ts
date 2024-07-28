@@ -1,21 +1,17 @@
-import { responses } from "../responses";
+import { responses } from "../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { numberOfOrderByMonthAnalytics } from "@/services/analytics/numberOfOrdersByMonthAnalytics.ts";
-
-export const numberOfOrdersByMonthAnalyticsRoute = async (
+import { numberOfOrdersByYearAnalytics } from "@/services/analytics/numberOfOrdersByYearAnalytics";
+export const numberOfOrdersByYearAnalyticsRoute = async (
   request: NextRequest,
 ) => {
   try {
     const { searchParams } = new URL(request.url);
-
-    const month = searchParams.get("month");
-
-    if (!month) {
-      return responses.invalidRequest("Date Parameter is Required");
+    const year = searchParams.get("year");
+    if (!year) {
+      return responses.invalidRequest("Year Parameter is Required");
     }
-
-    const res = await numberOfOrderByMonthAnalytics(month);
+    const res = await numberOfOrdersByYearAnalytics(year);
     return NextResponse.json(
       {
         message: "success",
