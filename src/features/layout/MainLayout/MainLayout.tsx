@@ -1,23 +1,23 @@
-import { useAuth } from "@/features/shared/hooks/useAuth";
+import { useEffect, useState } from "react";
 import Sidebar from "@/features/layout/widgets/Sidebar";
 import TopNav from "@/features/layout/widgets/TopNavbar";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/features/shared/hooks/useAuth";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
+import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
+  const { user } = useAuth();
   const { setStatus } = useOrdersStore();
   const { navigateToOrders } = useNavigation();
-
-  const { user } = useAuth();
+  const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
 
   //@ts-ignore
-  const isAdmin = user?.roleCode === "ADMIN";
+  const isAdmin = user?.roleId === "1";
 
   useEffect(() => {
     if (window.innerWidth > 1400) {

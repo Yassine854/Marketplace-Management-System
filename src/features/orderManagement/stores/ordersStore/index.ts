@@ -5,7 +5,7 @@ export const useOrdersStore = create<any>(
   persist(
     (set, get) => ({
       orders: [],
-      storeId: "1",
+
       status: "open",
       selectedOrders: [],
       isOrdersLoading: false,
@@ -14,7 +14,6 @@ export const useOrdersStore = create<any>(
 
       setOrders: (orders: any[]) => set({ orders }),
       setStatus: (status: string) => set({ status }),
-      setStoreId: (storeId: string) => set({ storeId }),
       resetSelectedOrders: () => set({ selectedOrders: [] }),
       setSelectedOrders: (selectedOrders: any) => set({ selectedOrders }),
 

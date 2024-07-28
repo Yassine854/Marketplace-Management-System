@@ -6,6 +6,8 @@ import AuthWrapper from "@/libs/next-auth/authWrapper";
 import { ApolloProviderWrapper } from "@/libs/apollo/apollo-provider-wrapper";
 import TanstackQueryProvider from "@/libs/tanstackQuery/TanstackQueryProvider";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
+import { useAuth } from "@/features/shared/hooks/useAuth";
 
 //To Refactor
 const RootLayout = ({ children }: { children: React.ReactNode }) => {

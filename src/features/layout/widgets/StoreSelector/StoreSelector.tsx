@@ -2,19 +2,37 @@ import { IconBuildingWarehouse } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
 import { IconChevronDown } from "@tabler/icons-react";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 import { useAuth } from "@/features/shared/hooks/useAuth";
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
 export const layoutList = ["All", "Tunis", "Sousse", "Kamarket"];
 
 const StoreSelector = ({ isWhite }: { isWhite?: boolean }) => {
   const { open, ref, toggleOpen } = useDropdown();
-  const { setStoreId } = useOrdersStore();
+  const { setStoreId } = useGlobalStore();
+  const [storesList, setStoresList] = useState<string[]>([]);
 
   const { user } = useAuth();
 
   useEffect(() => {
-    console.log("🚀 ~ StoreSelector ~ user:", user);
+    //@ts-ignore
+    switch (user?.roleId) {
+      case "1":
+        setStoresList(["All", "Tunis", "Sousse", "Kamarket"]);
+        break;
+      case "5":
+        setStoresList(["All", "Tunis", "Sousse", "Kamarket"]);
+        break;
+      case "2":
+        setStoresList(["Tunis"]);
+        break;
+      case "3":
+        setStoresList(["Kmarket"]);
+        break;
+      case "4":
+        setStoresList(["Sousse"]);
+        break;
+    }
   }, [user]);
 
   const [layout, setLayout] = useState(layoutList[0]);
@@ -53,33 +71,44 @@ const StoreSelector = ({ isWhite }: { isWhite?: boolean }) => {
         <span className="flex select-none items-center gap-2">
           {/* <IconLayoutSidebar className="text-primary" /> */}
           <IconBuildingWarehouse className="text-primary" />
-          {layout}
+          {storesList.length == 1 ? (
+            <div>{storesList[0]}</div>
+          ) : (
+            <div>{layout}</div>
+          )}
         </span>
-        <IconChevronDown
-          className={`shrink-0 ${open && "rotate-180"} duration-300`}
-        />
+        {storesList.length > 1 && (
+          <IconChevronDown
+            className={`shrink-0 ${open && "rotate-180"} duration-300`}
+          />
+        )}
       </div>
-      {/* <ul
-        className={`absolute left-0 top-full z-20 w-full origin-top rounded-lg bg-n0 p-2 shadow-md duration-300 dark:bg-n800 ${
-          open ? "visible scale-100 opacity-100" : "invisible scale-0 opacity-0"
-        }`}
-      >
-        {layoutList.map((item) => (
-          <li
-            onClick={() => {
-              //  changeLayout(item);
-              setLayout(item);
-              toggleOpen();
-            }}
-            className={`block cursor-pointer select-none rounded-md p-2 duration-300 hover:text-primary ${
-              layout == item ? "bg-primary text-n0 hover:!text-n0" : ""
-            }`}
-            key={item}
-          >
-            {item}
-          </li>
-        ))}
-      </ul> */}
+
+      {storesList.length > 1 && (
+        <ul
+          className={`absolute left-0 top-full z-20 w-full origin-top rounded-lg bg-n0 p-2 shadow-md duration-300 dark:bg-n800 ${
+            open
+              ? "visible scale-100 opacity-100"
+              : "invisible scale-0 opacity-0"
+          }`}
+        >
+          {storesList.map((item) => (
+            <li
+              onClick={() => {
+                //  changeLayout(item);
+                setLayout(item);
+                toggleOpen();
+              }}
+              className={`block cursor-pointer select-none rounded-md p-2 duration-300 hover:text-primary ${
+                layout == item ? "bg-primary text-n0 hover:!text-n0" : ""
+              }`}
+              key={item}
+            >
+              {item}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

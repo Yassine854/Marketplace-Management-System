@@ -18,9 +18,9 @@ const intlMiddleware = createIntlMiddleware({
 });
 
 const middleware = auth((req: any) => {
-  // const isAuthPage = req.nextUrl.pathname !== "/login";
-  // const session = req?.auth;
-  // const isAdmin = session?.user?.roleId === "1";
+  const isAuthPage = req.nextUrl.pathname !== "/login";
+  const session = req?.auth;
+  const isAdmin = session?.user?.roleId === "1";
 
   // if (!session && isAuthPage) {
   //   return NextResponse.redirect(new URL("/login", req.nextUrl));

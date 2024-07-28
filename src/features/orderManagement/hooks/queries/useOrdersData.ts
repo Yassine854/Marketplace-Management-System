@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useGetOrders } from "./useGetOrders";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 import { useOrdersTableStore } from "@/features/orderManagement/stores/ordersTableStore";
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
 export const useOrdersData = () => {
-  const { status, orders, storeId, setOrders, setIsOrdersLoading } =
-    useOrdersStore();
+  const { status, orders, setOrders, setIsOrdersLoading } = useOrdersStore();
+
+  const { storeId } = useGlobalStore();
   const { sort, search, currentPage, itemsPerPage } = useOrdersTableStore();
 
   const [filterBy, setFilterBy] = useState("");

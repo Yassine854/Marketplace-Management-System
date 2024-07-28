@@ -6,6 +6,5 @@ export type User = {
   email?: string | null;
   password: string;
   status: string;
-  roleCode: string;
-  warehouseCode: string;
+  roleId: string;
 };
