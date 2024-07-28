@@ -1,6 +1,6 @@
 import UsersTable from "../../tables/UsersTable";
 import UsersTableHeader from "@/features/usersManagement/widgets/UsersTableHeader";
-import { useGetUsers } from "@/features/shared/hooks/useGetUsers";
+import { useGetUsers } from "@/features/usersManagement/hooks/queries/useGetUsers";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 
 const UsersPage = () => {

@@ -1,4 +1,4 @@
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/shared/hooks/useAuth";
 import Sidebar from "@/features/layout/widgets/Sidebar";
 import TopNav from "@/features/layout/widgets/TopNavbar";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
