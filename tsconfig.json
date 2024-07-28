@@ -40,7 +40,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/features/layout/Sidebar/Sidebar.test.jsx",
+    "src/features/layout/widgets/Sidebar/Sidebar.test.jsx",
     "src/clients/typesense/typesenseClient.ts",
     "src/features/orderManagement/hooks/queries/useGetOrders.ts",
     "src/services/auth/auth.js",
