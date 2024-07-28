@@ -7,9 +7,12 @@ export const useGlobalStore = create<any>(
       storeId: "1",
       isNoEditUser: false,
       isAdmin: false,
+      isMultipleStoreAccessUser: false,
 
       setStoreId: (storeId: string) => set({ storeId }),
       setIsAdmin: (isAdmin: boolean) => set({ isAdmin }),
+      setIsMultipleStoreAccessUser: (isMultipleStoreAccessUser: boolean) =>
+        set({ isMultipleStoreAccessUser }),
       setIsNoEditUser: (isNoEditUser: boolean) => set({ isNoEditUser }),
     }),
     {
