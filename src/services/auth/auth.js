@@ -1,6 +1,6 @@
-import CredentialsProvider from "next-auth/providers/credentials";
 import NextAuth from "next-auth";
 import { handleAuthentication } from "./handleAuthentication";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
@@ -32,30 +32,33 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         //return '/unauthorized'
       }
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, profile, session }) {
       if (user) {
-        token.id = user.id;
-
-        token.roleId = user.roleId;
-        token.username = user.username;
-        token.lastName = user.lastName;
-        token.firstName = user.firstName;
+        return {
+          ...token,
+          userId: user.id,
+          userRoleId: user.roleId,
+          username: user.username,
+          userFirstName: user.firstName,
+          userLastName: user.lastName,
+        };
       }
+
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
-
-        session.user.roleId = token.roleId;
+        session.user.roleId = token.userRoleId;
         session.user.username = token.username;
-        session.user.lastName = token.lastName;
-        session.user.firstName = token.firstName;
+        session.user.lastName = token.userLastName;
+        session.user.firstName = token.userFirstName;
       }
+
       return session;
     },
   },
   secret: process.env.AUTH_SECRET,
   trustHost: true,
-  debug: process.env.NODE_ENV === "production" ? false : true,
+  debug: process.env.NODE_ENV === "development",
 });

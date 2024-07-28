@@ -4,7 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import { FormSchema } from "./formSchema";
 import { toast } from "react-hot-toast";
-import { useAuth } from "../useAuth";
+import { useAuth } from "../../../shared/hooks/useAuth";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";

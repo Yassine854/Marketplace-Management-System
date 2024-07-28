@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useGetOrders } from "./useGetOrders";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
 export const useOrdersCount = () => {
-  const { storeId } = useOrdersStore();
+  const { storeId } = useGlobalStore();
 
   const [isLoading, setIsLoading] = useState(false);
 

@@ -17,6 +17,7 @@ import SidebarOrdersSubMenu from "@/features/shared/elements/SidebarElements/Sid
 
 const Sidebar = ({
   isAdmin,
+  isNoEdit,
   setSidebar,
   sidebarIsOpen,
   onOrderStatusClick,
@@ -81,15 +82,19 @@ const Sidebar = ({
             }}
             onSubMenuItemClick={onOrderStatusClick}
           />
-          <Divider />
-          <SidebarButton
-            isActive={pathname?.includes("milk-run")}
-            name={"Milk Run"}
-            icon={<IconMap2 />}
-            onClick={() => {
-              push("/milk-run");
-            }}
-          />
+          {!isNoEdit && (
+            <>
+              <Divider />
+              <SidebarButton
+                isActive={pathname?.includes("milk-run")}
+                name={"Milk Run"}
+                icon={<IconMap2 />}
+                onClick={() => {
+                  push("/milk-run");
+                }}
+              />
+            </>
+          )}
           <Divider />
           <SidebarButton
             isActive={pathname?.includes("notifications")}

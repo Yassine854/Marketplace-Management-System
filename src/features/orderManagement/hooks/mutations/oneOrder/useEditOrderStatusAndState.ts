@@ -5,9 +5,11 @@ import { useMutation } from "@tanstack/react-query";
 import { useGetOrder } from "../../queries/useGetOrder";
 import { useOrdersData } from "../../queries/useOrdersData";
 import { useOrdersCount } from "../../queries/useOrdersCount";
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
 export const useEditOrderStatusAndState = () => {
   const { refetch } = useOrdersData();
+  const { isNoEditUser } = useGlobalStore();
 
   const { refetch: refetchOrder } = useGetOrder();
 
@@ -15,6 +17,10 @@ export const useEditOrderStatusAndState = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ orderId, status, state }: any) => {
+      if (isNoEditUser) {
+        toast.error(`Action not allowed`, { duration: 5000 });
+        throw new Error();
+      }
       await magento.mutations.changeOrderStatus({ orderId, status, state });
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
         order: {

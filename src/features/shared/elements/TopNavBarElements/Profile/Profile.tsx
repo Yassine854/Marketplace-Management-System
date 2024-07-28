@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { logError } from "@/utils/logError";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/shared/hooks/useAuth";
 import { IconLogout, IconSettings } from "@tabler/icons-react";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
 
