@@ -18,6 +18,8 @@ export default function MainLayout({
 
   //@ts-ignore
   const isAdmin = user?.roleId === "1";
+  //@ts-ignore
+  const isNoEdit = user?.roleId === "5";
 
   useEffect(() => {
     if (window.innerWidth > 1400) {
@@ -48,6 +50,7 @@ export default function MainLayout({
         sidebarIsOpen={sidebarIsOpen}
         setSidebar={setSidebarIsOpen}
         isAdmin={isAdmin}
+        isNoEdit={isNoEdit}
         onOrderStatusClick={(status: any) => {
           setStatus(status);
           navigateToOrders();

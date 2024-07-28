@@ -16,6 +16,7 @@ export const useAuth = () => {
 
   const logout = async () => {
     await signOut({ redirect: false });
+    localStorage.clear();
     navigateToLogin();
   };
 
