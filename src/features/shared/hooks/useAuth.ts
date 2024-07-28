@@ -1,10 +1,16 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
+import { useEffect } from "react";
 
 export const useAuth = () => {
   const { navigateToLogin } = useNavigation();
   const { data, status } = useSession();
+
+  const a = useSession();
+  useEffect(() => {
+    console.log("🚀 ~ useAuth ~ a:", a);
+  }, [a]);
 
   const login = async (username: string, password: string) =>
     signIn("credentials", {

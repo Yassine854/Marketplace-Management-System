@@ -3,12 +3,19 @@ import { useEffect, useState } from "react";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
 import { IconChevronDown } from "@tabler/icons-react";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
+import { useAuth } from "@/features/shared/hooks/useAuth";
 
 export const layoutList = ["All", "Tunis", "Sousse", "Kamarket"];
 
 const StoreSelector = ({ isWhite }: { isWhite?: boolean }) => {
   const { open, ref, toggleOpen } = useDropdown();
   const { setStoreId } = useOrdersStore();
+
+  const { user } = useAuth();
+
+  useEffect(() => {
+    console.log("🚀 ~ StoreSelector ~ user:", user);
+  }, [user]);
 
   const [layout, setLayout] = useState(layoutList[0]);
 
