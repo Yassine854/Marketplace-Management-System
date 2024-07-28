@@ -4,20 +4,23 @@ import { FormSchema } from "./formSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
-import { useUser } from "@/features/usersManagement/hooks/mutations/useUser";
+import { useUser } from "@/features/usersManagement/hooks/useUser";
+import { useGetUser } from "../queries/useGetUser";
+import { useEffect } from "react";
 
 type FormData = z.infer<typeof FormSchema>;
 
 export const useCreateUserForm = () => {
-  const user = useUser();
-
+  const userClient = useUser();
+  const { user } = useGetUser();
   const { navigateToUsersTable } = useNavigation();
 
   const {
     handleSubmit,
     register,
     setValue,
-    formState: { errors },
+    getValues,
+    formState: { errors, defaultValues },
   } = useForm<FormData>({
     resolver: zodResolver(FormSchema),
   });
@@ -25,7 +28,7 @@ export const useCreateUserForm = () => {
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     const { username, firstName, lastName, roleId, password } = data;
 
-    const { message, success } = await user.mutation.create.newUser({
+    const { message, success } = await userClient.mutation.create.newUser({
       roleId,
       username,
       lastName,
@@ -44,11 +47,13 @@ export const useCreateUserForm = () => {
   };
 
   return {
+    user,
     errors,
     onSubmit,
     register,
     setValue,
+    getValues,
     handleSubmit: handleSubmit(onSubmit),
-    isLoading: user.mutation.create.isLoading,
+    isLoading: userClient.mutation.create.isLoading,
   };
 };

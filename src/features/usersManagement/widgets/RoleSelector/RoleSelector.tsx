@@ -3,6 +3,7 @@ import useDropdown from "./useRoleSelector";
 import { tailwind } from "./RoleSelector.styles";
 import { IconChevronDown } from "@tabler/icons-react";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { useGetUser } from "../../hooks/queries/useGetUser";
 
 export type DropRef = {
   reset: () => void;
@@ -11,8 +12,18 @@ export type DropRef = {
 
 // eslint-disable-next-line react/display-name
 const RoleSelector = forwardRef<DropRef, any>(
-  ({ isError, errorMessage, onChange, placeholder = "Choose Role" }, ref) => {
+  (
+    {
+      isError,
+      errorMessage,
+      onChange,
+      placeholder = "Choose Role",
+      defaultValue,
+    },
+    ref,
+  ) => {
     const [selectedRole, setSelectedRole] = useState<any>();
+    const { user } = useGetUser();
 
     const { open, ref: dropRef, toggleOpen } = useDropdown();
 
@@ -28,6 +39,22 @@ const RoleSelector = forwardRef<DropRef, any>(
     useEffect(() => {
       onChange && selectedRole && onChange(selectedRole?.key);
     }, [selectedRole, onChange]);
+
+    // useEffect(() => {
+
+    //   if (defaultValue) {
+    //     const value = roles?.find((role: any) => role.key === defaultValue);
+    //     console.log("🚀 ~ useEffect ~ value:", value);
+    //     setSelectedRole(value);
+    //   }
+    // }, [defaultValue]);
+
+    useEffect(() => {
+      if (user) {
+        const value = roles?.find((role: any) => role.key === user.roleId);
+        setSelectedRole(value);
+      }
+    }, [user]);
 
     return (
       <div className="col-span-2 flex flex-col   md:col-span-1">

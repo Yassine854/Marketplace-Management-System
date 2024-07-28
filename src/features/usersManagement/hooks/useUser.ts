@@ -1,8 +1,9 @@
-import { useCreateUser } from "./useCrateUser";
+import { useCreateUser } from "./mutations/useCrateUser";
+import { useGetUser } from "./queries/useGetUser";
 
 export const useUser = () => {
   const { create, isLoading, data, error } = useCreateUser();
-
+  const { user: userDate } = useGetUser();
   const user = {
     mutation: {
       create: {
@@ -11,6 +12,9 @@ export const useUser = () => {
         isLoading,
         newUser: create,
       },
+    },
+    queries: {
+      getUser: userDate,
     },
   };
 

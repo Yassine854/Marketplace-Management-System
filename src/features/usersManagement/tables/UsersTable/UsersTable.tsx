@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import TableRowSkeleton from "./elements/RowSkeleton";
 import UsersTableHead from "./elements/UsersTableHead/UsersTableHead";
 import UsersTableRow from "./elements/UsersTableRow";
@@ -10,9 +9,6 @@ const UsersTable = ({
   onSelectAllClick,
   isAllOrdersSelected,
 }: any) => {
-  useEffect(() => {
-    console.log("🚀 ~ users:", users);
-  }, [users]);
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>
       <UsersTableHead

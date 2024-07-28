@@ -1,17 +1,20 @@
+import GoBackArrow from "../../widgets/GoBackArrow";
 import RoleSelector from "../../widgets/RoleSelector";
 import Loading from "@/features/shared/elements/Loading";
 import TextInput from "@/features/shared/inputs/TextInput";
-import { useCreateUserForm } from "../../hooks/useCreateUserForm";
 import PasswordInput from "@/features/shared/inputs/PasswordInput";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
-import GoBackArrow from "../../widgets/GoBackArrow";
+import { useEditUserForm } from "../../hooks/useEditUserForm";
 
-const CreateUserForm = () => {
+const EditUserForm = () => {
   const { navigateToUsersTable, navigateBack } = useNavigation();
 
-  const { handleSubmit, register, setValue, errors, isLoading } =
-    useCreateUserForm();
+  const { handleSubmit, register, setValue, errors, isLoading, user } =
+    useEditUserForm();
 
+  if (isLoading) {
+    return <div>Loading... </div>;
+  }
   return (
     <div className="grid h-full w-full items-center justify-center gap-4  xxxl:gap-6 ">
       <form
@@ -21,16 +24,13 @@ const CreateUserForm = () => {
         <div className="box w-full min-w-[800px]  xl:p-8">
           <div className="bb-dashed mb-6 flex items-center  pb-6">
             <GoBackArrow onClick={navigateBack} />
-            <p className="ml-4 text-xl font-bold">Create User</p>
+            <p className="ml-4 text-xl font-bold">Edit User</p>
           </div>
           <div className="box mb-6 grid grid-cols-2 gap-4 bg-primary/5 dark:bg-bg3 md:p-4 xl:p-6 xxxl:gap-6">
-            <TextInput
-              label="Username * "
-              isError={errors.username}
-              placeholder="Enter username"
-              register={register("username")}
-              errorMessage={errors.username?.message}
-            />
+            <div className="">
+              <p className="text-xl  font-medium">Username :</p>
+              <p className="ml-4  mt-2 text-xl font-bold">{user?.username}</p>
+            </div>
             <RoleSelector
               isError={errors.roleId}
               errorMessage={errors.roleId?.message}
@@ -52,13 +52,13 @@ const CreateUserForm = () => {
             />
 
             <PasswordInput
-              label="Password *"
+              label="New Password "
               isError={errors.password}
               register={register("password")}
               errorMessage={errors.password?.message}
             />
             <PasswordInput
-              label="Confirm Password *"
+              label="Confirm New Password "
               isError={errors.confirmPassword}
               register={register("confirmPassword")}
               errorMessage={errors.confirmPassword?.message}
@@ -69,7 +69,7 @@ const CreateUserForm = () => {
             <div className="mt-7 flex gap-4 lg:mt-10">
               {!isLoading && (
                 <button type="submit" className="btn px-4 hover:shadow-none">
-                  Create
+                  Edit
                 </button>
               )}
               {isLoading && <Loading />}
@@ -88,4 +88,4 @@ const CreateUserForm = () => {
   );
 };
 
-export default CreateUserForm;
+export default EditUserForm;

@@ -18,7 +18,7 @@ const QUERY = gql`
 `;
 
 export const useGetUsers = () => {
-  const { data, loading, error } = useQuery(QUERY, {
+  const { data, loading, error, refetch } = useQuery(QUERY, {
     fetchPolicy: "network-only",
   });
 
@@ -26,5 +26,6 @@ export const useGetUsers = () => {
     users: data?.getUsers.users,
     isLoading: loading,
     error,
+    refetch,
   };
 };
