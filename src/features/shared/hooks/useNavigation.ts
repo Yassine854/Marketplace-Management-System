@@ -31,19 +31,24 @@ export const useNavigation = () => {
     push("/access/create-user");
   };
 
+  const navigateToEditUserForm = () => {
+    push("/access/edit-user");
+  };
+
   const navigateToManageMilkRun = () => {
     push("/milk-run");
   };
 
   return {
     navigateBack,
-    navigateToOrderDetails,
+    navigateToLogin,
+    navigateToOrders,
     navigateToDashboard,
     navigateToUsersTable,
-    navigateToLogin,
-    navigateToCreateUserForm,
-    navigateToManageMilkRun,
-    navigateToOrders,
+    navigateToOrderDetails,
     locale: String(locale),
+    navigateToEditUserForm,
+    navigateToManageMilkRun,
+    navigateToCreateUserForm,
   };
 };

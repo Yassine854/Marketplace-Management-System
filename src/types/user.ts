@@ -3,7 +3,6 @@ export type User = {
   username: string;
   firstName: string;
   lastName: string;
-  email?: string | null;
   password: string;
   status: string;
   roleId: string;

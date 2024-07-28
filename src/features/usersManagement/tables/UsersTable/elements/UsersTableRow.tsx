@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import { roles } from "../../../staticRoles";
 import UsersTableCell from "./UsersTableCell";
 import { IconSettings } from "@tabler/icons-react";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
+import { useUsersStore } from "@/features/usersManagement/stores/usersStore";
 
 const UsersTableRow = ({ user }: any) => {
+  const { setUserOnReviewUsername } = useUsersStore();
   const [role, setRole] = useState<any>("");
+  const { navigateToEditUserForm } = useNavigation();
 
   useEffect(() => {
     if (user) {
@@ -36,7 +40,14 @@ const UsersTableRow = ({ user }: any) => {
       </UsersTableCell>
       {/*Edit*/}
       <UsersTableCell>
-        <IconSettings string={2} className="cursor-pointer" />
+        <IconSettings
+          onClick={() => {
+            setUserOnReviewUsername(user.username);
+            navigateToEditUserForm();
+          }}
+          string={2}
+          className="cursor-pointer"
+        />
       </UsersTableCell>
     </tr>
   );
