@@ -2,7 +2,7 @@ import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetMilkRunOrders = (deliveryDate: number) => {
-  const { isLoading, data } = useQuery({
+  const { isLoading, data, refetch } = useQuery({
     queryKey: ["milkRunOrders", deliveryDate?.toString()],
     queryFn: async () => {
       const { data } = await axios.servicesClient(
@@ -17,5 +17,6 @@ export const useGetMilkRunOrders = (deliveryDate: number) => {
     orders: data?.orders || [],
     count: data?.count || 0,
     isLoading,
+    refetch,
   };
 };

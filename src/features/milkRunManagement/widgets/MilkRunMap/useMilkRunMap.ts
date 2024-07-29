@@ -15,6 +15,10 @@ export const useMilkRunMap = ({ ordersMarkers }: any) => {
   });
 
   useEffect(() => {
+    setPopupInfo(null);
+  }, [list]);
+
+  useEffect(() => {
     const agentColors = {};
     let colorIndex = 0;
     const newList: any[] = [];

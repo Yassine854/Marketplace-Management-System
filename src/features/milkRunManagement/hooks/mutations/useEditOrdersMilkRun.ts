@@ -2,16 +2,21 @@ import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
+import { useMilkRunStore } from "../../stores/milkRunStore";
+import { useGetMilkRunOrders } from "../queries/useGetMilkRunOrders";
 
 export const useEditOrdersMilkRun = () => {
+  const { deliveryDate } = useMilkRunStore();
+  const { refetch } = useGetMilkRunOrders(Number(deliveryDate));
+
   const { mutate, isPending } = useMutation({
     mutationFn: async ({
       ordersIds,
       deliverySlot,
-      deliveryAgentName,
       deliveryAgentId,
+      deliveryAgentName,
     }: any) => {
-      Promise.all(
+      await Promise.all(
         ordersIds.map(async (orderId: string) => {
           await magento.mutations.editOrderMilkRun({
             orderId,
@@ -19,18 +24,21 @@ export const useEditOrdersMilkRun = () => {
             deliveryAgentName,
             deliveryAgentId,
           });
+
           await axios.servicesClient.put("/api/orders/typesense/edit-order", {
             order: {
-              id: orderId,
+              id: orderId.toString(),
               deliverySlot,
               deliveryAgentName,
-              deliveryAgentId: deliveryAgentId,
+              deliveryAgentId: deliveryAgentId.toString(),
             },
           });
         }),
       );
     },
     onSuccess: () => {
+      refetch();
+
       toast.success(`Orders Milk Run Updated Successfully`, { duration: 5000 });
     },
     onError: () => {

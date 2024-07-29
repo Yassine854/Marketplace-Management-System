@@ -8,6 +8,7 @@ const MilkRunPage = () => {
     orders,
     onReset,
     isLoading,
+    isPending,
     onValidate,
     ordersCount,
     deliveryAgents,
@@ -38,6 +39,7 @@ const MilkRunPage = () => {
       />
 
       <MilkRunToolbar
+        isPending={isPending}
         isLoading={isLoading}
         onValidate={onValidate}
         deliveryAgents={deliveryAgents}

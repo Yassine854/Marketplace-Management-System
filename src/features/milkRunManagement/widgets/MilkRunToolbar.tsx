@@ -5,6 +5,7 @@ import DeliveryAgentSelector from "./DeliveryAgentSelector";
 
 const MilkRunToolbar = ({
   isLoading,
+  isPending,
   onValidate,
   deliveryAgents,
   onMilkRunChange,
@@ -40,12 +41,17 @@ const MilkRunToolbar = ({
       )}
 
       <div className="flex h-full items-center justify-center  ">
-        {!isLoading && (
+        {!isLoading && !isPending && (
           <Button className="mx-4" color="primary" onClick={onValidate}>
             Validate
           </Button>
         )}
       </div>
+      {isPending && (
+        <div className="flex items-center justify-center px-12">
+          <Loading />
+        </div>
+      )}
     </div>
   );
 };

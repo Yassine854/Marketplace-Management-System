@@ -110,6 +110,7 @@ export const useMilkRunPage = () => {
   return {
     orders,
     onReset,
+    isPending,
     isLoading,
     onValidate,
     ordersCount,
