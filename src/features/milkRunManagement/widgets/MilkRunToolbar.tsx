@@ -13,7 +13,7 @@ const MilkRunToolbar = ({
   deliveryAgentSelectorRef,
 }: any) => {
   return (
-    <div className="  absolute -right-4 bottom-0 left-1 z-10 flex h-20 w-full justify-between  bg-n20 px-8">
+    <div className=" absolute bottom-2 left-1 z-10  flex     h-20  w-full  justify-between bg-n20 bg-n20  px-8 px-8">
       {!isLoading && (
         <div className="flex">
           <div className=" flex   flex-wrap items-center  justify-center">
@@ -34,7 +34,7 @@ const MilkRunToolbar = ({
         </div>
       )}
       {isLoading && (
-        <div className="flex items-center justify-center  px-12">
+        <div className="flex items-center justify-center px-12">
           <Loading />
         </div>
       )}

@@ -25,7 +25,7 @@ const Hero = () => {
       <div className="relative z-[2]">
         <h1 className="h1 mb-10 max-w-[752px] text-black ">Orders Search</h1>
 
-        <div className=" w-full rounded-2xl bg-green-400 bg-n0 p-3 dark:bg-bg4 sm:p-4 lg:px-6 lg:py-5 "></div>
+        <div className=" w-full rounded-2xl  bg-n0 p-3 dark:bg-bg4 sm:p-4 lg:px-6 lg:py-5 "></div>
       </div>
     </div>
   );
