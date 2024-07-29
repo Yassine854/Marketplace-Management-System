@@ -1,0 +1,46 @@
+import { Button } from "@nextui-org/react";
+import DeliverySlotSelector from "./DeliverySlotSelector";
+import DeliveryAgentSelector from "./DeliveryAgentSelector";
+
+const MilkRunToolbar = ({
+  isLoading,
+  onValidate,
+  deliveryAgents,
+  onMilkRunChange,
+  onDeliveryAgentChange,
+  deliverySlotSelectorRef,
+  deliveryAgentSelectorRef,
+}: any) => {
+  return (
+    <div className="  absolute -right-4 bottom-0 left-1 z-10 flex h-20 w-full justify-between  bg-n20 px-8">
+      {!isLoading && (
+        <div className="flex">
+          <div className=" flex   flex-wrap items-center  justify-center">
+            <p className=" mr-4 text-lg font-bold ">Agent :</p>
+            <DeliveryAgentSelector
+              ref={deliveryAgentSelectorRef}
+              deliveryAgents={deliveryAgents}
+              onChange={onDeliveryAgentChange}
+            />
+          </div>
+          <div className=" mx-4 flex flex-wrap items-center justify-center  ">
+            <p className="mr-3 text-lg font-bold">Milk Run :</p>
+            <DeliverySlotSelector
+              onChange={onMilkRunChange}
+              ref={deliverySlotSelectorRef}
+            />
+          </div>
+        </div>
+      )}
+      {isLoading && <div>Loading ....</div>}
+
+      <div className="flex h-full items-center justify-center  ">
+        <Button className="mx-4" color="primary" onClick={onValidate}>
+          Validate
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default MilkRunToolbar;

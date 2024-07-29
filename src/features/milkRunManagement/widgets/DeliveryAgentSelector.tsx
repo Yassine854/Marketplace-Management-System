@@ -18,10 +18,7 @@ const DeliveryAgentSelector = forwardRef(
     }));
 
     return (
-      <div
-        ref={DropDownRef}
-        className="relative hidden min-w-[250px] lg:block xxl:min-w-[272px] "
-      >
+      <div ref={DropDownRef} className="relative  ">
         <div
           onClick={toggleOpen}
           className={` ${

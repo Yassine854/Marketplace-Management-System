@@ -65,7 +65,7 @@ export const useMilkRunPage = () => {
   };
 
   const onReset = () => {
-    toast.success("test");
+    toast.success("Reset");
     reset();
     //@ts-ignore
     deliveryAgentSelectorRef?.current?.reset();
