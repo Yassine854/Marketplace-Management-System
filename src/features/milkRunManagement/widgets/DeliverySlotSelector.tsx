@@ -22,10 +22,7 @@ const DeliverySlotSelector = forwardRef(({ onChange }: any, ref) => {
   }));
 
   return (
-    <div
-      ref={dropDownRef}
-      className="relative hidden min-w-[250px] lg:block xxl:min-w-[272px]"
-    >
+    <div ref={dropDownRef} className="relative ">
       <div
         onClick={toggleOpen}
         className={` ${

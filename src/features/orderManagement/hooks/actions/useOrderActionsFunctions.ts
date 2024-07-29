@@ -39,7 +39,7 @@ export const useOrderActionsFunctions = () => {
       editStatusAndState({
         orderId,
         status: "valid",
-        state: "valid",
+        state: "new",
       });
     },
   };
@@ -65,7 +65,7 @@ export const useOrderActionsFunctions = () => {
       editStatusAndState({
         orderId,
         status: "unpaid",
-        state: "unpaid",
+        state: "new",
       });
     },
   };
@@ -78,7 +78,7 @@ export const useOrderActionsFunctions = () => {
       editStatusAndState({
         orderId,
         status: "shipped",
-        state: "shipped",
+        state: "new",
       });
     },
   };
@@ -91,7 +91,7 @@ export const useOrderActionsFunctions = () => {
       editStatusAndState({
         orderId,
         status: "delivered",
-        state: "delivered",
+        state: "new",
       });
     },
   };
@@ -104,7 +104,7 @@ export const useOrderActionsFunctions = () => {
       editStatusAndState({
         orderId,
         status: "archived",
-        state: "archived",
+        state: "new",
       });
     },
   };
@@ -117,7 +117,7 @@ export const useOrderActionsFunctions = () => {
       editStatusAndState({
         orderId,
         status: "valid",
-        state: "valid",
+        state: "new",
       });
     },
   };

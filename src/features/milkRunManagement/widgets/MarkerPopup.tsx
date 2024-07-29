@@ -1,28 +1,30 @@
-import { Button } from "@nextui-org/button";
 import { Popup } from "react-map-gl";
+import { Button } from "@nextui-org/button";
 import { IconSquareRoundedX } from "@tabler/icons-react";
 
 const MarkerPopup = ({
-  longitude,
-  latitude,
-  orderId,
-  orderKamiounId,
-  customer,
   total,
-  deliveryAgentName,
+  orderId,
   onClose,
-  onEditClick,
+  latitude,
+  customer,
+  longitude,
+  deliverySlot,
+  orderKamiounId,
+  onDetailsClick,
+  deliveryAgentName,
 }: any) => {
   return (
     <Popup
-      closeButton={false}
       anchor="bottom"
-      longitude={Number(longitude)}
-      latitude={Number(latitude)}
       focusAfterOpen
       onClose={onClose}
+      closeButton={false}
+      style={{ width: "300px" }}
+      latitude={Number(latitude)}
+      longitude={Number(longitude)}
     >
-      <div className="mb-4 flex w-full justify-between  ">
+      <div className="mb-4 flex w-full justify-between">
         <IconSquareRoundedX
           stroke={2}
           size={28}
@@ -33,7 +35,7 @@ const MarkerPopup = ({
           size="sm"
           className="font-bold"
           color="primary"
-          onClick={onEditClick}
+          onClick={onDetailsClick}
         >
           Details
         </Button>
@@ -52,7 +54,13 @@ const MarkerPopup = ({
       </div>
       <div className=" font-semibold text-black">
         Delivery Agent :{" "}
-        <span className="font-bold text-n90">{deliveryAgentName}</span>
+        <span className="font-bold text-n90">
+          {deliveryAgentName || "*****"}
+        </span>
+      </div>
+      <div className=" font-semibold text-black">
+        Delivery Slot :{" "}
+        <span className="font-bold text-n90">{deliverySlot || "*****"}</span>
       </div>
     </Popup>
   );

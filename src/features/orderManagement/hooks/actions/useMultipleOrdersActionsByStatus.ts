@@ -12,7 +12,7 @@ export const useMultipleOrdersActionsByStatus = ({
       editStatusesAndStates({
         ordersIds: selectedOrders,
         status: "valid",
-        state: "valid",
+        state: "new",
       });
     },
   };
@@ -36,7 +36,7 @@ export const useMultipleOrdersActionsByStatus = ({
       editStatusesAndStates({
         ordersIds: selectedOrders,
         status: "unpaid",
-        state: "unpaid",
+        state: "new",
       });
     },
   };
@@ -49,7 +49,7 @@ export const useMultipleOrdersActionsByStatus = ({
       editStatusesAndStates({
         ordersIds: selectedOrders,
         status: "shipped",
-        state: "shipped",
+        state: "new",
       });
     },
   };
@@ -62,7 +62,7 @@ export const useMultipleOrdersActionsByStatus = ({
       editStatusesAndStates({
         ordersIds: selectedOrders,
         status: "delivered",
-        state: "delivered",
+        state: "new",
       });
     },
   };
@@ -75,7 +75,7 @@ export const useMultipleOrdersActionsByStatus = ({
       editStatusesAndStates({
         ordersIds: selectedOrders,
         status: "archived",
-        state: "archived",
+        state: "new",
       });
     },
   };
@@ -88,7 +88,7 @@ export const useMultipleOrdersActionsByStatus = ({
       editStatusesAndStates({
         ordersIds: selectedOrders,
         status: "valid",
-        state: "valid",
+        state: "new",
       });
     },
   };

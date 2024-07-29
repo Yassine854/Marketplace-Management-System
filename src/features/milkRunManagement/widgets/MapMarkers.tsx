@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Marker, Popup } from "react-map-gl";
 
 const MapMarkers = ({ markers, onMarkerClick, onMarkerHover }: any) => {
+  console.log("🚀 ~ MapMarkers ~ markers:", markers);
   const [popupInfo, setPopupInfo] = useState<any>(null);
 
   return (
