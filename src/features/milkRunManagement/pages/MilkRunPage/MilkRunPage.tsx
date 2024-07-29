@@ -1,4 +1,4 @@
-import MilRunMap from "../../widgets/MilkRunMap";
+import MilRunMap from "../../widgets/MilkRunMap/MilkRunMap";
 import { useMilkRunPage } from "./useMilkRunPage";
 import MilkRunToolbar from "../../widgets/MilkRunToolbar";
 import MilkRunFloatingSection from "../../widgets/MilkRunFloatingSection";
@@ -9,9 +9,9 @@ const MilkRunPage = () => {
     onReset,
     isLoading,
     onValidate,
-    onDetailsClick,
     ordersCount,
     deliveryAgents,
+    onDetailsClick,
     onMilkRunChange,
     selectedOrdersIds,
     onOrderMarkerClick,
@@ -37,7 +37,6 @@ const MilkRunPage = () => {
         onDeliveryDateChange={onDeliveryDateChange}
       />
 
-      {/* <div className="  fixed  bottom-2 left-1 z-10 flex h-20 w-full justify-between  bg-n20 px-8"> */}
       <MilkRunToolbar
         isLoading={isLoading}
         onValidate={onValidate}
@@ -47,7 +46,6 @@ const MilkRunPage = () => {
         deliverySlotSelectorRef={deliverySlotSelectorRef}
         deliveryAgentSelectorRef={deliveryAgentSelectorRef}
       />
-      {/* </div> */}
     </div>
   );
 };
