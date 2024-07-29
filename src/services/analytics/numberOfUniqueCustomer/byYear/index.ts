@@ -3,7 +3,6 @@ import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import { logError } from "@/utils/logError";
 import dayjs from "dayjs";
 import { unixTimestampToDateDMY } from "@/utils/unixTimestamp";
-import { promise } from "zod";
 
 export const numberOfUniqueCustometerByYearAnalytics = async (date: string) => {
   try {
@@ -25,8 +24,6 @@ export const numberOfUniqueCustometerByYearAnalytics = async (date: string) => {
     const [startDay, startMonth, startYear] = unixTimestampToDateDMY(createdAt)
       .split("/")
       .map(Number);
-
-    const list: any[] = [];
 
     const fetchPromises = [];
 
