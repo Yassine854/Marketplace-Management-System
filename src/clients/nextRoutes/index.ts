@@ -18,6 +18,7 @@ import { grossMarketValueByDayAnalyticsRoute } from "./analytics/grossMarketValu
 import { grossMarketValueByMonthAnalyticsRoute } from "./analytics/grossMarketValue/grossMarketValueAnalyticsByMonthAnalyticsRoute";
 import { getGrossMarketValueByDayRoute } from "./orders/typesense/grossMarketValue/getGrossMarketValueByDay";
 import { grossMarketValueByWeekAnalyticsRoute } from "./analytics/grossMarketValue/grossMarketValueByWeekAnalyticsRoute";
+import { numberOfUniqueCustomerByMonthAnalyticsRoute } from "./analytics/numberOfUniqueCustomer/numberOfUniqueCustomerByMonthAnalyticsRoute";
 
 export const nextRoute = {
   analytics: {
@@ -39,6 +40,9 @@ export const nextRoute = {
       byYear: grossMarketValueByYearAnalyticsRoute,
       byQuarter: grossMarketValueByQuarterAnalyticsRoute,
       lifetime: grossMarketValueLifetimeAnalyticsRoute,
+    },
+    numberOfUniqueCustomer: {
+      byMonth: numberOfUniqueCustomerByMonthAnalyticsRoute,
     },
   },
 
