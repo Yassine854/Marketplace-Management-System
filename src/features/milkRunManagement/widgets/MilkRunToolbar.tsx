@@ -1,4 +1,5 @@
 import { Button } from "@nextui-org/react";
+import Loading from "@/features/shared/elements/Loading";
 import DeliverySlotSelector from "./DeliverySlotSelector";
 import DeliveryAgentSelector from "./DeliveryAgentSelector";
 
@@ -32,12 +33,18 @@ const MilkRunToolbar = ({
           </div>
         </div>
       )}
-      {isLoading && <div>Loading ....</div>}
+      {isLoading && (
+        <div className="flex items-center justify-center  px-12">
+          <Loading />
+        </div>
+      )}
 
       <div className="flex h-full items-center justify-center  ">
-        <Button className="mx-4" color="primary" onClick={onValidate}>
-          Validate
-        </Button>
+        {!isLoading && (
+          <Button className="mx-4" color="primary" onClick={onValidate}>
+            Validate
+          </Button>
+        )}
       </div>
     </div>
   );
