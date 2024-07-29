@@ -11,7 +11,7 @@ const MarkerPopup = ({
   total,
   deliveryAgentName,
   onClose,
-  onEditClick,
+  onDetailsClick,
 }: any) => {
   return (
     <Popup
@@ -33,7 +33,7 @@ const MarkerPopup = ({
           size="sm"
           className="font-bold"
           color="primary"
-          onClick={onEditClick}
+          onClick={onDetailsClick}
         >
           Details
         </Button>

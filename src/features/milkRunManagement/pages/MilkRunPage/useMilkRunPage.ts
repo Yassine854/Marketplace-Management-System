@@ -5,7 +5,7 @@ import { useNavigation } from "../../../shared/hooks/useNavigation";
 import { useGetMilkRunOrders } from "../../hooks/queries/useGetMilkRunOrders";
 import { useGetDeliveryAgents } from "../../hooks/queries/useGetDeliveryAgents";
 import { useEditOrdersMilkRun } from "../../hooks/mutations/useEditOrdersMilkRun";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 
 //To Refactor
 export const useMilkRunPage = () => {
@@ -23,7 +23,7 @@ export const useMilkRunPage = () => {
     setDeliveryAgentName,
   } = useMilkRunStore();
 
-  const { setOrderOnReviewId } = useOrdersStore();
+  const { setOrderOnReviewId } = useOrderDetailsStore();
 
   const { navigateToOrderDetails } = useNavigation();
 
@@ -54,7 +54,7 @@ export const useMilkRunPage = () => {
     setSelectedOrdersIds(list);
   };
 
-  const onEditClick = (orderId: string): void => {
+  const onDetailsClick = (orderId: string): void => {
     setOrderOnReviewId(orderId);
     navigateToOrderDetails();
   };
@@ -112,8 +112,8 @@ export const useMilkRunPage = () => {
     onReset,
     isLoading,
     onValidate,
-    onEditClick,
     ordersCount,
+    onDetailsClick,
     deliveryAgents,
     selectedOrdersIds,
     onOrderMarkerClick,

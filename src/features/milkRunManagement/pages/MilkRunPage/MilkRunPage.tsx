@@ -9,7 +9,7 @@ const MilkRunPage = () => {
     onReset,
     isLoading,
     onValidate,
-    onEditClick,
+    onDetailsClick,
     ordersCount,
     deliveryAgents,
     onMilkRunChange,
@@ -25,7 +25,7 @@ const MilkRunPage = () => {
     <div className="relative  mt-[4.8rem] flex  flex-grow overflow-hidden p-2">
       <MilRunMap
         ordersMarkers={orders}
-        onEditClick={onEditClick}
+        onDetailsClick={onDetailsClick}
         selectedOrdersIds={selectedOrdersIds}
         onOrderMarkerClick={onOrderMarkerClick}
       />

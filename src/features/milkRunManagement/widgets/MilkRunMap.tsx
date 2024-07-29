@@ -36,7 +36,7 @@ const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
   */
 
 const MilkRunMap = ({
-  onEditClick,
+  onDetailsClick,
   ordersMarkers,
   onOrderMarkerClick,
   selectedOrdersIds,
@@ -110,7 +110,7 @@ const MilkRunMap = ({
               longitude={popupInfo?.longitude}
               orderKamiounId={popupInfo?.kamioun_order_id}
               deliveryAgentName={popupInfo?.delivery_agent}
-              onEditClick={() => onEditClick(popupInfo?.order_id)}
+              onDetailsClick={() => onDetailsClick(popupInfo?.order_id)}
             />
           )}
         </div>
