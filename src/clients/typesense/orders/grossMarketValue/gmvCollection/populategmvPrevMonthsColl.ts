@@ -1,0 +1,41 @@
+import { NextRequest, NextResponse } from "next/server";
+import { typesenseClient } from "@/clients/typesense/typesenseClient";
+import dayjs from "dayjs";
+import { getGrossMarketValueByMonth } from "../getGrossMarketValueByMonth";
+import { logError } from "@/utils/logError";
+export async function populateGMVPreviousMonths() {
+  try {
+    const startYear = 2020;
+    const currentDate = dayjs().format("MM-YYYY");
+    const [month, year] = currentDate.split("-").map(Number);
+    let endMonth = 12;
+    // console.log("🚀 ~ populateGMVPreviousMonths ~ currentDate:", currentDate)
+    for (let j = startYear; j <= year; j++) {
+      if (j === year) {
+        endMonth = month - 1;
+      }
+      for (let i = 1; i <= endMonth; i++) {
+        const result = await getGrossMarketValueByMonth(j, i);
+        const monthDocument = {
+          id: `${i}-${j}`,
+          year: j.toString(),
+          month: i.toString(),
+          gmv: result,
+        };
+        await typesenseClient
+          .collections("gmvPreviousMonths")
+          .documents()
+          .upsert(monthDocument);
+      }
+    }
+
+    console.log("Finished populating gmvPreviousMonths collection");
+    return {
+      success: true,
+      message: "GMV previous months data updated successfully",
+    };
+  } catch (error) {
+    console.error("Error populating gmvPreviousMonths:", error);
+    throw error;
+  }
+}
