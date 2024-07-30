@@ -5,58 +5,71 @@ meta {
 }
 
 put {
-  url: {{baseUrl}}/api/orders/typesense/edit-order
+  url: https://oms-staging.kamioun.com/api/orders/typesense/edit-order
   body: json
   auth: none
 }
 
-headers {
-  X-API-Key: HgomyMjEBfIAi0FukmGf5E65sKDhEy
-}
-
 body:json {
   {
-    "order": {
-      "id": "60028",
-      "kamiounId": "000050048",
-      "state": "valid",
-      "status": "Valid",
-      "total": 817.9,
-      "createdAt": 1720183297,
-      "customerId": 7043,
-      "storeId": 1,
-      "customerPhone": "50885777",
-      "customerFirstname": "najeh",
-      "customerLastname": "abassi",
-      "deliveryAgentId": 66,
-      "deliveryAgent": "Mehdi Alagui",
-      "deliveryDate": 1720224000,
-      "deliveryStatus": "test",
-      "source": "online",
-      "items": [
-        {
-          "id": "736819",
-          "orderId": "60028",
-          "kamiounOrderId": "000050048",
-          "productId": "5301",
-          "productName": "P6",
-          "productPrice": 500,
-          "totalPrice": 500,
-          "quantity": 1,
-          "sku": "P6-2"
-        },
-        {
-          "id": "736820",
-          "orderId": "60028",
-          "kamiounOrderId": "000050048",
-          "productId": "5306",
-          "productName": "Manar - Thon entier HO 160 g",
-          "productPrice": 317.9,
-          "totalPrice": 317.9,
-          "quantity": 1,
-          "sku": "T0160HOVENC-MN-FI1-5"
-        }
-      ]
-    }
+    "order": 
+      {
+        "id": "63450",
+        "orderId": "63450",
+        "incrementId": "000052672",
+        "kamiounId": "000052672",
+        "state": "new",
+        "status": "open",
+        "total": 159.09,
+        "createdAt": 1722348213,
+        "customerId": 6324,
+        "storeId": 1,
+        "customerPhone": "24946132",
+        "customerFirstname": "Ikbel",
+        "customerLastname": "Sousse",
+        "deliveryAgentId": "",
+        "deliveryAgentName": "",
+        "deliverySlot": "",
+        "deliveryDate": 0,
+        "deliveryStatus": "",
+        "source": "online",
+        "items": [
+          {
+            "id": "797778",
+            "orderId": "63450",
+            "kamiounOrderId": "000052672",
+            "productId": "3244",
+            "productName": "La Goulette - Thon entier HV 2.1kg ( unit\u00e9 )",
+            "productPrice": 46.2,
+            "totalPrice": 138.6,
+            "quantity": 3,
+            "sku": "61915718013445"
+          },
+          {
+            "id": "797779",
+            "orderId": "63450",
+            "kamiounOrderId": "000052672",
+            "productId": "3952",
+            "productName": "Oliv+ Trio d'Or - 50% Huile d'Olive 1L",
+            "productPrice": 15.39,
+            "totalPrice": 15.39,
+            "quantity": 1,
+            "sku": "6194017409148"
+          },
+          {
+            "id": "797780",
+            "orderId": "63450",
+            "kamiounOrderId": "000052672",
+            "productId": "154",
+            "productName": "Bonna - Pot moutarde 263ml (Unit\u00e9)",
+            "productPrice": 5.1,
+            "totalPrice": 5.1,
+            "quantity": 1,
+            "sku": "001-001001"
+          }
+        ]
+      }
+    
+  
   }
 }

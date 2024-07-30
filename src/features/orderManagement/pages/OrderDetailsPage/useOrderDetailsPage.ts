@@ -1,116 +1,86 @@
-import { useOrderDetailsEffect } from "../../hooks/useOrderDetailsEffect";
-import { useEffect, useRef, useState } from "react";
-import { useOrderDetailsActions } from "../../hooks/actions/useOrderDetailsActions";
+import { useTotal } from "../../hooks/useTotal";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
+import { useOrderActionsStore } from "../../stores/orderActionsStore";
+import { useOrderDetailsEffect } from "../../hooks/useOrderDetailsEffect";
+import { useOrderOnReviewItems } from "../../hooks/useOrderOnReviewItems";
 import { useGetOrder } from "@/features/orderManagement/hooks/queries/useGetOrder";
+import { useOrderDetailsActions } from "../../hooks/actions/useOrderDetailsActions";
+import { useCancelOrderFromDetailsPage } from "../../hooks/useCancelOrderFromDetailsPage";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
-import { useCancelOrder } from "../../hooks/mutations/oneOrder/useCancelOrder";
-import { useDisclosure } from "@nextui-org/modal";
-import { useGetOrderItems } from "../../hooks/queries/useGetOrderItems";
 
 export const useOrderDetailsPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const { navigateBack } = useNavigation();
+  useTotal();
+
+  useOrderDetailsEffect();
+
   const dropRef = useRef();
+
+  const { navigateBack } = useNavigation();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { orderUnderActionId } = useOrderActionsStore();
+
+  const { data: order, isLoading: isOrderLoading } = useGetOrder();
+
+  const { actions, isSomeActionPending } = useOrderDetailsActions();
+
+  const { orderOnReviewItems, isLoading: isOrderOnReviewItemsLoading } =
+    useOrderOnReviewItems();
 
   const {
     total,
     isInEditMode,
-    orderOnReviewId,
-    orderOnReviewItems,
-    setOrderOnReviewDeliveryDate,
     setOrderOnReviewItems,
+    setOrderOnReviewDeliveryDate,
   } = useOrderDetailsStore();
 
-  const { actions, isSomeActionPending, orderToCancelId, setOrderToCancelId } =
-    useOrderDetailsActions();
   const {
-    onOpen,
-    isOpen: isCancelingModalOpen,
-    onClose: onCancelingModalClose,
-  } = useDisclosure();
-  const {
-    cancelOrderAsync,
-    isPending: isCancelingPending,
-    isError,
-  } = useCancelOrder();
+    cancelOrder,
+    isCancelingPending,
+    isCancelingModalOpen,
+    onCancelingModalClose,
+  } = useCancelOrderFromDetailsPage();
 
-  const { data: order, isLoading: isOrderLoading } = useGetOrder();
-
-  const { data: orderItems, isLoading: isOrderItemsLoading } =
-    useGetOrderItems(orderOnReviewId);
-
-  const reset = () => {
+  const reset = useCallback(() => {
     //@ts-ignore
     dropRef.current && dropRef.current?.reset();
-  };
+  }, []);
 
   useEffect(() => {
-    if (!isSomeActionPending) {
+    if (!orderUnderActionId) {
       reset();
     }
-  }, [isSomeActionPending]);
-
-  useOrderDetailsEffect(reset);
+  }, [orderUnderActionId, reset]);
 
   useEffect(() => {
-    if (orderToCancelId) {
-      onOpen();
-    } else {
-      onCancelingModalClose();
-    }
-  }, [orderToCancelId, onOpen, onCancelingModalClose]);
+    order && setOrderOnReviewDeliveryDate(order?.deliveryDate);
+  }, [order, setOrderOnReviewItems, setOrderOnReviewDeliveryDate]);
 
   useEffect(() => {
-    if (isError) {
-      setOrderToCancelId("");
-      onCancelingModalClose();
-      reset();
-    }
-  }, [isError]);
-
-  useEffect(() => {
-    if (order && orderItems) {
-      const mergedItems = order?.items.map((item: any) => {
-        const product = orderItems?.find(
-          (p: any) => p.id === parseInt(item.productId),
-        );
-
-        return { ...item, ...product };
-      });
-
-      setOrderOnReviewItems(mergedItems);
-    }
-  }, [order, orderItems, setOrderOnReviewItems]);
-
-  useEffect(() => {
-    if (isOrderItemsLoading || isOrderItemsLoading) {
+    if (isOrderLoading || isOrderOnReviewItemsLoading) {
       setIsLoading(true);
     } else {
       setIsLoading(false);
     }
-  }, [isOrderLoading, isOrderItemsLoading]);
+  }, [isOrderLoading, isOrderOnReviewItemsLoading]);
 
   return {
     order,
     total,
     dropRef,
     isLoading,
+    cancelOrder,
     isInEditMode,
     orderOnReviewItems,
-    onArrowClick: navigateBack,
-    cancelOrder: async () => {
-      await cancelOrderAsync(orderOnReviewId);
-      setOrderToCancelId("");
-      onCancelingModalClose();
-      reset();
-    },
-    //@ts-ignore
-    actions: actions[order?.status],
+    isCancelingPending,
     isSomeActionPending,
-    onDeliveryDateChange: setOrderOnReviewDeliveryDate,
     isCancelingModalOpen,
     onCancelingModalClose,
-    isCancelingPending,
+    onArrowClick: navigateBack,
+    //@ts-ignore
+    actions: actions[order?.status],
+    onDeliveryDateChange: setOrderOnReviewDeliveryDate,
   };
 };

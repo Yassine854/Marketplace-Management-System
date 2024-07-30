@@ -6,14 +6,18 @@ import { useGetOrder } from "../../queries/useGetOrder";
 import { useOrdersData } from "../../queries/useOrdersData";
 import { useOrdersCount } from "../../queries/useOrdersCount";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
+import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
 
 export const useEditOrderStatusAndState = () => {
   const { refetch } = useOrdersData();
+
   const { isNoEditUser } = useGlobalStore();
 
   const { refetch: refetchOrder } = useGetOrder();
 
   const { refetch: refetchCount } = useOrdersCount();
+
+  const { setOrderUnderActionId } = useOrderActionsStore();
 
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ orderId, status, state }: any) => {
@@ -36,9 +40,11 @@ export const useEditOrderStatusAndState = () => {
       refetch();
       refetchOrder();
       refetchCount();
+      setOrderUnderActionId("");
       toast.success(`Order Status Updated Successfully`, { duration: 5000 });
     },
     onError: () => {
+      setOrderUnderActionId("");
       toast.error(`Something Went Wrong`, { duration: 5000 });
     },
   });

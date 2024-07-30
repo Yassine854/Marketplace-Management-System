@@ -1,8 +1,8 @@
 import SortByDropdown from "../SortByDropdown";
 import { useOrdersToolbar } from "./useOrdersToolBar";
+import OrderCancelingModal from "../OrderCancelingModal";
 import SearchBar from "@/features/shared/inputs/SearchBar";
 import MultipleOrdersActionsDropdown from "../MultipleOrdersActionsDropdown";
-import OrderCancelingModal from "../OrderCancelingModal";
 
 const OrdersToolBar = () => {
   const {
@@ -16,7 +16,7 @@ const OrdersToolBar = () => {
     actionsRef,
     ordersCount,
     isCancelingModalOpen,
-    cancelOrders,
+    cancelMultipleOrders,
     onCancelingModalClose,
     isSomeOrdersSelected,
     isCancelingPending,
@@ -43,7 +43,7 @@ const OrdersToolBar = () => {
       </div>
 
       <OrderCancelingModal
-        onConfirm={cancelOrders}
+        onConfirm={cancelMultipleOrders}
         isOpen={isCancelingModalOpen}
         isPending={isCancelingPending}
         onClose={onCancelingModalClose}

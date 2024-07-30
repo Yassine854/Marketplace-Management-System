@@ -9,9 +9,9 @@ export const editOrderDetails = async ({
 }: any): Promise<any> => {
   try {
     const data = {
-      items: items,
       entity: {
         entity_id: orderId,
+        items: items,
         base_subtotal: total,
         subtotal: total,
         base_grand_total: total,
@@ -24,6 +24,6 @@ export const editOrderDetails = async ({
     await axios.magentoClient.put("orders/create", data);
   } catch (error) {
     logError(error);
-    throw error;
+    throw new Error();
   }
 };

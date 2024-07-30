@@ -6,6 +6,7 @@ import { useGetOrder } from "../../queries/useGetOrder";
 import { useOrdersData } from "../../queries/useOrdersData";
 import { useOrdersCount } from "../../queries/useOrdersCount";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
+import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
 
 export const useCancelOrder = () => {
   const { refetch } = useOrdersData();
@@ -15,6 +16,8 @@ export const useCancelOrder = () => {
   const { refetch: refetchCount } = useOrdersCount();
 
   const { isNoEditUser } = useGlobalStore();
+
+  const { setOrderToCancelId, setOrderUnderActionId } = useOrderActionsStore();
 
   const { mutate, isPending, mutateAsync, isError } = useMutation({
     mutationFn: async (orderId: string) => {
@@ -35,9 +38,14 @@ export const useCancelOrder = () => {
       refetch();
       refetchCount();
       refetchOrder();
+      setOrderToCancelId("");
+      setOrderUnderActionId("");
       toast.success(`Order Canceled  Successfully`, { duration: 5000 });
     },
     onError: () => {
+      setOrderToCancelId("");
+      setOrderUnderActionId("");
+
       toast.error(`Something Went Wrong`, { duration: 5000 });
     },
   });

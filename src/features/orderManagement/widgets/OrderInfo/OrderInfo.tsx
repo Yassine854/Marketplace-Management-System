@@ -1,5 +1,5 @@
-import { IconShoppingCart } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
+import { IconShoppingCart } from "@tabler/icons-react";
 
 const OrderInfo = ({ id, total, storeId }: any) => {
   const [store, setStore] = useState("Tunis");
@@ -18,8 +18,8 @@ const OrderInfo = ({ id, total, storeId }: any) => {
   }, [storeId]);
 
   return (
-    <div className=" flex h-32">
-      <div className="   flex  h-16 w-16  items-center justify-center rounded-full bg-n30 ">
+    <div className=" flex h-32  min-w-[200px]">
+      <div className="   flex  h-16 w-24 items-center justify-center rounded-full bg-n30 ">
         <IconShoppingCart stroke={2} size={48} />
       </div>
 
@@ -31,7 +31,7 @@ const OrderInfo = ({ id, total, storeId }: any) => {
           </p>
           <p className="text-black  ">
             <span className="text-n90 ">Total : </span>
-            {total} TND
+            {Number(total)?.toFixed(2)}
           </p>
           <p className="text-black  ">
             <span className="text-n90 ">Store : </span>

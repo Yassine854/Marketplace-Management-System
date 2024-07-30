@@ -7,7 +7,6 @@ export const cancelOrder = async (orderId: string): Promise<any> => {
     return res?.data;
   } catch (error) {
     logError(error);
-
-    // throw error;
+    throw new Error();
   }
 };

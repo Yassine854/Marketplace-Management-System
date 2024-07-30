@@ -13,7 +13,7 @@ export const useMultipleOrdersActions = () => {
   const { onClose, onOpen, isOpen } = useDisclosure();
   const { status, selectedOrders } = useOrdersStore();
 
-  const { cancelOrdersAsync, isPending: isCancelingPending } =
+  const { cancelMultipleOrdersAsync, isPending: isCancelingPending } =
     useCancelMultipleOrders();
 
   const { editStatusesAndStates, isPending: isEditingPending } =
@@ -25,8 +25,8 @@ export const useMultipleOrdersActions = () => {
   const { generateDeliveryNotes, isPending: isGenerateDeliveryNotePending } =
     useGenerateMultipleDeliveryNotes();
 
-  const cancelOrders = async () => {
-    await cancelOrdersAsync(selectedOrders);
+  const cancelMultipleOrders = async () => {
+    await cancelMultipleOrdersAsync(selectedOrders);
     onClose();
   };
 
@@ -67,7 +67,7 @@ export const useMultipleOrdersActions = () => {
   return {
     isPending,
     actionsRef,
-    cancelOrders,
+    cancelMultipleOrders,
     generatePickLists,
     isCancelingPending,
     isCancelingModalOpen: isOpen,

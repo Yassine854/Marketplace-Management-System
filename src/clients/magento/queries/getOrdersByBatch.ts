@@ -14,6 +14,6 @@ export const getOrdersByBatch = async (page: any) => {
     };
   } catch (error) {
     logError(error);
-    throw error;
+    throw new Error();
   }
 };

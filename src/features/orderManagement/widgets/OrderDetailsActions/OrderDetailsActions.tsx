@@ -1,53 +1,19 @@
+import Dropdown from "../Dropdown";
 import { IconBrightnessAuto } from "@tabler/icons-react";
 import Loading from "@/features/shared/elements/Loading";
-import Dropdown from "../Dropdown";
-import { useEffect, useState } from "react";
 import { useOrderDetailsStore } from "../../stores/orderDetailsStore";
+import { useOrderActionsStore } from "../../stores/orderActionsStore";
 
-//To Refactor
 const OrderDetailsActions = ({ orderId, dropRef, isPending, actions }: any) => {
-  const [selectedAction, setSelectedAction] = useState<any>();
-  const { setIsInEditMode, isInEditMode } = useOrderDetailsStore();
+  const isInEditMode = useOrderDetailsStore((state: any) => state.isInEditMode);
 
-  // useEffect(() => {
+  const setSelectedAction = useOrderActionsStore(
+    (state: any) => state.setSelectedAction,
+  );
 
-  //   if (isInEditMode) {
-  //     const item = actions.find((e: any) => e.key === "edit");
-  //     setSelectedAction(item);
-  //   }
-  // }, []);
-
-  useEffect(() => {
-    if (
-      isInEditMode === false &&
-      selectedAction &&
-      selectedAction?.key === "edit"
-    ) {
-      setIsInEditMode(true);
-    }
-
-    if (
-      isInEditMode === true &&
-      selectedAction &&
-      selectedAction?.key !== "edit"
-    ) {
-      setIsInEditMode(false);
-    }
-  }, [selectedAction, isInEditMode, setIsInEditMode]);
-
-  // useEffect(() => {
-  //   if (isInEditMode) {
-  //     const item = actions.find((e: any) => e.key === "edit");
-  //     setSelectedAction(item || null);
-  //   }
-  // }, [isInEditMode, actions]);
-
-  // useEffect(() => {
-  //   if (selectedAction) {
-  //     setIsInEditMode(selectedAction.key === "edit");
-  //   }
-  // }, [selectedAction, setIsInEditMode]);
-
+  const selectedAction = useOrderActionsStore(
+    (state: any) => state.selectedAction,
+  );
   return (
     <div className="flex">
       <div className="   flex  h-16 w-16  items-center justify-center rounded-full bg-n30 ">
@@ -55,8 +21,8 @@ const OrderDetailsActions = ({ orderId, dropRef, isPending, actions }: any) => {
       </div>
 
       <div className=" ml-2">
-        <p className=" ml-2 pb-2 text-2xl font-bold text-black">Actions </p>
-        <div className="flex items-center justify-center">
+        <p className=" ml-2 pb-2 text-2xl font-bold text-black">Actions</p>
+        <div className="flex h-24 flex-col  justify-between">
           <>
             {actions && (
               <Dropdown
@@ -69,10 +35,10 @@ const OrderDetailsActions = ({ orderId, dropRef, isPending, actions }: any) => {
             )}
 
             {selectedAction?.key && (
-              <>
+              <div className="flex h-12 items-center justify-center ">
                 {!isPending && (
                   <button
-                    className="btn m-2 flex h-2 items-center  justify-center p-4"
+                    className="btn m-2 flex h-2 w-full  items-center justify-center p-4"
                     onClick={() => {
                       selectedAction.action(orderId);
                     }}
@@ -85,7 +51,7 @@ const OrderDetailsActions = ({ orderId, dropRef, isPending, actions }: any) => {
                     <Loading />
                   </div>
                 )}
-              </>
+              </div>
             )}
           </>
         </div>

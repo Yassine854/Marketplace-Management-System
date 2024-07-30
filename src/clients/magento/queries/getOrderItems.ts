@@ -10,6 +10,6 @@ export const getOrderItems = async (orderId: string): Promise<any> => {
     return response.data;
   } catch (error) {
     logError(error);
-    throw error;
+    throw new Error();
   }
 };

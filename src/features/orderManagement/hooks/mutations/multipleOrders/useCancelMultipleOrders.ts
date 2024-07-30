@@ -42,5 +42,9 @@ export const useCancelMultipleOrders = () => {
     },
   });
 
-  return { cancelOrders: mutate, cancelOrdersAsync: mutateAsync, isPending };
+  return {
+    cancelMultipleOrders: mutate,
+    cancelMultipleOrdersAsync: mutateAsync,
+    isPending,
+  };
 };

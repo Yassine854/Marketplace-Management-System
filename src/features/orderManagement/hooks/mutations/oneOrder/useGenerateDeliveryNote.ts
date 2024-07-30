@@ -1,8 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
+import { useMutation } from "@tanstack/react-query";
+import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
 
 export const useGenerateDeliveryNote = () => {
+  const { setOrderUnderActionId } = useOrderActionsStore();
+
   const { mutate, isPending } = useMutation({
     mutationFn: async (orderId: string) => {
       const deliveryNotesUrl = await magento.mutations.generateDeliveryNotes(
@@ -13,12 +16,13 @@ export const useGenerateDeliveryNote = () => {
     },
     onSuccess: (deliveryNotesUrl) => {
       window.open(deliveryNotesUrl);
-
+      setOrderUnderActionId("");
       toast.success(`Order Delivery Note Generated Successfully`, {
         duration: 5000,
       });
     },
     onError: () => {
+      setOrderUnderActionId("");
       toast.error(`Something Went Wrong`, { duration: 5000 });
     },
   });

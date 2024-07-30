@@ -36,7 +36,7 @@ export const useMultipleOrdersActionsByStatus = ({
       editStatusesAndStates({
         ordersIds: selectedOrders,
         status: "unpaid",
-        state: "new",
+        state: "complete",
       });
     },
   };
@@ -62,7 +62,7 @@ export const useMultipleOrdersActionsByStatus = ({
       editStatusesAndStates({
         ordersIds: selectedOrders,
         status: "delivered",
-        state: "new",
+        state: "complete",
       });
     },
   };
@@ -75,7 +75,7 @@ export const useMultipleOrdersActionsByStatus = ({
       editStatusesAndStates({
         ordersIds: selectedOrders,
         status: "archived",
-        state: "new",
+        state: "complete",
       });
     },
   };

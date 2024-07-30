@@ -16,16 +16,14 @@ export const useOrderActionsFunctions = () => {
     isSomeMutationPending,
   } = useOrderMutations();
 
-  const {
-    setIsInEditMode,
-    setOrderOnReviewId,
-    orderOnReviewItems,
-    orderOnReviewDeliveryDate,
-    total,
-  } = useOrderDetailsStore();
+  const { setIsInEditMode, setOrderOnReviewId } = useOrderDetailsStore();
 
-  const { setOrderToCancelId, setIsSomeActionPending, setOrderUnderActionId } =
-    useOrderActionsStore();
+  const {
+    setSelectedAction,
+    setOrderToCancelId,
+    setIsSomeActionPending,
+    setOrderUnderActionId,
+  } = useOrderActionsStore();
 
   useEffect(() => {
     setIsSomeActionPending(isSomeMutationPending);
@@ -65,7 +63,7 @@ export const useOrderActionsFunctions = () => {
       editStatusAndState({
         orderId,
         status: "unpaid",
-        state: "new",
+        state: "complete",
       });
     },
   };
@@ -91,7 +89,7 @@ export const useOrderActionsFunctions = () => {
       editStatusAndState({
         orderId,
         status: "delivered",
-        state: "new",
+        state: "complete",
       });
     },
   };
@@ -104,7 +102,7 @@ export const useOrderActionsFunctions = () => {
       editStatusAndState({
         orderId,
         status: "archived",
-        state: "new",
+        state: "complete",
       });
     },
   };
@@ -162,6 +160,7 @@ export const useOrderActionsFunctions = () => {
     key: "gotToEdit",
     name: "Edit",
     action: (orderId: string): void => {
+      setSelectedAction(edit);
       navigateToOrderDetails();
       setIsInEditMode(true);
       setOrderUnderActionId(orderId);
@@ -174,12 +173,7 @@ export const useOrderActionsFunctions = () => {
     name: "Edit",
     action: (orderId: string) => {
       setOrderUnderActionId(orderId);
-      editDetails({
-        orderId,
-        items: orderOnReviewItems,
-        deliveryDate: orderOnReviewDeliveryDate,
-        total,
-      });
+      editDetails();
     },
   };
 

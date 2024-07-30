@@ -7,6 +7,7 @@ import { useOrdersData } from "../../queries/useOrdersData";
 import { useOrdersCount } from "../../queries/useOrdersCount";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
+import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
 
 const formatUnixTimestamp = (unixTimestamp: number): string => {
   const date = new Date(unixTimestamp * 1000);
@@ -19,16 +20,24 @@ const formatUnixTimestamp = (unixTimestamp: number): string => {
 export const useEditOrderDetails = () => {
   const { refetch } = useOrdersData();
 
+  const { isNoEditUser } = useGlobalStore();
+
   const { refetch: refetchOrder } = useGetOrder();
 
   const { refetch: refetchCount } = useOrdersCount();
 
-  const { setIsInEditMode } = useOrderDetailsStore();
+  const {
+    total,
+    setIsInEditMode,
+    orderOnReviewId,
+    orderOnReviewItems,
+    orderOnReviewDeliveryDate,
+  } = useOrderDetailsStore();
 
-  const { isNoEditUser } = useGlobalStore();
+  const { setOrderUnderActionId } = useOrderActionsStore();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async ({ orderId, items, deliveryDate, total }: any) => {
+    mutationFn: async () => {
       if (isNoEditUser) {
         toast.error(`Action not allowed`, { duration: 5000 });
         throw new Error();
@@ -36,36 +45,38 @@ export const useEditOrderDetails = () => {
 
       const magentoItems: any[] = [];
 
-      items.forEach((item: any) => {
+      orderOnReviewItems?.forEach((item: any) => {
         magentoItems.push({ item_id: item.id, weight: item.weight });
       });
 
       await magento.mutations.editOrderDetails({
-        orderId,
-        deliveryDate: formatUnixTimestamp(deliveryDate),
-        items: magentoItems,
         total,
+        orderId: orderOnReviewId,
+        items: magentoItems,
+        deliveryDate: formatUnixTimestamp(orderOnReviewDeliveryDate),
       });
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
         order: {
-          id: orderId,
-          items,
-          deliveryDate,
           total,
+          id: orderOnReviewId,
+          items: orderOnReviewItems,
+          deliveryDate: orderOnReviewDeliveryDate,
         },
       });
 
-      return orderId;
+      return orderOnReviewId;
     },
     onSuccess: () => {
       refetch();
       refetchCount();
       refetchOrder();
       setIsInEditMode(false);
+      setOrderUnderActionId("");
       toast.success(`Order Details Updated Successfully`, { duration: 5000 });
     },
 
     onError: () => {
+      setOrderUnderActionId("");
       toast.error(`Something Went Wrong`, { duration: 5000 });
     },
   });

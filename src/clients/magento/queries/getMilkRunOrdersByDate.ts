@@ -13,6 +13,6 @@ export const getMilkRunOrdersByDate = async (date: number): Promise<any[]> => {
     return response?.data || [];
   } catch (error) {
     logError(error);
-    throw error;
+    throw new Error();
   }
 };

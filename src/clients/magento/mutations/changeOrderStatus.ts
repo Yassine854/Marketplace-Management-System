@@ -17,6 +17,6 @@ export const changeOrderStatus = async ({
     await axios.magentoClient.put("orders/create", data);
   } catch (error) {
     logError(error);
-    throw error;
+    throw new Error();
   }
 };
