@@ -26,7 +26,7 @@ const OrdersTableHead = ({
           Customer <IconSelector size={18} />
         </OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onTotalClick}>
-          Total(TND)
+          Total
           <IconSelector size={18} />
         </OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onDeliveryDateClick}>
