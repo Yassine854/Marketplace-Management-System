@@ -3,6 +3,7 @@ import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import { logError } from "@/utils/logError";
 import dayjs from "dayjs";
 import { unixTimestampToDateDMY } from "@/utils/unixTimestamp";
+import { numberOfUniqueCustometerByMonthAnalytics } from "../byMonth";
 
 export const numberOfUniqueCustometerByYearAnalytics = async (date: string) => {
   try {
@@ -25,7 +26,7 @@ export const numberOfUniqueCustometerByYearAnalytics = async (date: string) => {
       .split("/")
       .map(Number);
 
-    const fetchPromises = [];
+    const result: any[] = [];
 
     for (let month = 1; month <= 12; month++) {
       if (
@@ -34,16 +35,10 @@ export const numberOfUniqueCustometerByYearAnalytics = async (date: string) => {
       ) {
         continue;
       }
-      fetchPromises.push(
-        fetch(
-          `http://localhost:3000/api/analytics/numberOfUniqueCustomer/byMonth?date=${paramYear}-${month}`,
-        )
-          .then((response) => response.json())
-          .then((json) => json.data),
-      );
+      const numberOfUniqueCustomer =
+        await numberOfUniqueCustometerByMonthAnalytics(`${paramYear}-${month}`);
+      result.push(numberOfUniqueCustomer);
     }
-
-    const result = await Promise.all(fetchPromises);
     return result;
   } catch (error) {
     logError(error);
