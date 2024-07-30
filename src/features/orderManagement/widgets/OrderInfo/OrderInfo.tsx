@@ -31,7 +31,7 @@ const OrderInfo = ({ id, total, storeId }: any) => {
           </p>
           <p className="text-black  ">
             <span className="text-n90 ">Total : </span>
-            {total}
+            {Number(total)?.toFixed(2)}
           </p>
           <p className="text-black  ">
             <span className="text-n90 ">Store : </span>

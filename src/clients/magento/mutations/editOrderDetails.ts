@@ -9,16 +9,16 @@ export const editOrderDetails = async ({
 }: any): Promise<any> => {
   try {
     const data = {
-      items: items,
       entity: {
         entity_id: orderId,
-        base_subtotal: total,
-        subtotal: total,
-        base_grand_total: total,
-        grand_total: total,
-        extension_attributes: {
-          delivery_date: deliveryDate,
-        },
+        items: items,
+        // base_subtotal: total,
+        //  subtotal: total,
+        //  base_grand_total: total,
+        //  grand_total: total,
+        // extension_attributes: {
+        //   delivery_date: deliveryDate,
+        // },
       },
     };
     await axios.magentoClient.put("orders/create", data);

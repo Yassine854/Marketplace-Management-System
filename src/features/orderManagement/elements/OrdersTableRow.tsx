@@ -71,7 +71,7 @@ const OrdersTableRow = ({
       <OrdersTableCell>
         {order?.customerFirstname + " " + order?.customerLastname}
       </OrdersTableCell>
-      <OrdersTableCell>{order?.total}</OrdersTableCell>
+      <OrdersTableCell>{Number(order?.total).toFixed(2)}</OrdersTableCell>
       <OrdersTableCell>
         {unixTimeStampToStringDateYMD(order?.deliveryDate)}
       </OrdersTableCell>

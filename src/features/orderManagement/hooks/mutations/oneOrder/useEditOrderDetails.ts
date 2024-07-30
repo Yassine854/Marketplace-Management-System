@@ -26,12 +26,18 @@ export const useEditOrderDetails = () => {
 
   const { refetch: refetchCount } = useOrdersCount();
 
-  const { setIsInEditMode } = useOrderDetailsStore();
+  const {
+    total,
+    setIsInEditMode,
+    orderOnReviewId,
+    orderOnReviewItems,
+    orderOnReviewDeliveryDate,
+  } = useOrderDetailsStore();
 
   const { setOrderUnderActionId } = useOrderActionsStore();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async ({ orderId, items, deliveryDate, total }: any) => {
+    mutationFn: async () => {
       if (isNoEditUser) {
         toast.error(`Action not allowed`, { duration: 5000 });
         throw new Error();
@@ -39,26 +45,26 @@ export const useEditOrderDetails = () => {
 
       const magentoItems: any[] = [];
 
-      items.forEach((item: any) => {
+      orderOnReviewItems?.forEach((item: any) => {
         magentoItems.push({ item_id: item.id, weight: item.weight });
       });
 
       await magento.mutations.editOrderDetails({
         total,
-        orderId,
+        orderId: orderOnReviewId,
         items: magentoItems,
-        deliveryDate: formatUnixTimestamp(deliveryDate),
+        deliveryDate: formatUnixTimestamp(orderOnReviewDeliveryDate),
       });
       await axios.servicesClient.put("/api/orders/typesense/edit-order", {
         order: {
-          items,
           total,
-          id: orderId,
-          deliveryDate,
+          id: orderOnReviewId,
+          items: orderOnReviewItems,
+          deliveryDate: orderOnReviewDeliveryDate,
         },
       });
 
-      return orderId;
+      return orderOnReviewId;
     },
     onSuccess: () => {
       refetch();

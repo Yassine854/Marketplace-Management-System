@@ -179,12 +179,7 @@ export const useOrderActionsFunctions = () => {
     name: "Edit",
     action: (orderId: string) => {
       setOrderUnderActionId(orderId);
-      editDetails({
-        total,
-        orderId,
-        items: orderOnReviewItems,
-        deliveryDate: orderOnReviewDeliveryDate,
-      });
+      editDetails();
     },
   };
 

@@ -4,8 +4,8 @@ meta {
   seq: 2
 }
 
-post {
-  url: {{baseUrl}}/api/orders/typesense/add-order
+put {
+  url: https://oms-staging.kamioun.com/api/orders/typesense/edit-order
   body: json
   auth: none
 }
@@ -16,37 +16,65 @@ headers {
 
 body:json {
   {
-    "order": {
-    "id": "59990",
-    "kamiounId": "000050010",
-    "state": "new",
-    "status": "open",
-    "total": 500,
-    "createdAt": 1720099225,
-    "customerId": 7043,
-    "storeId": 1,
-    "customerPhone": "3214564133",
-    "customerFirstname": "qasim",
-    "customerLastname": "hussain",
-    "deliveryAgentId": "",
-    "deliveryAgent": "",
-    "deliveryDate": 0,
-    "deliveryStatus": "",
-    "source": "online",
-    "items": [
+    "order": 
       {
-        "id": "736802",
-        "orderId": "59990",
-        "kamiounOrderId": "000050010",
-        "productId": "5301",
-        "productName": "P6",
-        "productPrice": 500,
-        "totalPrice": 500,
-        "quantity": 1,
-        "sku": "P6-2"
+        "id": "63450",
+        "orderId": "63450",
+        "incrementId": "000052672",
+        "kamiounId": "000052672",
+        "state": "new",
+        "status": "open",
+        "total": 159.09,
+        "createdAt": 1722348213,
+        "customerId": 6324,
+        "storeId": 1,
+        "customerPhone": "24946132",
+        "customerFirstname": "Ikbel",
+        "customerLastname": "Sousse",
+        "deliveryAgentId": "",
+        "deliveryAgentName": "",
+        "deliverySlot": "",
+        "deliveryD321321ate": 0,
+        "deliveryStatus": "",
+        "source": "online",
+        "items": [
+          {
+            "id": "797778",
+            "orderId": "63450",
+            "kamiounOrderId": "000052672",
+            "productId": "3244",
+            "productName": "La Goulette - Thon entier HV 2.1kg ( unit\u00e9 )",
+            "productPrice": 46.2,
+            "totalPrice": 138.6,
+            "quantity": 3,
+            "sku": "61915718013445"
+          },
+          {
+            "id": "797779",
+            "orderId": "63450",
+            "kamiounOrderId": "000052672",
+            "productId": "3952",
+            "productName": "Oliv+ Trio d'Or - 50% Huile d'Olive 1L",
+            "productPrice": 15.39,
+            "totalPrice": 15.39,
+            "quantity": 1,
+            "sku": "6194017409148"
+          },
+          {
+            "id": "797780",
+            "orderId": "63450",
+            "kamiounOrderId": "000052672",
+            "productId": "154",
+            "productName": "Bonna - Pot moutarde 263ml (Unit\u00e9)",
+            "productPrice": 5.1,
+            "totalPrice": 5.1,
+            "quantity": 1,
+            "sku": "001-001001"
+          }
+        ]
       }
-    ]
-  }
+    
+  
   }
 }
 

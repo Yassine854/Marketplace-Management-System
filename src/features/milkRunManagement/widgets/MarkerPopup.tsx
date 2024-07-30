@@ -50,7 +50,8 @@ const MarkerPopup = ({
         Customer : <span className="font-bold text-n90">{customer}</span>
       </div>
       <div className=" font-semibold text-black">
-        Total : <span className="font-bold text-n90">{total}</span>
+        Total :{" "}
+        <span className="font-bold text-n90">{Number(total)?.toFixed(2)}</span>
       </div>
       <div className=" font-semibold text-black">
         Delivery Agent :{" "}
