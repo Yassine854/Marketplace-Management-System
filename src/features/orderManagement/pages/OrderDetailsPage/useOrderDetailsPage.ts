@@ -1,4 +1,3 @@
-import { useOrderDetailsEffect } from "../../hooks/useOrderDetailsEffect";
 import { useEffect, useRef, useState } from "react";
 import { useOrderDetailsActions } from "../../hooks/actions/useOrderDetailsActions";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
@@ -7,19 +6,23 @@ import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDet
 import { useCancelOrder } from "../../hooks/mutations/oneOrder/useCancelOrder";
 import { useDisclosure } from "@nextui-org/modal";
 import { useGetOrderItems } from "../../hooks/queries/useGetOrderItems";
+import { redirect } from "next/navigation";
+import { useOrderActionsStore } from "../../stores/orderActionsStore";
+import { useOrderOnReviewItems } from "../../hooks/useOrderOnReviewItems";
+import { useTotal } from "../../hooks/useTotal";
 
 export const useOrderDetailsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { navigateBack } = useNavigation();
   const dropRef = useRef();
-
+  useOrderOnReviewItems();
   const {
     total,
     isInEditMode,
     orderOnReviewId,
-    orderOnReviewItems,
-    setOrderOnReviewDeliveryDate,
     setOrderOnReviewItems,
+    setOrderOnReviewDeliveryDate,
+    orderOnReviewItems,
   } = useOrderDetailsStore();
 
   const { actions, isSomeActionPending, orderToCancelId, setOrderToCancelId } =
@@ -34,7 +37,7 @@ export const useOrderDetailsPage = () => {
     isPending: isCancelingPending,
     isError,
   } = useCancelOrder();
-
+  useTotal();
   const { data: order, isLoading: isOrderLoading } = useGetOrder();
 
   const { data: orderItems, isLoading: isOrderItemsLoading } =
@@ -51,7 +54,23 @@ export const useOrderDetailsPage = () => {
     }
   }, [isSomeActionPending]);
 
-  useOrderDetailsEffect(reset);
+  //useOrderDetailsEffect(reset);
+
+  const { orderUnderActionId } = useOrderActionsStore();
+
+  useEffect(() => {
+    if (!orderUnderActionId) {
+      reset();
+    }
+  }, [orderUnderActionId, reset]);
+
+  useEffect(() => {
+    !orderOnReviewId && redirect("/orders");
+  }, [orderOnReviewId]);
+
+  useEffect(() => {
+    order && setOrderOnReviewDeliveryDate(order?.deliveryDate);
+  }, [order, setOrderOnReviewItems, setOrderOnReviewDeliveryDate]);
 
   useEffect(() => {
     if (orderToCancelId) {
@@ -70,21 +89,7 @@ export const useOrderDetailsPage = () => {
   }, [isError]);
 
   useEffect(() => {
-    if (order && orderItems) {
-      const mergedItems = order?.items.map((item: any) => {
-        const product = orderItems?.find(
-          (p: any) => p.id === parseInt(item.productId),
-        );
-
-        return { ...item, ...product };
-      });
-
-      setOrderOnReviewItems(mergedItems);
-    }
-  }, [order, orderItems, setOrderOnReviewItems]);
-
-  useEffect(() => {
-    if (isOrderItemsLoading || isOrderItemsLoading) {
+    if (isOrderItemsLoading) {
       setIsLoading(true);
     } else {
       setIsLoading(false);

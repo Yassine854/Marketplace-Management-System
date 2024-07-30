@@ -37,7 +37,6 @@ export const useOrderDetailsEffect = (reset: any) => {
   }, [orderOnReviewItems, setTotal]);
 
   useEffect(() => {
-    //  order && setOrderOnReviewItems(order?.items);
     order && setOrderOnReviewDeliveryDate(order?.deliveryDate);
   }, [order, setOrderOnReviewItems, setOrderOnReviewDeliveryDate]);
 };
