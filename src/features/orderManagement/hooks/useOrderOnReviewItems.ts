@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGetOrderItems } from "./queries/useGetOrderItems";
 import { useGetOrder } from "./queries/useGetOrder";
 import { useOrderDetailsStore } from "../stores/orderDetailsStore";
 
 export const useOrderOnReviewItems = () => {
-  const { orderOnReviewId, setOrderOnReviewItems } = useOrderDetailsStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const { orderOnReviewId, setOrderOnReviewItems, orderOnReviewItems } =
+    useOrderDetailsStore();
 
   const { data: order, isLoading: isOrderLoading } = useGetOrder();
 
@@ -24,4 +26,14 @@ export const useOrderOnReviewItems = () => {
       setOrderOnReviewItems(mergedItems);
     }
   }, [order, orderItems, setOrderOnReviewItems]);
+
+  useEffect(() => {
+    if (isOrderLoading || isOrderItemsLoading) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [isOrderLoading, isOrderItemsLoading]);
+
+  return { orderOnReviewItems, isLoading };
 };

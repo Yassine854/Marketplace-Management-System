@@ -30,41 +30,53 @@ const OrderDetailsPage = () => {
   return (
     <div className="mt-[4.8rem] flex flex-grow flex-col justify-between bg-n20 p-4 ">
       <div className=" flex flex-grow flex-col overflow-hidden  rounded-2xl  bg-n10 p-2 shadow-2xl ">
-        <OrderDetailsPageHeader
-          status={order?.status}
-          onArrowClick={onArrowClick}
-        />
+        <>
+          {!isLoading && (
+            <OrderDetailsPageHeader
+              status={order?.status}
+              onArrowClick={onArrowClick}
+            />
+          )}
+          {isLoading && <div className="h-12 w-full animate-pulse bg-n40" />}
+        </>
+
         <Divider />
+        <>
+          {!isLoading && (
+            <>
+              <div className=" mt-8  flex justify-between px-12 ">
+                <OrderInfo
+                  id={order?.incrementId}
+                  status={order?.status}
+                  storeId={order?.storeId}
+                  total={total?.toFixed(2)}
+                  createdAt={order?.createdAt}
+                />
+                <CustomerInfo
+                  phone={order?.customerPhone}
+                  lastname={order?.customerLastname}
+                  firstname={order?.customerFirstname}
+                />
 
-        <div className=" mt-8  flex justify-between px-12 ">
-          <OrderInfo
-            id={order?.incrementId}
-            status={order?.status}
-            storeId={order?.storeId}
-            total={total?.toFixed(2)}
-            createdAt={order?.createdAt}
-          />
-          <CustomerInfo
-            phone={order?.customerPhone}
-            lastname={order?.customerLastname}
-            firstname={order?.customerFirstname}
-          />
+                <DeliveryInfo
+                  isInEditMode={isInEditMode}
+                  deliveryDate={order?.deliveryDate}
+                  deliveryAgentName={order?.deliveryAgentName}
+                  onDeliveryDateChange={onDeliveryDateChange}
+                />
 
-          <DeliveryInfo
-            isInEditMode={isInEditMode}
-            deliveryDate={order?.deliveryDate}
-            deliveryAgentName={order?.deliveryAgentName}
-            onDeliveryDateChange={onDeliveryDateChange}
-          />
-
-          <OrderActions
-            dropRef={dropRef}
-            actions={actions}
-            orderId={order?.id}
-            isInEditMode={isInEditMode}
-            isPending={isSomeActionPending}
-          />
-        </div>
+                <OrderActions
+                  dropRef={dropRef}
+                  actions={actions}
+                  orderId={order?.id}
+                  isInEditMode={isInEditMode}
+                  isPending={isSomeActionPending}
+                />
+              </div>
+            </>
+          )}
+          {isLoading && <div className="h-48 w-full animate-pulse bg-n40" />}
+        </>
         <Divider />
         <div className="relative mb-4 mt-1 flex flex-grow overflow-y-scroll ">
           {!isLoading && orderOnReviewItems && (
@@ -73,6 +85,7 @@ const OrderDetailsPage = () => {
               isInEditMode={isInEditMode}
             />
           )}
+          {isLoading && <div className="h-full w-full animate-pulse bg-n40" />}
         </div>
       </div>
       <OrderCancelingModal

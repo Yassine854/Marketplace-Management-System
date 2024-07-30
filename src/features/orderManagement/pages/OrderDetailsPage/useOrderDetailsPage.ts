@@ -15,14 +15,15 @@ export const useOrderDetailsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { navigateBack } = useNavigation();
   const dropRef = useRef();
-  useOrderOnReviewItems();
+  const { orderOnReviewItems, isLoading: isOrderOnReviewItemsLoading } =
+    useOrderOnReviewItems();
   const {
     total,
     isInEditMode,
     orderOnReviewId,
     setOrderOnReviewItems,
     setOrderOnReviewDeliveryDate,
-    orderOnReviewItems,
+    // orderOnReviewItems,
   } = useOrderDetailsStore();
 
   const { actions, isSomeActionPending, orderToCancelId, setOrderToCancelId } =
@@ -40,8 +41,8 @@ export const useOrderDetailsPage = () => {
   useTotal();
   const { data: order, isLoading: isOrderLoading } = useGetOrder();
 
-  const { data: orderItems, isLoading: isOrderItemsLoading } =
-    useGetOrderItems(orderOnReviewId);
+  // const { data: orderItems, isLoading: isOrderItemsLoading } =
+  //   useGetOrderItems(orderOnReviewId);
 
   const reset = () => {
     //@ts-ignore
@@ -89,12 +90,12 @@ export const useOrderDetailsPage = () => {
   }, [isError]);
 
   useEffect(() => {
-    if (isOrderItemsLoading) {
+    if (isOrderLoading || isOrderOnReviewItemsLoading) {
       setIsLoading(true);
     } else {
       setIsLoading(false);
     }
-  }, [isOrderLoading, isOrderItemsLoading]);
+  }, [isOrderLoading, isOrderOnReviewItemsLoading]);
 
   return {
     order,
