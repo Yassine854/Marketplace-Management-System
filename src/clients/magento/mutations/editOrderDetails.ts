@@ -12,13 +12,13 @@ export const editOrderDetails = async ({
       entity: {
         entity_id: orderId,
         items: items,
-        // base_subtotal: total,
-        //  subtotal: total,
-        //  base_grand_total: total,
-        //  grand_total: total,
-        // extension_attributes: {
-        //   delivery_date: deliveryDate,
-        // },
+        base_subtotal: total,
+        subtotal: total,
+        base_grand_total: total,
+        grand_total: total,
+        extension_attributes: {
+          delivery_date: deliveryDate,
+        },
       },
     };
     await axios.magentoClient.put("orders/create", data);

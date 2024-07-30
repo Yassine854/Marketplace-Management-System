@@ -16,13 +16,7 @@ export const useOrderActionsFunctions = () => {
     isSomeMutationPending,
   } = useOrderMutations();
 
-  const {
-    total,
-    setIsInEditMode,
-    setOrderOnReviewId,
-    orderOnReviewItems,
-    orderOnReviewDeliveryDate,
-  } = useOrderDetailsStore();
+  const { setIsInEditMode, setOrderOnReviewId } = useOrderDetailsStore();
 
   const {
     setSelectedAction,
