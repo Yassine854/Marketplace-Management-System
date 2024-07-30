@@ -21,8 +21,8 @@ const OrderDetailsActions = ({ orderId, dropRef, isPending, actions }: any) => {
       </div>
 
       <div className=" ml-2">
-        <p className=" ml-2 pb-2 text-2xl font-bold text-black">Actions </p>
-        <div className="flex flex-col items-center justify-center">
+        <p className=" ml-2 pb-2 text-2xl font-bold text-black">Actions</p>
+        <div className="flex h-24 flex-col  justify-between">
           <>
             {actions && (
               <Dropdown
@@ -35,10 +35,10 @@ const OrderDetailsActions = ({ orderId, dropRef, isPending, actions }: any) => {
             )}
 
             {selectedAction?.key && (
-              <>
+              <div className="flex h-12 items-center justify-center ">
                 {!isPending && (
                   <button
-                    className="btn m-2 flex h-2 items-center  justify-center p-4"
+                    className="btn m-2 flex h-2 w-full  items-center justify-center p-4"
                     onClick={() => {
                       selectedAction.action(orderId);
                     }}
@@ -51,7 +51,7 @@ const OrderDetailsActions = ({ orderId, dropRef, isPending, actions }: any) => {
                     <Loading />
                   </div>
                 )}
-              </>
+              </div>
             )}
           </>
         </div>
