@@ -22,7 +22,7 @@ const OrderDetailsActions = ({ orderId, dropRef, isPending, actions }: any) => {
 
       <div className=" ml-2">
         <p className=" ml-2 pb-2 text-2xl font-bold text-black">Actions </p>
-        <div className="flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center">
           <>
             {actions && (
               <Dropdown

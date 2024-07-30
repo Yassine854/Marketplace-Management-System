@@ -17,11 +17,11 @@ export const useOrderActionsFunctions = () => {
   } = useOrderMutations();
 
   const {
+    total,
     setIsInEditMode,
     setOrderOnReviewId,
     orderOnReviewItems,
     orderOnReviewDeliveryDate,
-    total,
   } = useOrderDetailsStore();
 
   const {

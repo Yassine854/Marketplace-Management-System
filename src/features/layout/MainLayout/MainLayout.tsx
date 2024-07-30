@@ -1,87 +1,16 @@
-import { useEffect, useState } from "react";
+import { useMainLayout } from "./useMainLayout";
 import Sidebar from "@/features/layout/widgets/Sidebar";
 import TopNav from "@/features/layout/widgets/TopNavbar";
-import { useAuth } from "@/features/shared/hooks/useAuth";
-import { useNavigation } from "@/features/shared/hooks/useNavigation";
-import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 
-//To Refactor
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
-
-  const { setStatus } = useOrdersStore();
-  const { navigateToOrders } = useNavigation();
-  const { isAdmin, isNoEditUser, isMultipleStoreAccessUser } = useGlobalStore();
-  const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
   const {
-    setStoreId,
-    setIsNoEditUser,
-    setIsAdmin,
-    storeId,
-    setIsMultipleStoreAccessUser,
-  } = useGlobalStore();
-
-  useEffect(() => {
-    //@ts-ignore
-    if (user?.roleId !== "5") {
-      setIsNoEditUser(false);
-      setIsMultipleStoreAccessUser(false);
-    }
-  }, [storeId]);
-
-  useEffect(() => {
-    //@ts-ignore
-    if (user?.roleId !== "1") {
-      setIsAdmin(false);
-    }
-  }, [storeId]);
-
-  useEffect(() => {
-    //@ts-ignore
-    switch (user?.roleId) {
-      case "1":
-        setStoreId("1");
-        setIsAdmin(true);
-
-        break;
-      case "5":
-        setStoreId("1");
-        setIsMultipleStoreAccessUser(true);
-        setIsNoEditUser(true);
-        break;
-      case "2":
-        setStoreId("2");
-        break;
-      case "3":
-        setStoreId("2");
-        break;
-      case "4":
-        setStoreId("4");
-        break;
-    }
-  }, [user, setStoreId]);
-
-  useEffect(() => {
-    if (window.innerWidth > 1400) {
-      setSidebarIsOpen(true);
-    } else {
-      setSidebarIsOpen(false);
-    }
-    const handleResize = () => {
-      if (window.innerWidth < 1400) {
-        setSidebarIsOpen(false);
-      } else {
-        setSidebarIsOpen(true);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+    isAdmin,
+    setStatus,
+    isNoEditUser,
+    sidebarIsOpen,
+    navigateToOrders,
+    setSidebarIsOpen,
+  } = useMainLayout();
 
   return (
     <div className="h-screen w-screen">
