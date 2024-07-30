@@ -65,7 +65,7 @@ export const useOrderActionsFunctions = () => {
       editStatusAndState({
         orderId,
         status: "unpaid",
-        state: "new",
+        state: "complete",
       });
     },
   };
@@ -91,7 +91,7 @@ export const useOrderActionsFunctions = () => {
       editStatusAndState({
         orderId,
         status: "delivered",
-        state: "new",
+        state: "complete",
       });
     },
   };
@@ -104,7 +104,7 @@ export const useOrderActionsFunctions = () => {
       editStatusAndState({
         orderId,
         status: "archived",
-        state: "new",
+        state: "complete",
       });
     },
   };
@@ -175,10 +175,10 @@ export const useOrderActionsFunctions = () => {
     action: (orderId: string) => {
       setOrderUnderActionId(orderId);
       editDetails({
+        total,
         orderId,
         items: orderOnReviewItems,
         deliveryDate: orderOnReviewDeliveryDate,
-        total,
       });
     },
   };
