@@ -24,8 +24,12 @@ export const useOrderActionsFunctions = () => {
     total,
   } = useOrderDetailsStore();
 
-  const { setOrderToCancelId, setIsSomeActionPending, setOrderUnderActionId } =
-    useOrderActionsStore();
+  const {
+    setSelectedAction,
+    setOrderToCancelId,
+    setIsSomeActionPending,
+    setOrderUnderActionId,
+  } = useOrderActionsStore();
 
   useEffect(() => {
     setIsSomeActionPending(isSomeMutationPending);
@@ -162,6 +166,7 @@ export const useOrderActionsFunctions = () => {
     key: "gotToEdit",
     name: "Edit",
     action: (orderId: string): void => {
+      setSelectedAction(edit);
       navigateToOrderDetails();
       setIsInEditMode(true);
       setOrderUnderActionId(orderId);
