@@ -1,7 +1,7 @@
 const Cell = ({ children }: any) => {
   return (
     <td className="p-5">
-      <div className="  flex w-full cursor-pointer select-none items-center justify-center gap-1 bg-purple-600">
+      <div className="  flex w-full cursor-pointer select-none items-center justify-center gap-1 ">
         {children}
       </div>
     </td>
