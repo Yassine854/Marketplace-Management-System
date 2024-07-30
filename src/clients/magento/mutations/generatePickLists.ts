@@ -11,6 +11,6 @@ export const generatePickLists = async (
     return res?.data;
   } catch (error) {
     logError(error);
-    throw error;
+    throw new Error();
   }
 };

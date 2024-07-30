@@ -4,16 +4,8 @@ import { useOrderActionsStore } from "@/features/orderManagement/stores/orderAct
 
 export const useOrderDetailsActions = () => {
   const { actions } = useOrderDetailsActionsByStatus();
-  const {
-    isSomeActionPending,
-    setOrderUnderActionId,
-    orderToCancelId,
-    setOrderToCancelId,
-  } = useOrderActionsStore();
-
-  useEffect(() => {
-    !isSomeActionPending && setOrderUnderActionId("");
-  }, [isSomeActionPending, setOrderUnderActionId]);
+  const { isSomeActionPending, orderToCancelId, setOrderToCancelId } =
+    useOrderActionsStore();
 
   return {
     setOrderToCancelId,

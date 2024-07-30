@@ -9,6 +9,9 @@ export const useOrderDetailsStore = create<any>(
       orderOnReviewDeliveryDate: null,
       isInEditMode: false,
       total: 0,
+      // reset: () => {
+      //   const test = get().total;
+      // },
 
       setTotal: (total: number) => set({ total }),
 
@@ -21,6 +24,8 @@ export const useOrderDetailsStore = create<any>(
       setOrderOnReviewId: (orderOnReviewId: string) => set({ orderOnReviewId }),
 
       setIsInEditMode: (isInEditMode: boolean) => set({ isInEditMode }),
+
+      setReset: (reset: any) => set({ reset }),
     }),
 
     {

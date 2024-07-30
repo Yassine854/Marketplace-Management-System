@@ -10,10 +10,10 @@ import Loading from "@/features/shared/elements/Loading";
 
 const OrderCancelingModal = ({
   isOpen,
-  isPending,
-  onConfirm,
   onClose,
   message,
+  isPending,
+  onConfirm,
 }: any) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>

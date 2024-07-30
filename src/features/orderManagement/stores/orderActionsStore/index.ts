@@ -4,26 +4,29 @@ import { persist } from "zustand/middleware";
 export const useOrderActionsStore = create<any>(
   persist(
     (set, get) => ({
+      isPending: false,
+      selectedAction: {},
+      orderToCancelId: "",
       orderUnderActionId: "",
+      isEditingPending: false,
+      isSomeActionPending: false,
+
       setOrderUnderActionId: (orderUnderActionId: string) =>
         set({
           orderUnderActionId,
         }),
 
-      openCancelingModal: () => {},
-
-      isSomeActionPending: false,
-      setIsSomeActionPending: (isSomeActionPending: boolean): void =>
-        set({ isSomeActionPending }),
-      orderToCancelId: "",
-      setOrderToCancelId: (orderToCancelId: string) => set({ orderToCancelId }),
-
-      isEditingPending: false,
       setIsEditingPending: (isEditingPending: boolean) =>
         set({ isEditingPending }),
 
-      isPending: false,
       setIsPending: (isPending: boolean) => set({ isPending }),
+
+      setIsSomeActionPending: (isSomeActionPending: boolean): void =>
+        set({ isSomeActionPending }),
+
+      setSelectedAction: (selectedAction: any) => set({ selectedAction }),
+
+      setOrderToCancelId: (orderToCancelId: string) => set({ orderToCancelId }),
     }),
     {
       name: "ordersStore",

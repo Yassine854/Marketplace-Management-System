@@ -11,6 +11,6 @@ export const getDeliveryAgents = async () => {
     };
   } catch (error) {
     logError(error);
-    throw error;
+    throw new Error();
   }
 };
