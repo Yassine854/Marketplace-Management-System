@@ -1,7 +1,6 @@
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import dayjs from "dayjs";
-import { getGrossMarketValueByMonth } from "../../../../clients/typesense/orders/grossMaValue/getGrossMarketValueByMonth";
-
+import { getGrossMarketValueByMonth } from "@/clients/typesense/orders/grossMarchandiseValue/getGrossMarchandiseValueByMonth";
 export async function populateGMVPreviousMonths() {
   try {
     const startYear = 2020;
