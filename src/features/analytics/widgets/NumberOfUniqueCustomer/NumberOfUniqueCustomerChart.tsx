@@ -2,14 +2,12 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useGetNumberOfUniqueCustomerByYearAnalytics } from "../../hooks/useGetNumberOfUniqueCustomerByYearAnalytics";
 import Loading from "@/features/shared/elements/Loading";
-import MonthPicker from "../MonthPicker";
+import YearPicker from "../YearPicker";
 
 const NumberOfUniqueCustomerChart = () => {
   const [date, setDate] = useState(`${new Date().getFullYear()}-01-01`);
-  const year = date.split("-")[0];
-  const { data, isLoading } = useGetNumberOfUniqueCustomerByYearAnalytics(
-    Number(year),
-  );
+  const year = Number(date);
+  const { data, isLoading } = useGetNumberOfUniqueCustomerByYearAnalytics(year);
   const [chartData, setChartData] = useState<number[]>([]);
   useEffect(() => {
     if (data) {
@@ -56,7 +54,7 @@ const NumberOfUniqueCustomerChart = () => {
           </div>
           <p className="text-2xl font-bold">Number of Unique Customer </p>
         </div>
-        <MonthPicker onMonthChange={(date: string) => setDate(date)} />
+        <YearPicker onYearChange={(date: string) => setDate(date)} />
       </div>
       <div className="h-[320px]">
         <ReactApexChart

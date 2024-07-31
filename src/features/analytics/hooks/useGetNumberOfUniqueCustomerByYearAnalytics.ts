@@ -12,11 +12,9 @@ export const useGetNumberOfUniqueCustomerByYearAnalytics = (year: number) => {
       data?.data.map((item: any) => {
         list.push(item.NumberOfUniqueCustomer);
       });
-      // console.log("API response for", ":", list); // Log API response
       return list;
     },
   });
-  // console.log("From outside",data);
 
   return {
     data,
