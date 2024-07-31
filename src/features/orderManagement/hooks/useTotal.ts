@@ -6,8 +6,8 @@ export const useTotal = () => {
 
   useEffect(() => {
     let total = 0;
-    orderOnReviewItems.forEach((item: any) => {
-      total += item.weight * item.productPrice;
+    orderOnReviewItems?.forEach((item: any) => {
+      total += item?.weight * item?.productPrice;
     });
 
     setTotal(total);

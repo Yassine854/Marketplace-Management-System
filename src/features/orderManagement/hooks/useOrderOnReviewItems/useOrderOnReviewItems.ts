@@ -1,7 +1,20 @@
 import { useEffect, useState } from "react";
-import { useGetOrder } from "./queries/useGetOrder";
-import { useGetOrderItems } from "./queries/useGetOrderItems";
-import { useOrderDetailsStore } from "../stores/orderDetailsStore";
+import { useGetOrder } from "../queries/useGetOrder";
+import { useGetOrderItems } from "../queries/useGetOrderItems";
+import { useOrderDetailsStore } from "../../stores/orderDetailsStore";
+
+const getMergedItems = (orderItems1: any, orderItems2: any): any[] => {
+  if (orderItems1 && orderItems2) {
+    const mergedItems = orderItems1.map((item: any) => {
+      const product = orderItems2?.find((p: any) => p.sku == item.sku);
+
+      return { ...item, ...product };
+    });
+
+    return mergedItems;
+  }
+  return [];
+};
 
 export const useOrderOnReviewItems = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,14 +28,7 @@ export const useOrderOnReviewItems = () => {
 
   useEffect(() => {
     if (order && orderItems) {
-      const mergedItems = order?.items.map((item: any) => {
-        const product = orderItems?.find(
-          (p: any) => p.id === parseInt(item.productId),
-        );
-
-        return { ...item, ...product };
-      });
-
+      const mergedItems = getMergedItems(order?.items, orderItems);
       setOrderOnReviewItems(mergedItems);
     }
   }, [order, orderItems, setOrderOnReviewItems]);

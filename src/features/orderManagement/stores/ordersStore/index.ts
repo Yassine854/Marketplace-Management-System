@@ -26,9 +26,6 @@ export const useOrdersStore = create<any>(
       resetSelectedOrders: () => set({ selectedOrders: [] }),
       setSelectedOrders: (selectedOrders: any) => set({ selectedOrders }),
 
-      setOrderOnReviewItems: (orderOnReviewItems: any[]) =>
-        set({ orderOnReviewItems }),
-
       setIsOrdersLoading: (loading: boolean) =>
         set(() => ({ isOrdersLoading: loading })),
 
