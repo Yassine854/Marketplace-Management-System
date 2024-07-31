@@ -20,7 +20,7 @@ import { getGrossMarketValueByDayRoute } from "./orders/typesense/grossMarketVal
 import { grossMarketValueByWeekAnalyticsRoute } from "./analytics/grossMarketValue/grossMarketValueByWeekAnalyticsRoute";
 import { numberOfUniqueCustomerByMonthAnalyticsRoute } from "./analytics/numberOfUniqueCustomer/numberOfUniqueCustomerByMonthAnalyticsRoute";
 import { numberOfUniqueCustomerByYearAnalyticsRoute } from "./analytics/numberOfUniqueCustomer/numberOfUniqueCustomerByYearAnalyticsRoute";
-
+import { getOrderRoute } from "./orders/getOrderRoute";
 export const nextRoute = {
   analytics: {
     numberOfOrders: {
@@ -49,6 +49,7 @@ export const nextRoute = {
   },
 
   orders: {
+    getOrder: getOrderRoute,
     magento: {
       getMany: {
         byDeliveryDate: getOrdersByDeliveryDateRoute,
