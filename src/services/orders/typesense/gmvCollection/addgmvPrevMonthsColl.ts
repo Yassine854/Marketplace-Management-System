@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import { checkApiKey } from "@/services/auth/checkApiKey";
 import { logError } from "@/utils/logError";
-
-import { gmvPreviousMonthsCollectionSchema } from "@/clients/typesense/schema/gmvPreviousMonthsCollection";
 import {
   successResponse,
   conflictResponse,
   invalidRequestResponse,
   internalServerErrorResponse,
 } from "./response";
+
+import { gmvPreviousMonthsCollectionSchema } from "@/clients/typesense/schema/gmvPreviousMonthsCollection";
+
 export const addgmvCollection = async (request: NextRequest) => {
   try {
     await typesenseClient

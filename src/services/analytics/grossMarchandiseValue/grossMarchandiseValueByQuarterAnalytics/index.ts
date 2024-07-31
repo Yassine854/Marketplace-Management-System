@@ -1,4 +1,4 @@
-import { getGrossMarketValueByQuarter } from "@/services/orders/typesense/grossMarketValue/getGrossMarketValueByQuarter";
+import { getGrossMarketValueByQuarter } from "@/services/orders/typesense/grossMarchandiseValue/getGrossMarchandiseValueByQuarter";
 
 export const grossMarketValueByQuarterAnalytics = async (year: number) => {
   const quarterMonths: { [key: string]: [number, number] } = {

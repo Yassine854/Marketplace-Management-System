@@ -1,7 +1,7 @@
 import { responses } from "../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getGrossMarketValueByMonthAnalytics } from "@/services/orders/typesense/grossMarketValue/getGrossMarketValueByMonth";
+import { getGrossMarketValueByMonthAnalytics } from "@/services/orders/typesense/grossMarchandiseValue/getGrossMarchandiseValueByMonth";
 export const grossMarketValueByMonthAnalyticsRoute = async (
   request: NextRequest,
 ) => {
@@ -16,6 +16,7 @@ export const grossMarketValueByMonthAnalyticsRoute = async (
       return responses.invalidRequest("Year Parameter is Required");
     }
     const res = await getGrossMarketValueByMonthAnalytics(year, month);
+
     return NextResponse.json(
       {
         message: "success",

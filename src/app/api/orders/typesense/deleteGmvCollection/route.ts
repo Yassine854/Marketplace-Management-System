@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { deletegmvCollection } from "@/clients/typesense/orders/grossMarketValue/gmvCollection/deletegmvPrevMonthsColl";
+import { deletegmvCollection } from "@/services/orders/typesense/gmvCollection/deletegmvPrevMonthsColl";
 
 export async function DELETE(Request: any) {
   try {

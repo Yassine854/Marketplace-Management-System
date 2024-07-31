@@ -1,4 +1,4 @@
-import { grossMarketValueByQuarterAnalytics } from "../grossMarketValueByQuarterAnalytics";
+import { grossMarketValueByQuarterAnalytics } from "../grossMarchandiseValueByQuarterAnalytics";
 
 export const grossMarketValueLifetimeAnalytics = async (
   startYear: number,

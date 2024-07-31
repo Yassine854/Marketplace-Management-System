@@ -1,4 +1,4 @@
-import { getGrossMarketValueByDay } from "./getGrossMarketValueByDay";
+import { getGrossMarketValueByDay } from "./getGrossMarchandiseValueByDay";
 
 function generateMonthDaysObject({ year, month }: any) {
   const lastDay = new Date(year, month, 0).getDate();
