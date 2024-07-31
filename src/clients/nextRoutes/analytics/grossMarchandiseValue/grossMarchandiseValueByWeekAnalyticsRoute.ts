@@ -1,8 +1,8 @@
-import { grossMarketValueByQuarterAnalytics } from "@/services/analytics/grossMarketValue/grossMarketValueByQuarterAnalytics";
+import { grossMarketValueByQuarterAnalytics } from "@/services/analytics/grossMarchandiseValue/grossMarchandiseValueByQuarterAnalytics";
 import { responses } from "../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { grossMarketValueByWeekAnalytics } from "@/services/analytics/grossMarketValue/grossMarketValueByWeekAnalytics";
+import { grossMarketValueByWeekAnalytics } from "@/services/analytics/grossMarchandiseValue/grossMarchandiseValueByWeekAnalytics";
 
 export const grossMarketValueByWeekAnalyticsRoute = async (
   request: NextRequest,

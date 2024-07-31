@@ -1,7 +1,7 @@
 import { responses } from "../../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getGrossMarketValueByDay } from "@/services/orders/typesense/grossMarketValue/getGrossMarketValueByDay";
+import { getGrossMarketValueByDay } from "@/services/orders/typesense/grossMarchandiseValue/getGrossMarketValueByDay";
 export const getGrossMarketValueByDayRoute = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -16,7 +16,7 @@ export const getGrossMarketValueByDayRoute = async (request: NextRequest) => {
       return responses.invalidRequest("Month Parameter is Required");
     }
     if (!dayString) {
-      return responses.invalidRequest("day Parameter is Required");
+      return responses.invalidRequest("Day Parameter is Required");
     }
     const year = parseInt(yearString, 10);
     const month = parseInt(monthString, 10);
