@@ -1,11 +1,11 @@
+import { useResetStores } from "./useResetStores";
 import { signIn, signOut, useSession } from "next-auth/react";
-
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
-import { useEffect } from "react";
 
 export const useAuth = () => {
-  const { navigateToLogin } = useNavigation();
   const { data, status } = useSession();
+  const resetAllStores = useResetStores();
+  const { navigateToLogin } = useNavigation();
 
   const login = async (username: string, password: string) =>
     signIn("credentials", {
@@ -16,6 +16,7 @@ export const useAuth = () => {
 
   const logout = async () => {
     await signOut({ redirect: false });
+    resetAllStores();
     localStorage.clear();
     navigateToLogin();
   };

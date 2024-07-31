@@ -13,8 +13,11 @@ export const useMilkRunStore: any = create(
 
       reset: () =>
         set({
-          DeliveryAgentId: "",
+          deliverySlot: "",
+          deliveryAgentId: "",
           selectedOrdersIds: [],
+          deliveryAgentName: "",
+          deliveryDate: getUnixTimestampForTomorrow(),
         }),
 
       setDeliveryAgentName: (deliveryAgentName: string) =>

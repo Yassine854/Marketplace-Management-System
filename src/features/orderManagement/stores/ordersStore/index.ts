@@ -12,6 +12,15 @@ export const useOrdersStore = create<any>(
       isAllOrdersSelected: false,
       isSomeOrdersSelected: false,
 
+      reset: () =>
+        set({
+          status: "open",
+          selectedOrders: [],
+          isOrdersLoading: false,
+          isAllOrdersSelected: false,
+          isSomeOrdersSelected: false,
+        }),
+
       setOrders: (orders: any[]) => set({ orders }),
       setStatus: (status: string) => set({ status }),
       resetSelectedOrders: () => set({ selectedOrders: [] }),

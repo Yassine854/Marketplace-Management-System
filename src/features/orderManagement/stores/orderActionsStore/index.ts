@@ -11,6 +11,16 @@ export const useOrderActionsStore = create<any>(
       isEditingPending: false,
       isSomeActionPending: false,
 
+      reset: () =>
+        set({
+          isPending: false,
+          selectedAction: {},
+          orderToCancelId: "",
+          orderUnderActionId: "",
+          isEditingPending: false,
+          isSomeActionPending: false,
+        }),
+
       setOrderUnderActionId: (orderUnderActionId: string) =>
         set({
           orderUnderActionId,
