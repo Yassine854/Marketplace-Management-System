@@ -1,10 +1,9 @@
 import { useState } from "react";
-import "mapbox-gl/dist/mapbox-gl.css";
 import Image from "next/image";
+import "mapbox-gl/dist/mapbox-gl.css";
 import { Marker, Popup } from "react-map-gl";
 
 const MapMarkers = ({ markers, onMarkerClick, onMarkerHover }: any) => {
-  console.log("🚀 ~ MapMarkers ~ markers:", markers);
   const [popupInfo, setPopupInfo] = useState<any>(null);
 
   return (

@@ -12,13 +12,19 @@ export const useOrdersStore = create<any>(
       isAllOrdersSelected: false,
       isSomeOrdersSelected: false,
 
+      reset: () =>
+        set({
+          status: "open",
+          selectedOrders: [],
+          isOrdersLoading: false,
+          isAllOrdersSelected: false,
+          isSomeOrdersSelected: false,
+        }),
+
       setOrders: (orders: any[]) => set({ orders }),
       setStatus: (status: string) => set({ status }),
       resetSelectedOrders: () => set({ selectedOrders: [] }),
       setSelectedOrders: (selectedOrders: any) => set({ selectedOrders }),
-
-      setOrderOnReviewItems: (orderOnReviewItems: any[]) =>
-        set({ orderOnReviewItems }),
 
       setIsOrdersLoading: (loading: boolean) =>
         set(() => ({ isOrdersLoading: loading })),

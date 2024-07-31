@@ -24,9 +24,18 @@ const DeliveryInfo = ({
         <div className=" flex  items-center justify-center ">
           <p className="text-black  ">
             <span className="text-n90 ">Delivery Date :</span>{" "}
-            {!deliveryDate && "*****"}
+            {!deliveryDate && !isInEditMode && "*****"}
           </p>
           {!!deliveryDate && (
+            <DeliveryDatePicker
+              defaultValue={deliveryDate}
+              direction="down"
+              isReadOnly={!isInEditMode}
+              onChange={onDeliveryDateChange}
+            />
+          )}
+
+          {!deliveryDate && isInEditMode && (
             <DeliveryDatePicker
               defaultValue={deliveryDate}
               direction="down"

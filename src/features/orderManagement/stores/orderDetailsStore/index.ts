@@ -4,14 +4,20 @@ import { persist } from "zustand/middleware";
 export const useOrderDetailsStore = create<any>(
   persist(
     (set, get) => ({
+      total: 0,
       orderOnReviewId: "",
+      isInEditMode: false,
       orderOnReviewItems: [],
       orderOnReviewDeliveryDate: null,
-      isInEditMode: false,
-      total: 0,
-      // reset: () => {
-      //   const test = get().total;
-      // },
+
+      reset: () =>
+        set({
+          total: 0,
+          isInEditMode: false,
+          orderOnReviewId: "",
+          orderOnReviewItems: [],
+          orderOnReviewDeliveryDate: null,
+        }),
 
       setTotal: (total: number) => set({ total }),
 

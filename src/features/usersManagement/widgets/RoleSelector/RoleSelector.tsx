@@ -40,15 +40,6 @@ const RoleSelector = forwardRef<DropRef, any>(
       onChange && selectedRole && onChange(selectedRole?.key);
     }, [selectedRole, onChange]);
 
-    // useEffect(() => {
-
-    //   if (defaultValue) {
-    //     const value = roles?.find((role: any) => role.key === defaultValue);
-    //     console.log("🚀 ~ useEffect ~ value:", value);
-    //     setSelectedRole(value);
-    //   }
-    // }, [defaultValue]);
-
     useEffect(() => {
       if (user) {
         const value = roles?.find((role: any) => role.key === user.roleId);

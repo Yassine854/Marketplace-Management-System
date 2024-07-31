@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useOrderActionsStore } from "../../stores/orderActionsStore";
 import { useOrderDetailsEffect } from "../../hooks/useOrderDetailsEffect";
-import { useOrderOnReviewItems } from "../../hooks/useOrderOnReviewItems";
+import { useOrderOnReviewItems } from "../../hooks/useOrderOnReviewItems/useOrderOnReviewItems";
 import { useGetOrder } from "@/features/orderManagement/hooks/queries/useGetOrder";
 import { useOrderDetailsActions } from "../../hooks/actions/useOrderDetailsActions";
 import { useCancelOrderFromDetailsPage } from "../../hooks/useCancelOrderFromDetailsPage";
@@ -22,19 +22,15 @@ export const useOrderDetailsPage = () => {
 
   const { orderUnderActionId } = useOrderActionsStore();
 
+  const { total, isInEditMode, setOrderOnReviewDeliveryDate } =
+    useOrderDetailsStore();
+
   const { data: order, isLoading: isOrderLoading } = useGetOrder();
 
   const { actions, isSomeActionPending } = useOrderDetailsActions();
 
   const { orderOnReviewItems, isLoading: isOrderOnReviewItemsLoading } =
     useOrderOnReviewItems();
-
-  const {
-    total,
-    isInEditMode,
-    setOrderOnReviewItems,
-    setOrderOnReviewDeliveryDate,
-  } = useOrderDetailsStore();
 
   const {
     cancelOrder,
@@ -56,7 +52,7 @@ export const useOrderDetailsPage = () => {
 
   useEffect(() => {
     order && setOrderOnReviewDeliveryDate(order?.deliveryDate);
-  }, [order, setOrderOnReviewItems, setOrderOnReviewDeliveryDate]);
+  }, [order, setOrderOnReviewDeliveryDate]);
 
   useEffect(() => {
     if (isOrderLoading || isOrderOnReviewItemsLoading) {
