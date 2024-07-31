@@ -1,6 +1,6 @@
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import dayjs from "dayjs";
-import { getGrossMarketValueByMonth } from "../../../../clients/typesense/orders/grossMarketValue/getGrossMarketValueByMonth";
+import { getGrossMarketValueByMonth } from "../../../../clients/typesense/orders/grossMaValue/getGrossMarketValueByMonth";
 
 export async function populateGMVPreviousMonths() {
   try {

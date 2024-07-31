@@ -1,4 +1,4 @@
-import { getGrossMarketValueByDay } from "@/clients/typesense/orders/grossMarketValue/getGrossMarketValueByDay";
+import { getGrossMarketValueByDay } from "@/clients/typesense/orders/grossMarchandiseValue/getGrossMarchandiseValueByDay";
 function generateMonthDaysObject({ year, month }: any) {
   const lastDay = new Date(year, month, 0).getDate();
   const daysArray = Array.from({ length: lastDay }, (_, i) => i + 1);

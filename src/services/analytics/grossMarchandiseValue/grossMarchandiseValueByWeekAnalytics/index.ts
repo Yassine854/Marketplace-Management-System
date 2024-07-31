@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import isoWeek from "dayjs/plugin/isoWeek";
-import { getGrossMarketValueByDay } from "@/clients/typesense/orders/grossMarketValue/getGrossMarketValueByDay";
+import { getGrossMarketValueByDay } from "@/clients/typesense/orders/grossMarchandiseValue/getGrossMarchandiseValueByDay";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(isoWeek);

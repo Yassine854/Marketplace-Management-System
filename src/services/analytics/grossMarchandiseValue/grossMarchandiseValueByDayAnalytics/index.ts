@@ -1,4 +1,4 @@
-import { getGrossMarketValueByHour } from "@/clients/typesense/orders/grossMarketValue/getGrossMarketValueByHour";
+import { getGrossMarketValueByHour } from "@/clients/typesense/orders/grossMarchandiseValue/getGrossMarchandiseValueByHour";
 
 export const grossMarketValueByDayAnalytics = async (isoDate: string) => {
   const [year, month, day] = isoDate.split("-").map(Number);
