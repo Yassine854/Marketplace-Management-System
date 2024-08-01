@@ -1,4 +1,4 @@
-import { grossMarketValueByYearAnalytics } from "@/services/analytics/grossMarchandiseValue/grossMarchandiseValueByYearAnalytics";
+import { grossMarketValueByYearAnalytics } from "@/services/analytics/gmv/gmvByYearAnalytics";
 import { responses } from "../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";

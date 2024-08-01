@@ -1,6 +1,6 @@
 import { typesense } from "@/clients/typesense";
 
-export const getGrossMarketValueByDay = (
+export const getgmvByDay = (
   yearArg: number,
   monthArg: number,
   dayArg: number,

@@ -1,7 +1,7 @@
 import { logError } from "@/utils/logError";
 import { typesenseClient } from "../../typesenseClient";
 
-export const getGrossMarketValueByMonth = async (
+export const getGmvByMonth = async (
   yearArg: number,
   monthArg: number,
 ): Promise<number | undefined> => {

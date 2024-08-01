@@ -1,7 +1,7 @@
 import { responses } from "@/utils/responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getGrossMarketValueByQuarter } from "@/services/orders/typesense/grossMarchandiseValue/getGrossMarchandiseValueByQuarter";
+import { getGrossMarketValueByQuarter } from "@/services/orders/typesense/gmv/getGmvByQuarter";
 export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);

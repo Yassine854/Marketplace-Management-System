@@ -1,7 +1,7 @@
 import { responses } from "../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getGrossMarketValueByMonthAnalytics } from "@/services/orders/typesense/grossMarchandiseValue/getGrossMarchandiseValueByMonth";
+import { getGrossMarketValueByMonthAnalytics } from "@/services/orders/typesense/gmv/getGmvByMonth";
 export const grossMarketValueByMonthAnalyticsRoute = async (
   request: NextRequest,
 ) => {
