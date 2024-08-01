@@ -6,7 +6,7 @@ export const getMergedItems = ({
     const mergedItems = typesenseOrderItems.map((item: any) => {
       const product = magentoOrderProducts?.find((p: any) => p.sku == item.sku);
       if (product) {
-        return { ...item, ...product };
+        return { ...item, ...product, id: item.id };
       }
     });
 
