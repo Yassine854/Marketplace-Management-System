@@ -1,6 +1,5 @@
-import { populateGMVPreviousMonths } from "@/services/orders/typesense/grossMarchandiseValueCollections/GMVPreviousMonthsCollection/populateGMVPreviousMonthsCollection";
-import { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { populateGMVPreviousMonths } from "@/services/orders/typesense/grossMarchandiseValueCollections/GMVPreviousMonthsCollection/populategmvPrevMonthsColl";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
