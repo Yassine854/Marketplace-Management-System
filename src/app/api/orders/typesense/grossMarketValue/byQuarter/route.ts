@@ -1,5 +1,47 @@
-import { NextRequest } from "next/server";
-import { nextRoute } from "@/clients/nextRoutes";
+import { responses } from "@/utils/responses";
+import { logError } from "@/utils/logError";
+import { NextResponse, type NextRequest } from "next/server";
+import { getGrossMarketValueByQuarter } from "@/services/orders/typesense/grossMarchandiseValue/getGrossMarchandiseValueByQuarter";
+export const GET = async (request: NextRequest) => {
+  try {
+    const { searchParams } = new URL(request.url);
 
-export const GET = async (request: NextRequest) =>
-  nextRoute.orders.typesense.grossMarketValue.byQuarter(request);
+    const yearString = searchParams.get("year");
+    const quarter = searchParams.get("quarter");
+
+    if (!yearString) {
+      return responses.invalidRequest("Year Parameter is Required");
+    }
+    if (!quarter) {
+      return responses.invalidRequest("Quarter Parameter is Required");
+    }
+    const year = parseInt(yearString, 10);
+
+    const gmv: number | undefined = await getGrossMarketValueByQuarter(
+      year,
+      quarter,
+    );
+
+    if (!gmv) {
+      return responses.internalServerError(
+        "Gross Market Value By Quarter is Undefined",
+      );
+    }
+
+    const date = year + "-" + quarter;
+
+    return NextResponse.json(
+      {
+        message: "success",
+        gmv,
+        date,
+      },
+      {
+        status: 200,
+      },
+    );
+  } catch (error: any) {
+    logError(error);
+    return responses.internalServerError();
+  }
+};
