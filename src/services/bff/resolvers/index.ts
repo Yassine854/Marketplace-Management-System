@@ -1,7 +1,6 @@
 import { GetOrdersParams, getOrders } from "./queries/getOrders";
 import { createUser } from "./mutations/createUser";
 import { deleteUser } from "./mutations/deleteUser";
-import { getOrder } from "./queries/getOrder";
 import { getUser } from "./queries/getUser";
 import { getUsers } from "./queries/getUsers";
 import { editUser } from "./mutations/editUser";
@@ -15,8 +14,7 @@ export const resolvers = {
   },
   Query: {
     getOrders: (parent: any, args: GetOrdersParams) => getOrders(args),
-    getOrder: (parent: any, args: { orderId: string }) =>
-      getOrder(args.orderId),
+
     getUser: (parent: any, args: { username: string }) =>
       getUser(args.username),
     getUsers: (parent: any, args: any) => getUsers(),

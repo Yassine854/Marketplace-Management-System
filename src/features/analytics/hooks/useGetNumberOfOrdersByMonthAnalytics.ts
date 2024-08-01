@@ -11,7 +11,6 @@ export const useGetNumberOfOrdersByMonthAnalytics = (
       const { data } = await axios.servicesClient(
         `/api/analytics/numberOfOrders/byMonth?year=${year}&month=${month}`,
       );
-      console.log("API response for", month, ":", data); // Log API response
       return data?.data;
     },
   });

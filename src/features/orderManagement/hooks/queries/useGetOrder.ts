@@ -1,80 +1,24 @@
-import { gql, useQuery } from "@apollo/client";
+import { axios } from "@/libs/axios";
+import { useQuery } from "@tanstack/react-query";
 
-import { ApolloError } from "@apollo/client";
-import { Order } from "@/types/order";
-import { useOrderDetailsStore } from "../../stores/orderDetailsStore";
-
-export type Params = {
-  status: string;
-  page: number;
-  perPage: number;
-  sortBy: string;
-  search: string;
-};
-
-type Orders = {
-  orders: Order[];
-  total: number;
-};
-
-type Res = {
-  data: Order;
-  error: ApolloError | undefined;
-  isLoading: boolean;
-};
-
-const QUERY = gql`
-  query GetOrder($orderId: ID!) {
-    getOrder(orderId: $orderId) {
-      id
-      incrementId
-      kamiounId
-      storeId
-      state
-      status
-      total
-      createdAt
-      customerId
-      customerFirstname
-      customerLastname
-      customerPhone
-      deliveryAgentId
-      deliveryAgentName
-      deliveryDate
-      deliveryStatus
-      source
-      items {
-        id
-        orderId
-        productId
-        productName
-        productPrice
-        totalPrice
-        sku
-        weight
-        orderedQuantity
-        #  quantity
-        # shipped
-        # pcb
-      }
-    }
-  }
-`;
-
-export const useGetOrder = () => {
-  const { orderOnReviewId } = useOrderDetailsStore();
-  const { data, loading, error, refetch } = useQuery(QUERY, {
-    fetchPolicy: "network-only",
-    pollInterval: 300000,
-    variables: {
-      orderId: orderOnReviewId,
+export const useGetOrder = (id: number) => {
+  const {
+    isLoading,
+    data: order,
+    refetch,
+  } = useQuery({
+    queryKey: ["getOrder", id],
+    queryFn: async () => {
+      const { data } = await axios.servicesClient(
+        `/api/orders/getOrder?id=${id}`,
+      );
+      return data?.order;
     },
   });
 
   return {
-    data: data?.getOrder,
-    isLoading: loading,
-    error,
+    order,
     refetch,
+    isLoading,
   };
 };

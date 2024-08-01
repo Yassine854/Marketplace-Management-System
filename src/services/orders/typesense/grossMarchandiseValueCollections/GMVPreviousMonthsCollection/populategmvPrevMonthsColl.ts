@@ -1,6 +1,7 @@
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import dayjs from "dayjs";
-import { getGrossMarketValueByMonth } from "@/clients/typesense/orders/grossMarchandiseValue/getGrossMarchandiseValueByMonth";
+import { getGmvByMonth } from "../../../../clients/typesense/orders/gmv/getGmvByMonth";
+
 export async function populateGMVPreviousMonths() {
   try {
     const startYear = 2020;
@@ -12,7 +13,7 @@ export async function populateGMVPreviousMonths() {
         endMonth = month - 1;
       }
       for (let i = 1; i <= endMonth; i++) {
-        const result = await getGrossMarketValueByMonth(j, i);
+        const result = await getGmvByMonth(j, i);
         const monthDocument = {
           id: `${i}-${j}`,
           year: j.toString(),
@@ -26,7 +27,7 @@ export async function populateGMVPreviousMonths() {
       }
     }
 
-    console.log("Finished populating gmvPreviousMonths collection");
+    console.info("Finished populating gmvPreviousMonths collection");
     return {
       success: true,
       message: "GMV previous months data updated successfully",

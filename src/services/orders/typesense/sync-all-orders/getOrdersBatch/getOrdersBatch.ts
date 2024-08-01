@@ -14,26 +14,31 @@ const deliveryDateToUnixTimeStamp = (
   return unixTimestampToDate;
 };
 
+const safeString = (value: any): string => (value ? String(value) : "");
+
 export const getOrdersBatch = (orders: any): Order[] =>
   orders?.map((order: any) => {
     return {
-      id: String(order?.entity_id) || "",
-      orderId: String(order?.entity_id) || "",
-      incrementId: String(order?.increment_id) || "",
-      kamiounId: String(order?.extension_attributes?.kamioun_order_id) || "",
-      storeId: order?.store_id,
-      state: order?.state || "",
-      status: order?.status || "",
-      total: order?.subtotal || 0,
+      id: safeString(order?.entity_id),
+      orderId: safeString(order?.entity_id),
+      incrementId: safeString(order?.increment_id),
+      kamiounId: safeString(order?.extension_attributes?.kamioun_order_id),
+      storeId: safeString(order?.store_id),
+      state: safeString(order?.state),
+      status: safeString(order?.status),
+      total: Number(order?.subtotal) || 0,
       createdAt: new Date(order?.created_at).getTime() || 0,
-      customerId: String(order?.customer_id) || "",
-      customerFirstname: order?.customer_firstname || "",
-      customerLastname: order?.customer_lastname || "",
-      customerPhone: order?.billing_address?.telephone || "",
-      deliveryAgentId:
-        String(order?.extension_attributes?.delivery_agent_id) || "",
-      deliveryAgentName: order?.extension_attributes?.delivery_agent || "",
-      deliveryStatus: order?.extension_attributes?.delivery_status || "",
+      customerId: safeString(order?.customer_id),
+      customerFirstname: safeString(order?.customer_firstname),
+      customerLastname: safeString(order?.customer_lastname),
+      customerPhone: safeString(order?.billing_address?.telephone),
+      deliveryAgentId: safeString(
+        order?.extension_attributes?.delivery_agent_id,
+      ),
+      deliveryAgentName: safeString(
+        order?.extension_attributes?.delivery_agent,
+      ),
+      deliveryStatus: safeString(order?.extension_attributes?.delivery_status),
       deliveryDate: deliveryDateToUnixTimeStamp(
         order?.extension_attributes?.delivery_date,
       ),
