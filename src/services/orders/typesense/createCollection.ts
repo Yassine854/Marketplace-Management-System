@@ -2,21 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import { checkApiKey } from "@/services/auth/checkApiKey";
 import { logError } from "@/utils/logError";
+import { CollectionCreateSchema } from "typesense/lib/Typesense/Collections";
 import {
   successResponse,
   conflictResponse,
   invalidRequestResponse,
   internalServerErrorResponse,
-} from "./response";
+} from "./grossMarchandiseValueCollections/response";
 
-import { gmvPreviousMonthsCollectionSchema } from "@/clients/typesense/schema/gmvPreviousMonthsCollection";
-
-export const addgmvCollection = async (request: NextRequest) => {
+export const createCollection = async (
+  request: NextRequest,
+  collection: CollectionCreateSchema,
+) => {
   try {
-    await typesenseClient
-      .collections()
-      .create(gmvPreviousMonthsCollectionSchema);
-
+    await typesenseClient.collections().create(collection);
     return successResponse("");
   } catch (error: any) {
     logError(error);
