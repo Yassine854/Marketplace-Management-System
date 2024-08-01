@@ -1,4 +1,4 @@
-import { getgmvByQuarter } from "@/services/orders/typesense/gmv/getGmvByQuarter";
+import { getGmvByQuarter } from "@/services/orders/typesense/gmv/getGmvByQuarter";
 
 export const gmvByQuarterAnalytics = async (year: number) => {
   const quarterMonths: { [key: string]: [number, number] } = {
@@ -11,7 +11,7 @@ export const gmvByQuarterAnalytics = async (year: number) => {
   const list: any[] = [];
 
   for (const quarter in quarterMonths) {
-    const grossMarketValueThatQuarter = await getgmvByQuarter(year, quarter);
+    const grossMarketValueThatQuarter = await getGmvByQuarter(year, quarter);
     if (grossMarketValueThatQuarter != undefined) {
       list.push({
         grossMarketValue: grossMarketValueThatQuarter.toString(),
