@@ -8,15 +8,14 @@ import {
   conflictResponse,
   invalidRequestResponse,
   internalServerErrorResponse,
-} from "./response";
+} from "./grossMarchandiseValueCollections/response";
 
-export const createGMVCollection = async (
+export const createCollection = async (
   request: NextRequest,
   collection: CollectionCreateSchema,
 ) => {
   try {
     await typesenseClient.collections().create(collection);
-
     return successResponse("");
   } catch (error: any) {
     logError(error);
