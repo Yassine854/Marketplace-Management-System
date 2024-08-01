@@ -4,10 +4,10 @@ import { gmvPreviousDaysCollectionSchema } from "@/clients/typesense/schema/GMVP
 
 export async function DELETE(Request: any) {
   try {
-    await deleteCollection(gmvPreviousDaysMasterCollectionSchema.name);
+    await deleteCollection(gmvPreviousDaysCollectionSchema.name);
     return NextResponse.json(
-      gmvPreviousDaysMasterCollectionSchema.name +
-        "Collection Deleted Successfully ...",
+      gmvPreviousDaysCollectionSchema.name +
+        " Collection Deleted Successfully ...",
       {
         status: 200,
       },
