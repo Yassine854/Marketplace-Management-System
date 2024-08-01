@@ -1,4 +1,4 @@
-import { populateGMVPreviousDays } from "@/services/orders/typesense/grossMarchandiseValueCollections/GMVPreviousDaysCollection/populategmvPrevDaysColl";
+import { populateGMVPreviousDays } from "@/services/orders/typesense/grossMarchandiseValueCollections/GMVPreviousDaysCollection/populateGMVPreviousDaysCollection";
 import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
