@@ -70,7 +70,6 @@ export const typeDefs = gql`
   }
 
   type Query {
-    getOrder(orderId: ID!): Order
     getOrders(
       page: Int
       perPage: Int

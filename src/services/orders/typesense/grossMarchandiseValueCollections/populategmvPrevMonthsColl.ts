@@ -28,7 +28,7 @@ export async function populateGMVPreviousMonths() {
       }
     }
 
-    console.log("Finished populating gmvPreviousMonths collection");
+    console.info("Finished populating gmvPreviousMonths collection");
     return {
       success: true,
       message: "GMV previous months data updated successfully",

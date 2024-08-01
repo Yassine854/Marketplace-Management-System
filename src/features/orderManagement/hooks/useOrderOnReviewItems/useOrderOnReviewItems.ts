@@ -1,33 +1,18 @@
-import { useEffect, useState } from "react";
-import { getMergedItems } from "./getMergedItems";
+import { useEffect } from "react";
 import { useGetOrder } from "../queries/useGetOrder";
-import { useGetOrderItems } from "../queries/useGetOrderItems";
 import { useOrderDetailsStore } from "../../stores/orderDetailsStore";
 
 export const useOrderOnReviewItems = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const { orderOnReviewId, setOrderOnReviewItems, orderOnReviewItems } =
     useOrderDetailsStore();
 
-  const { data: order, isLoading: isOrderLoading } = useGetOrder();
-
-  const { data: orderItems, isLoading: isOrderItemsLoading } =
-    useGetOrderItems(orderOnReviewId);
+  const { order, isLoading } = useGetOrder(orderOnReviewId);
 
   useEffect(() => {
-    if (order && orderItems) {
-      const mergedItems = getMergedItems(order?.items, orderItems);
-      setOrderOnReviewItems(mergedItems);
+    if (order) {
+      setOrderOnReviewItems(order.items);
     }
-  }, [order, orderItems, setOrderOnReviewItems]);
-
-  useEffect(() => {
-    if (isOrderLoading || isOrderItemsLoading) {
-      setIsLoading(true);
-    } else {
-      setIsLoading(false);
-    }
-  }, [isOrderLoading, isOrderItemsLoading]);
+  }, [order, setOrderOnReviewItems]);
 
   return { orderOnReviewItems, isLoading };
 };

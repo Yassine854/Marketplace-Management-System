@@ -22,8 +22,6 @@ export const useEditOrderDetails = () => {
 
   const { isNoEditUser } = useGlobalStore();
 
-  const { refetch: refetchOrder } = useGetOrder();
-
   const { refetch: refetchCount } = useOrdersCount();
 
   const {
@@ -33,6 +31,8 @@ export const useEditOrderDetails = () => {
     orderOnReviewItems,
     orderOnReviewDeliveryDate,
   } = useOrderDetailsStore();
+
+  const { refetch: refetchOrder } = useGetOrder(orderOnReviewId);
 
   const { setOrderUnderActionId } = useOrderActionsStore();
 

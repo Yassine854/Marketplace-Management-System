@@ -18,7 +18,7 @@ export const GET = async (request: NextRequest) => {
     return NextResponse.json(
       {
         message: "success",
-        data: { order },
+        order,
       },
       {
         status: 200,

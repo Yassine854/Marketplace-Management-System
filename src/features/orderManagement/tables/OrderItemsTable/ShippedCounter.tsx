@@ -8,7 +8,7 @@ const ShippedCounter = ({ id }: any) => {
 
   const onValueChange = (value: number) => {
     if (item && item.weight != value) {
-      const items: any = orderOnReviewItems.map((item: any) => {
+      const items: any[] = orderOnReviewItems.map((item: any) => {
         if (item?.id === id) {
           return {
             ...item,
@@ -33,9 +33,9 @@ const ShippedCounter = ({ id }: any) => {
     <div className="flex">
       {item && (
         <CustomNumberInput
-          max={item?.orderedQuantity}
+          max={item?.quantity}
           min={0}
-          step={item?.orderOrdered}
+          step={item?.pcb}
           defaultValue={item?.weight}
           onChange={onValueChange}
         />
