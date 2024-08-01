@@ -38,6 +38,7 @@ const OrdersTableRow = ({
   actionsList,
   isSomeActionPending,
 }: any) => {
+  console.log("🚀 ~ order:", order);
   const checkboxRef = useRef(null);
 
   const handleParentClick = (event: any) => {
