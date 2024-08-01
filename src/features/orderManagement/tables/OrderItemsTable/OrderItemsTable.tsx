@@ -1,19 +1,7 @@
-import { useEffect } from "react";
 import Head from "./OrderItemsTableHead";
-
 import ShippedCounter from "./ShippedCounter";
 
 const OrderItemsTable = ({ items, isInEditMode }: any) => {
-  //console.log("🚀 ~ OrderItemsTable ~ items:", items[0]);
-
-  useEffect(() => {
-    if (items?.length > 0)
-      items?.map((item: any) => {
-        console.log("🚀 ~ PCB:", item?.pcb);
-        console.log("🚀 ~ Quantity:", item?.orderedQuantity);
-      });
-  }, [items]);
-
   return (
     <div className="mb-6 w-full ">
       <table className="w-full whitespace-nowrap">

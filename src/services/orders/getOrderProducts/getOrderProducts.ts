@@ -1,9 +1,9 @@
 import { magento } from "@/clients/magento";
 import { logError } from "@/utils/logError";
 
-export const getOrderItems = async (orderId: string): Promise<any> => {
+export const getOrderProducts = async (orderId: string): Promise<any> => {
   try {
-    const magnetoOrderItems: any[] = await magento.queries.getOrderItems(
+    const magnetoOrderItems: any[] = await magento.queries.getOrderProducts(
       orderId,
     );
 

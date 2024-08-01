@@ -1,4 +1,3 @@
-import { getOrderItemsRoute } from "./orders/magento/getOrderItemsRoute";
 import { numberOfOrdersByMonthAnalyticsRoute } from "./analytics/numberOfOrders/numberOfOrdersByMonthAnalyticsRoute";
 import { numberOfOrdersLifetimeAnalyticsRoute } from "./analytics/numberOfOrders/numberOfOrdersLifetimeAnalyticsRoute";
 import { numberOfOrdersByQuarterAnalyticsRoute } from "./analytics/numberOfOrders/numberOfOrdersByQuarterAnalyticsRoute";
@@ -49,13 +48,10 @@ export const nextRoute = {
   },
 
   orders: {
-    getOrder: getOrderRoute,
+    getOne: getOrderRoute,
     magento: {
       getMany: {
         byDeliveryDate: getOrdersByDeliveryDateRoute,
-      },
-      getOne: {
-        items: getOrderItemsRoute,
       },
     },
 

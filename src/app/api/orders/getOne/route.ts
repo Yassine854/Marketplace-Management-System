@@ -1,9 +1,9 @@
-import { responses } from "../../responses";
+import { responses } from "@/clients/nextRoutes/responses";
 import { logError } from "@/utils/logError";
+import { getOrder } from "@/services/orders/getOne";
 import { NextResponse, type NextRequest } from "next/server";
-import { getOrder } from "@/services/orders/getOrder";
 
-export const getOrderRoute = async (request: NextRequest) => {
+export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
 

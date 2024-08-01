@@ -1,7 +1,7 @@
 import { responses } from "../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getOrdersByDeliveryDate } from "@/services/orders/magento/getOrdersByDeliveryDate";
+import { getOrdersByDeliveryDate } from "@/services/orders/getOrdersByDeliveryDate";
 
 export const getOrdersByDeliveryDateRoute = async (request: NextRequest) => {
   try {
