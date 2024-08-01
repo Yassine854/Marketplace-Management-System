@@ -1,9 +1,3 @@
-/*import { NextRequest } from "next/server";
-import { nextRoute } from "@/clients/nextRoutes";
-
-export const GET = async (request: NextRequest) =>
-  nextRoute.orders.typesense.numberOfOrders.byDay(request);*/
-
 import { responses } from "@/utils/responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
