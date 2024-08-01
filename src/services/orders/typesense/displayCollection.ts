@@ -2,15 +2,17 @@ import { NextResponse, type NextRequest } from "next/server";
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import { logError } from "@/utils/logError";
 
-export const displayColl = async (
+export const displayCollection = async (
   request: NextRequest,
   collectionName: string,
+  filterBy?: string,
+  queryBy?: string,
 ) => {
   try {
     const searchParams = {
-      filter_by: "",
+      filter_by: filterBy,
       q: "*",
-      query_by: "year,month",
+      query_by: queryBy,
       page: 1,
       per_page: 250,
     };
