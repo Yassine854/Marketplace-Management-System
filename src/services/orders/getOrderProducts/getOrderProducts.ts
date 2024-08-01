@@ -1,14 +1,13 @@
 import { magento } from "@/clients/magento";
 import { logError } from "@/utils/logError";
 
-export const getOrderItems = async (orderId: string): Promise<any> => {
+export const getOrderProducts = async (orderId: string): Promise<any> => {
   try {
-    const magnetoOrderItems: any[] = await magento.queries.getOrderItems(
+    const magnetoOrderProducts: any[] = await magento.queries.getOrderProducts(
       orderId,
     );
 
-    const orderItems: any[] = [];
-    magnetoOrderItems.forEach((item) => {
+    const orderProducts = magnetoOrderProducts.map((item) => {
       const { id, sku, name, price, custom_attributes } = item;
 
       const description = custom_attributes.find(
@@ -24,20 +23,18 @@ export const getOrderItems = async (orderId: string): Promise<any> => {
         (attr: any) => attr.attribute_code === "brand",
       )?.value;
 
-      const orderItem = {
+      return {
         id,
         sku,
+        pcb,
         name,
+        brand,
         price,
         description,
-        pcb,
-        brand,
       };
-
-      orderItems.push(orderItem);
     });
 
-    return { orderItems };
+    return orderProducts;
   } catch (error: any) {
     logError(error);
     throw error;

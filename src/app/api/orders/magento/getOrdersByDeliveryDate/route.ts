@@ -1,7 +1,7 @@
 import { responses } from "@/utils/responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getOrdersByDeliveryDate } from "@/services/orders/magento/getOrdersByDeliveryDate";
+import { getOrdersByDeliveryDate } from "@/services/orders/getOrdersByDeliveryDate";
 
 export const GET = async (request: NextRequest) => {
   try {

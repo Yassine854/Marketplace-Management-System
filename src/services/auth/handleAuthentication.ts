@@ -10,17 +10,15 @@ export const handleAuthentication = async (
     const user = await prisma.getUser(username);
 
     if (!user) {
-      process.env.NODE_ENV === "development" && console.error("User Not Found");
-      return null;
+      throw new Error("User Not Found");
     }
 
     const isValid = await isPasswordValid(password, user?.password);
 
-    if (isValid) {
-      return user;
+    if (!isValid) {
+      throw new Error("Wrong Password");
     }
-    process.env.NODE_ENV === "development" && console.error("Wrong Password");
-    return null;
+    return user;
   } catch (error) {
     logError(error);
     return null;

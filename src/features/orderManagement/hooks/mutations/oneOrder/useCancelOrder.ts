@@ -7,15 +7,18 @@ import { useOrdersData } from "../../queries/useOrdersData";
 import { useOrdersCount } from "../../queries/useOrdersCount";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
+import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 
 export const useCancelOrder = () => {
   const { refetch } = useOrdersData();
 
-  const { refetch: refetchOrder } = useGetOrder();
+  const { isNoEditUser } = useGlobalStore();
+
+  const { orderOnReviewId } = useOrderDetailsStore();
 
   const { refetch: refetchCount } = useOrdersCount();
 
-  const { isNoEditUser } = useGlobalStore();
+  const { refetch: refetchOrder } = useGetOrder(orderOnReviewId);
 
   const { setOrderToCancelId, setOrderUnderActionId } = useOrderActionsStore();
 
