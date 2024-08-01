@@ -8,10 +8,8 @@ export const getOrder = async (id: string): Promise<any> => {
     const typesenseOrder: any = await typesense.orders.getOne(id);
 
     const typesenseOrderItems = typesenseOrder?.items;
-    console.log("🚀 ~ getOrder ~ typesenseOrderItems:", typesenseOrderItems);
 
     const magentoOrderProducts = await getOrderProducts(id);
-    console.log("🚀 ~ getOrder ~ magentoOrderProducts:", magentoOrderProducts);
 
     const mergedItems = getMergedItems({
       typesenseOrderItems,
