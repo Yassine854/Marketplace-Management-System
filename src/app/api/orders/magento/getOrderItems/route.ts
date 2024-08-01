@@ -1,15 +1,19 @@
 import { responses } from "@/utils/responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getOrdersByDeliveryDate } from "@/services/orders/magento/getOrdersByDeliveryDate";
+import { getOrderItems } from "@/services/orders/magento/getOrderItems";
 
 export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
 
-    const deliveryDate = searchParams.get("deliveryDate");
+    const orderId = searchParams.get("orderId");
 
-    const res = await getOrdersByDeliveryDate(Number(deliveryDate));
+    if (!orderId) {
+      return responses.invalidRequest("orderId parameter is Required");
+    }
+
+    const res = await getOrderItems(orderId);
 
     return NextResponse.json(res);
   } catch (error: any) {
