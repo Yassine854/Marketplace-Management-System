@@ -1,7 +1,7 @@
 import { Button } from "@nextui-org/react";
 import Loading from "@/features/shared/elements/Loading";
 import DeliverySlotSelector from "./DeliverySlotSelector";
-import DeliveryAgentSelector from "./DeliveryAgentSelector";
+import DeliveryAgentSelector from "@/features/shared/inputs/DeliveryAgentSelector";
 
 const MilkRunToolbar = ({
   isLoading,
