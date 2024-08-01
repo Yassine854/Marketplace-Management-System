@@ -11,14 +11,12 @@ export const getOrder = async (id: string): Promise<any> => {
 
     const magentoOrderProducts = await getOrderProducts(id);
 
-    //@ts-ignore
     const mergedItems = getMergedItems({
       typesenseOrderItems,
       magentoOrderProducts,
     });
-    console.log("🚀 ~ getOrder ~ mergedItems:", mergedItems);
 
-    const order = {};
+    const order = { ...typesenseOrder, items: mergedItems };
     return order;
   } catch (error) {
     logError(error);

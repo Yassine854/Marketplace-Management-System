@@ -16,7 +16,6 @@ export const useOrderOnReviewItems = () => {
 
   useEffect(() => {
     if (order && orderItems) {
-      console.log("🚀 ~ useEffect ~ orderItems:", orderItems);
       const mergedItems = getMergedItems(order?.items, orderItems);
       setOrderOnReviewItems(mergedItems);
     }

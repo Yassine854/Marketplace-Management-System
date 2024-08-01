@@ -1,6 +1,6 @@
-import { responses } from "@/clients/nextRoutes/responses";
 import { logError } from "@/utils/logError";
-import { getOrder } from "@/services/orders/getOne";
+import { responses } from "@/utils/responses";
+import { getOrder } from "@/services/orders/getOrder";
 import { NextResponse, type NextRequest } from "next/server";
 
 export const GET = async (request: NextRequest) => {
@@ -13,9 +13,17 @@ export const GET = async (request: NextRequest) => {
       return responses.invalidRequest("id parameter is Required");
     }
 
-    const res = await getOrder(id);
+    const order = await getOrder(id);
 
-    return NextResponse.json(res);
+    return NextResponse.json(
+      {
+        message: "success",
+        data: { order },
+      },
+      {
+        status: 200,
+      },
+    );
   } catch (error: any) {
     logError(error);
 

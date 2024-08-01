@@ -1,7 +1,7 @@
 import { responses } from "../../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getGrossMarketValueByDay } from "@/services/orders/typesense/grossMarchandiseValue/getGrossMarketValueByDay";
+//import { getGrossMarketValueByDay } from "@/services/orders/typesense/grossMarchandiseValue/getGrossMarketValueByDay";
 export const getGrossMarketValueByDayRoute = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -21,11 +21,12 @@ export const getGrossMarketValueByDayRoute = async (request: NextRequest) => {
     const year = parseInt(yearString, 10);
     const month = parseInt(monthString, 10);
     const day = parseInt(dayString, 10);
-    const gmv: number | undefined = await getGrossMarketValueByDay(
-      year,
-      month,
-      day,
-    );
+    const gmv = 10;
+    // const gmv: number | undefined = await getGrossMarketValueByDay(
+    //   year,
+    //   month,
+    //   day,
+    // );
 
     if (!gmv) {
       return responses.internalServerError(
