@@ -17,7 +17,7 @@ type SearchResult = {
   hits: Array<{ document: GmvDocument }>;
 };
 
-export const grossMarketValueByYearAnalytics = async (year: any) => {
+export const gmvByYearAnalytics = async (year: any) => {
   try {
     let Months = [
       "Jan",

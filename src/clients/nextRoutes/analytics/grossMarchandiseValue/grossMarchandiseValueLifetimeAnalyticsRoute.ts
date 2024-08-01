@@ -1,4 +1,4 @@
-import { grossMarketValueLifetimeAnalytics } from "@/services/analytics/grossMarchandiseValue/grossMarchandiseValueLifetimeAnalytics";
+import { grossMarketValueLifetimeAnalytics } from "@/services/analytics/gmv/gmvLifetimeAnalytics";
 import { responses } from "../../responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";

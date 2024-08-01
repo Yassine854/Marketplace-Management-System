@@ -9,9 +9,9 @@ import { deleteOrdersCollection } from "./orders/deleteOrdersCollection";
 import { getNumberOfOrdersByDay } from "./orders/numberOfOrders/getNumberOfOrdersByDay ";
 import { getNumberOfOrdersByQuarter } from "./orders/numberOfOrders/getNumberOfOrdersByQuarter";
 import { getNumberOfOrdersByMonth } from "./orders/numberOfOrders/getNumberOfOrdersByMonth";
-import { getGrossMarketValueByQuarter } from "./orders/grossMarchandiseValue/getGrossMarchandiseValueByQuarter";
-import { getGrossMarketValueByMonth } from "./orders/grossMarchandiseValue/getGrossMarchandiseValueByMonth";
-import { getGrossMarketValueByDay } from "./orders/grossMarchandiseValue/getGrossMarchandiseValueByDay";
+import { getGmvByQuarter } from "./orders/gmv/getGmvByQuarter";
+import { getGmvByMonth } from "./orders/gmv/getGmvByMonth";
+import { getGmvByDay } from "./orders/gmv/getGmvByDay";
 
 export const typesense = {
   isCollectionExist,
@@ -29,9 +29,9 @@ export const typesense = {
       byQuarter: getNumberOfOrdersByQuarter,
     },
     grossMarketValue: {
-      byDay: getGrossMarketValueByDay,
-      byQuarter: getGrossMarketValueByQuarter,
-      byMonth: getGrossMarketValueByMonth,
+      byDay: getGmvByDay,
+      byQuarter: getGmvByQuarter,
+      byMonth: getGmvByMonth,
     },
   },
 };

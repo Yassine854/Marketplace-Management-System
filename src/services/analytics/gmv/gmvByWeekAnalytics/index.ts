@@ -1,15 +1,12 @@
 import dayjs from "dayjs";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import isoWeek from "dayjs/plugin/isoWeek";
-import { getGrossMarketValueByDay } from "@/clients/typesense/orders/grossMarchandiseValue/getGrossMarchandiseValueByDay";
+import { getGmvByDay } from "@/clients/typesense/orders/gmv/getGmvByDay";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(isoWeek);
 
-export const grossMarketValueByWeekAnalytics = async (
-  yearArg: number,
-  weekArg: number,
-) => {
+export const gmvByWeekAnalytics = async (yearArg: number, weekArg: number) => {
   const list: any[] = [];
 
   const startCurrentWeek = dayjs()
@@ -31,7 +28,7 @@ export const grossMarketValueByWeekAnalytics = async (
       .split("-")
       .map(Number);
 
-    const fetchPromise = await getGrossMarketValueByDay(year, month, day);
+    const fetchPromise = await getGmvByDay(year, month, day);
     if (fetchPromise === null) {
       break;
     }

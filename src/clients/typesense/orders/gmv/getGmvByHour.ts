@@ -2,7 +2,7 @@ import { logError } from "@/utils/logError";
 import { typesenseClient } from "../../typesenseClient";
 import dayjs from "dayjs";
 
-export const getGrossMarketValueByHour = async (
+export const getGmvByHour = async (
   year: number,
   month: number,
   day: number,

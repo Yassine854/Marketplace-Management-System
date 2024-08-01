@@ -1,4 +1,4 @@
-import { getGrossMarketValueByHour } from "@/clients/typesense/orders/grossMarchandiseValue/getGrossMarchandiseValueByHour";
+import { getGrossMarketValueByHour } from "@/clients/typesense/orders/gmv/getGmvByHour";
 import { responses } from "@/utils/responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
