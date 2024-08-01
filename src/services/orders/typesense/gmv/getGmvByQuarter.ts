@@ -1,6 +1,6 @@
 import { typesense } from "@/clients/typesense";
 
-export const getgmvByQuarter = (
+export const getGmvByQuarter = (
   yearArg: number,
   quarter: string,
 ): Promise<number | undefined> =>
