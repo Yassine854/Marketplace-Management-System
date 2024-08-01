@@ -1,4 +1,4 @@
-import { getGrossMarketValueByHour } from "@/clients/typesense/orders/gmv/getGmvByHour";
+import { getGmvByHour } from "@/clients/typesense/orders/gmv/getGmvByHour";
 import { responses } from "@/utils/responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
@@ -14,7 +14,7 @@ export const GET = async (request: NextRequest) => {
 
     const [year, month, day] = date.split("-").map(Number);
 
-    const gmv: [string, number][] | undefined = await getGrossMarketValueByHour(
+    const gmv: [string, number][] | undefined = await getGmvByHour(
       year,
       month,
       day,

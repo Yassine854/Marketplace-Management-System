@@ -1,7 +1,7 @@
 import { responses } from "@/utils/responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getGrossMarketValueByMonth } from "@/clients/typesense/orders/gmv/getGmvByMonth";
+import { getGmvByMonth } from "@/clients/typesense/orders/gmv/getGmvByMonth";
 export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -18,10 +18,7 @@ export const GET = async (request: NextRequest) => {
     const year = parseInt(yearString, 10);
     const month = parseInt(monthString, 10);
 
-    const gmv: number | undefined = await getGrossMarketValueByMonth(
-      year,
-      month,
-    );
+    const gmv: number | undefined = await getGmvByMonth(year, month);
 
     if (!gmv) {
       return responses.internalServerError(

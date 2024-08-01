@@ -1,4 +1,4 @@
-import { responses } from "@/clients/nextRoutes/responses";
+import { responses } from "@/utils/responses";
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import { logError } from "@/utils/logError";
 import dayjs from "dayjs";

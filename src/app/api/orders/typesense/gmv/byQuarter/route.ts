@@ -1,7 +1,7 @@
 import { responses } from "@/utils/responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getGrossMarketValueByQuarter } from "@/services/orders/typesense/gmv/getGmvByQuarter";
+import { getGmvByQuarter } from "@/services/orders/typesense/gmv/getGmvByQuarter";
 export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -17,10 +17,7 @@ export const GET = async (request: NextRequest) => {
     }
     const year = parseInt(yearString, 10);
 
-    const gmv: number | undefined = await getGrossMarketValueByQuarter(
-      year,
-      quarter,
-    );
+    const gmv: number | undefined = await getGmvByQuarter(year, quarter);
 
     if (!gmv) {
       return responses.internalServerError(
