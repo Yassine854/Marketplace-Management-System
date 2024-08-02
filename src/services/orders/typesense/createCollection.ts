@@ -1,34 +1,26 @@
-import { NextRequest, NextResponse } from "next/server";
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
-import { checkApiKey } from "@/services/auth/checkApiKey";
 import { logError } from "@/utils/logError";
 import { CollectionCreateSchema } from "typesense/lib/Typesense/Collections";
-import {
-  successResponse,
-  conflictResponse,
-  invalidRequestResponse,
-  internalServerErrorResponse,
-} from "./grossMarchandiseValueCollections/response";
 
 export const createCollection = async (
-  request: NextRequest,
   collection: CollectionCreateSchema,
-) => {
+): Promise<{ success: boolean; message?: string }> => {
   try {
     await typesenseClient.collections().create(collection);
-    return successResponse("");
+    return { success: true };
   } catch (error: any) {
     logError(error);
 
     const message: string = error?.message ?? "";
 
     if (message.includes("Request failed with HTTP code 409")) {
-      return conflictResponse();
+      return { success: false, message: "conflict" };
     }
 
-    if (message.includes("Request failed with HTTP code 400"))
-      return invalidRequestResponse(message);
-  }
+    if (message.includes("Request failed with HTTP code 400")) {
+      return { success: false, message: message };
+    }
 
-  return internalServerErrorResponse();
+    return { success: false, message: "internal_server_error" };
+  }
 };
