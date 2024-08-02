@@ -54,7 +54,7 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
   const isNextYearDisabled = year >= new Date().getFullYear();
 
   return (
-    <div ref={dropDownRef} className="relative  block w-[200px] ">
+    <div ref={dropDownRef} className="relative  block w-[220px] ">
       <div
         onClick={() => {
           toggleOpen();
@@ -63,7 +63,7 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
            gap-2 rounded-[30px] border bg-slate-100 px-4 py-3 dark:border-n500
             dark:bg-bg4 xxl:px-6"
       >
-        <span className="flex select-none items-center gap-2">
+        <span className="flex select-none items-center gap-2 font-semibold">
           {selectedMonth.name} {year}
         </span>
         <div className="flex">
