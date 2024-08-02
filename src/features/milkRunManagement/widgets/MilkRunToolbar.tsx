@@ -20,6 +20,7 @@ const MilkRunToolbar = ({
           <div className=" flex   flex-wrap items-center  justify-center">
             <p className=" mr-4 text-lg font-bold ">Agent :</p>
             <DeliveryAgentSelector
+              direction="up"
               ref={deliveryAgentSelectorRef}
               deliveryAgents={deliveryAgents}
               onChange={onDeliveryAgentChange}

@@ -3,7 +3,6 @@ import { DayPicker } from "react-day-picker";
 import { IconCalendar } from "@tabler/icons-react";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { select } from "@nextui-org/theme";
 
 //To Refactor
 const formatDate = (date: Date): string | undefined => {
