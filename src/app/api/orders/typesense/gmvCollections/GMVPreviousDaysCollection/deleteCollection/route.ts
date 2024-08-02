@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { deleteCollection } from "@/services/orders/typesense/deleteCollection";
 import { gmvPreviousDaysCollectionSchema } from "@/clients/typesense/schema/GMVPreviousDaysCollection";
 
-export async function DELETE(Request: any) {
+export async function DELETE(request: any) {
   try {
     await deleteCollection(gmvPreviousDaysCollectionSchema.name);
     return NextResponse.json(
@@ -12,9 +12,19 @@ export async function DELETE(Request: any) {
         status: 200,
       },
     );
-  } catch (err) {
+  } catch (err: any) {
+    if (err.message.includes("does not exist")) {
+      return NextResponse.json(
+        {
+          error: err.message,
+        },
+        {
+          status: 404,
+        },
+      );
+    }
     process.env.NODE_ENV === "development" && console.error(err);
-    return NextResponse.json("Error", {
+    return NextResponse.json("Internal Server Error", {
       status: 500,
     });
   }
