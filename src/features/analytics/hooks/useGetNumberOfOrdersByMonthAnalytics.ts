@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const useGetNumberOfOrdersByMonthAnalytics = (
   year: number,
-  month: string,
+  month: number,
 ) => {
   const { isLoading, data } = useQuery({
     queryKey: ["numberOfOrdersByMonthAnalytics", year, month],

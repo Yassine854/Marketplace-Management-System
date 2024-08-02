@@ -9,8 +9,9 @@ const NumberOfOrdersChart = () => {
   // const { theme } = useTheme();
   // const [month, setMonth] = useState(`${new Date().getFullYear()}-01-01`);
   const [date, setDate] = useState(`${new Date().getFullYear()}-01-01`);
+  const [year, month, day] = date.split("-").map(Number);
 
-  const { data, isLoading } = useGetNumberOfOrdersByMonthAnalytics(2024, "03");
+  const { data, isLoading } = useGetNumberOfOrdersByMonthAnalytics(year, month);
   const [xAxis, setXaxis] = useState([]);
   const [yAxis, setYaxis] = useState([]);
 
