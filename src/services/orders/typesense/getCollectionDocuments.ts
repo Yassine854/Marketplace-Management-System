@@ -1,13 +1,11 @@
-import { NextResponse, type NextRequest } from "next/server";
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import { logError } from "@/utils/logError";
 
-export const displayCollection = async (
-  request: NextRequest,
+export const getCollectionDocuments = async (
   collectionName: string,
   filterBy?: string,
   queryBy?: string,
-) => {
+): Promise<{ found: number; documents: any[]; error?: string }> => {
   try {
     const searchParameters = {
       filter_by: filterBy,
@@ -16,7 +14,7 @@ export const displayCollection = async (
       per_page: 250,
     };
 
-    let allDocuments: any = [];
+    let allDocuments: any[] = [];
     let currentPage = 1;
     let result;
 
@@ -33,8 +31,6 @@ export const displayCollection = async (
       }
       currentPage++;
     } while (result.hits && result.hits.length > 0);
-
-    console.log("All Documents in collection:", collectionName, allDocuments);
 
     return {
       found: allDocuments.length,

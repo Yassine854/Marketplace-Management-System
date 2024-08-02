@@ -1,13 +1,12 @@
 import { gmvPreviousDaysCollectionSchema } from "@/clients/typesense/schema/GMVPreviousDaysCollection";
-import { displayCollection } from "@/services/orders/typesense/displayCollection";
+import { getCollectionDocuments } from "@/services/orders/typesense/getCollectionDocuments";
 import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
     const collectionName = gmvPreviousDaysCollectionSchema.name;
-    const result = await displayCollection(
-      request,
+    const result = await getCollectionDocuments(
       collectionName,
       "",
       "year,month",
