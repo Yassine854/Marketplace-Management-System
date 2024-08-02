@@ -97,15 +97,21 @@ const Sidebar = ({
             </>
           )}
           <Divider />
-          <SidebarButton
-            name={"Reports"}
+
+          <SidebarSubMenu
             icon={<IconReport />}
+            name="Reports"
             onClick={() => {
-              push("/reports");
+              push("/reports/agent");
             }}
             isActive={pathname?.includes("reports")}
+            items={[
+              { name: "Agent", path: "/reports/agent" },
+              { name: "Supplier", path: "/reports/supplier" },
+            ]}
           />
           <Divider />
+
           <SidebarButton
             name={"Notifications"}
             icon={<IconBell />}

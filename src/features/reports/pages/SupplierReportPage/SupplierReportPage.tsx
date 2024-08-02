@@ -1,13 +1,13 @@
-import ReportsForm from "../forms/ReportsForm/ReportsForm";
+import SupplierReportFrom from "../../forms/SupplierReportForm";
 
-const ReportsPage = () => {
+const SupplierReportPage = () => {
   return (
     <div className="flex h-full flex-grow ">
       <div className=" h-full w-full rounded-lg bg-[url(/images/login-bg.png)] bg-cover">
-        <ReportsForm />
+        <SupplierReportFrom />
       </div>
     </div>
   );
 };
 
-export default ReportsPage;
+export default SupplierReportPage;

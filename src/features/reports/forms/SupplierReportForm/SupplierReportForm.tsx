@@ -6,8 +6,9 @@ import PasswordInput from "@/features/shared/inputs/PasswordInput";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 // import GoBackArrow from "../../widgets/GoBackArrow";
 
-const ReportsForm = () => {
+const SupplierReportForm = () => {
   const { navigateToUsersTable, navigateBack } = useNavigation();
+  const isLoading = false;
 
   //   const { handleSubmit, register, setValue, errors, isLoading } =
   //     useCreateUserForm();
@@ -21,7 +22,7 @@ const ReportsForm = () => {
         <div className="box w-full min-w-[800px]  xl:p-8">
           <div className="bb-dashed mb-6 flex items-center  pb-6">
             {/* <GoBackArrow onClick={navigateBack} /> */}
-            <p className="ml-4 text-xl font-bold">Download Report</p>
+            <p className="ml-4 text-xl font-bold">Download Supplier Report</p>
           </div>
           <div className="box mb-6 grid grid-cols-2 gap-4 bg-primary/5 dark:bg-bg3 md:p-4 xl:p-6 xxxl:gap-6">
             <TextInput
@@ -67,19 +68,12 @@ const ReportsForm = () => {
 
           <div className="mt-6">
             <div className="mt-7 flex justify-end gap-4  lg:mt-10">
-              {/* {!isLoading && (
+              {!isLoading && (
                 <button type="submit" className="btn px-4 hover:shadow-none">
-                  Create
+                  Download
                 </button>
               )}
-              {isLoading && <Loading />} */}
-              <button
-                type="reset"
-                className="btn-outline px-4 shadow-none"
-                onClick={navigateToUsersTable}
-              >
-                Download
-              </button>
+              {isLoading && <Loading />}
             </div>
           </div>
         </div>
@@ -88,4 +82,4 @@ const ReportsForm = () => {
   );
 };
 
-export default ReportsForm;
+export default SupplierReportForm;
