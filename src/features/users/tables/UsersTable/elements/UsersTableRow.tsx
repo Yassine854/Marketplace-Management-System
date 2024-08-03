@@ -3,7 +3,7 @@ import { roles } from "../../../staticRoles";
 import UsersTableCell from "./UsersTableCell";
 import { IconSettings } from "@tabler/icons-react";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
-import { useUsersStore } from "@/features/usersManagement/stores/usersStore";
+import { useUsersStore } from "@/features/users/stores/usersStore";
 
 const UsersTableRow = ({ user }: any) => {
   const { setUserOnReviewUsername } = useUsersStore();

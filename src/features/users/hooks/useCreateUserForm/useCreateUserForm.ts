@@ -4,7 +4,7 @@ import { FormSchema } from "./formSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
-import { useUser } from "@/features/usersManagement/hooks/useUser";
+import { useUser } from "@/features/users/hooks/useUser";
 import { useGetUser } from "../queries/useGetUser";
 import { useEffect } from "react";
 

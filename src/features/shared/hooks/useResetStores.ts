@@ -1,5 +1,5 @@
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
-import { useMilkRunStore } from "@/features/milkRunManagement/stores/milkRunStore";
+import { useMilkRunStore } from "@/features/delivery/stores/milkRunStore";
 import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 import { useOrdersTableStore } from "@/features/orderManagement/stores/ordersTableStore";

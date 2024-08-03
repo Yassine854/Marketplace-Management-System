@@ -1,5 +1,5 @@
-import { useDropdown } from "@/features/shared/hooks/useDropdown";
 import { IconChevronDown } from "@tabler/icons-react";
+import { useDropdown } from "@/features/shared/hooks/useDropdown";
 import { forwardRef, useImperativeHandle, useState } from "react";
 
 //@ts-ignore
@@ -33,7 +33,7 @@ const DeliveryAgentSelector = forwardRef(
           />
         </div>
         <ul
-          className={`absolute bottom-full left-0 z-20 max-h-64 w-full origin-top overflow-x-hidden overflow-y-scroll rounded-lg bg-n0 p-2 shadow-md duration-300 dark:bg-n800 ${
+          className={`absolute left-0 z-20 max-h-64 w-full origin-top overflow-x-hidden overflow-y-scroll rounded-lg bg-n0 p-2 shadow-md duration-300 dark:bg-n800 ${
             open
               ? "visible scale-100 opacity-100"
               : "invisible scale-0 opacity-0"

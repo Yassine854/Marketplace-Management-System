@@ -1,39 +1,37 @@
+import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
-import { magento } from "@/clients/magento";
-
-const formatDeliveryAgentsArray = (deliveryAgents: any) => {
-  const response: any[] = [];
-
-  deliveryAgents?.forEach((e: any) => {
-    const agentFullName = e.custom_attributes.find(
-      (e: any) => e["attribute_code"] === "full_name",
-    );
-    const agentPhone = e.custom_attributes.find(
-      (e: any) => e["attribute_code"] === "phone_number",
-    );
-    const agent = {
-      id: e.id,
-      name: agentFullName.value,
-      phone: agentPhone?.value,
-    };
-
-    response.push(agent);
-  });
-
-  return response;
-};
+import { useEffect } from "react";
 
 export const useGetDeliveryAgents = () => {
-  const { isLoading, data } = useQuery({
+  const {
+    isLoading,
+    data: deliveryAgents,
+    fetchStatus,
+    isPending,
+  } = useQuery({
     queryKey: ["deliveryAgents"],
+    networkMode: "always",
+    //  behavior:'',
+
     queryFn: async () => {
-      const { deliveryAgents } = await magento.queries.getDeliveryAgents();
-      return formatDeliveryAgentsArray(deliveryAgents);
+      const { data }: any = await axios.servicesClient.get(
+        "/api/delivery/getAllDeliveryAgents",
+      );
+
+      return data?.deliveryAgents;
     },
   });
 
+  useEffect(() => {
+    console.log("🚀 ~ useGetDeliveryAgents ~ isPending:", isPending);
+  }, [isPending]);
+  useEffect(() => {
+    console.log("🚀 ~ useGetDeliveryAgents ~ fetchStatus:", fetchStatus);
+  }, [fetchStatus]);
+
+  const isLoadingV3 = isLoading && fetchStatus !== "idle";
   return {
-    deliveryAgents: data,
-    isLoading,
+    isLoading: isLoadingV3,
+    deliveryAgents,
   };
 };

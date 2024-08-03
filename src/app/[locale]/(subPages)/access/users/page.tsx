@@ -1,3 +1,3 @@
 "use client";
 
-export { default } from "@/features/usersManagement/pages/UsersPage";
+export { default } from "@/features/users/pages/UsersPage";

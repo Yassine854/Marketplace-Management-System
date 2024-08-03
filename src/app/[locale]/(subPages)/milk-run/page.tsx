@@ -1,3 +1,3 @@
 "use client";
 
-export { default } from "@/features/milkRunManagement/pages/MilkRunPage";
+export { default } from "@/features/delivery/pages/MilkRunPage";

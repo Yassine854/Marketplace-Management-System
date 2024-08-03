@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/features/shared/hooks/useAuth";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
-import { useUsersStore } from "@/features/usersManagement/stores/usersStore";
+import { useUsersStore } from "@/features/users/stores/usersStore";
 import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
 import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
 import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";

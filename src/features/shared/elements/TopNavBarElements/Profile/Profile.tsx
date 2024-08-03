@@ -39,6 +39,8 @@ const Profile = () => {
     <div className="relative shrink-0" ref={ref}>
       <div className="w-10 cursor-pointer sm:w-12" onClick={toggleOpen}>
         <Image
+          loading="eager"
+          priority={true}
           src="/profile.png"
           className="rounded-full"
           width={48}
@@ -53,6 +55,8 @@ const Profile = () => {
       >
         <div className="flex flex-col items-center border-b p-3 text-center dark:border-n500 lg:p-4">
           <Image
+            loading="eager"
+            priority={true}
             src="/profile.png"
             width={60}
             height={60}

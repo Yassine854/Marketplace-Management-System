@@ -4,10 +4,15 @@ import { useEffect } from "react";
 
 const AgentReportPage = () => {
   const { deliveryAgents, isLoading } = useGetDeliveryAgents();
+  // console.log("🚀 ~ AgentReportPage ~ deliveryAgents:", deliveryAgents);
 
   useEffect(() => {
     console.log("🚀 ~ AgentReportPage ~ deliveryAgents:", deliveryAgents);
   }, [deliveryAgents]);
+
+  useEffect(() => {
+    console.log("🚀 ~ AgentReportPage ~ isLoading:", isLoading);
+  }, [isLoading]);
 
   const isPending = false;
 
