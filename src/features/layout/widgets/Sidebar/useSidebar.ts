@@ -1,7 +1,4 @@
-import {
-  useOrdersData,
-  useOrdersCount,
-} from "@/features/orderManagement/hooks";
+import { useOrdersData, useOrdersCount } from "@/features/orders/hooks";
 import { useCallback, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
 

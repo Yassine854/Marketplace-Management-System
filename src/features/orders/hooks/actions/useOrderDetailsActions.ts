@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useOrderDetailsActionsByStatus } from "./useOrderDetailsActionsByStatus";
-import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
+import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
 
 export const useOrderDetailsActions = () => {
   const { actions } = useOrderDetailsActionsByStatus();

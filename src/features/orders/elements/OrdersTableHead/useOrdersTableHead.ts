@@ -1,4 +1,4 @@
-import { useOrdersTableStore } from "@/features/orderManagement/stores/ordersTableStore";
+import { useOrdersTableStore } from "@/features/orders/stores/ordersTableStore";
 
 export const useOrdersTableHead = (
   changeSelectedSort: (selected: any) => void,

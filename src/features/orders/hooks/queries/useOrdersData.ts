@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGetOrders } from "./useGetOrders";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
-import { useOrdersTableStore } from "@/features/orderManagement/stores/ordersTableStore";
+import { useOrdersStore } from "@/features/orders/stores/ordersStore";
+import { useOrdersTableStore } from "@/features/orders/stores/ordersTableStore";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
 export const useOrdersData = () => {

@@ -1,7 +1,7 @@
 import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
-import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
+import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
 
 export const useGenerateOrderSummary = () => {
   const { setOrderUnderActionId } = useOrderActionsStore();

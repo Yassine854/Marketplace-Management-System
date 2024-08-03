@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useOrdersData } from "@/features/orderManagement/hooks";
-import { useOrdersTableStore } from "@/features/orderManagement/stores/ordersTableStore";
+import { useOrdersData } from "@/features/orders/hooks";
+import { useOrdersTableStore } from "@/features/orders/stores/ordersTableStore";
 
 export const useOrdersPagination = () => {
   const [endIndex, setEndIndex] = useState(0);

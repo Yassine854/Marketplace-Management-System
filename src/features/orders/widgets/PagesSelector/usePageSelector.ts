@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useOrdersData } from "@/features/orderManagement/hooks";
+import { useOrdersData } from "@/features/orders/hooks";
 import { usePageSelectorEffects } from "./usePageSelectorEffects";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
-import { useOrdersTableStore } from "@/features/orderManagement/stores/ordersTableStore";
+import { useOrdersStore } from "@/features/orders/stores/ordersStore";
+import { useOrdersTableStore } from "@/features/orders/stores/ordersTableStore";
 
 export const usePageSelector = () => {
   const { status } = useOrdersStore();

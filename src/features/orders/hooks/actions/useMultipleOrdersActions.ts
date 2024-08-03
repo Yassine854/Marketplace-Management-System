@@ -1,7 +1,7 @@
 import { useDisclosure } from "@nextui-org/react";
 import { useEffect, useRef, useState } from "react";
 import { useCancelMultipleOrders } from "../mutations/multipleOrders/useCancelMultipleOrders";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
+import { useOrdersStore } from "@/features/orders/stores/ordersStore";
 import { useMultipleOrdersActionsByStatus } from "./useMultipleOrdersActionsByStatus";
 import { useGenerateMultiplePickLists } from "../mutations/multipleOrders/useGenerateMultiplePickLists";
 import { useGenerateMultipleDeliveryNotes } from "../mutations/multipleOrders/useGenerateMultipleDeliveryNotes";

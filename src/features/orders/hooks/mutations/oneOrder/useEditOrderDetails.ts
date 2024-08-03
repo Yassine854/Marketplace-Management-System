@@ -6,8 +6,8 @@ import { useGetOrder } from "../../queries/useGetOrder";
 import { useOrdersData } from "../../queries/useOrdersData";
 import { useOrdersCount } from "../../queries/useOrdersCount";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
-import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
-import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
+import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
+import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
 
 const formatUnixTimestamp = (unixTimestamp: number): string => {
   const date = new Date(unixTimestamp * 1000);

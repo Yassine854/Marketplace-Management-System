@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import CustomNumberInput from "./CustomNumberInput";
-import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
+import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 
 const ShippedCounter = ({ id }: any) => {
   const { orderOnReviewItems, setOrderOnReviewItems } = useOrderDetailsStore();

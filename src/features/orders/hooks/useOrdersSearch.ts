@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
-import { useOrdersTableStore } from "@/features/orderManagement/stores/ordersTableStore";
+import { useOrdersStore } from "@/features/orders/stores/ordersStore";
+import { useOrdersTableStore } from "@/features/orders/stores/ordersTableStore";
 
 export const useOrdersSearch = () => {
   const searchRef = useRef(null);

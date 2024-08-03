@@ -3,7 +3,7 @@ import { useGeneratePickList } from "./mutations/oneOrder/useGeneratePickList";
 import { useEditOrderDetails } from "./mutations/oneOrder/useEditOrderDetails";
 import { useGenerateDeliveryNote } from "./mutations/oneOrder/useGenerateDeliveryNote";
 import { useEditOrderStatusAndState } from "./mutations/oneOrder/useEditOrderStatusAndState";
-import { useGenerateOrderSummary } from "@/features/orderManagement/hooks/mutations/oneOrder/useGenerateOrderSummary";
+import { useGenerateOrderSummary } from "@/features/orders/hooks/mutations/oneOrder/useGenerateOrderSummary";
 
 export const useOrderMutations = () => {
   const { editDetails, isPending: isEditingDetailsPending } =

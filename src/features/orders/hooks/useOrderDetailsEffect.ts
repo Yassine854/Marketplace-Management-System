@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { redirect } from "next/navigation";
-import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
-import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
+import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
+import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
 
 export const useOrderDetailsEffect = () => {
   const { selectedAction } = useOrderActionsStore();

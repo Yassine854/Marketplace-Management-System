@@ -2,11 +2,11 @@ import OrderInfo from "../../widgets/OrderInfo/OrderInfo";
 import CustomerInfo from "../../widgets/CustomerInfo/CustomerInfo";
 import DeliveryInfo from "../../widgets/DeliveryInfo/DeliveryInfo";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import OrderItemsTable from "@/features/orderManagement/tables/OrderItemsTable";
+import OrderItemsTable from "@/features/orders/tables/OrderItemsTable";
 import OrderActions from "../../widgets/OrderDetailsActions/OrderDetailsActions";
 import OrderDetailsPageHeader from "../../widgets/OrderDetailsPageHeader/OrderDetailsPageHeader";
-import { useOrderDetailsPage } from "@/features/orderManagement/pages/OrderDetailsPage/useOrderDetailsPage";
-import OrderCancelingModal from "@/features/orderManagement/widgets/OrderCancelingModal/OrderCancelingModal";
+import { useOrderDetailsPage } from "@/features/orders/pages/OrderDetailsPage/useOrderDetailsPage";
+import OrderCancelingModal from "@/features/orders/widgets/OrderCancelingModal/OrderCancelingModal";
 
 const OrderDetailsPage = () => {
   const {

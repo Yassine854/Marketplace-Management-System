@@ -3,7 +3,7 @@ import TableRowSkeleton from "../../elements/RowSkeleton";
 import OrdersTableRow from "../../elements/OrdersTableRow";
 import { useOrderTableActions } from "./useOrderTableActions";
 import OrdersTableHead from "../../elements/OrdersTableHead/OrdersTableHead";
-import OrderCancelingModal from "@/features/orderManagement/widgets/OrderCancelingModal/OrderCancelingModal";
+import OrderCancelingModal from "@/features/orders/widgets/OrderCancelingModal/OrderCancelingModal";
 
 const OrdersTable = () => {
   const {

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
-import { useOrdersTableStore } from "@/features/orderManagement/stores/ordersTableStore";
+import { useOrdersStore } from "@/features/orders/stores/ordersStore";
+import { useOrdersTableStore } from "@/features/orders/stores/ordersTableStore";
 
 type UseOrdersSelection = {
   selectedOrders: string[];

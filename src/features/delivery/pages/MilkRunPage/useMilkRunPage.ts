@@ -5,7 +5,7 @@ import { useNavigation } from "../../../shared/hooks/useNavigation";
 import { useGetMilkRunOrders } from "../../hooks/queries/useGetMilkRunOrders";
 import { useGetDeliveryAgents } from "../../../shared/hooks/queries/useGetDeliveryAgents";
 import { useEditOrdersMilkRun } from "../../hooks/mutations/useEditOrdersMilkRun";
-import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
+import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 
 //To Refactor
 export const useMilkRunPage = () => {

@@ -4,9 +4,9 @@ import {
   useOrdersSorting,
   useOrdersSelection,
   useMultipleOrdersActions,
-} from "@/features/orderManagement/hooks";
+} from "@/features/orders/hooks";
 import { useEffect, useState } from "react";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
+import { useOrdersStore } from "@/features/orders/stores/ordersStore";
 
 export const useOrdersToolbar = () => {
   const { status } = useOrdersStore();

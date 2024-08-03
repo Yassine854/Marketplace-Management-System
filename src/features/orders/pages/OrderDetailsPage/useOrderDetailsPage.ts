@@ -3,10 +3,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useOrderActionsStore } from "../../stores/orderActionsStore";
 import { useOrderDetailsEffect } from "../../hooks/useOrderDetailsEffect";
-import { useGetOrder } from "@/features/orderManagement/hooks/queries/useGetOrder";
+import { useGetOrder } from "@/features/orders/hooks/queries/useGetOrder";
 import { useOrderDetailsActions } from "../../hooks/actions/useOrderDetailsActions";
 import { useCancelOrderFromDetailsPage } from "../../hooks/useCancelOrderFromDetailsPage";
-import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
+import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useOrderOnReviewItems } from "../../hooks/useOrderOnReviewItems/useOrderOnReviewItems";
 
 export const useOrderDetailsPage = () => {

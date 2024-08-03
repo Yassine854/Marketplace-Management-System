@@ -1,4 +1,4 @@
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
+import { useOrdersStore } from "@/features/orders/stores/ordersStore";
 import { useOrderActionsFunctions } from "./useOrderActionsFunctions";
 
 export const useOrderActionsByStatus = () => {

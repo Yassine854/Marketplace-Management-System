@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGetOrders } from "./useGetOrders";
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
+import { useOrdersStore } from "@/features/orders/stores/ordersStore";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
 export const useOrdersCount = () => {

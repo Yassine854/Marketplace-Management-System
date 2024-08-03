@@ -3,9 +3,9 @@ import { useDisclosure } from "@nextui-org/modal";
 import { useCancelOrder } from "../../hooks/mutations/oneOrder/useCancelOrder";
 import { useOrderActionsByStatus } from "../../hooks/actions/useOrderActionsByStatus";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
-import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
-import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
-import { useOrderActionsFunctions } from "@/features/orderManagement/hooks/actions/useOrderActionsFunctions";
+import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
+import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
+import { useOrderActionsFunctions } from "@/features/orders/hooks/actions/useOrderActionsFunctions";
 
 export const useOrderTableActions = () => {
   const { actions } = useOrderActionsByStatus();

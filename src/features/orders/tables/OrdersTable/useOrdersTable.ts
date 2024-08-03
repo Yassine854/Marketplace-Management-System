@@ -2,7 +2,7 @@ import {
   useOrdersData,
   useOrdersSelection,
   useOrdersSorting,
-} from "@/features/orderManagement/hooks";
+} from "@/features/orders/hooks";
 import { useDisclosure } from "@nextui-org/modal";
 
 export const useOrdersTable = () => {

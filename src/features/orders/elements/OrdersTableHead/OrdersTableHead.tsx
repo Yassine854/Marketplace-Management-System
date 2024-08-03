@@ -2,7 +2,7 @@ import Checkbox from "@/features/shared/inputs/Checkbox";
 import { IconSelector } from "@tabler/icons-react";
 import OrdersTableHeadCell from "../OrdersTableHeadCell";
 import OrdersTableHeadSmallCell from "../OrdersTableHeadSmallCell";
-import { useOrdersTableHead } from "@/features/orderManagement/hooks";
+import { useOrdersTableHead } from "@/features/orders/hooks";
 
 const OrdersTableHead = ({
   changeSelectedSort,
