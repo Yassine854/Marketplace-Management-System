@@ -7,7 +7,6 @@ import { useUsersStore } from "@/features/users/stores/usersStore";
 import { useOrdersStore } from "@/features/orders/stores/ordersStore";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
-import { useGetDeliveryAgents } from "@/features/shared/hooks/queries/useGetDeliveryAgents";
 
 //To Refactor
 export const useMainLayout = () => {
@@ -18,8 +17,6 @@ export const useMainLayout = () => {
     setIsNoEditUser,
     setIsMultipleStoreAccessUser,
   } = useGlobalStore();
-
-  useGetDeliveryAgents();
 
   const { user } = useAuth();
 
