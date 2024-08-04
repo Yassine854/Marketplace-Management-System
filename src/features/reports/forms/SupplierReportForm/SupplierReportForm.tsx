@@ -5,6 +5,7 @@ import SupplierSelector from "../../widgets/SupplierSelector";
 import DateRangePicker from "@/features/shared/inputs/DateRangePicker";
 import ButtonSkeleton from "../../widgets/ButtonSkeleton/ButtonSkeleton";
 import { useGetAllSuppliers } from "../../hooks/queries/useGetAllSuppliers";
+import { useGenerateSupplierReport } from "../../hooks/mutations/useGenerateSupplierReport";
 
 const SuppliersReportForm = () => {
   const [supplierId, setSupplierId] = useState("");
@@ -12,7 +13,8 @@ const SuppliersReportForm = () => {
   const [toDate, setToDate] = useState("");
 
   const { isLoading, suppliers } = useGetAllSuppliers();
-  const isPending = false;
+
+  const { generateSupplierReport, isPending } = useGenerateSupplierReport();
 
   return (
     <div className="grid h-full w-full items-center justify-center gap-4  xxxl:gap-6 ">
@@ -38,7 +40,17 @@ const SuppliersReportForm = () => {
             {isLoading && <ButtonSkeleton />}
 
             {!isLoading && !isPending && (
-              <button type="submit" className="btn px-4 hover:shadow-none">
+              <button
+                type="submit"
+                className="btn px-4 hover:shadow-none"
+                onClick={() => {
+                  generateSupplierReport({
+                    fromDate: "11/07/2024",
+                    toDate: "22/08/2024",
+                    supplierId: "22",
+                  });
+                }}
+              >
                 Download
               </button>
             )}

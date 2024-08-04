@@ -11,6 +11,7 @@ import { generateOrderSummary } from "./mutations/generateOrderSummary";
 import { getAllOrdersPagesCount } from "./queries/getAllOrdersPagesCount";
 import { generateDeliveryNotes } from "./mutations/generateDeliveryNotes";
 import { getMilkRunOrdersByDate } from "./queries/getMilkRunOrdersByDate";
+import { generateSupplierReport } from "./mutations/generateSupplierReport";
 
 export const magento = {
   queries: {
@@ -30,5 +31,6 @@ export const magento = {
     generatePickLists,
     generateOrderSummary,
     generateDeliveryNotes,
+    generateSupplierReport,
   },
 };
