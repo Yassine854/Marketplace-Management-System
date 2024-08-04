@@ -6,9 +6,7 @@ export const getAllSuppliers = async () => {
     const response = await axios.magentoClient.get(
       "kamioun-manufacturers/manufacturer/search?searchCriteria=",
     );
-    return {
-      suppliers: response.data.items,
-    };
+    return response.data.items;
   } catch (error) {
     logError(error);
     throw new Error();

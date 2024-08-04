@@ -3,8 +3,23 @@ import DatePicker from "@/features/shared/inputs/DatePicker";
 import TriangleSkeleton from "../../widgets/TriangleSkeleton";
 import ButtonSkeleton from "../../widgets/ButtonSkeleton/ButtonSkeleton";
 import DeliveryAgentSelector from "@/features/shared/inputs/DeliveryAgentSelector";
+import { useGetDeliveryAgents } from "@/features/shared/hooks/queries/useGetDeliveryAgents";
+import { useEffect } from "react";
 
-const AgentReportForm = ({ deliveryAgents, isLoading, isPending }: any) => {
+const AgentReportForm = () => {
+  const { deliveryAgents, isLoading } = useGetDeliveryAgents();
+  // console.log("🚀 ~ AgentReportPage ~ deliveryAgents:", deliveryAgents);
+
+  useEffect(() => {
+    console.log("🚀 ~ AgentReportPage ~ deliveryAgents:", deliveryAgents);
+  }, [deliveryAgents]);
+
+  useEffect(() => {
+    console.log("🚀 ~ AgentReportPage ~ isLoading:", isLoading);
+  }, [isLoading]);
+
+  const isPending = false;
+
   return (
     <div className="grid h-full w-full items-center justify-center gap-4  xxxl:gap-6 ">
       {isLoading}

@@ -9,6 +9,7 @@ export const useGetAllSuppliers = () => {
       const { data }: any = await axios.servicesClient.get(
         "/api/suppliers/getAllSuppliers",
       );
+      console.log("🚀 ~ queryFn: ~ data:", data);
 
       return data?.suppliers;
     },

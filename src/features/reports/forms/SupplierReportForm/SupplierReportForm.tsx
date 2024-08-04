@@ -1,85 +1,53 @@
-// import RoleSelector from "../../widgets/RoleSelector";
 import Loading from "@/features/shared/elements/Loading";
-import TextInput from "@/features/shared/inputs/TextInput";
-// import { useCreateUserForm } from "../../hooks/useCreateUserForm";
-import PasswordInput from "@/features/shared/inputs/PasswordInput";
-import { useNavigation } from "@/features/shared/hooks/useNavigation";
-// import GoBackArrow from "../../widgets/GoBackArrow";
+import DatePicker from "@/features/shared/inputs/DatePicker";
+import TriangleSkeleton from "../../widgets/TriangleSkeleton";
+import ButtonSkeleton from "../../widgets/ButtonSkeleton/ButtonSkeleton";
+import SupplierSelector from "../../widgets/SupplierSelector";
+import { useGetAllSuppliers } from "../../hooks/queries/useGetAllSuppliers";
+import { useState } from "react";
 
-const SupplierReportForm = () => {
-  const { navigateToUsersTable, navigateBack } = useNavigation();
-  const isLoading = false;
+const SuppliersReportForm = () => {
+  const [supplierId, setSupplierId] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
-  //   const { handleSubmit, register, setValue, errors, isLoading } =
-  //     useCreateUserForm();
+  const { isLoading, suppliers } = useGetAllSuppliers();
+  const isPending = false;
 
   return (
     <div className="grid h-full w-full items-center justify-center gap-4  xxxl:gap-6 ">
-      <form
-        className="w-full lg:col-span-7 xl:col-span-8"
-        //   onSubmit={handleSubmit}
-      >
-        <div className="box w-full min-w-[800px]  xl:p-8">
-          <div className="bb-dashed mb-6 flex items-center  pb-6">
-            {/* <GoBackArrow onClick={navigateBack} /> */}
-            <p className="ml-4 text-xl font-bold">Download Supplier Report</p>
+      {isLoading}
+      <div className="box w-full min-w-[800px]  xl:p-8">
+        <div className="bb-dashed mb-6 flex items-center  pb-6">
+          <p className="ml-4 text-xl font-bold">Download Supplier Report</p>
+        </div>
+        {!isLoading && (
+          <div className="box mb-6   flex  justify-evenly bg-primary/5 dark:bg-bg3">
+            <SupplierSelector
+              suppliers={suppliers}
+              onChange={(supplier: any) => {
+                setSupplierId(supplier?.id);
+              }}
+            />
+            <DatePicker />
           </div>
-          <div className="box mb-6 grid grid-cols-2 gap-4 bg-primary/5 dark:bg-bg3 md:p-4 xl:p-6 xxxl:gap-6">
-            <TextInput
-              label="Username * "
-              // isError={errors.username}
-              placeholder="Enter username"
-              // register={register("username")}
-              // errorMessage={errors.username?.message}
-            />
-            {/* <RoleSelector
-              isError={errors.roleId}
-              errorMessage={errors.roleId?.message}
-              onChange={(roleId: string) => setValue("roleId", roleId)}
-            /> */}
-            <TextInput
-              label="First Name *"
-              //  isError={errors.firstName}
-              placeholder="Enter first name"
-              //  register={register("firstName")}
-              //  errorMessage={errors.firstName?.message}
-            />
-            <TextInput
-              label="Last Name *"
-              // isError={errors.lastName}
-              placeholder="Enter lastName"
-              //  register={register("lastName")}
-              //  errorMessage={errors.lastName?.message}
-            />
+        )}
+        {isLoading && <TriangleSkeleton />}
+        <div className="mt-6">
+          <div className="mt-7 flex justify-end gap-4  lg:mt-10">
+            {isLoading && <ButtonSkeleton />}
 
-            <PasswordInput
-              label="Password *"
-              //   isError={errors.password}
-              //  register={register("password")}
-              //  errorMessage={errors.password?.message}
-            />
-            <PasswordInput
-              label="Confirm Password *"
-              //  isError={errors.confirmPassword}
-              // register={register("confirmPassword")}
-              //errorMessage={errors.confirmPassword?.message}
-            />
-          </div>
-
-          <div className="mt-6">
-            <div className="mt-7 flex justify-end gap-4  lg:mt-10">
-              {!isLoading && (
-                <button type="submit" className="btn px-4 hover:shadow-none">
-                  Download
-                </button>
-              )}
-              {isLoading && <Loading />}
-            </div>
+            {!isLoading && !isPending && (
+              <button type="submit" className="btn px-4 hover:shadow-none">
+                Download
+              </button>
+            )}
+            {!isLoading && isPending && <Loading />}
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
 
-export default SupplierReportForm;
+export default SuppliersReportForm;
