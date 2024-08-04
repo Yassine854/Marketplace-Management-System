@@ -1,25 +1,31 @@
+import { useState } from "react";
 import Loading from "@/features/shared/elements/Loading";
-import DatePicker from "@/features/shared/inputs/DatePicker";
 import TriangleSkeleton from "../../widgets/TriangleSkeleton";
+import DateRangePicker from "@/features/shared/inputs/DateRangePicker";
 import ButtonSkeleton from "../../widgets/ButtonSkeleton/ButtonSkeleton";
 import DeliveryAgentSelector from "@/features/shared/inputs/DeliveryAgentSelector";
-import { useGetDeliveryAgents } from "@/features/shared/hooks/queries/useGetDeliveryAgents";
-import { useEffect } from "react";
-import DateRangePicker from "@/features/shared/inputs/DateRangePicker";
 import { useGenerateAgentReport } from "../../hooks/mutations/useGenerateAgentReport";
+import { useGetDeliveryAgents } from "@/features/shared/hooks/queries/useGetDeliveryAgents";
+
+import { toast } from "react-hot-toast";
+
+function formatDate(inputDate: string) {
+  const date = new Date(inputDate);
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${month}/${day}/${year}`;
+}
 
 const AgentReportForm = () => {
+  const [toDate, setToDate] = useState("");
+  const [agentId, setAgentId] = useState("");
+  const [fromDate, setFromDate] = useState("");
+
   const { deliveryAgents, isLoading } = useGetDeliveryAgents();
   const { generateAgentReport, isPending } = useGenerateAgentReport();
-  // console.log("🚀 ~ AgentReportPage ~ deliveryAgents:", deliveryAgents);
-
-  useEffect(() => {
-    console.log("🚀 ~ AgentReportPage ~ deliveryAgents:", deliveryAgents);
-  }, [deliveryAgents]);
-
-  useEffect(() => {
-    console.log("🚀 ~ AgentReportPage ~ isLoading:", isLoading);
-  }, [isLoading]);
 
   return (
     <div className="grid h-full w-full items-center justify-center gap-4  xxxl:gap-6 ">
@@ -29,14 +35,20 @@ const AgentReportForm = () => {
           <p className="ml-4 text-xl font-bold">Download Agent Report</p>
         </div>
         {!isLoading && (
-          <div className="box mb-6   flex  justify-evenly bg-primary/5 dark:bg-bg3">
+          <div className=" box flex w-full justify-between   bg-primary/5   dark:bg-bg3">
             <DeliveryAgentSelector
               deliveryAgents={deliveryAgents}
-              onChange={(a: any) => {
-                console.log("🚀 ~ AgentReportForm ~ a:", a);
+              onChange={(agent: any) => {
+                setAgentId(agent.id);
               }}
             />
-            <DateRangePicker />
+
+            <DateRangePicker
+              onChange={(e: any) => {
+                setToDate(e?.toDate);
+                setFromDate(e?.fromDate);
+              }}
+            />
           </div>
         )}
         {isLoading && <TriangleSkeleton />}
@@ -49,10 +61,22 @@ const AgentReportForm = () => {
                 type="submit"
                 className="btn px-4 hover:shadow-none"
                 onClick={() => {
+                  if (!agentId) {
+                    toast.error(`Please Select an Agent`, {
+                      duration: 5000,
+                    });
+                    return;
+                  }
+                  if (!toDate || !fromDate) {
+                    toast.error(`Please Select Date Range`, {
+                      duration: 5000,
+                    });
+                    return;
+                  }
                   generateAgentReport({
-                    fromDate: "11/07/2024",
-                    toDate: "22/08/2024",
-                    agentId: "1057",
+                    agentId,
+                    toDate: formatDate(toDate),
+                    fromDate: formatDate(fromDate),
                   });
                 }}
               >

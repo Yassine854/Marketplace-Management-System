@@ -6,6 +6,17 @@ import DateRangePicker from "@/features/shared/inputs/DateRangePicker";
 import ButtonSkeleton from "../../widgets/ButtonSkeleton/ButtonSkeleton";
 import { useGetAllSuppliers } from "../../hooks/queries/useGetAllSuppliers";
 import { useGenerateSupplierReport } from "../../hooks/mutations/useGenerateSupplierReport";
+import { toast } from "react-hot-toast";
+
+function formatDate(inputDate: string) {
+  const date = new Date(inputDate);
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${month}/${day}/${year}`;
+}
 
 const SuppliersReportForm = () => {
   const [supplierId, setSupplierId] = useState("");
@@ -31,7 +42,12 @@ const SuppliersReportForm = () => {
                 setSupplierId(supplier?.id);
               }}
             />
-            <DateRangePicker />
+            <DateRangePicker
+              onChange={(e: any) => {
+                setToDate(e?.toDate);
+                setFromDate(e?.fromDate);
+              }}
+            />
           </div>
         )}
         {isLoading && <TriangleSkeleton />}
@@ -44,10 +60,18 @@ const SuppliersReportForm = () => {
                 type="submit"
                 className="btn px-4 hover:shadow-none"
                 onClick={() => {
+                  if (!supplierId) {
+                    toast.error(`Please Select a Supplier`, { duration: 5000 });
+                    return;
+                  }
+                  if (!toDate || !fromDate) {
+                    toast.error(`Please Select Date Range`, { duration: 5000 });
+                    return;
+                  }
                   generateSupplierReport({
-                    fromDate: "11/07/2024",
-                    toDate: "22/08/2024",
-                    supplierId: "22",
+                    supplierId,
+                    toDate: formatDate(toDate),
+                    fromDate: formatDate(fromDate),
                   });
                 }}
               >

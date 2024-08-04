@@ -1,5 +1,6 @@
-import React, { ChangeEventHandler, useState } from "react";
+import React, { ChangeEventHandler, useEffect, useState } from "react";
 import { format, isAfter, isBefore, isValid, parse } from "date-fns";
+import "react-day-picker/dist/style.css";
 
 import {
   DateRange,
@@ -8,37 +9,10 @@ import {
 } from "react-day-picker";
 import { Button } from "@nextui-org/button";
 
-const TwoMonthsCalender = () => {
+const TwoMonthsCalender = ({ onChange }: any) => {
   const [selectedRange, setSelectedRange] = useState<DateRange>();
   const [fromValue, setFromValue] = useState<string>("");
   const [toValue, setToValue] = useState<string>("");
-
-  const handleFromChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setFromValue(e.target.value);
-    const date = parse(e.target.value, "y-MM-dd", new Date());
-    if (!isValid(date)) {
-      return setSelectedRange({ from: undefined, to: undefined });
-    }
-    if (selectedRange?.to && isAfter(date, selectedRange.to)) {
-      setSelectedRange({ from: selectedRange.to, to: date });
-    } else {
-      setSelectedRange({ from: date, to: selectedRange?.to });
-    }
-  };
-
-  const handleToChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setToValue(e.target.value);
-    const date = parse(e.target.value, "y-MM-dd", new Date());
-
-    if (!isValid(date)) {
-      return setSelectedRange({ from: selectedRange?.from, to: undefined });
-    }
-    if (selectedRange?.from && isBefore(date, selectedRange.from)) {
-      setSelectedRange({ from: date, to: selectedRange.from });
-    } else {
-      setSelectedRange({ from: selectedRange?.from, to: date });
-    }
-  };
 
   const handleRangeSelect: SelectRangeEventHandler = (
     range: DateRange | undefined,
@@ -56,6 +30,12 @@ const TwoMonthsCalender = () => {
     }
   };
 
+  useEffect(() => {
+    if (fromValue && toValue) {
+      onChange({ fromDate: fromValue, toDate: toValue });
+    }
+  }, [fromValue, toValue, onChange]);
+
   return (
     <div>
       <DayPicker
@@ -64,23 +44,8 @@ const TwoMonthsCalender = () => {
         selected={selectedRange}
         onSelect={handleRangeSelect}
       />
-
-      <Button>Confirm</Button>
-      {/* <form className="ma2">
-        <input
-          size={10}
-          placeholder="From Date"
-          value={fromValue}
-          onChange={handleFromChange}
-        />
-        {" – "}
-        <input
-          size={10}
-          placeholder="To Date"
-          value={toValue}
-          onChange={handleToChange}
-        />
-      </form> */}
+      {/* 
+      <Button>Confirm</Button> */}
     </div>
   );
 };
