@@ -1,37 +1,24 @@
+import { useState } from "react";
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 
 export const useGetDeliveryAgents = () => {
-  const {
-    isLoading,
-    data: deliveryAgents,
-    fetchStatus,
-    isPending,
-  } = useQuery({
+  const [isLoading, setIsLoading] = useState(false);
+  const { data: deliveryAgents } = useQuery({
     queryKey: ["deliveryAgents"],
-    networkMode: "always",
-    //  behavior:'',
 
     queryFn: async () => {
+      setIsLoading(true);
       const { data }: any = await axios.servicesClient.get(
         "/api/delivery/getAllDeliveryAgents",
       );
-
+      setIsLoading(false);
       return data?.deliveryAgents;
     },
   });
 
-  useEffect(() => {
-    console.log("🚀 ~ useGetDeliveryAgents ~ isPending:", isPending);
-  }, [isPending]);
-  useEffect(() => {
-    console.log("🚀 ~ useGetDeliveryAgents ~ fetchStatus:", fetchStatus);
-  }, [fetchStatus]);
-
-  const isLoadingV3 = isLoading && fetchStatus !== "idle";
   return {
-    isLoading: isLoadingV3,
+    isLoading,
     deliveryAgents,
   };
 };
