@@ -1,6 +1,6 @@
+import { useEffect } from "react";
 import { useAuth } from "@/features/shared/hooks/useAuth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 

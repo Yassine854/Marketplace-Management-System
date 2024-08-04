@@ -4,6 +4,7 @@ import {
   IconList,
   IconMap2,
   IconUsers,
+  IconReport,
   IconDashboard,
 } from "@tabler/icons-react";
 import Link from "next/link";
@@ -44,10 +45,10 @@ const Sidebar = ({
         <div className="flex items-center justify-center ">
           <Link href="/">
             <Image
+              alt="logo"
               width={180}
               height={38}
               src="/images/Kamioun-logo-text.png"
-              alt="logo"
             />
           </Link>
           <button onClick={() => setSidebar(false)} className="xxl:hidden">
@@ -59,65 +60,81 @@ const Sidebar = ({
         <div className="min-h-[70%] px-4 pb-24 xxl:px-6 xxxl:px-8">
           <Divider />
           <SidebarButton
-            isActive={pathname?.includes("dashboard")}
-            name={"Dashboard"}
-            icon={<IconDashboard />}
             onClick={() => {
               push("/dashboard");
             }}
+            name={"Dashboard"}
+            icon={<IconDashboard />}
+            isActive={pathname?.includes("dashboard")}
           />
           <Divider />
           <SidebarOrdersSubMenu
-            isAdmin={isAdmin}
-            readyOrdersCount={readyOrdersCount}
-            openOrdersCount={openOrdersCount}
-            validOrdersCount={validOrdersCount}
-            selectedStatus={selectedStatus}
-            items={statuses}
-            isActive={
-              pathname?.includes("order") && !pathname?.includes("logs")
-            }
             onClick={() => {
               push("/orders");
             }}
+            items={statuses}
+            isAdmin={isAdmin}
+            selectedStatus={selectedStatus}
+            openOrdersCount={openOrdersCount}
+            readyOrdersCount={readyOrdersCount}
+            validOrdersCount={validOrdersCount}
             onSubMenuItemClick={onOrderStatusClick}
+            isActive={
+              pathname?.includes("order") && !pathname?.includes("logs")
+            }
           />
           {!isNoEditUser && (
             <>
               <Divider />
               <SidebarButton
-                isActive={pathname?.includes("milk-run")}
                 name={"Milk Run"}
                 icon={<IconMap2 />}
                 onClick={() => {
                   push("/milk-run");
                 }}
+                isActive={pathname?.includes("milk-run")}
               />
             </>
           )}
           <Divider />
+
+          <SidebarSubMenu
+            icon={<IconReport />}
+            name="Reports"
+            onClick={() => {
+              push("/reports/agent");
+            }}
+            isActive={pathname?.includes("reports")}
+            items={[
+              { name: "Agent", path: "/reports/agent" },
+              { name: "Supplier", path: "/reports/supplier" },
+            ]}
+          />
+          <Divider />
+
           <SidebarButton
-            isActive={pathname?.includes("notifications")}
             name={"Notifications"}
             icon={<IconBell />}
             onClick={() => {
               push("/notifications");
             }}
+            isActive={pathname?.includes("notifications")}
           />
           <Divider />
+
           {isAdmin && (
             <>
               <SidebarSubMenu
-                isActive={pathname?.includes("access")}
-                name="Access Control"
                 icon={<IconUsers />}
+                name="Access Control"
+                onClick={() => {
+                  push("/access/users");
+                }}
+                isActive={pathname?.includes("access")}
                 items={[
                   { name: "Users", path: "/access/users" },
                   { name: "Roles", path: "/access/roles" },
                 ]}
-                onClick={() => {
-                  push("/access/users");
-                }}
               />
 
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
@@ -127,16 +144,16 @@ const Sidebar = ({
           {isAdmin && (
             <>
               <SidebarSubMenu
-                isActive={pathname?.includes("logs")}
                 name="Logs"
                 icon={<IconList />}
+                isActive={pathname?.includes("logs")}
+                onClick={() => {
+                  push("/logs/orders-logs");
+                }}
                 items={[
                   { name: "Orders", path: "/logs/orders-logs" },
                   { name: "Activities", path: "/logs/activities-logs" },
                 ]}
-                onClick={() => {
-                  push("/logs/orders-logs");
-                }}
               />
 
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />

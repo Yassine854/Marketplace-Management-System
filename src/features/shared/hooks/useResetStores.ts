@@ -1,8 +1,8 @@
-import { useOrdersStore } from "@/features/orderManagement/stores/ordersStore";
-import { useMilkRunStore } from "@/features/milkRunManagement/stores/milkRunStore";
-import { useOrderActionsStore } from "@/features/orderManagement/stores/orderActionsStore";
-import { useOrderDetailsStore } from "@/features/orderManagement/stores/orderDetailsStore";
-import { useOrdersTableStore } from "@/features/orderManagement/stores/ordersTableStore";
+import { useOrdersStore } from "@/features/orders/stores/ordersStore";
+import { useMilkRunStore } from "@/features/delivery/stores/milkRunStore";
+import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
+import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
+import { useOrdersTableStore } from "@/features/orders/stores/ordersTableStore";
 
 export const useResetStores = () => {
   const resetOrdersTableStore = useOrdersTableStore(
