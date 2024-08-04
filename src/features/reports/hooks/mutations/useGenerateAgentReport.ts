@@ -5,14 +5,14 @@ import { useMutation } from "@tanstack/react-query";
 type Params = {
   toDate: string;
   fromDate: string;
-  supplierId: string;
+  agentId: string;
 };
 
-export const useGenerateSupplierReport = () => {
+export const useGenerateAgentReport = () => {
   const { mutate, isPending } = useMutation({
-    mutationFn: async ({ supplierId, fromDate, toDate }: Params) => {
-      const url = await magento.mutations.generateSupplierReport({
-        supplierId,
+    mutationFn: async ({ agentId, fromDate, toDate }: Params) => {
+      const url = await magento.mutations.generateAgentReport({
+        agentId,
         fromDate,
         toDate,
       });
@@ -22,7 +22,7 @@ export const useGenerateSupplierReport = () => {
     onSuccess: (url) => {
       window.open(url);
 
-      toast.success(`Supplier Report  Generated Successfully`, {
+      toast.success(`Agent Report  Generated Successfully`, {
         duration: 5000,
       });
     },
@@ -31,5 +31,5 @@ export const useGenerateSupplierReport = () => {
     },
   });
 
-  return { generateSupplierReport: mutate, isPending };
+  return { generateAgentReport: mutate, isPending };
 };

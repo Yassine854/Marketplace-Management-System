@@ -6,9 +6,11 @@ import DeliveryAgentSelector from "@/features/shared/inputs/DeliveryAgentSelecto
 import { useGetDeliveryAgents } from "@/features/shared/hooks/queries/useGetDeliveryAgents";
 import { useEffect } from "react";
 import DateRangePicker from "@/features/shared/inputs/DateRangePicker";
+import { useGenerateAgentReport } from "../../hooks/mutations/useGenerateAgentReport";
 
 const AgentReportForm = () => {
   const { deliveryAgents, isLoading } = useGetDeliveryAgents();
+  const { generateAgentReport, isPending } = useGenerateAgentReport();
   // console.log("🚀 ~ AgentReportPage ~ deliveryAgents:", deliveryAgents);
 
   useEffect(() => {
@@ -18,8 +20,6 @@ const AgentReportForm = () => {
   useEffect(() => {
     console.log("🚀 ~ AgentReportPage ~ isLoading:", isLoading);
   }, [isLoading]);
-
-  const isPending = false;
 
   return (
     <div className="grid h-full w-full items-center justify-center gap-4  xxxl:gap-6 ">
@@ -45,7 +45,17 @@ const AgentReportForm = () => {
             {isLoading && <ButtonSkeleton />}
 
             {!isLoading && !isPending && (
-              <button type="submit" className="btn px-4 hover:shadow-none">
+              <button
+                type="submit"
+                className="btn px-4 hover:shadow-none"
+                onClick={() => {
+                  generateAgentReport({
+                    fromDate: "11/07/2024",
+                    toDate: "22/08/2024",
+                    agentId: "1057",
+                  });
+                }}
+              >
                 Download
               </button>
             )}

@@ -7,6 +7,7 @@ import { editOrderMilkRun } from "./mutations/editOrderMilkRun";
 import { getDeliveryAgents } from "./queries/getAllDeliveryAgents";
 import { generatePickLists } from "./mutations/generatePickLists";
 import { changeOrderStatus } from "./mutations/changeOrderStatus";
+import { generateAgentReport } from "./mutations/generateAgentReport";
 import { generateOrderSummary } from "./mutations/generateOrderSummary";
 import { getAllOrdersPagesCount } from "./queries/getAllOrdersPagesCount";
 import { generateDeliveryNotes } from "./mutations/generateDeliveryNotes";
@@ -29,6 +30,7 @@ export const magento = {
     editOrderMilkRun,
     changeOrderStatus,
     generatePickLists,
+    generateAgentReport,
     generateOrderSummary,
     generateDeliveryNotes,
     generateSupplierReport,
