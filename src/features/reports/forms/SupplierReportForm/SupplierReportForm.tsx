@@ -1,10 +1,10 @@
-import Loading from "@/features/shared/elements/Loading";
-import DatePicker from "@/features/shared/inputs/DatePicker";
-import TriangleSkeleton from "../../widgets/TriangleSkeleton";
-import ButtonSkeleton from "../../widgets/ButtonSkeleton/ButtonSkeleton";
-import SupplierSelector from "../../widgets/SupplierSelector";
-import { useGetAllSuppliers } from "../../hooks/queries/useGetAllSuppliers";
 import { useState } from "react";
+import Loading from "@/features/shared/elements/Loading";
+import TriangleSkeleton from "../../widgets/TriangleSkeleton";
+import SupplierSelector from "../../widgets/SupplierSelector";
+import DateRangePicker from "@/features/shared/inputs/DateRangePicker";
+import ButtonSkeleton from "../../widgets/ButtonSkeleton/ButtonSkeleton";
+import { useGetAllSuppliers } from "../../hooks/queries/useGetAllSuppliers";
 
 const SuppliersReportForm = () => {
   const [supplierId, setSupplierId] = useState("");
@@ -29,7 +29,7 @@ const SuppliersReportForm = () => {
                 setSupplierId(supplier?.id);
               }}
             />
-            <DatePicker />
+            <DateRangePicker />
           </div>
         )}
         {isLoading && <TriangleSkeleton />}

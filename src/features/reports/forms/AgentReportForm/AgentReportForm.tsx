@@ -5,6 +5,7 @@ import ButtonSkeleton from "../../widgets/ButtonSkeleton/ButtonSkeleton";
 import DeliveryAgentSelector from "@/features/shared/inputs/DeliveryAgentSelector";
 import { useGetDeliveryAgents } from "@/features/shared/hooks/queries/useGetDeliveryAgents";
 import { useEffect } from "react";
+import DateRangePicker from "@/features/shared/inputs/DateRangePicker";
 
 const AgentReportForm = () => {
   const { deliveryAgents, isLoading } = useGetDeliveryAgents();
@@ -35,7 +36,7 @@ const AgentReportForm = () => {
                 console.log("🚀 ~ AgentReportForm ~ a:", a);
               }}
             />
-            <DatePicker />
+            <DateRangePicker />
           </div>
         )}
         {isLoading && <TriangleSkeleton />}
