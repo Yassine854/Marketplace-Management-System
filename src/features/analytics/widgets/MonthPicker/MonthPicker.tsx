@@ -44,7 +44,7 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
       const formattedDate = `${year}-${selectedMonth.key}-01`;
       onMonthChange(formattedDate);
     }
-  }, [selectedMonth, year, onMonthChange]);
+  }, [selectedMonth, year, onMonthChange, toggleOpen]);
 
   const handleYearChange = (indicator: number) => {
     setYear((year) => year + indicator);

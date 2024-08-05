@@ -1,7 +1,7 @@
 import { prisma } from "@/clients/prisma";
-import { UsersPayload } from "@/types/resolvers.types";
+//import { UsersPayload } from "@/types/resolvers.types";
 
-export const getAllUsers = async (): Promise<UsersPayload> => {
+export const getAllUsers = async (): Promise<any> => {
   try {
     const users = await prisma.getAllUsers();
 
