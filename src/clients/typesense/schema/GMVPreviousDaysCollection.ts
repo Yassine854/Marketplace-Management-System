@@ -24,5 +24,9 @@ export const gmvPreviousDaysCollectionSchema: CollectionCreateSchema = {
       name: "gmv",
       type: "float",
     },
+    {
+      name: "week",
+      type: "string",
+    },
   ],
 };
