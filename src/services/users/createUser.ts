@@ -6,8 +6,6 @@ export const createUser = async (
   newUser: any,
 ): Promise<{ data: User | undefined; message: string; success: boolean }> => {
   try {
-    console.log("Received newUser:", newUser);
-
     const existingUser = await prismaClient.user.findUnique({
       where: { username: newUser.username },
     });
