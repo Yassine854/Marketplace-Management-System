@@ -1,5 +1,5 @@
 import { prisma } from "@/clients/prisma";
-import { UserPayload } from "../bff/resolvers/resolvers.types";
+import { UserPayload } from "@/types/resolvers.types";
 
 export const getUser = async (username: string): Promise<UserPayload> => {
   try {
