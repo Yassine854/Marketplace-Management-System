@@ -1,0 +1,16 @@
+meta {
+  name: by Month
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/analytics/gmv/byMonth?year=2024&month=3
+  body: none
+  auth: none
+}
+
+params:query {
+  year: 2024
+  month: 3
+}
