@@ -7,9 +7,22 @@ export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
 
+    const storeId = searchParams.get("storeId");
+
     const deliveryDate = searchParams.get("deliveryDate");
 
-    const res = await getOrdersByDeliveryDate(Number(deliveryDate));
+    if (!storeId) {
+      return responses.invalidRequest("storeId parameter is Required");
+    }
+
+    if (!deliveryDate) {
+      return responses.invalidRequest("deliveryDate parameter is Required");
+    }
+
+    const res = await getOrdersByDeliveryDate({
+      deliveryDate,
+      storeId,
+    });
 
     return NextResponse.json(res);
   } catch (error: any) {

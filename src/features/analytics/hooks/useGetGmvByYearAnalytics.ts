@@ -8,11 +8,11 @@ export const useGetGmvByYearAnalytics = (year: number) => {
       const { data } = await axios.servicesClient(
         `/api/analytics/gmv/byYear?year=${year}`,
       );
-      return data?.data.gmv;
+      return data?.data;
     },
   });
   return {
-    data,
-    isLoading,
+    dataYear: data,
+    isLoadingYear: isLoading,
   };
 };
