@@ -1,15 +1,17 @@
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
 
-export const useGetMilkRunOrders = (deliveryDate: number) => {
+export const useGetMilkRunOrders = ({ deliveryDate, storeId }: any) => {
   const { isLoading, data, refetch } = useQuery({
     queryKey: ["milkRunOrders", deliveryDate?.toString()],
     queryFn: async () => {
-      const { data } = await axios.servicesClient(
-        `/api/orders/magento/getOrdersByDeliveryDate?deliveryDate=${deliveryDate}`,
-      );
+      if (storeId && deliveryDate) {
+        const { data } = await axios.servicesClient(
+          `/api/orders/getOrdersByDeliveryDate?deliveryDate=${deliveryDate}&storeId=${storeId}`,
+        );
 
-      return data;
+        return data;
+      }
     },
   });
 

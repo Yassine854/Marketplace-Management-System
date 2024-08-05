@@ -2,13 +2,20 @@ import { toast } from "react-hot-toast";
 import { useEffect, useState, useRef } from "react";
 import { useMilkRunStore } from "../../stores/milkRunStore";
 import { useNavigation } from "../../../shared/hooks/useNavigation";
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useGetMilkRunOrders } from "../../hooks/queries/useGetMilkRunOrders";
-import { useGetDeliveryAgents } from "../../../shared/hooks/queries/useGetDeliveryAgents";
 import { useEditOrdersMilkRun } from "../../hooks/mutations/useEditOrdersMilkRun";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
+import { useGetDeliveryAgents } from "../../../shared/hooks/queries/useGetDeliveryAgents";
 
 //To Refactor
 export const useMilkRunPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const deliveryAgentSelectorRef = useRef(null);
+
+  const deliverySlotSelectorRef = useRef(null);
+
   const {
     reset,
     deliverySlot,
@@ -23,6 +30,8 @@ export const useMilkRunPage = () => {
     setDeliveryAgentName,
   } = useMilkRunStore();
 
+  const { storeId } = useGlobalStore();
+
   const { setOrderOnReviewId } = useOrderDetailsStore();
 
   const { navigateToOrderDetails } = useNavigation();
@@ -34,15 +43,10 @@ export const useMilkRunPage = () => {
     orders,
     count: ordersCount,
     isLoading: isOrdersLoading,
-  } = useGetMilkRunOrders(Number(deliveryDate));
+    refetch,
+  } = useGetMilkRunOrders({ deliveryDate, storeId });
 
   const { editOrdersMilkRun, isPending } = useEditOrdersMilkRun();
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const deliveryAgentSelectorRef = useRef(null);
-
-  const deliverySlotSelectorRef = useRef(null);
 
   const onOrderMarkerClick = (orderId: string): void => {
     let list = selectedOrdersIds;
@@ -106,6 +110,10 @@ export const useMilkRunPage = () => {
       setIsLoading(false);
     }
   }, [isDeliveryAgentsLoading, isOrdersLoading, setIsLoading]);
+
+  useEffect(() => {
+    refetch();
+  }, [storeId, deliveryDate, refetch]);
 
   return {
     orders,
