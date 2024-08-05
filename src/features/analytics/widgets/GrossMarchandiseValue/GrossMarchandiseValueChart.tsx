@@ -3,9 +3,12 @@ import { useEffect, useState } from "react";
 import { useGetGmvByYearAnalytics } from "../../hooks/useGetGmvByYearAnalytics";
 import Loading from "@/features/shared/elements/Loading";
 import YearPicker from "../YearPicker";
+import Dropdown from "@/features/orders/widgets/Dropdown";
+import { options } from "@/public/data/timesDropdown";
 
 const GrossMarchandiseValueChart = () => {
   const [date, setDate] = useState(`${new Date().getFullYear()}-01-01`);
+  const [selected, setSelected] = useState(options[0]);
   const year = Number(date);
   const { data, isLoading } = useGetGmvByYearAnalytics(year);
   const [chartData, setChartData] = useState<number[]>([]);
@@ -15,7 +18,7 @@ const GrossMarchandiseValueChart = () => {
         const numberString = gmvNumber.toString();
         const dotPosition = numberString.indexOf(".");
         const decimalPart =
-          dotPosition !== -1 ? numberString.substring(dotPosition + 1) : "";
+          dotPosition !== -1 ? numberString.substring(0, dotPosition) : "";
         return Number(decimalPart);
       });
       setChartData(newList);
@@ -61,7 +64,14 @@ const GrossMarchandiseValueChart = () => {
           </div>
           <p className="text-2xl font-bold">Gross Marchandise Value</p>
         </div>
-        <YearPicker onYearChange={(date: string) => setDate(date)} />
+        <div className="flex flex-row">
+          <Dropdown
+            selected={selected}
+            onSelect={setSelected}
+            items={options}
+          />
+          <YearPicker onYearChange={(date: string) => setDate(date)} />
+        </div>
       </div>
       <div className="h-[320px]">
         <ReactApexChart
