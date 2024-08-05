@@ -1,1 +1,4 @@
-export const options = ["Last 7 Days", "Last 15 Days", "Last 1 Month"];
+export const options = [
+  { name: "Year", key: "year" },
+  { name: "Month", key: "month" },
+];
