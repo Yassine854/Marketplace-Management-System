@@ -4,4 +4,4 @@ export const getGmvByQuarter = (
   yearArg: number,
   quarter: string,
 ): Promise<number | undefined> =>
-  typesense.orders.grossMarketValue.byQuarter(yearArg, quarter);
+  typesense.orders.gmv.byQuarter(yearArg, quarter);
