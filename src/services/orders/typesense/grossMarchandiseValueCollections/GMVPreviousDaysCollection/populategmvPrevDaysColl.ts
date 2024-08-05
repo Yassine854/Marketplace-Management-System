@@ -1,6 +1,7 @@
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import dayjs from "dayjs";
 import { getGmvByDay } from "@/clients/typesense/orders/gmv/getGmvByDay";
+import { dateYMDToUnixTimestamp } from "@/utils/unixTimestamp";
 
 export async function populateGMVPreviousDays() {
   try {
@@ -22,8 +23,11 @@ export async function populateGMVPreviousDays() {
         for (let day = 1; day <= endDay; day++) {
           try {
             const result = await getGmvByDay(year, month, day);
+            const unixDate = dateYMDToUnixTimestamp(
+              year + "-" + month + "-" + day,
+            );
             const document = {
-              id: `${day}-${month}-${year}`,
+              id: `${unixDate}`,
               year: year.toString(),
               month: month.toString(),
               day: day.toString(),
@@ -35,7 +39,7 @@ export async function populateGMVPreviousDays() {
               .upsert(document);
           } catch (error) {
             console.error(
-              `Error processing date ${day}-${month}-${year}:`,
+              `Error processing date ${year}-${month}-${day}:`,
               error,
             );
           }
