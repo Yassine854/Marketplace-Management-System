@@ -1,0 +1,15 @@
+meta {
+  name: byYear
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/analytics/gmv/byYear?year=2024
+  body: none
+  auth: none
+}
+
+params:query {
+  year: 2024
+}
