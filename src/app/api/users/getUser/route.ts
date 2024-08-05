@@ -7,7 +7,7 @@ export const GET = async (request: NextRequest) => {
 
   if (!username) {
     return NextResponse.json(
-      { message: "Username is required", success: false },
+      { message: "Username is required" },
       { status: 400 },
     );
   }
@@ -17,7 +17,7 @@ export const GET = async (request: NextRequest) => {
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(
-      { message: "Failed to fetch user", success: false },
+      { message: "Failed to fetch user" },
       { status: 500 },
     );
   }
