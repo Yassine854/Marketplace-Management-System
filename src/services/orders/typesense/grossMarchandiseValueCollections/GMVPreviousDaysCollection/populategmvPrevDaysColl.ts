@@ -43,7 +43,7 @@ export async function populateGMVPreviousDays() {
       }
     }
 
-    console.log("Finished populating gmvPreviousDays collection");
+    console.info("Finished populating gmvPreviousDays collection");
     return {
       success: true,
       message: "GMV previous days data updated successfully",
