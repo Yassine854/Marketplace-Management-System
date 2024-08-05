@@ -1,7 +1,12 @@
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import dayjs from "dayjs";
+import weekOfYear from "dayjs/plugin/weekOfYear";
+import isoWeek from "dayjs/plugin/isoWeek";
 import { getGmvByDay } from "@/clients/typesense/orders/gmv/getGmvByDay";
 import { dateYMDToUnixTimestamp } from "@/utils/unixTimestamp";
+
+dayjs.extend(weekOfYear);
+dayjs.extend(isoWeek);
 
 export async function populateGMVPreviousDays() {
   try {
@@ -22,16 +27,16 @@ export async function populateGMVPreviousDays() {
 
         for (let day = 1; day <= endDay; day++) {
           try {
+            const date = dayjs(`${year}-${month}-${day}`);
+            const week = date.isoWeek(); // ISO week number
             const result = await getGmvByDay(year, month, day);
-            const unixDate = dateYMDToUnixTimestamp(
-              year + "-" + month + "-" + day,
-            );
             const document = {
-              id: `${unixDate}`,
+              id: `${year}-${month}-${day}`,
               year: year.toString(),
               month: month.toString(),
               day: day.toString(),
               gmv: result,
+              week: week.toString(),
             };
             await typesenseClient
               .collections("gmvPreviousDays")
