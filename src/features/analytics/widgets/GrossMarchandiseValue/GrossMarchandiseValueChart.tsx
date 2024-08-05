@@ -9,22 +9,35 @@ import MonthPicker from "../MonthPicker";
 import { useGetGmvByMonthAnalytics } from "../../hooks/useGetGmvByMonthAnalytics";
 
 const GrossMarchandiseValueChart = () => {
-  const [date, setDate] = useState(`${new Date().getFullYear()}-01-01`);
-
+  const [dateYear, setDateYear] = useState(`${new Date().getFullYear()}-01-01`);
+  const [dateMonth, setDateMonth] = useState("2024-01");
+  const [year, month, day] = dateMonth.split("-").map(Number);
   const [selected, setSelected] = useState(options[0]);
   const [chartData, setChartData] = useState<number[]>([]);
   const [xAxis, setXAxis] = useState<string[]>([]);
-  const { dataMonth, isLoadingMonth } = useGetGmvByMonthAnalytics(2024, 7);
-  const { dataYear, isLoadingYear } = useGetGmvByYearAnalytics(2024);
+  const { dataMonth, isLoadingMonth, refetch } = useGetGmvByMonthAnalytics(
+    month,
+    year,
+  );
+  const { dataYear, isLoadingYear } = useGetGmvByYearAnalytics(
+    Number(dateYear),
+  );
   useEffect(() => {
     if (selected.name === "Month") {
-      const days = dataMonth.Days;
+      const days = dataMonth?.Days;
       setXAxis(days);
-      setChartData(dataMonth.gmv);
-    } else {
-      setChartData(dataYear);
+      setChartData(dataMonth?.gmv);
+      refetch();
     }
-  }, [selected]);
+  }, [selected, dataMonth, year, month]);
+
+  useEffect(() => {
+    if (selected.name === "Year") {
+      const months = dataYear?.Months;
+      setXAxis(months);
+      setChartData(dataYear?.gmv);
+    }
+  }, [selected, dataYear, dateYear]);
 
   const ReactApexChart = dynamic(() => import("react-apexcharts"), {
     ssr: false,
@@ -32,23 +45,7 @@ const GrossMarchandiseValueChart = () => {
 
   const chartOptions = {
     xaxis: {
-      categories:
-        selected.name === "Month"
-          ? xAxis
-          : [
-              "Jan",
-              "Feb",
-              "Mar",
-              "Apr",
-              "May",
-              "Jun",
-              "Jul",
-              "Aug",
-              "Sep",
-              "Oct",
-              "Nov",
-              "Dec",
-            ],
+      categories: xAxis,
     },
   };
 
@@ -75,9 +72,9 @@ const GrossMarchandiseValueChart = () => {
             items={options}
           />
           {selected.name === "Year" ? (
-            <YearPicker onYearChange={(date: string) => setDate(date)} />
+            <YearPicker onYearChange={(date: string) => setDateYear(date)} />
           ) : (
-            <MonthPicker onYearChange={(date: string) => setDate(date)} />
+            <MonthPicker onMonthChange={(date: string) => setDateMonth(date)} />
           )}
         </div>
       </div>

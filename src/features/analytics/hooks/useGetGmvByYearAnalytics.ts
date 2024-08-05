@@ -8,14 +8,7 @@ export const useGetGmvByYearAnalytics = (year: number) => {
       const { data } = await axios.servicesClient(
         `/api/analytics/gmv/byYear?year=${year}`,
       );
-      const newList = data?.data.gmv.map((gmvNumber: number) => {
-        const numberString = gmvNumber.toString();
-        const dotPosition = numberString.indexOf(".");
-        const decimalPart =
-          dotPosition !== -1 ? numberString.substring(0, dotPosition) : "";
-        return Number(decimalPart);
-      });
-      return newList;
+      return data?.data;
     },
   });
   return {
