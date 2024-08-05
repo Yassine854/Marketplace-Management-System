@@ -1,10 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { logError } from "@/utils/logError";
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
-type DataType = {
-  Months: string[];
-  gmv: number[];
-};
 
 type GmvDocument = {
   gmv: number;
@@ -14,34 +10,19 @@ type GmvDocument = {
 };
 
 type SearchResult = {
-  hits: Array<{ document: GmvDocument }>;
+  hits?: Array<{ document: GmvDocument }>;
 };
 
-export const gmvByYearAnalytics = async (year: any) => {
-  try {
-    let Months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth();
+type DataType = {
+  month: string;
+  gmv: number;
+};
 
-    if (Number(year) === currentYear) {
-      Months = Months.slice(0, currentMonth + 1);
-    }
-    const gmv: number[] = [];
-    let allOrders: number[] = [];
+export const gmvByYearAnalytics = async (year: number) => {
+  try {
+    const gmvData: DataType[] = [];
+    let allOrders: GmvDocument[] = [];
+
     try {
       const searchParams = {
         filter_by: `year:=${year}`,
@@ -50,30 +31,39 @@ export const gmvByYearAnalytics = async (year: any) => {
         page: 1,
         per_page: 250,
       };
-      const searchResults = await typesenseClient
+
+      const searchResults: SearchResult = await typesenseClient
         .collections("gmvPreviousMonths")
         .documents()
         .search(searchParams);
+
       const hits = searchResults.hits || [];
-      //@ts-ignore
-      allOrders = hits.map((hit) => hit.document.gmv);
+      allOrders = hits.map((hit) => hit.document);
+
+      // Sort the orders by month to maintain the correct order
+      allOrders.sort(
+        (a, b) =>
+          new Date(`${a.month} 1, ${a.year}`).getTime() -
+          new Date(`${b.month} 1, ${b.year}`).getTime(),
+      );
     } catch (error: any) {
       logError(error);
     }
-    if (Number(year) === currentYear) {
-      Months = Months.slice(0, currentMonth + 1);
-    }
-    const data: DataType = {
-      Months,
-      gmv: allOrders,
-    };
 
-    return data;
+    // Create an array of data with month and corresponding GMV
+    allOrders.forEach((order) => {
+      gmvData.push({
+        month: order.month,
+        gmv: order.gmv,
+      });
+    });
+
+    return gmvData;
   } catch (error: unknown) {
     if (error instanceof Error) {
-      logError(`Error fetching gmv per year data: ${error.message}`);
+      logError(`Error fetching GMV per year data: ${error.message}`);
     } else {
-      logError("Unknown error fetching gmv per year data");
+      logError("Unknown error fetching GMV per year data");
     }
     return NextResponse.json(
       { error: "Failed to fetch data" },
