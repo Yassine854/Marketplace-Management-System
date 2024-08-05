@@ -5,4 +5,4 @@ export const getgmvByDay = (
   monthArg: number,
   dayArg: number,
 ): Promise<number | undefined> =>
-  typesense.orders.grossMarketValue.byDay(yearArg, monthArg, dayArg);
+  typesense.orders.gmv.byDay(yearArg, monthArg, dayArg);
