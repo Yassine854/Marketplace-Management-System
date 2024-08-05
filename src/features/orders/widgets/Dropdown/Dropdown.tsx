@@ -23,13 +23,15 @@ const Dropdown = forwardRef<DropRef, Props>(
       if (!placeholder) {
         onSelect && onSelect(items[0]);
       }
-
       //Problem in Dependencies
     }, []);
 
     return (
-      <div className="col-span-2 flex items-center justify-center md:col-span-1">
-        <div className="relative rounded-3xl bg-n30 shadow-sm" ref={dropRef}>
+      <div className="col-span-2 flex items-center justify-center px-6 md:col-span-1">
+        <div
+          className="relative rounded-3xl bg-n30 text-xl font-semibold shadow-sm"
+          ref={dropRef}
+        >
           <div onClick={toggleOpen} className={tailwind.container("", "")}>
             {selected?.name || placeholder}
             <IconChevronDown
