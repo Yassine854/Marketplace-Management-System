@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { deleteCollection } from "@/services/orders/typesense/deleteCollection";
-import { gmvPreviousMonthsCollectionSchema } from "../../../../../../../clients/typesense/schema/GMVPreviousMonthsCollection";
+//import { gmvPreviousMonthsCollectionSchema } from "../../../../../../../clients/typesense/schema/GMVPreviousMonthsCollection";
 
 export async function DELETE(request: any) {
   try {
-    await deleteCollection(gmvPreviousMonthsCollectionSchema.name);
+    //await deleteCollection(gmvPreviousMonthsCollectionSchema.name);
     return NextResponse.json(
-      gmvPreviousMonthsCollectionSchema.name +
-        " Collection Deleted Successfully ...",
+      //  gmvPreviousMonthsCollectionSchema.name +
+      " Collection Deleted Successfully ...",
       {
         status: 200,
       },
