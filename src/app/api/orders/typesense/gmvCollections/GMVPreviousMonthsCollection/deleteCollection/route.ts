@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { deleteCollection } from "@/services/orders/typesense/deleteCollection";
-import { gmvPreviousMonthsCollectionSchema } from "@/clients/typesense/schema/gmvPreviousMonthsCollection";
+import { gmvPreviousMonthsCollectionSchema } from "../../../../../../../clients/typesense/schema/GMVPreviousMonthsCollection";
 
 export async function DELETE(request: any) {
   try {
