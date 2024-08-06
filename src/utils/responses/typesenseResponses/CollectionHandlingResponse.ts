@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export const successResponse = (collId: string, extraMsg?: any) =>
+export const successResponse = (collId?: string, extraMsg?: any) =>
   NextResponse.json(
     {
       message: "Collection successfully created.",
