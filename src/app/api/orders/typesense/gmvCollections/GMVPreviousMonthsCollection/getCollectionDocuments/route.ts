@@ -1,4 +1,4 @@
-import { gmvPreviousMonthsCollectionSchema } from "@/clients/typesense/schema/gmvPreviousMonthsCollection";
+import { gmvPreviousMonthsCollectionSchema } from "../../../../../../../clients/typesense/schema/GMVPreviousMonthsCollection";
 import { getCollectionDocuments } from "@/services/orders/typesense/getCollectionDocuments";
 import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
