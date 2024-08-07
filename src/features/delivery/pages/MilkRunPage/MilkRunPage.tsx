@@ -33,6 +33,7 @@ const MilkRunPage = () => {
 
       <MilkRunFloatingSection
         onReset={onReset}
+        isLoading={isLoading}
         ordersCount={ordersCount}
         selectedOrdersIds={selectedOrdersIds}
         onDeliveryDateChange={onDeliveryDateChange}
