@@ -15,7 +15,7 @@ const MilkRunHistoryFloatingSection = ({
           onChange={onDeliveryDateChange}
         />
       </div>
-      <div className="m-1 flex  h-10 w-full items-center  rounded-xl bg-n20 p-4 shadow-lg ">
+      <div className="m-1 flex  h-10 w-full items-center  rounded-xl bg-n20 pl-4 shadow-lg ">
         <p>
           Number of Orders :
           {!isLoading && <span className="font-bold">{ordersCount}</span>}
