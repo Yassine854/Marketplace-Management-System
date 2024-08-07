@@ -62,7 +62,7 @@ const Notification = ({ isWhite }: { isWhite?: boolean }) => {
           <h5 className="h5">Notifications</h5>
           <Link
             href="/notifications"
-            onClick={toggleOpen}
+            //  onClick={toggleOpen}
             className="text-sm text-primary"
           >
             View All

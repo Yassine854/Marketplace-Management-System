@@ -5,19 +5,19 @@ import { tailwind } from "./ItemsPerPageSelector.styles";
 import { useOrdersStore } from "../../stores/ordersStore";
 import { useOrdersTableStore } from "../../stores/ordersTableStore";
 
-const options = [10, 25, 50];
+const options = [25, 50, 100];
 
 const ItemsPerPageSelector = () => {
   const { status } = useOrdersStore();
 
-  const [selected, setSelected] = useState(10);
+  const [selected, setSelected] = useState(25);
 
   const { open, ref, toggleOpen } = useDropdown();
 
   const { setItemsPerPage } = useOrdersTableStore();
 
   useEffect(() => {
-    setSelected(10);
+    setSelected(25);
   }, [status]);
 
   useEffect(() => {

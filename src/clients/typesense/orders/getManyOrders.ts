@@ -13,7 +13,7 @@ export const getManyOrders = async ({
     const searchParams = {
       q: search || "",
       query_by:
-        "customerFirstname,customerLastname,kamiounId,orderId,incrementId",
+        "customerFirstname,customerLastname,kamiounId,orderId,incrementId,productsNames",
       page: page || 1,
       per_page: perPage || 250,
       sort_by: sortBy || "",

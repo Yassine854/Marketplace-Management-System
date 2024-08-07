@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { getTomorrowIsoDate } from "@/utils/getTomorrowIsoDate";
+import { getTomorrowIsoDate } from "@/utils/date/getTomorrowIsoDate";
 
 export const useMilkRunStore: any = create(
   persist(
