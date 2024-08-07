@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { deleteCollection } from "@/clients/typesense/deleteCollection";
-import { nucPreviousMonthsCollectionSchema } from "@/clients/typesense/schema/nucPreviousMonthsCollection";
+import { nucPreviousMonthsCollectionSchema } from "@/clients/typesense/schemas/nucPreviousMonthsCollection";
 
 export async function DELETE(Request: any) {
   try {

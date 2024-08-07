@@ -1,4 +1,4 @@
-import { nucPreviousMonthsCollectionSchema } from "@/clients/typesense/schema/nucPreviousMonthsCollection";
+import { nucPreviousMonthsCollectionSchema } from "@/clients/typesense/schemas/nucPreviousMonthsCollection";
 import { createCollection } from "@/clients/typesense/createCollection";
 import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
