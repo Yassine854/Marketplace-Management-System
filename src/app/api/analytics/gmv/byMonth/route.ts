@@ -1,7 +1,7 @@
 import { responses } from "@/utils/responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { gmvByMonthAnalytics } from "@/services/analytics/gmv/gmvByMonthAnalytics";
+//import { gmvByMonthAnalytics } from "@/services/analytics/gmv/gmvByMonthAnalytics";
 export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -13,8 +13,9 @@ export const GET = async (request: NextRequest) => {
     if (!year) {
       return responses.invalidRequest("Year Parameter is Required");
     }
+    //const res = await getgmvByMonthAnalytics(year, month);
 
-    const res = await gmvByMonthAnalytics(Number(year), Number(month));
+    const res = undefined;
     return NextResponse.json(
       {
         message: "success",

@@ -1,13 +1,14 @@
 import { getGmvByDay } from "@/clients/typesense/orders/gmv/getGmvByDay";
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import { logError } from "@/utils/logError";
-import { dateYMDToUnixTimestamp } from "@/utils/date/unixTimestamp";
+//import { dateYMDToUnixTimestamp } from "@/utils/unixTimestamp";
 
 function generateMonthDaysObject({ year, month }: any) {
   const lastDay = new Date(year, month, 0).getDate();
   const daysArray = Array.from({ length: lastDay }, (_, i) => i + 1);
   return daysArray;
 }
+
 type DataType = {
   day: number;
   gmv: number;
