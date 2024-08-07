@@ -1,6 +1,17 @@
-import { OrderLine } from "@/types/orderLine";
+type Item = {
+  id: string;
+  sku: string;
+  orderId: string;
+  productId: string;
+  productName: string;
+  productPrice: string;
 
-export const getOrderItems = (orderItems: any): OrderLine[] =>
+  weight: number;
+  quantity: number;
+  totalPrice: number;
+};
+
+export const getOrderItems = (orderItems: any): Item[] =>
   orderItems?.map((item: any) => {
     return {
       id: String(item.item_id),
