@@ -1,13 +1,17 @@
 meta {
-  name: Edit Order Details  in Magento
+  name: Get Orders By Delivery Date
   type: http
-  seq: 3
+  seq: 6
 }
 
-put {
-  url: {{magentoUrl}}/rest/default/V1/orders/create
+get {
+  url: https://accept.kamioun.com/rest/default/V1/orders/list/per_delivery_date?deliveryDate=15/07/2024
   body: json
   auth: bearer
+}
+
+params:query {
+  deliveryDate: 15/07/2024
 }
 
 auth:bearer {

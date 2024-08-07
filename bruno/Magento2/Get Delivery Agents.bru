@@ -1,11 +1,11 @@
 meta {
   name: Get Delivery Agents
   type: http
-  seq: 1
+  seq: 2
 }
 
 get {
-  url: {{magentoUrl}}/rest/default/V1/customers/search/?searchCriteria[filterGroups][0][filters][0][field]=group_id&searchCriteria[filterGroups][0][filters][0][value]=4
+  url: https://accept.kamioun.com/rest/default/V1/customers/search/?searchCriteria[filterGroups][0][filters][0][field]=group_id&searchCriteria[filterGroups][0][filters][0][value]=4
   body: none
   auth: bearer
 }
