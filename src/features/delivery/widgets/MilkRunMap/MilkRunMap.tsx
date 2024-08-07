@@ -40,7 +40,7 @@ const MilkRunMap = ({
           <IconMapPinFilled size={38} className={`[&_path]:fill-black-800`} />
         </div>
       </Marker>
-      {ordersMarkers.length && (
+      {ordersMarkers?.length && (
         <div>
           {[...list].map((marker: any) => {
             if (!marker.latitude && !marker.longitude) {
@@ -55,7 +55,7 @@ const MilkRunMap = ({
                 longitude={marker.longitude}
                 onClick={(e: any) => {
                   e.originalEvent.stopPropagation();
-                  onOrderMarkerClick(marker.order_id);
+                  onOrderMarkerClick && onOrderMarkerClick(marker.order_id);
                 }}
               >
                 <div
@@ -64,13 +64,13 @@ const MilkRunMap = ({
                     setPopupInfo(marker);
                   }}
                 >
-                  {selectedOrdersIds.includes(marker.order_id) && (
+                  {selectedOrdersIds?.includes(marker.order_id) && (
                     <IconMapPinFilled
                       size={38}
                       className={`[&_path]:fill-green-800`}
                     />
                   )}
-                  {!selectedOrdersIds.includes(marker.order_id) && (
+                  {!selectedOrdersIds?.includes(marker.order_id) && (
                     <IconMapPin
                       color={marker?.markerColor}
                       size={38}

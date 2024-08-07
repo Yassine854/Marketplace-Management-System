@@ -83,19 +83,28 @@ const Sidebar = ({
               pathname?.includes("order") && !pathname?.includes("logs")
             }
           />
-          {!isNoEditUser && (
-            <>
-              <Divider />
-              <SidebarButton
-                name={"Milk Run"}
-                icon={<IconMap2 />}
-                onClick={() => {
-                  push("/milk-run");
-                }}
-                isActive={pathname?.includes("milk-run")}
-              />
-            </>
-          )}
+
+          <>
+            <Divider />
+
+            <SidebarSubMenu
+              icon={<IconMap2 />}
+              name={"Milk Run"}
+              onClick={() => {
+                push("/milk-run");
+              }}
+              isActive={pathname?.includes("milk-run")}
+              items={
+                isNoEditUser
+                  ? [{ name: "History", path: "/milk-run-history" }]
+                  : [
+                      { name: "Main", path: "/milk-run" },
+                      { name: "History", path: "/milk-run-history" },
+                    ]
+              }
+            />
+          </>
+
           <Divider />
 
           <SidebarSubMenu
