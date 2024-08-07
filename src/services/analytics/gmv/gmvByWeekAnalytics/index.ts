@@ -37,7 +37,7 @@ export const gmvByWeekAnalytics = async (yearArg: number, weekArg: number) => {
         per_page: 250,
       };
 
-      const searchResults: SearchResult = await typesenseClient
+      const searchResults: any = await typesenseClient
         .collections("gmvPreviousDays")
         .documents()
         .search(searchParams);
@@ -45,15 +45,15 @@ export const gmvByWeekAnalytics = async (yearArg: number, weekArg: number) => {
       const hits = searchResults.hits ?? [];
 
       const allOrders = hits
-        .map((hit) => hit.document)
-        .sort((a, b) => {
+        .map((hit: any) => hit.document)
+        .sort((a: any, b: any) => {
           return (
             new Date(`${a.year}-${a.month}-${a.day}`).getTime() -
             new Date(`${b.year}-${b.month}-${b.day}`).getTime()
           );
         });
 
-      allOrders.forEach((order) => {
+      allOrders.forEach((order: any) => {
         const formattedDate = dayjs(
           `${order.year}-${order.month}-${order.day}`,
         ).format("ddd, DD-MM-YYYY"); // Format as "Mon", "Tue", etc.

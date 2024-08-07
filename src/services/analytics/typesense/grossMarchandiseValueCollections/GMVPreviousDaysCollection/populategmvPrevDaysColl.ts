@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import isoWeek from "dayjs/plugin/isoWeek";
 import { getGmvByDay } from "@/clients/typesense/orders/gmv/getGmvByDay";
-import { dateYMDToUnixTimestamp } from "@/utils/unixTimestamp";
+//import { dateYMDToUnixTimestamp } from "@/utils/unixTimestamp";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(isoWeek);

@@ -32,13 +32,13 @@ export const gmvByYearAnalytics = async (year: number) => {
         per_page: 250,
       };
 
-      const searchResults: SearchResult = await typesenseClient
+      const searchResults: any = await typesenseClient
         .collections("gmvPreviousMonths")
         .documents()
         .search(searchParams);
 
       const hits = searchResults.hits || [];
-      allOrders = hits.map((hit) => hit.document);
+      allOrders = hits.map((hit: any) => hit.document);
 
       // Sort the orders by month to maintain the correct order
       allOrders.sort(
