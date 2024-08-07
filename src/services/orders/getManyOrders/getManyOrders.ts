@@ -13,7 +13,7 @@ export const getManyOrders = async ({
   { orders: Order[]; totalOrders: number } | undefined
 > => {
   try {
-    const { orders, count } = await typesense.orders.getMany({
+    const res = await typesense.orders.getMany({
       sortBy,
       page,
       perPage,
@@ -21,10 +21,7 @@ export const getManyOrders = async ({
       filterBy,
     });
 
-    return {
-      orders,
-      totalOrders: count,
-    };
+    return res;
   } catch (error) {
     logError(error);
   }

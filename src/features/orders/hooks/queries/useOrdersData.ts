@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useGetOrders } from "./useGetOrders";
+import { useGetManyOrders } from "./useGetManyOrders";
 import { useOrdersStore } from "@/features/orders/stores/ordersStore";
 import { useOrdersTableStore } from "@/features/orders/stores/ordersTableStore";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
@@ -12,7 +12,7 @@ export const useOrdersData = () => {
 
   const [filterBy, setFilterBy] = useState("");
 
-  const { data, isLoading, refetch } = useGetOrders({
+  const { data, isLoading, refetch } = useGetManyOrders({
     page: currentPage,
     perPage: itemsPerPage,
     search,

@@ -21,34 +21,24 @@ export const GET = async (request: NextRequest) => {
       return responses.invalidRequest("page parameter is Required");
     }
 
-    if (!sortBy) {
-      return responses.invalidRequest("sortBy parameter is Required");
-    }
-
-    if (!search) {
-      return responses.invalidRequest("search parameter is Required");
-    }
-
     if (!perPage) {
       return responses.invalidRequest("perPage parameter is Required");
     }
 
-    if (!filterBy) {
-      return responses.invalidRequest("filterBy parameter is Required");
-    }
-
-    const orders = await getManyOrders({
+    //@ts-ignore
+    const res = await getManyOrders({
       page,
-      sortBy,
-      search,
       perPage,
-      filterBy,
+      sortBy: sortBy || "",
+      search: search || "",
+      filterBy: filterBy || "",
     });
 
     return NextResponse.json(
       {
         message: "success",
-        orders,
+        orders: res?.orders,
+        count: res?.count,
       },
       {
         status: 200,

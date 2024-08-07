@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useGetOrders } from "./useGetOrders";
+import { useGetManyOrders } from "./useGetManyOrders";
 import { useOrdersStore } from "@/features/orders/stores/ordersStore";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
@@ -12,7 +12,7 @@ export const useOrdersCount = () => {
     refetch: r1,
     data: openOrders,
     isLoading: isOpenLoading,
-  } = useGetOrders({
+  } = useGetManyOrders({
     page: 1,
     perPage: 1,
     search: "",
@@ -24,7 +24,7 @@ export const useOrdersCount = () => {
     refetch: r2,
     data: validOrders,
     isLoading: isValidLoading,
-  } = useGetOrders({
+  } = useGetManyOrders({
     page: 1,
     perPage: 1,
     sortBy: "",
@@ -36,7 +36,7 @@ export const useOrdersCount = () => {
     refetch: r3,
     data: readyOrders,
     isLoading: isReadyLoading,
-  } = useGetOrders({
+  } = useGetManyOrders({
     page: 1,
     perPage: 1,
     search: "",
