@@ -1,4 +1,4 @@
-import { getTomorrowJsDate } from "@/utils/getTomorrowJsDate";
+import { getTomorrowJsDate } from "@/utils/date/getTomorrowJsDate";
 
 export const getTomorrow = (): Date => {
   const today = new Date();
