@@ -38,6 +38,7 @@ export const GET = async (request: NextRequest) => {
       {
         message: "success",
         orders: res?.orders,
+        //@ts-ignore
         count: res?.count,
       },
       {
