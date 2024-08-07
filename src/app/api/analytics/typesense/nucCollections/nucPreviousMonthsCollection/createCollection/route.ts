@@ -1,5 +1,5 @@
 import { nucPreviousMonthsCollectionSchema } from "@/clients/typesense/schema/nucPreviousMonthsCollection";
-import { createCollection } from "@/services/orders/typesense/createCollection";
+import { createCollection } from "@/clients/typesense/createCollection";
 import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 

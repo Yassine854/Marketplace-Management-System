@@ -1,4 +1,4 @@
-import { createCollection } from "@/services/orders/typesense/createCollection";
+import { createCollection } from "@/clients/typesense/createCollection";
 //import { gmvPreviousMonthsCollectionSchema } from "@/clients/typesense/schema/GMVPreviousMonthsCollection";
 
 import { NextRequest, NextResponse } from "next/server";

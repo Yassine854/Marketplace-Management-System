@@ -1,7 +1,7 @@
 import { responses } from "@/utils/responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getNumberOfOrdersByDay } from "@/services/orders/typesense/numberOfOrders/getNumberOfOrdersByDay";
+import { getNumberOfOrdersByDay } from "@/services/analytics/typesense/numberOfOrders/getNumberOfOrdersByDay";
 
 export const GET = async (request: NextRequest) => {
   try {

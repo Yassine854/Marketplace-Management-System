@@ -1,6 +1,6 @@
 import { axios } from "@/libs/axios";
 import { logError } from "@/utils/logError";
-import { formatIsoDate2MagentoDate } from "@/utils/formatIsoDate2MagentoDate";
+import { formatIsoDate2MagentoDate } from "@/utils/date/formatIsoDate2MagentoDate";
 
 export const getMilkRunOrdersByDate = async (date: string): Promise<any[]> => {
   try {

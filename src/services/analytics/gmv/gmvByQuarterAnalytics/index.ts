@@ -1,4 +1,4 @@
-import { getGmvByQuarter } from "@/services/orders/typesense/gmv/getGmvByQuarter";
+import { getGmvByQuarter } from "@/services/analytics/typesense/gmv/getGmvByQuarter";
 
 export const gmvByQuarterAnalytics = async (year: number) => {
   const quarterMonths: { [key: string]: [number, number] } = {

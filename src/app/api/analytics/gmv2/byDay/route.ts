@@ -1,7 +1,7 @@
 import { responses } from "@/utils//responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getgmvByDay } from "@/services/orders/typesense/gmv/getGmvByDay";
+import { getgmvByDay } from "@/services/analytics/typesense/gmv/getGmvByDay";
 export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);

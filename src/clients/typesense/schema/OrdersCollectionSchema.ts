@@ -91,6 +91,11 @@ export const typesenseOrdersCollectionSchema: CollectionCreateSchema = {
       type: "string",
       optional: true,
     },
+    {
+      name: "products-names",
+      type: "string[]",
+      optional: true,
+    },
 
     {
       name: "items",

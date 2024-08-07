@@ -1,7 +1,7 @@
 import { logError } from "@/utils/logError";
 import { typesense } from "@/clients/typesense";
 
-export const getOrdersByDeliveryDate = async (
+export const getOrdersByDeliveryDateTypesense = async (
   deliveryDate: number,
 ): Promise<{ orders: any[]; count: number }> => {
   try {
