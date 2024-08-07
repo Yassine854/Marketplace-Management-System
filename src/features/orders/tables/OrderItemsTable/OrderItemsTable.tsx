@@ -26,13 +26,15 @@ const OrderItemsTable = ({ items, isInEditMode }: any) => {
               </td>
               <td className="px-3 py-2">
                 <div className="flex items-center gap-3">
-                  {item?.quantity || 0}
+                  {Number(item?.quantity) || 0}
                 </div>
               </td>
-              <td className="px-3 py-2">{item?.quantity * item?.pcb || 0}</td>
+              <td className="px-3 py-2">
+                {Number(item?.quantity) * Number(item?.pcb) || 0}
+              </td>
               <td className="px-3 py-2">
                 <div className="flex gap-2">
-                  {item?.totalPrice?.toFixed(2) || 0}
+                  {Number(item?.totalPrice)?.toFixed(3) || 0}
                 </div>
               </td>
             </tr>

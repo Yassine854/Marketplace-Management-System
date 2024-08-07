@@ -1,4 +1,4 @@
-import { getNumberOfOrdersByDay } from "@/services/orders/typesense/numberOfOrders/getNumberOfOrdersByDay";
+import { getNumberOfOrdersByDay } from "@/services/analytics/typesense/numberOfOrders/getNumberOfOrdersByDay";
 import { numberOfOrdersByHour } from "../numberOfOrdersByHour";
 
 export const numberOfOrderByCurrentDayAnalytics = async (

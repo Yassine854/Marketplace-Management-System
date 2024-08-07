@@ -1,4 +1,3 @@
-import { orderItemschema } from "./orderLine";
 import { z } from "zod";
 
 const orderSchema = z.object({
@@ -16,7 +15,7 @@ const orderSchema = z.object({
   deliveryDate: z.number(),
   deliveryStatus: z.string(),
   source: z.string(),
-  items: z.array(orderItemschema),
+  items: z.array(z.any()),
 });
 
 export type Order = z.infer<typeof orderSchema>;

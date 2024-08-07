@@ -2,7 +2,7 @@ import { responses } from "@/utils/responses";
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import { logError } from "@/utils/logError";
 import dayjs from "dayjs";
-import { unixTimestampToDateDMY } from "@/utils/unixTimestamp";
+import { unixTimestampToDateDMY } from "@/utils/date/unixTimestamp";
 import { numberOfUniqueCustometerByMonthAnalytics } from "../byMonth";
 
 export const numberOfUniqueCustometerByYearAnalytics = async (date: string) => {
