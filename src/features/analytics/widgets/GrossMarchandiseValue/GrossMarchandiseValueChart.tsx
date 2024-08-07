@@ -3,24 +3,41 @@ import { useEffect, useState } from "react";
 import { useGetGmvByYearAnalytics } from "../../hooks/useGetGmvByYearAnalytics";
 import Loading from "@/features/shared/elements/Loading";
 import YearPicker from "../YearPicker";
+import Dropdown from "@/features/orders/widgets/Dropdown";
+import { options } from "@/public/data/timesDropdown";
+import MonthPicker from "../MonthPicker";
+import { useGetGmvByMonthAnalytics } from "../../hooks/useGetGmvByMonthAnalytics";
 
 const GrossMarchandiseValueChart = () => {
-  const [date, setDate] = useState(`${new Date().getFullYear()}-01-01`);
-  const year = Number(date);
-  const { data, isLoading } = useGetGmvByYearAnalytics(year);
+  const [dateYear, setDateYear] = useState(`${new Date().getFullYear()}-01-01`);
+  const [dateMonth, setDateMonth] = useState("2024-01");
+  const [year, month, day] = dateMonth.split("-").map(Number);
+  const [selected, setSelected] = useState(options[0]);
   const [chartData, setChartData] = useState<number[]>([]);
+  const [xAxis, setXAxis] = useState<string[]>([]);
+  const { dataMonth, isLoadingMonth, refetch } = useGetGmvByMonthAnalytics(
+    month,
+    year,
+  );
+  const { dataYear, isLoadingYear } = useGetGmvByYearAnalytics(
+    Number(dateYear),
+  );
   useEffect(() => {
-    if (data) {
-      const newList = data.map((gmvNumber: number) => {
-        const numberString = gmvNumber.toString();
-        const dotPosition = numberString.indexOf(".");
-        const decimalPart =
-          dotPosition !== -1 ? numberString.substring(dotPosition + 1) : "";
-        return Number(decimalPart);
-      });
-      setChartData(newList);
+    if (selected.name === "Month") {
+      const days = dataMonth?.Days;
+      setXAxis(days);
+      setChartData(dataMonth?.gmv);
+      refetch();
     }
-  }, [data]);
+  }, [selected, dataMonth, year, month]);
+
+  useEffect(() => {
+    if (selected.name === "Year") {
+      const months = dataYear?.Months;
+      setXAxis(months);
+      setChartData(dataYear?.gmv);
+    }
+  }, [selected, dataYear, dateYear]);
 
   const ReactApexChart = dynamic(() => import("react-apexcharts"), {
     ssr: false,
@@ -28,20 +45,7 @@ const GrossMarchandiseValueChart = () => {
 
   const chartOptions = {
     xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      categories: xAxis,
     },
   };
 
@@ -57,11 +61,22 @@ const GrossMarchandiseValueChart = () => {
       <div className=" bb-dashed mb-4 flex flex-wrap items-center justify-between gap-3 pb-4 lg:mb-6 lg:pb-6">
         <div className="flex items-center justify-center ">
           <div className=" mx-4 h-8 w-8 items-center justify-center ">
-            {isLoading && <Loading />}
+            <Loading />
           </div>
           <p className="text-2xl font-bold">Gross Marchandise Value</p>
         </div>
-        <YearPicker onYearChange={(date: string) => setDate(date)} />
+        <div className="flex flex-row">
+          <Dropdown
+            selected={selected}
+            onSelect={setSelected}
+            items={options}
+          />
+          {selected.name === "Year" ? (
+            <YearPicker onYearChange={(date: string) => setDateYear(date)} />
+          ) : (
+            <MonthPicker onMonthChange={(date: string) => setDateMonth(date)} />
+          )}
+        </div>
       </div>
       <div className="h-[320px]">
         <ReactApexChart

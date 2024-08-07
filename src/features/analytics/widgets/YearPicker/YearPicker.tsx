@@ -1,5 +1,4 @@
 import { IconCalendar } from "@tabler/icons-react";
-import { useDropdown } from "@/features/shared/hooks/useDropdown";
 import { useEffect, useState } from "react";
 
 const Year = ({ year, onClick, selectedYear }: any) => (

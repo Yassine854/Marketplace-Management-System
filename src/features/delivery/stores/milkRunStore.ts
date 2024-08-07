@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { getUnixTimestampForTomorrow } from "@/utils/unixTimestamp";
+import { getTomorrowIsoDate } from "@/utils/date/getTomorrowIsoDate";
 
 export const useMilkRunStore: any = create(
   persist(
@@ -9,7 +9,7 @@ export const useMilkRunStore: any = create(
       deliveryAgentId: "",
       selectedOrdersIds: [],
       deliveryAgentName: "",
-      deliveryDate: getUnixTimestampForTomorrow(),
+      deliveryDate: getTomorrowIsoDate(),
 
       reset: () =>
         set({
@@ -17,7 +17,6 @@ export const useMilkRunStore: any = create(
           deliveryAgentId: "",
           selectedOrdersIds: [],
           deliveryAgentName: "",
-          deliveryDate: getUnixTimestampForTomorrow(),
         }),
 
       setDeliveryAgentName: (deliveryAgentName: string) =>

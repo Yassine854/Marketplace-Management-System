@@ -28,7 +28,7 @@ export const typesense = {
       byMonth: getNumberOfOrdersByMonth,
       byQuarter: getNumberOfOrdersByQuarter,
     },
-    grossMarketValue: {
+    gmv: {
       byDay: getGmvByDay,
       byQuarter: getGmvByQuarter,
       byMonth: getGmvByMonth,

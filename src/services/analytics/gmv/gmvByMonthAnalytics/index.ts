@@ -1,7 +1,7 @@
 import { getGmvByDay } from "@/clients/typesense/orders/gmv/getGmvByDay";
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import { logError } from "@/utils/logError";
-import { dateYMDToUnixTimestamp } from "@/utils/unixTimestamp";
+//import { dateYMDToUnixTimestamp } from "@/utils/unixTimestamp";
 
 function generateMonthDaysObject({ year, month }: any) {
   const lastDay = new Date(year, month, 0).getDate();

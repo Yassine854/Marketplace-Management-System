@@ -42,14 +42,14 @@ export const useMainLayout = () => {
       setIsNoEditUser(false);
       setIsMultipleStoreAccessUser(false);
     }
-  }, [storeId]);
+  }, [storeId, setIsMultipleStoreAccessUser, user, setIsNoEditUser]);
 
   useEffect(() => {
     //@ts-ignore
     if (user?.roleId !== "1") {
       setIsAdmin(false);
     }
-  }, [storeId]);
+  }, [storeId, setIsAdmin, user]);
 
   useEffect(() => {
     //@ts-ignore
@@ -78,7 +78,13 @@ export const useMainLayout = () => {
         setStoreId("4");
         break;
     }
-  }, [user, setStoreId]);
+  }, [
+    user,
+    setStoreId,
+    setIsAdmin,
+    setIsMultipleStoreAccessUser,
+    setIsNoEditUser,
+  ]);
 
   useEffect(() => {
     if (pathname !== "/en/order-details") {
@@ -88,7 +94,7 @@ export const useMainLayout = () => {
     if (pathname !== "/en/access/edit-user") {
       setUserOnReviewUsername("");
     }
-    //NO More Dependencies
+    //NO More Dependencies !!
   }, [pathname]);
 
   useEffect(() => {
