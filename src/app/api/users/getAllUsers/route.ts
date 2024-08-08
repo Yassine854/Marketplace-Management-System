@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 export const GET = async (request: NextRequest) => {
   try {
     const users = await getAllUsers();
-    console.log("🚀 ~ GET ~ users:", users);
 
     return NextResponse.json(
       {

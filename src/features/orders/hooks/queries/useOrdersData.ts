@@ -17,7 +17,7 @@ export const useOrdersData = () => {
     perPage: itemsPerPage || 25,
     search,
     sortBy: sort || "createdAt:desc",
-    filterBy: filterBy || `storeId:=`,
+    filterBy,
   });
 
   useEffect(() => {
