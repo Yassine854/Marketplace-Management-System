@@ -25,7 +25,7 @@ export const useEditOrdersMilkRun = () => {
             deliveryAgentId,
           });
 
-          await axios.servicesClient.put("/api/orders/typesense/edit-order", {
+          await axios.servicesClient.put("/api/typesense/editOrder", {
             order: {
               id: orderId.toString(),
               deliverySlot,

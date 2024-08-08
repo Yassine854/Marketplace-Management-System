@@ -8,7 +8,7 @@ import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
 import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
-const formatUnixTimestamp = (unixTimestamp: number): string => {
+const formatUnixTimestamp2MagentoDate = (unixTimestamp: number): string => {
   const date = new Date(unixTimestamp * 1000);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -52,14 +52,16 @@ export const useEditOrderDetails = () => {
         total,
         orderId: orderOnReviewId,
         items: magentoItems,
-        deliveryDate: formatUnixTimestamp(orderOnReviewDeliveryDate),
+        deliveryDate: formatUnixTimestamp2MagentoDate(
+          orderOnReviewDeliveryDate,
+        ),
       });
-      await axios.servicesClient.put("/api/orders/typesense/edit-order", {
+      await axios.servicesClient.put("/api/typesense/editOrder", {
         order: {
           total,
           id: orderOnReviewId,
           items: orderOnReviewItems,
-          deliveryDate: orderOnReviewDeliveryDate,
+          deliveryDate: Number(orderOnReviewDeliveryDate),
         },
       });
 
