@@ -1,4 +1,4 @@
-import { getNumberOfOrdersByDay } from "@/services/analytics/typesense/numberOfOrders/getNumberOfOrdersByDay";
+import { getNumberOfOrdersByDay } from "@/services/analytics/numberOfOrders/getNumberOfOrdersByDay";
 
 function generateMonthDaysObject({ year, month }: any) {
   const lastDay = new Date(year, month, 0).getDate();
