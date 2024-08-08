@@ -1,10 +1,8 @@
-import { User } from "@/types/user";
 import { hashPassword } from "@/utils/password";
 import { prismaClient } from "@/clients/prisma/prismaClient";
+import { logError } from "@/utils/logError";
 
-export const createUser = async (
-  newUser: any,
-): Promise<{ data: User | undefined; message: string; success: boolean }> => {
+export const createUser = async (newUser: any): Promise<any> => {
   try {
     const existingUser = await prismaClient.user.findUnique({
       where: { username: newUser.username },
@@ -26,14 +24,8 @@ export const createUser = async (
     if (!user) {
       throw new Error("Unable To Create User");
     }
-    return {
-      //@ts-ignore
-      data: user,
-      success: true,
-      message: "User Created Successfully !",
-    };
+    return user;
   } catch (err) {
-    process.env.NODE_ENV === "development" && console.error(err);
-    return { data: undefined, message: err as string, success: false };
+    logError(err);
   }
 };
