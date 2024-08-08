@@ -38,7 +38,7 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
   const [year, setYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
-    toggleOpen();
+    //   toggleOpen();
 
     if (onMonthChange) {
       const formattedDate = `${year}-${selectedMonth.key}-01`;
@@ -114,7 +114,11 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
               key={month.key}
               name={month.name}
               selectedMonth={selectedMonth}
-              onClick={() => setSelectedMonth(month)}
+              onClick={() => {
+                setSelectedMonth(month);
+
+                toggleOpen();
+              }}
             />
           ))}
         </div>

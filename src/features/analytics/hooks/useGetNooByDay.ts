@@ -1,16 +1,14 @@
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
 
-export const useGetNumberOfOrdersLifetimeAnalytics = (
-  startYear: number,
-  endYear: number,
-) => {
+export const useGetNooByDay = (date: number) => {
   const { isLoading, data } = useQuery({
-    queryKey: ["numberOfOrdersLifetimeAnalytics", startYear, endYear],
+    queryKey: ["nooByDay", date],
     queryFn: async () => {
       const { data } = await axios.servicesClient(
-        `/api/analytics/numberOfOrders/lifetime?startYear=${startYear}&endYear=${endYear}`,
+        `/api/analytics/noo/byDay?date=${date}`,
       );
+
       return data?.data;
     },
   });
