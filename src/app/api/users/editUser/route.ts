@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/clients/prisma";
 import { hashPassword } from "@/utils/password";
 
-export const POST = async (request: NextRequest) => {
+export const PUT = async (request: NextRequest) => {
   try {
     const { username, firstName, lastName, roleId, newPassword } =
       await request.json();

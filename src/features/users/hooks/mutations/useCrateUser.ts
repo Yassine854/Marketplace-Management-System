@@ -1,51 +1,26 @@
-import { gql, useMutation } from "@apollo/client";
-import { logError } from "@/utils/logError";
-
-const MUTATION = gql`
-  mutation CreateUser($input: CreateUserInput) {
-    createUser(input: $input) {
-      message
-      success
-    }
-  }
-`;
-
-type CreateUserInput = {
-  username: string;
-  firstName: string;
-  lastName: string;
-  password: string;
-  roleId: string;
-};
+import { axios } from "@/libs/axios";
+import { toast } from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
 
 export const useCreateUser = () => {
-  const [mutate, { data, loading, error }] = useMutation(MUTATION);
+  const { navigateToUsersTable } = useNavigation();
 
-  const create = async (user: CreateUserInput) => {
-    try {
-      await mutate({
-        variables: { input: user },
-      });
-
-      return {
-        success: true,
-        message: "User Created Successfully !",
-      };
-    } catch (err) {
-      logError(err);
-
-      return {
-        success: false,
-        //@ts-ignore
-        message: err?.message ?? "User Created Successfully !",
-      };
-    }
-  };
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (user: any) => {
+      await axios.servicesClient.post("/api/users/createUser", user);
+    },
+    onSuccess: () => {
+      navigateToUsersTable();
+      toast.success(`User Created Successfully`, { duration: 5000 });
+    },
+    onError: () => {
+      toast.error(`Something Went Wrong`, { duration: 5000 });
+    },
+  });
 
   return {
-    create,
-    data: data?.createUser,
-    isLoading: loading,
-    error,
+    isPending,
+    createUser: mutate,
   };
 };
