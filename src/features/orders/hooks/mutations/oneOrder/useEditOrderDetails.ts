@@ -55,7 +55,7 @@ export const useEditOrderDetails = () => {
         items: magentoItems,
         deliveryDate: formatUnixTimestamp(orderOnReviewDeliveryDate),
       });
-      await axios.servicesClient.put("/api/orders/typesense/edit-order", {
+      await axios.servicesClient.put("/api/typesense/editOrder", {
         order: {
           total,
           id: orderOnReviewId,

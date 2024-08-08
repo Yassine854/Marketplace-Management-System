@@ -22,7 +22,7 @@ export const useEditOrdersStatusesAndStates = () => {
       return Promise.all(
         ordersIds.map(async (orderId: string) => {
           await magento.mutations.changeOrderStatus({ orderId, status, state });
-          await axios.servicesClient.put("/api/orders/typesense/edit-order", {
+          await axios.servicesClient.put("/api/typesense/editOrder", {
             order: {
               id: orderId,
               status,
