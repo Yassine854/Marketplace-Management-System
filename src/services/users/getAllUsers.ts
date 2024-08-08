@@ -1,24 +1,15 @@
 import { prisma } from "@/clients/prisma";
+import { logError } from "@/utils/logError";
 
 export const getAllUsers = async () => {
   try {
     const users = await prisma.getAllUsers();
+    console.log("🚀 ~ getAllUsers ~ users:", users);
 
-    if (users && users?.length > 0) {
-      return {
-        message: "Users fetched successfully",
-        users,
-      };
-    } else {
-      return {
-        message: "No users found",
-      };
-    }
+    return users;
   } catch (error: any) {
-    process.env.NODE_ENV === "development" &&
-      console.error("Error fetching users:", error);
-    return {
-      message: error.message || "An error occurred while fetching users",
-    };
+    logError(error);
+
+    throw new Error(error);
   }
 };

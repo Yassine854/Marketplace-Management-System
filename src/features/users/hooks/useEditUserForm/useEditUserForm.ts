@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { useGetUser } from "../queries/useGetUser";
 import { useEditUser } from "../mutations/useEditUser";
 import { useUsersStore } from "../../stores/usersStore";
-import { useGetUsers } from "../queries/useGetUsers";
+import { useGetUsers } from "../queries/useGetAllUsers";
 
 type FormData = z.infer<typeof editUserFormSchema>;
 

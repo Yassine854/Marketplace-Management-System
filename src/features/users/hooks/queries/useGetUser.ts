@@ -1,37 +1,26 @@
-import { gql, useQuery } from "@apollo/client";
+import { axios } from "@/libs/axios";
+import { useQuery } from "@tanstack/react-query";
 import { useUsersStore } from "../../stores/usersStore";
 
-const QUERY = gql`
-  query GetUser($username: String!) {
-    getUser(username: $username) {
-      user {
-        id
-        firstName
-        lastName
-        username
-        password
-        roleId
-        createdAt
-      }
-      success
-      message
-    }
-  }
-`;
-
 export const useGetUser = () => {
-  const { userOnReviewUsername } = useUsersStore();
-  const { data, loading, error, refetch } = useQuery(QUERY, {
-    fetchPolicy: "network-only",
-    variables: {
-      username: userOnReviewUsername,
+  const { userOnReviewUsername: username } = useUsersStore();
+  const {
+    isLoading,
+    data: user,
+    refetch,
+  } = useQuery({
+    queryKey: ["getUser", username],
+    queryFn: async () => {
+      const { data } = await axios.servicesClient(
+        `/api/users/getUser?username=${username}`,
+      );
+      return data;
     },
   });
 
   return {
-    user: data?.getUser.user,
-    isLoading: loading,
-    error,
+    user,
     refetch,
+    isLoading,
   };
 };

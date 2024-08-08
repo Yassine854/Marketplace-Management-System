@@ -1,10 +1,10 @@
 import UsersTable from "../../tables/UsersTable";
 import UsersTableHeader from "@/features/users/widgets/UsersTableHeader";
-import { useGetUsers } from "@/features/users/hooks/queries/useGetUsers";
+import { useGetAllUsers } from "@/features/users/hooks/queries/useGetAllUsers";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 
 const UsersPage = () => {
-  const { users, isLoading } = useGetUsers();
+  const { users, isLoading } = useGetAllUsers();
   const { navigateToCreateUserForm } = useNavigation();
 
   return (
