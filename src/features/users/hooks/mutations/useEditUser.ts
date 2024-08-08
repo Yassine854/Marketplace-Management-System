@@ -1,65 +1,30 @@
-import { gql, useMutation } from "@apollo/client";
-import { logError } from "@/utils/logError";
-
-const MUTATION = gql`
-  mutation EditUser(
-    $username: String!
-    $firstName: String!
-    $lastName: String!
-    $roleId: String!
-    $newPassword: String!
-  ) {
-    editUser(
-      username: $username
-      firstName: $firstName
-      lastName: $lastName
-      roleId: $roleId
-      newPassword: $newPassword
-    ) {
-      user {
-        id
-      }
-      success
-      message
-    }
-  }
-`;
+import { axios } from "@/libs/axios";
+import { toast } from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
+import { useGetAllUsers } from "../queries/useGetAllUsers";
 
 export const useEditUser = () => {
-  const [mutate, { data, loading, error }] = useMutation(MUTATION);
+  const { navigateToUsersTable } = useNavigation();
+  const { refetch: refetchAll } = useGetAllUsers();
 
-  const edit = async (user: any) => {
-    const { username, firstName, lastName, password, roleId } = user;
-    try {
-      await mutate({
-        variables: {
-          username,
-          firstName,
-          lastName,
-          newPassword: password,
-          roleId,
-        },
-      });
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (user: any) => {
+      await axios.servicesClient.put("/api/users/editUser", user);
+    },
+    onSuccess: () => {
+      refetchAll();
+      toast.success(`User Edited Successfully`, { duration: 5000 });
 
-      return {
-        success: true,
-        message: "User Updated Successfully !",
-      };
-    } catch (err) {
-      logError(err);
-
-      return {
-        success: false,
-        //@ts-ignore
-        message: err?.message ?? "User Updated Successfully !",
-      };
-    }
-  };
+      navigateToUsersTable();
+    },
+    onError: () => {
+      toast.error(`Something Went Wrong`, { duration: 5000 });
+    },
+  });
 
   return {
-    edit,
-    data: data?.editUser,
-    isLoading: loading,
-    error,
+    isPending,
+    editUser: mutate,
   };
 };

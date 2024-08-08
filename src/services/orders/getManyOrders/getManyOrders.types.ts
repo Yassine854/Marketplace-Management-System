@@ -1,4 +1,4 @@
-export type GetOrdersParams = {
+export type GetManyOrdersParams = {
   page: number;
   perPage: number;
   sortBy: string;

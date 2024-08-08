@@ -1,12 +1,14 @@
 import {
-  useOrdersCount,
   useOrdersSearch,
   useOrdersSorting,
   useOrdersSelection,
   useMultipleOrdersActions,
 } from "@/features/orders/hooks";
+
+import { useGetOrdersCount } from "@/features/orders/hooks";
 import { useEffect, useState } from "react";
 import { useOrdersStore } from "@/features/orders/stores/ordersStore";
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
 export const useOrdersToolbar = () => {
   const { status } = useOrdersStore();
@@ -19,8 +21,9 @@ export const useOrdersToolbar = () => {
 
   const [ordersCount, setOrdersCount] = useState<number>();
 
+  const { storeId } = useGlobalStore();
   const { openOrdersCount, validOrdersCount, readyOrdersCount } =
-    useOrdersCount();
+    useGetOrdersCount({ storeId });
 
   const {
     actions,

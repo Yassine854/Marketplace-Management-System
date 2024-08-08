@@ -1,37 +1,23 @@
-import { gql, useQuery } from "@apollo/client";
+import { axios } from "@/libs/axios";
+import { useQuery } from "@tanstack/react-query";
 
-export type Params = {
-  status: string;
-  page: number;
-  perPage: number;
-};
+export const useGetOrdersCount = ({ storeId }: any | undefined) => {
+  const { isLoading, data, refetch } = useQuery({
+    queryKey: ["useGetOrdersCount", storeId],
+    queryFn: async () => {
+      const { data } = await axios.servicesClient(
+        `/api/orders/getOrdersCount?storeId=1`,
+      );
 
-const QUERY = gql`
-  query GetOrders($status: String!, $page: Int!, $perPage: Int!) {
-    getOrders(status: $status, page: $page, perPage: $perPage) {
-      orders {
-        id
-        deliveryDate
-        customer {
-          id
-          name
-        }
-      }
-      total
-    }
-  }
-`;
-
-export const useGetOrders = ({ status, page, perPage }: Params) => {
-  const { data, loading, error } = useQuery(QUERY, {
-    fetchPolicy: "network-only",
-
-    variables: {
-      status,
-      page,
-      perPage,
+      return data;
     },
   });
 
-  return { data: data?.getOrders, isLoading: loading, error };
+  return {
+    isLoading,
+    refetch,
+    openOrdersCount: data?.openOrdersCount || 0,
+    validOrdersCount: data?.validOrdersCount || 0,
+    readyOrdersCount: data?.shippedOrdersCount || 0,
+  };
 };

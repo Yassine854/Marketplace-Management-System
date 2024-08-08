@@ -1,10 +1,12 @@
-export * from "./prismaClient";
 export * from "./getUser";
+export * from "./prismaClient";
 
-import { getAllUsers } from "./getAllUsers";
 import { getUser } from "./getUser";
+import { editUser } from "./editUser";
+import { getAllUsers } from "./getAllUsers";
 
 export const prisma = {
-  getAllUsers,
   getUser,
+  editUser,
+  getAllUsers,
 };

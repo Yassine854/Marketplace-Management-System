@@ -4,11 +4,10 @@ import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
 import { useGetOrder } from "../../queries/useGetOrder";
 import { useOrdersData } from "../../queries/useOrdersData";
-import { useOrdersCount } from "../../queries/useOrdersCount";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
-
+import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
 const formatUnixTimestamp2MagentoDate = (unixTimestamp: number): string => {
   const date = new Date(unixTimestamp * 1000);
   const year = date.getFullYear();
@@ -20,9 +19,9 @@ const formatUnixTimestamp2MagentoDate = (unixTimestamp: number): string => {
 export const useEditOrderDetails = () => {
   const { refetch } = useOrdersData();
 
-  const { isNoEditUser } = useGlobalStore();
+  const { isNoEditUser, storeId } = useGlobalStore();
 
-  const { refetch: refetchCount } = useOrdersCount();
+  const { refetch: refetchCount } = useGetOrdersCount({ storeId });
 
   const {
     total,

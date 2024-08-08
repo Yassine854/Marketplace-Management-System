@@ -3,15 +3,14 @@ import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
 import { useOrdersData } from "../../queries/useOrdersData";
-import { useOrdersCount } from "../../queries/useOrdersCount";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
-
+import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
 export const useCancelMultipleOrders = () => {
   const { refetch } = useOrdersData();
 
-  const { isNoEditUser } = useGlobalStore();
+  const { isNoEditUser, storeId } = useGlobalStore();
 
-  const { refetch: refetchCount } = useOrdersCount();
+  const { refetch: refetchCount } = useGetOrdersCount({ storeId });
 
   const { mutate, isPending, mutateAsync } = useMutation({
     mutationFn: async (ordersIds: string[]) => {
