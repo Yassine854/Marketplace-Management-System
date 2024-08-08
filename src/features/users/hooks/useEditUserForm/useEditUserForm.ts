@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { useGetUser } from "../queries/useGetUser";
 import { useEditUser } from "../mutations/useEditUser";
 import { useUsersStore } from "../../stores/usersStore";
-import { useGetUsers } from "../queries/useGetAllUsers";
+import { useGetAllUsers } from "../queries/useGetAllUsers";
 
 type FormData = z.infer<typeof editUserFormSchema>;
 
@@ -17,7 +17,7 @@ export const useEditUserForm = () => {
   const { userOnReviewUsername } = useUsersStore();
   const userClient = useUser();
   const { user, refetch } = useGetUser();
-  const { refetch: refetchAll } = useGetUsers();
+  const { refetch: refetchAll } = useGetAllUsers();
 
   const { navigateToUsersTable } = useNavigation();
 
