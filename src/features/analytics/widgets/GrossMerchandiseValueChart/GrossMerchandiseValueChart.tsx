@@ -8,7 +8,7 @@ import { options } from "@/public/data/timesDropdown";
 import MonthPicker from "../MonthPicker";
 import { useGetGmvByMonthAnalytics } from "../../hooks/useGetGmvByMonthAnalytics";
 
-const GrossMarchandiseValueChart = () => {
+const GrossMerchandiseValueChart = () => {
   const [dateYear, setDateYear] = useState(`${new Date().getFullYear()}-01-01`);
   const [dateMonth, setDateMonth] = useState("2024-01");
   const [year, month, day] = dateMonth.split("-").map(Number);
@@ -51,7 +51,7 @@ const GrossMarchandiseValueChart = () => {
 
   const series = [
     {
-      name: "Gross Marchandise Value",
+      name: "Gross Merchandise Value",
       data: chartData,
     },
   ];
@@ -63,7 +63,7 @@ const GrossMarchandiseValueChart = () => {
           <div className=" mx-4 h-8 w-8 items-center justify-center ">
             <Loading />
           </div>
-          <p className="text-2xl font-bold">Gross Marchandise Value</p>
+          <p className="text-2xl font-bold">Gross Merchandise Value</p>
         </div>
         <div className="flex flex-row">
           <Dropdown
@@ -91,4 +91,4 @@ const GrossMarchandiseValueChart = () => {
   );
 };
 
-export default GrossMarchandiseValueChart;
+export default GrossMerchandiseValueChart;
