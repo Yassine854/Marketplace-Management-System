@@ -29,7 +29,7 @@ export const useCancelOrder = () => {
         throw new Error();
       }
       await magento.mutations.cancelOrder(orderId);
-      await axios.servicesClient.put("/api/orders/typesense/edit-order", {
+      await axios.servicesClient.put("/api/typesense/editOrder", {
         order: {
           id: orderId,
           status: "failed",
