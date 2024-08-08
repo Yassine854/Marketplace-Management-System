@@ -11,11 +11,7 @@ export const startIndexingStream = async () => {
     const isOrdersCollectionExist = await typesense.isCollectionExist("orders");
 
     if (!isOrdersCollectionExist) {
-      console.info("Creating orders Collection...");
-
       await typesense.orders.createCollection();
-
-      console.info("orders collection created Successfully...");
     }
 
     const readableStream = readingOrdersStream();
