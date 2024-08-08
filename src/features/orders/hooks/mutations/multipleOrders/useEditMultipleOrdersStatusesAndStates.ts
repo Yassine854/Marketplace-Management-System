@@ -2,13 +2,14 @@ import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
-import { useOrdersCount } from "../../queries/useOrdersCount";
 import { useOrdersData } from "../../queries/useOrdersData";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
-
+import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
 export const useEditOrdersStatusesAndStates = () => {
   const { refetch } = useOrdersData();
-  const { refetch: refetchCount } = useOrdersCount();
+
+  const { storeId } = useGlobalStore();
+  const { refetch: refetchCount } = useGetOrdersCount({ storeId });
 
   const { isNoEditUser } = useGlobalStore();
 
