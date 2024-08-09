@@ -29,11 +29,11 @@ const YearPicker = ({ onYearChange }: any) => {
   const isNextYearDisabled = selectedYear >= new Date().getFullYear();
 
   return (
-    <div className="relative block w-[220px]">
+    <div className="relative block flex h-12  w-[220px] items-center justify-center p-2">
       <div
-        className="border-50 flex w-full cursor-pointer items-center justify-between
-          gap-2 rounded-[30px] border bg-slate-100 px-4 py-3 dark:border-n500
-            dark:bg-bg4 xxl:px-6"
+        className="border-50 flex h-12 w-full cursor-pointer items-center
+          justify-between gap-2 rounded-[30px]  border bg-n20 px-4
+            py-3 dark:border-n500 dark:bg-bg4 xxl:px-6"
       >
         <div className="flex items-center justify-center text-xl font-semibold">
           <button

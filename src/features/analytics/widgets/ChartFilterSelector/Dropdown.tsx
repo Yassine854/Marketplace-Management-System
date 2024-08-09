@@ -33,7 +33,7 @@ const Dropdown = forwardRef<DropRef, Props>(
           ref={dropRef}
         >
           <div onClick={toggleOpen} className={tailwind.container("", "")}>
-            {selected?.name || placeholder}
+            <p className="">{selected?.name || placeholder}</p>
             <IconChevronDown
               size={20}
               className={`duration-300 ${open ? "rotate-180" : ""}`}
