@@ -1,12 +1,11 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { useGetGmvByYearAnalytics } from "../../hooks/useGetGmvByYearAnalytics";
 import Loading from "@/features/shared/elements/Loading";
 import YearPicker from "../YearPicker";
 import Dropdown from "@/features/orders/widgets/Dropdown";
 import { options } from "@/public/data/timesDropdown";
 import MonthPicker from "../MonthPicker";
-import { useGetGmvByMonthAnalytics } from "../../hooks/useGetGmvByMonthAnalytics";
+import { useGetGmvByMonth } from "../../hooks/useGetGmvByMonth";
 
 const GrossMerchandiseValueChart = () => {
   const [dateYear, setDateYear] = useState(`${new Date().getFullYear()}-01-01`);
@@ -15,13 +14,10 @@ const GrossMerchandiseValueChart = () => {
   const [selected, setSelected] = useState(options[0]);
   const [chartData, setChartData] = useState<number[]>([]);
   const [xAxis, setXAxis] = useState<string[]>([]);
-  const { dataMonth, isLoadingMonth, refetch } = useGetGmvByMonthAnalytics(
-    month,
-    year,
-  );
-  const { dataYear, isLoadingYear } = useGetGmvByYearAnalytics(
-    Number(dateYear),
-  );
+  const { dataMonth, isLoadingMonth, refetch } = useGetGmvByMonth(month, year);
+  // const { dataYear, isLoadingYear } = useGetGmvByYearAnalytics(
+  //   Number(dateYear),
+  // );
   useEffect(() => {
     if (selected.name === "Month") {
       const days = dataMonth?.Days;
@@ -31,13 +27,13 @@ const GrossMerchandiseValueChart = () => {
     }
   }, [selected, dataMonth, year, month]);
 
-  useEffect(() => {
-    if (selected.name === "Year") {
-      const months = dataYear?.Months;
-      setXAxis(months);
-      setChartData(dataYear?.gmv);
-    }
-  }, [selected, dataYear, dateYear]);
+  // useEffect(() => {
+  //   if (selected.name === "Year") {
+  //     const months = dataYear?.Months;
+  //     setXAxis(months);
+  //     setChartData(dataYear?.gmv);
+  //   }
+  // }, [selected, dataYear, dateYear]);
 
   const ReactApexChart = dynamic(() => import("react-apexcharts"), {
     ssr: false,
