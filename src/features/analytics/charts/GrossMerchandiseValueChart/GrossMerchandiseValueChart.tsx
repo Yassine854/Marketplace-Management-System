@@ -1,9 +1,9 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import Loading from "@/features/shared/elements/Loading";
-import YearPicker from "../YearPicker";
-import ChartFilterSelector from "../ChartFilterSelector";
-import MonthPicker from "../MonthPicker";
+import YearPicker from "../../widgets/YearPicker";
+import ChartFilterSelector from "../../widgets/ChartFilterSelector";
+import MonthPicker from "../../widgets/MonthPicker";
 import { useGetGmvByMonth } from "../../hooks/useGetGmvByMonth";
 
 export const options = [
@@ -12,6 +12,7 @@ export const options = [
 ];
 
 const GrossMerchandiseValueChart = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [dateYear, setDateYear] = useState(`${new Date().getFullYear()}-01-01`);
   const [dateMonth, setDateMonth] = useState("2024-01");
   const [year, month, day] = dateMonth.split("-").map(Number);
@@ -24,7 +25,11 @@ const GrossMerchandiseValueChart = () => {
   //   Number(dateYear),
   // );
 
-  const { data: monthData, isLoading: isMonthLoading } = useGetGmvByMonth({
+  const {
+    data: monthData,
+    isLoading: isMonthLoading,
+    refetch,
+  } = useGetGmvByMonth({
     year,
     month,
   });
@@ -34,7 +39,7 @@ const GrossMerchandiseValueChart = () => {
       const days = monthData?.Days;
       setXAxis(days);
       setChartData(monthData?.gmv);
-      // refetch();
+      refetch();
     }
   }, [selected, monthData, year, month]);
 
@@ -72,6 +77,14 @@ const GrossMerchandiseValueChart = () => {
       data: chartData,
     },
   ];
+
+  useEffect(() => {
+    if (isMonthLoading || false || false) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [isMonthLoading]);
 
   return (
     <div className="box min-h-92 col-span-12 mb-12 w-full overflow-x-hidden shadow-xl lg:col-span-6">

@@ -1,6 +1,6 @@
-import NumberOfOrdersChart from "../../widgets/NumberOfOrdersChart";
+import NumberOfOrdersChart from "../../charts/NumberOfOrdersChart";
 import NumberOfUniqueCustomer from "../../widgets/NumberOfUniqueCustomer";
-import GrossMerchandiseValueChart from "../../widgets/GrossMerchandiseValueChart";
+import GrossMerchandiseValueChart from "../../charts/GrossMerchandiseValueChart";
 
 const Dashboard = () => {
   return (

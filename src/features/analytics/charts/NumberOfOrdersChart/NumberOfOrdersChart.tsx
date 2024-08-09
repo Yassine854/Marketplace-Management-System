@@ -1,11 +1,11 @@
 import dynamic from "next/dynamic";
-import MonthPicker from "../MonthPicker";
+import MonthPicker from "../../widgets/MonthPicker";
 import { useEffect, useState } from "react";
 import Loading from "@/features/shared/elements/Loading";
 import { useGetNooByMonth } from "../../hooks/useGetNooByMonth";
 import { useGetNooLifetime } from "../../hooks/useGetNooLifetime";
 import ChartFilterSelector from "../../widgets/ChartFilterSelector";
-import YearPicker from "../YearPicker";
+import YearPicker from "../../widgets/YearPicker";
 import { useGetNooByYear } from "../../hooks/useGetNooByYear";
 
 export const options = [
