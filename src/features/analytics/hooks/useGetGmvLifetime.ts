@@ -1,12 +1,12 @@
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
 
-export const useGetGmvByYear = (year: string) => {
+export const useGetGmvLifetime = () => {
   const { isLoading, data, refetch } = useQuery({
-    queryKey: ["gmvByYear", year],
+    queryKey: ["gmvLifetime"],
     queryFn: async () => {
       const { data } = await axios.servicesClient(
-        `/api/analytics/gmv/byYear?year=${year}`,
+        `/api/analytics/gmv/lifetime`,
       );
       return data?.data;
     },
