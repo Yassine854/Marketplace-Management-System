@@ -2,10 +2,14 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import Loading from "@/features/shared/elements/Loading";
 import YearPicker from "../YearPicker";
-import Dropdown from "@/features/orders/widgets/Dropdown";
-import { options } from "@/public/data/timesDropdown";
+import ChartFilterSelector from "../ChartFilterSelector";
 import MonthPicker from "../MonthPicker";
 import { useGetGmvByMonth } from "../../hooks/useGetGmvByMonth";
+
+export const options = [
+  { name: "By Year", key: "year" },
+  { name: "By Month", key: "month" },
+];
 
 const GrossMerchandiseValueChart = () => {
   const [dateYear, setDateYear] = useState(`${new Date().getFullYear()}-01-01`);
@@ -14,18 +18,35 @@ const GrossMerchandiseValueChart = () => {
   const [selected, setSelected] = useState(options[0]);
   const [chartData, setChartData] = useState<number[]>([]);
   const [xAxis, setXAxis] = useState<string[]>([]);
-  const { dataMonth, isLoadingMonth, refetch } = useGetGmvByMonth(month, year);
+
+  //  const { dataMonth, isLoadingMonth, refetch } = useGetGmvByMonth(month, year);
   // const { dataYear, isLoadingYear } = useGetGmvByYearAnalytics(
   //   Number(dateYear),
   // );
+
+  const { data: monthData, isLoading: isMonthLoading } = useGetGmvByMonth({
+    year,
+    month,
+  });
+
   useEffect(() => {
-    if (selected.name === "Month") {
-      const days = dataMonth?.Days;
+    if (selected.key === "month" && monthData) {
+      const days = monthData?.Days;
       setXAxis(days);
-      setChartData(dataMonth?.gmv);
-      refetch();
+      setChartData(monthData?.gmv);
+      // refetch();
     }
-  }, [selected, dataMonth, year, month]);
+  }, [selected, monthData, year, month]);
+
+  useEffect(() => {
+    if (selected.key === "month" && monthData) {
+      const yAxis = monthData?.map((item: any) => parseInt(item.gmv));
+      setChartData(yAxis);
+      //  setYAxis(yAxis);
+      const xAxis = monthData?.map((item: any) => item.day);
+      setXAxis(xAxis);
+    }
+  }, [monthData, selected, year, month]);
 
   // useEffect(() => {
   //   if (selected.name === "Year") {
@@ -53,7 +74,7 @@ const GrossMerchandiseValueChart = () => {
   ];
 
   return (
-    <div className="box min-h-92 col-span-12 w-full overflow-x-hidden shadow-xl lg:col-span-6">
+    <div className="box min-h-92 col-span-12 mb-12 w-full overflow-x-hidden shadow-xl lg:col-span-6">
       <div className=" bb-dashed mb-4 flex flex-wrap items-center justify-between gap-3 pb-4 lg:mb-6 lg:pb-6">
         <div className="flex items-center justify-center ">
           <div className=" mx-4 h-8 w-8 items-center justify-center ">
@@ -62,16 +83,17 @@ const GrossMerchandiseValueChart = () => {
           <p className="text-2xl font-bold">Gross Merchandise Value</p>
         </div>
         <div className="flex flex-row">
-          <Dropdown
-            selected={selected}
-            onSelect={setSelected}
-            items={options}
-          />
           {selected.name === "Year" ? (
             <YearPicker onYearChange={(date: string) => setDateYear(date)} />
           ) : (
             <MonthPicker onMonthChange={(date: string) => setDateMonth(date)} />
           )}
+
+          <ChartFilterSelector
+            selected={selected}
+            onSelect={setSelected}
+            items={options}
+          />
         </div>
       </div>
       <div className="h-[320px]">

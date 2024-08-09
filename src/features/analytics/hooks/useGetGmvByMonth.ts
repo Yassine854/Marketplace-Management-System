@@ -1,7 +1,7 @@
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
 
-export const useGetGmvByMonth = (month: number, year: number) => {
+export const useGetGmvByMonth = ({ year, month }: any) => {
   const { isLoading, data, refetch } = useQuery({
     queryKey: ["gmvByMonthAnalytics", year],
     queryFn: async () => {
@@ -12,8 +12,8 @@ export const useGetGmvByMonth = (month: number, year: number) => {
     },
   });
   return {
-    dataMonth: data,
-    isLoadingMonth: isLoading,
+    data,
+    isLoading,
     refetch,
   };
 };
