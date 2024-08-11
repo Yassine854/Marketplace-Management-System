@@ -14,6 +14,7 @@ export const useGetOrder = (id: number) => {
       );
       return data?.order;
     },
+    refetchInterval: 300000,
   });
 
   return {

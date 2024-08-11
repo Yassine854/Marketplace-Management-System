@@ -13,6 +13,8 @@ export const useGetMilkRunOrders = ({ deliveryDate, storeId }: any) => {
         return data;
       }
     },
+
+    refetchInterval: 300000,
   });
 
   return {
