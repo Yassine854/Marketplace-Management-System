@@ -5,7 +5,6 @@ export const POST = async (request: NextRequest) => {
   try {
     const newUser = await request.json();
     const user = await createUser(newUser);
-    console.log("🚀 ~ POST ~ user:", user);
     if (!user) {
       return NextResponse.json(
         {
