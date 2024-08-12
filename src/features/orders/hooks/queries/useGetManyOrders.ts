@@ -17,7 +17,7 @@ export const useGetManyOrders = ({
 
       return data;
     },
-    refetchInterval: 300000,
+    refetchInterval: 180000,
   });
 
   return {

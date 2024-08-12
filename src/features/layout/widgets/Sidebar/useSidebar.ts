@@ -1,15 +1,16 @@
-import { useOrdersData } from "@/features/orders/hooks";
 import { useGetOrdersCount } from "@/features/orders/hooks";
 import { useCallback, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
+import { useOrdersStore } from "@/features/orders/stores/ordersStore";
 
 export const useSidebar = (setSidebar: any) => {
   const { push } = useRouter();
 
   const pathname = usePathname();
 
-  const { selectedStatus } = useOrdersData();
+  const { status: selectedStatus } = useOrdersStore();
+
   const { storeId } = useGlobalStore();
 
   const { openOrdersCount, validOrdersCount, readyOrdersCount } =

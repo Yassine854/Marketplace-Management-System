@@ -1,6 +1,5 @@
 import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
-import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
 import { useGetOrder } from "../../queries/useGetOrder";
 import { useOrdersData } from "../../queries/useOrdersData";
@@ -28,13 +27,10 @@ export const useChangeOrderStatus = () => {
         toast.error(`Action not allowed`, { duration: 5000 });
         throw new Error();
       }
-      await magento.mutations.changeOrderStatus({ orderId, status, state });
-      await axios.servicesClient.put("/api/typesense/editOrder", {
-        order: {
-          id: orderId,
-          status,
-          state,
-        },
+      await axios.servicesClient.post("/orders/changeOrderStatus", {
+        orderId,
+        status,
+        state,
       });
 
       return orderId;

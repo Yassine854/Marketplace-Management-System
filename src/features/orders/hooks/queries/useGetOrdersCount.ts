@@ -11,7 +11,7 @@ export const useGetOrdersCount = ({ storeId }: any | undefined) => {
 
       return data;
     },
-    refetchInterval: 300000,
+    refetchInterval: 180000,
   });
 
   return {
