@@ -1,7 +1,10 @@
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 
 export const useGetOrder = (id: number) => {
+  const pathname = usePathname();
+
   const {
     isLoading,
     data: order,
@@ -9,10 +12,13 @@ export const useGetOrder = (id: number) => {
   } = useQuery({
     queryKey: ["getOrder", id],
     queryFn: async () => {
-      const { data } = await axios.servicesClient(
-        `/api/orders/getOrder?id=${id}`,
-      );
-      return data?.order;
+      const isOnOrderDetailsPage = pathname?.includes("order-details");
+      if (isOnOrderDetailsPage) {
+        const { data } = await axios.servicesClient(
+          `/api/orders/getOrder?id=${id}`,
+        );
+        return data?.order;
+      }
     },
     refetchInterval: 180000,
   });

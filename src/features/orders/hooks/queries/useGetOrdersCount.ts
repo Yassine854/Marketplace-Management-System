@@ -1,15 +1,21 @@
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 
 export const useGetOrdersCount = ({ storeId }: any | undefined) => {
+  const pathname = usePathname();
+
   const { isLoading, data, refetch } = useQuery({
     queryKey: ["useGetOrdersCount", storeId],
     queryFn: async () => {
-      const { data } = await axios.servicesClient(
-        `/api/orders/getOrdersCount?storeId=1`,
-      );
+      const isOnOrdersPage = pathname?.includes("orders");
+      if (isOnOrdersPage) {
+        const { data } = await axios.servicesClient(
+          `/api/orders/getOrdersCount?storeId=1`,
+        );
 
-      return data;
+        return data;
+      }
     },
     refetchInterval: 180000,
   });

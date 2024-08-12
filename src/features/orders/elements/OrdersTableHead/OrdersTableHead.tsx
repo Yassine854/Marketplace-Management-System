@@ -19,7 +19,7 @@ const OrdersTableHead = ({
         <OrdersTableHeadSmallCell>
           <div className="relative flex w-full items-center justify-center">
             {!!selectedOrders.length && (
-              <div className="absolute right-0 ">{selectedOrders.length}</div>
+              <div className="absolute right-0">{selectedOrders.length}</div>
             )}
 
             <Checkbox
