@@ -8,20 +8,31 @@ export const useGetManyOrders = ({
   search,
   sortBy,
   filterBy,
+  storeId,
+  status,
 }: any) => {
   const pathname = usePathname();
 
   const { isLoading, data, refetch } = useQuery({
-    queryKey: ["useGetManyOrders", page, perPage, search, sortBy, filterBy],
+    queryKey: [
+      "useGetManyOrders",
+      page,
+      perPage,
+      search,
+      sortBy,
+      storeId,
+      status,
+    ],
     queryFn: async () => {
       const isOnOrdersPage = pathname?.includes("orders");
       if (isOnOrdersPage) {
         const { data } = await axios.servicesClient(
-          `/api/orders/getManyOrders?sortBy=${sortBy}&search=${search}&page=${page}&filterBy=${filterBy}&perPage=${perPage}`,
+          `/api/orders/getManyOrders?sortBy=${sortBy}&search=${search}&page=${page}&storeId=${storeId}&status=${status}&perPage=${perPage}`,
         );
 
         return data;
       }
+      return [];
     },
     refetchInterval: 180000,
   });
