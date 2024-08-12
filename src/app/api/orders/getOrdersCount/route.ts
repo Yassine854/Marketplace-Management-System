@@ -13,16 +13,14 @@ export const GET = async (request: NextRequest) => {
     const openOrders = await getManyOrders({
       page: 1,
       perPage: 1,
-      filterBy: storeId ? `status:=open && storeId:=${storeId}` : "status:open",
+      filterBy: storeId ? `status:=open&&storeId:=${storeId}` : "status:open",
     });
 
     //@ts-ignore
     const validOrders = await getManyOrders({
       page: 1,
       perPage: 1,
-      filterBy: storeId
-        ? `status:=valid && storeId:=${storeId}`
-        : "status:valid",
+      filterBy: storeId ? `status:=valid&&storeId:=${storeId}` : "status:valid",
     });
 
     //@ts-ignore
@@ -30,7 +28,7 @@ export const GET = async (request: NextRequest) => {
       page: 1,
       perPage: 1,
       filterBy: storeId
-        ? `status:=shipped && storeId:=${storeId}`
+        ? `status:=shipped&&storeId:=${storeId}`
         : "status:shipped",
     });
 

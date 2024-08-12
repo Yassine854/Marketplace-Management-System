@@ -8,8 +8,7 @@ import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 export const useChangeMultipleOrdersStatuses = () => {
   const { refetch } = useOrdersData();
 
-  const { storeId } = useGlobalStore();
-  const { refetch: refetchCount } = useGetOrdersCount({ storeId });
+  const { refetch: refetchCount } = useGetOrdersCount();
 
   const { isNoEditUser } = useGlobalStore();
 

@@ -13,8 +13,8 @@ export const useSidebar = (setSidebar: any) => {
 
   const { storeId } = useGlobalStore();
 
-  const { openOrdersCount, validOrdersCount, readyOrdersCount } =
-    useGetOrdersCount({ storeId });
+  const { openOrdersCount, validOrdersCount, readyOrdersCount, refetch } =
+    useGetOrdersCount();
 
   const sidebarRef = useRef<HTMLDivElement | null>(null);
 
@@ -33,6 +33,10 @@ export const useSidebar = (setSidebar: any) => {
     },
     [setSidebar],
   );
+
+  useEffect(() => {
+    refetch();
+  }, [storeId, refetch]);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);

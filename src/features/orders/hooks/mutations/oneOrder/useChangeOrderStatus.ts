@@ -11,11 +11,11 @@ import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore
 export const useChangeOrderStatus = () => {
   const { refetch } = useOrdersData();
 
-  const { isNoEditUser, storeId } = useGlobalStore();
+  const { isNoEditUser } = useGlobalStore();
 
   const { orderOnReviewId } = useOrderDetailsStore();
 
-  const { refetch: refetchCount } = useGetOrdersCount({ storeId });
+  const { refetch: refetchCount } = useGetOrdersCount();
 
   const { setOrderUnderActionId } = useOrderActionsStore();
 
