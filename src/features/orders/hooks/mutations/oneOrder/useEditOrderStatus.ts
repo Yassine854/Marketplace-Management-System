@@ -9,7 +9,7 @@ import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
 
-export const useEditOrderStatusAndState = () => {
+export const useEditOrderStatus = () => {
   const { refetch } = useOrdersData();
 
   const { isNoEditUser, storeId } = useGlobalStore();
