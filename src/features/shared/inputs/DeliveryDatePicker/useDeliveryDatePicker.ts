@@ -2,7 +2,7 @@ import { getTomorrow as getTomorrowJsDate } from "./getTomorrow";
 import { useState, useImperativeHandle, useEffect } from "react";
 import { getTomorrowIsoDate } from "@/utils/date/getTomorrowIsoDate";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
-import { formatJsDate2IsoDate } from "@/utils/date/formatJsDate2IsoDate";
+import { formatJsDate2IsoDate } from "@/utils/date/convertJsDate2IsoDate";
 
 export const useDeliveryDatePicker = ({ onChange, ref }: any) => {
   const [selected, setSelected] = useState<Date>(getTomorrowJsDate());

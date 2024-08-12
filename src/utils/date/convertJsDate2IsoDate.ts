@@ -1,4 +1,4 @@
-export const formatJsDate2IsoDate = (date: Date) => {
+export const convertJsDate2IsoDate = (date: Date) => {
   if (!(date instanceof Date) || isNaN(date.getTime())) {
     throw new Error("Input must be a valid Date object");
   }

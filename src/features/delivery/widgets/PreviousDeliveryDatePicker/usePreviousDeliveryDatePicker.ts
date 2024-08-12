@@ -1,6 +1,6 @@
 import { useState, useImperativeHandle, useEffect } from "react";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
-import { formatJsDate2IsoDate } from "@/utils/date/formatJsDate2IsoDate";
+import { formatJsDate2IsoDate } from "@/utils/date/convertJsDate2IsoDate";
 
 export const getTodayJsDate = (): Date => {
   const today = new Date();

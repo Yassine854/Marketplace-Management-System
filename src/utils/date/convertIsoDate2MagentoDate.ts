@@ -1,4 +1,4 @@
-export const formatIsoDate2MagentoDate = (isoDate: string): string => {
+export const convertIsoDate2MagentoDate = (isoDate: string): string => {
   const date = new Date(isoDate);
 
   const day = String(date.getDate()).padStart(2, "0");
