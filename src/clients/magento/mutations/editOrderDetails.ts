@@ -1,6 +1,6 @@
 import { axios } from "@/libs/axios";
 import { logError } from "@/utils/logError";
-import { formatIsoDate2MagentoDate } from "@/utils/date/convertIsoDate2MagentoDate";
+import { convertIsoDate2MagentoDate } from "@/utils/date/convertIsoDate2MagentoDate";
 
 export const editOrderDetails = async ({
   orderId,
@@ -22,7 +22,7 @@ export const editOrderDetails = async ({
         base_grand_total: total,
         grand_total: total,
         extension_attributes: {
-          delivery_date: formatIsoDate2MagentoDate(deliveryDate),
+          delivery_date: convertIsoDate2MagentoDate(deliveryDate),
         },
       },
     };

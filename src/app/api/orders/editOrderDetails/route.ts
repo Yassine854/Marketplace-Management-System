@@ -1,16 +1,18 @@
-import { createUser } from "@/services/users/createUser";
-import { NextRequest, NextResponse } from "next/server";
-import { axios } from "@/libs/axios";
 import { magento } from "@/clients/magento";
-import { getOrderProductsNames } from "@/services/typesense/getOrderProductsNames";
+import { logError } from "@/utils/logError";
+import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
-//import { formatIsoDate2MagentoDate } from "@/utils/date/convertIsoDate2MagentoDate";
+import { NextRequest, NextResponse } from "next/server";
 
-export const POST = async (request: NextRequest) => {
+export const PUT = async (request: NextRequest) => {
   try {
-    const { orderDetails } = await request.json();
+    const { order } = await request.json();
 
-    const { total, orderId, items, deliveryDate } = orderDetails;
+    if (!order) {
+      return responses.invalidRequest("order is Required");
+    }
+
+    const { total, orderId, items, deliveryDate } = order;
 
     await magento.mutations.editOrderDetails({
       total,
@@ -32,10 +34,8 @@ export const POST = async (request: NextRequest) => {
       },
       { status: 200 },
     );
-  } catch (error) {
-    return NextResponse.json(
-      { message: (error as Error).message },
-      { status: 500 },
-    );
+  } catch (error: any) {
+    logError(error);
+    return responses.internalServerError(error);
   }
 };
