@@ -152,17 +152,13 @@ const Sidebar = ({
 
           {isAdmin && (
             <>
-              <SidebarSubMenu
-                name="Logs"
+              <SidebarButton
+                name="Audit Trail"
                 icon={<IconList />}
-                isActive={pathname?.includes("logs")}
                 onClick={() => {
-                  push("/logs/orders-logs");
+                  push("/audit-trail");
                 }}
-                items={[
-                  { name: "Orders", path: "/logs/orders-logs" },
-                  { name: "Activities", path: "/logs/activities-logs" },
-                ]}
+                isActive={pathname?.includes("audit")}
               />
 
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
