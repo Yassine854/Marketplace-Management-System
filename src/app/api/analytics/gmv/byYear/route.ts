@@ -1,8 +1,7 @@
 import { responses } from "@/utils/responses";
-import { gmvByYearAnalytics } from "@/services/analytics/gmv/gmvByYearAnalytics";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-
+import { gmvByYear } from "@/services/analytics/grossMerchandiseValue/gmvByYear";
 export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -15,7 +14,7 @@ export const GET = async (request: NextRequest) => {
 
     const year = parseInt(yearString, 10);
 
-    const res = await gmvByYearAnalytics(year);
+    const res = await gmvByYear(year);
     return NextResponse.json(
       {
         message: "success",

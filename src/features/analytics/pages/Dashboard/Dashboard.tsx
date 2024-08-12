@@ -1,15 +1,14 @@
-import NumberOfOrdersChart from "../../widgets/NumberOfOrdersChart";
+import NumberOfOrdersChart from "../../charts/NumberOfOrdersChart";
 import NumberOfUniqueCustomer from "../../widgets/NumberOfUniqueCustomer";
-import { useEffect } from "react";
-import GrossMarchandiseValue from "../../widgets/GrossMarchandiseValue";
+import GrossMerchandiseValueChart from "../../charts/GrossMerchandiseValueChart";
 
 const Dashboard = () => {
   return (
     <div className="mt-[4.8rem] w-full bg-n20 p-4">
-      <div className="flex h-[1500px] flex-col justify-between">
+      <div className="flex flex-col justify-between">
+        <GrossMerchandiseValueChart />
         <NumberOfOrdersChart />
-        <NumberOfUniqueCustomer />
-        <GrossMarchandiseValue />
+        {/*  <NumberOfUniqueCustomer /> */}
       </div>
     </div>
   );

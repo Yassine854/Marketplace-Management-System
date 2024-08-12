@@ -38,7 +38,7 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
   const [year, setYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
-    toggleOpen();
+    //   toggleOpen();
 
     if (onMonthChange) {
       const formattedDate = `${year}-${selectedMonth.key}-01`;
@@ -60,7 +60,7 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
           toggleOpen();
         }}
         className="border-50 flex w-full cursor-pointer items-center justify-between
-           gap-2 rounded-[30px] border bg-slate-100 px-4 py-3 dark:border-n500
+           gap-2 rounded-[30px] border bg-n20 px-4 py-3 dark:border-n500
             dark:bg-bg4 xxl:px-6"
       >
         <span className="flex select-none items-center gap-2 font-semibold">
@@ -114,7 +114,11 @@ const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
               key={month.key}
               name={month.name}
               selectedMonth={selectedMonth}
-              onClick={() => setSelectedMonth(month)}
+              onClick={() => {
+                setSelectedMonth(month);
+
+                toggleOpen();
+              }}
             />
           ))}
         </div>

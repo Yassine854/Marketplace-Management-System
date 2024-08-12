@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 const Year = ({ year, onClick, selectedYear }: any) => (
   <div
     onClick={onClick}
-    className={`m-1 flex h-12 w-20 cursor-pointer items-center justify-center rounded-md
+    className={`m-1 flex h-12 w-20 items-center justify-center rounded-md
       ${
         selectedYear === year
           ? "bg-blue-950 text-white"
@@ -29,11 +29,11 @@ const YearPicker = ({ onYearChange }: any) => {
   const isNextYearDisabled = selectedYear >= new Date().getFullYear();
 
   return (
-    <div className="relative block w-[220px]">
+    <div className="relative  flex h-12   items-center justify-center ">
       <div
-        className="border-50 flex w-full cursor-pointer items-center justify-between
-          gap-2 rounded-[30px] border bg-slate-100 px-4 py-3 dark:border-n500
-            dark:bg-bg4 xxl:px-6"
+        className="border-50 flex h-12 w-full  items-center
+          justify-between gap-2 rounded-[30px]  border bg-n20 px-4
+            py-3 dark:border-n500 dark:bg-bg4 xxl:px-6"
       >
         <div className="flex items-center justify-center text-xl font-semibold">
           <button
@@ -60,9 +60,9 @@ const YearPicker = ({ onYearChange }: any) => {
             &gt;
           </button>
         </div>
-        <div className="flex">
+        {/* <div className="flex">
           <IconCalendar />
-        </div>
+        </div> */}
       </div>
     </div>
   );

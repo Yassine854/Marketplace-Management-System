@@ -44,7 +44,7 @@ const Notification = ({ isWhite }: { isWhite?: boolean }) => {
   return (
     <div className="relative" ref={ref}>
       <button
-        onClick={toggleOpen}
+        //  onClick={toggleOpen}
         className={` rounded-full p-2 sm:p-3 ${
           isWhite
             ? "border border-n30 bg-n0 dark:border-n500 dark:bg-bg4"

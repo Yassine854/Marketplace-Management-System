@@ -1,26 +1,11 @@
 import { responses } from "@/utils/responses";
-import { gmvLifetimeAnalytics } from "@/services/analytics/gmv/gmvLifetimeAnalytics";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
+import { gmvLifetime } from "@/services/analytics/grossMerchandiseValue/gmvLifetime";
 
 export const GET = async (request: NextRequest) => {
   try {
-    const { searchParams } = new URL(request.url);
-
-    const startYearString = searchParams.get("startYear");
-    const endYearString = searchParams.get("endYear");
-
-    if (!startYearString) {
-      return responses.invalidRequest("startYear Parameter is Required");
-    }
-    if (!endYearString) {
-      return responses.invalidRequest("endYear Parameter is Required");
-    }
-
-    const startYear = parseInt(startYearString, 10);
-    const endYear = parseInt(endYearString, 10);
-
-    const res = await gmvLifetimeAnalytics(startYear, endYear);
+    const res = await gmvLifetime();
     return NextResponse.json(
       {
         message: "success",
