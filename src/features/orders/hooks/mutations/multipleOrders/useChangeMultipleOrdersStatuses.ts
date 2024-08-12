@@ -1,11 +1,11 @@
 import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
-import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
 import { useOrdersData } from "../../queries/useOrdersData";
-import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
-export const useEditOrdersStatusesAndStates = () => {
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
+
+export const useChangeMultipleOrdersStatuses = () => {
   const { refetch } = useOrdersData();
 
   const { storeId } = useGlobalStore();
@@ -22,13 +22,10 @@ export const useEditOrdersStatusesAndStates = () => {
 
       return Promise.all(
         ordersIds.map(async (orderId: string) => {
-          await magento.mutations.changeOrderStatus({ orderId, status, state });
-          await axios.servicesClient.put("/api/typesense/editOrder", {
-            order: {
-              id: orderId,
-              status,
-              state,
-            },
+          await axios.servicesClient.post("/api/orders/changeOrderStatus", {
+            orderId,
+            status,
+            state,
           });
         }),
       );

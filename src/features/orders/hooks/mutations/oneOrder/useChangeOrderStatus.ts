@@ -4,12 +4,12 @@ import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
 import { useGetOrder } from "../../queries/useGetOrder";
 import { useOrdersData } from "../../queries/useOrdersData";
+import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
-import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
 
-export const useEditOrderStatus = () => {
+export const useChangeOrderStatus = () => {
   const { refetch } = useOrdersData();
 
   const { isNoEditUser, storeId } = useGlobalStore();

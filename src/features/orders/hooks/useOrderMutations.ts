@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useGeneratePickList } from "./mutations/oneOrder/useGeneratePickList";
 import { useEditOrderDetails } from "./mutations/oneOrder/useEditOrderDetails";
 import { useGenerateDeliveryNote } from "./mutations/oneOrder/useGenerateDeliveryNote";
-import { useEditOrderStatus } from "./mutations/oneOrder/useEditOrderStatus";
+import { useChangeOrderStatus } from "./mutations/oneOrder/useChangeOrderStatus";
 import { useGenerateOrderSummary } from "@/features/orders/hooks/mutations/oneOrder/useGenerateOrderSummary";
 
 export const useOrderMutations = () => {
@@ -10,7 +10,7 @@ export const useOrderMutations = () => {
     useEditOrderDetails();
 
   const { editStatusAndState, isPending: isEditStatusPending } =
-    useEditOrderStatus();
+    useChangeOrderStatus();
 
   const { generateSummary, isPending: isGenerateSummaryPending } =
     useGenerateOrderSummary();
