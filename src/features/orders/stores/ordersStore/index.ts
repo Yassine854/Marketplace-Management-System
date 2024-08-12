@@ -56,18 +56,29 @@ export const useOrdersStore = create<any>(
       selectAllOrders: (isChecked: boolean) => {
         //@ts-ignore
         const { orders, setSelectedOrders } = get();
-        isChecked
-          ? setSelectedOrders(orders.map((order: any) => order.id))
-          : setSelectedOrders([]);
+        if (isChecked) {
+          setSelectedOrders(orders.map((order: any) => order.id));
+        } else {
+          setSelectedOrders([]);
+        }
       },
 
       selectOrder: (isChecked: boolean, orderId: string) => {
         //@ts-ignore
         const { selectedOrders, setSelectedOrders } = get();
-        const updatedSelectedOrders = isChecked
-          ? [...selectedOrders, orderId]
-          : selectedOrders.filter((id: string) => id !== orderId);
-        setSelectedOrders(updatedSelectedOrders);
+
+        let updatedSelectedOrders = [];
+        if (isChecked) {
+          updatedSelectedOrders = [...selectedOrders, orderId];
+        } else {
+          updatedSelectedOrders = selectedOrders.filter(
+            (id: string) => id !== orderId,
+          );
+        }
+        //@ts-ignore
+        const list = [...new Set(updatedSelectedOrders)];
+
+        setSelectedOrders(list);
       },
     }),
     {
