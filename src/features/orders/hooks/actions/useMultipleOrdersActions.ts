@@ -5,7 +5,7 @@ import { useOrdersStore } from "@/features/orders/stores/ordersStore";
 import { useMultipleOrdersActionsByStatus } from "./useMultipleOrdersActionsByStatus";
 import { useGenerateMultiplePickLists } from "../mutations/multipleOrders/useGenerateMultiplePickLists";
 import { useGenerateMultipleDeliveryNotes } from "../mutations/multipleOrders/useGenerateMultipleDeliveryNotes";
-import { useEditOrdersStatusesAndStates } from "../mutations/multipleOrders/useEditMultipleOrdersStatusesAndStates";
+import { useChangeMultipleOrdersStatuses } from "../mutations/multipleOrders/useChangeMultipleOrdersStatuses";
 
 export const useMultipleOrdersActions = () => {
   const actionsRef = useRef(null);
@@ -17,7 +17,7 @@ export const useMultipleOrdersActions = () => {
     useCancelMultipleOrders();
 
   const { editStatusesAndStates, isPending: isEditingPending } =
-    useEditOrdersStatusesAndStates();
+    useChangeMultipleOrdersStatuses();
 
   const { generatePickLists, isPending: isGeneratingPickListPending } =
     useGenerateMultiplePickLists();

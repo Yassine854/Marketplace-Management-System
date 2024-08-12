@@ -1,5 +1,6 @@
 import { axios } from "@/libs/axios";
 import { logError } from "@/utils/logError";
+import { convertIsoDate2MagentoDate } from "@/utils/date/convertIsoDate2MagentoDate";
 
 export const editOrderDetails = async ({
   orderId,
@@ -8,16 +9,20 @@ export const editOrderDetails = async ({
   total,
 }: any): Promise<any> => {
   try {
+    const magentoItems = items?.map((item: any) => {
+      return { item_id: item.id, weight: item.weight };
+    });
+
     const data = {
       entity: {
         entity_id: orderId,
-        items: items,
+        items: magentoItems,
         base_subtotal: total,
         subtotal: total,
         base_grand_total: total,
         grand_total: total,
         extension_attributes: {
-          delivery_date: deliveryDate,
+          delivery_date: convertIsoDate2MagentoDate(deliveryDate),
         },
       },
     };

@@ -1,20 +1,13 @@
 import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
-import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
 import { useGetOrder } from "../../queries/useGetOrder";
 import { useOrdersData } from "../../queries/useOrdersData";
+import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
-import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
-const formatUnixTimestamp2MagentoDate = (unixTimestamp: number): string => {
-  const date = new Date(unixTimestamp * 1000);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+import { convertUnixTimestampToIsoDate } from "@/utils/date/convertUnixTimestamp2IsoDate";
 
 export const useEditOrderDetails = () => {
   const { refetch } = useOrdersData();
@@ -42,26 +35,14 @@ export const useEditOrderDetails = () => {
         throw new Error();
       }
 
-      const magentoItems: any[] = [];
-
-      orderOnReviewItems?.forEach((item: any) => {
-        magentoItems.push({ item_id: item.id, weight: item.weight });
-      });
-
-      await magento.mutations.editOrderDetails({
-        total,
-        orderId: orderOnReviewId,
-        items: magentoItems,
-        deliveryDate: formatUnixTimestamp2MagentoDate(
-          orderOnReviewDeliveryDate,
-        ),
-      });
-      await axios.servicesClient.put("/api/typesense/editOrder", {
+      await axios.servicesClient.put("/api/orders/editOrderDetails", {
         order: {
           total,
-          id: orderOnReviewId,
+          orderId: orderOnReviewId,
           items: orderOnReviewItems,
-          deliveryDate: Number(orderOnReviewDeliveryDate),
+          deliveryDate: convertUnixTimestampToIsoDate(
+            orderOnReviewDeliveryDate,
+          ),
         },
       });
 

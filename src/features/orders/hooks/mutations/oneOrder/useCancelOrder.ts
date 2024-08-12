@@ -28,14 +28,8 @@ export const useCancelOrder = () => {
         toast.error(`Action not allowed`, { duration: 5000 });
         throw new Error();
       }
-      await magento.mutations.cancelOrder(orderId);
-      await axios.servicesClient.put("/api/typesense/editOrder", {
-        order: {
-          id: orderId,
-          status: "failed",
-          state: "canceled",
-        },
-      });
+
+      await axios.servicesClient.post("/api/orders/cancelOrder", { orderId });
     },
     onSuccess: () => {
       refetch();
