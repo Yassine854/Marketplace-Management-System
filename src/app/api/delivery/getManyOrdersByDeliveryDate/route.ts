@@ -1,7 +1,7 @@
 import { responses } from "@/utils/responses";
 import { logError } from "@/utils/logError";
 import { NextResponse, type NextRequest } from "next/server";
-import { getOrdersByDeliveryDate } from "@/services/orders/getOrdersByDeliveryDate";
+import { getOrdersByDeliveryDate } from "@/services/delivery/getOrdersByDeliveryDate";
 
 export const GET = async (request: NextRequest) => {
   try {

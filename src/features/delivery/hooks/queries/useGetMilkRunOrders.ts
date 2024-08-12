@@ -7,7 +7,7 @@ export const useGetMilkRunOrders = ({ deliveryDate, storeId }: any) => {
     queryFn: async () => {
       if (storeId && deliveryDate) {
         const { data } = await axios.servicesClient(
-          `/api/orders/getOrdersByDeliveryDate?deliveryDate=${deliveryDate}&storeId=${storeId}`,
+          `/api/delivery/getManyOrdersByDeliveryDate?deliveryDate=${deliveryDate}&storeId=${storeId}`,
         );
 
         return data;
