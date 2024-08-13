@@ -13,7 +13,9 @@ export const GET = async (request: NextRequest) => {
 
     const page = Number(searchParams.get("page"));
 
-    const filterBy = searchParams.get("filterBy");
+    const storeId = searchParams.get("storeId");
+
+    const status = searchParams.get("status");
 
     const perPage = Number(searchParams.get("perPage"));
 
@@ -23,6 +25,17 @@ export const GET = async (request: NextRequest) => {
 
     if (!perPage) {
       return responses.invalidRequest("perPage parameter is Required");
+    }
+    let filterBy = "";
+
+    if (status && storeId) {
+      filterBy = `status:=${status}&&storeId:=${storeId}`;
+    }
+    if (status && !storeId) {
+      filterBy = `status:=${status}`;
+    }
+    if (!status && storeId) {
+      filterBy = `storeId:=${storeId}`;
     }
 
     //@ts-ignore

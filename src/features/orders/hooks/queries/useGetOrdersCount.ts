@@ -1,17 +1,25 @@
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 
-export const useGetOrdersCount = ({ storeId }: any | undefined) => {
+export const useGetOrdersCount = () => {
+  const pathname = usePathname();
+  const { storeId } = useGlobalStore();
+
   const { isLoading, data, refetch } = useQuery({
     queryKey: ["useGetOrdersCount", storeId],
     queryFn: async () => {
-      const { data } = await axios.servicesClient(
-        `/api/orders/getOrdersCount?storeId=1`,
-      );
+      const isOnOrdersPage = pathname?.includes("orders");
+      if (isOnOrdersPage) {
+        const { data } = await axios.servicesClient(
+          `/api/orders/getOrdersCount?storeId=${storeId}`,
+        );
 
-      return data;
+        return data;
+      }
     },
-    refetchInterval: 300000,
+    refetchInterval: 180000,
   });
 
   return {

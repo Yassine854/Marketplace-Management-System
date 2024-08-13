@@ -8,9 +8,9 @@ import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
 export const useCancelMultipleOrders = () => {
   const { refetch } = useOrdersData();
 
-  const { isNoEditUser, storeId } = useGlobalStore();
+  const { isNoEditUser } = useGlobalStore();
 
-  const { refetch: refetchCount } = useGetOrdersCount({ storeId });
+  const { refetch: refetchCount } = useGetOrdersCount();
 
   const { mutate, isPending, mutateAsync } = useMutation({
     mutationFn: async (ordersIds: string[]) => {

@@ -3,6 +3,7 @@ import { IconSelector } from "@tabler/icons-react";
 import OrdersTableHeadCell from "../OrdersTableHeadCell";
 import OrdersTableHeadSmallCell from "../OrdersTableHeadSmallCell";
 import { useOrdersTableHead } from "@/features/orders/hooks";
+import { useOrdersStore } from "../../stores/ordersStore";
 
 const OrdersTableHead = ({
   changeSelectedSort,
@@ -11,15 +12,21 @@ const OrdersTableHead = ({
 }: any) => {
   const { onCustomerClick, onDeliveryDateClick, onTotalClick } =
     useOrdersTableHead(changeSelectedSort);
-
+  const { selectedOrders } = useOrdersStore();
   return (
     <thead className="sticky left-0 right-0 top-0 z-10 bg-n40 ">
       <tr>
         <OrdersTableHeadSmallCell>
-          <Checkbox
-            onClick={onSelectAllClick}
-            isChecked={isAllOrdersSelected}
-          />
+          <div className="relative flex w-full items-center justify-center">
+            {!!selectedOrders.length && (
+              <div className="absolute right-0">{selectedOrders.length}</div>
+            )}
+
+            <Checkbox
+              onClick={onSelectAllClick}
+              isChecked={isAllOrdersSelected}
+            />
+          </div>
         </OrdersTableHeadSmallCell>
         <OrdersTableHeadCell>ID</OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onCustomerClick}>

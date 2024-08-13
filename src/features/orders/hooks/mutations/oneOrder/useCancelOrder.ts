@@ -12,11 +12,11 @@ import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
 export const useCancelOrder = () => {
   const { refetch } = useOrdersData();
 
-  const { isNoEditUser, storeId } = useGlobalStore();
+  const { isNoEditUser } = useGlobalStore();
 
   const { orderOnReviewId } = useOrderDetailsStore();
 
-  const { refetch: refetchCount } = useGetOrdersCount({ storeId });
+  const { refetch: refetchCount } = useGetOrdersCount();
 
   const { refetch: refetchOrder } = useGetOrder(orderOnReviewId);
 

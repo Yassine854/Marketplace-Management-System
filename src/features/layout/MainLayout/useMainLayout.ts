@@ -55,27 +55,22 @@ export const useMainLayout = () => {
     //@ts-ignore
     switch (user?.roleId) {
       case "1":
-        setStoreId("1");
         setIsAdmin(true);
 
         break;
 
       case "5":
-        setStoreId("1");
         setIsNoEditUser(true);
         setIsMultipleStoreAccessUser(true);
         break;
 
       case "2":
-        setStoreId("2");
         break;
 
       case "3":
-        setStoreId("2");
         break;
 
       case "4":
-        setStoreId("4");
         break;
     }
   }, [
