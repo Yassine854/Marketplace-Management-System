@@ -8,9 +8,10 @@ export const useGenerateDeliveryNote = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (orderId: string) => {
-      const deliveryNotesUrl = await magento.mutations.generateDeliveryNotes(
-        [orderId].toString(),
-      );
+      const deliveryNotesUrl =
+        await magento.mutations.generateMultipleOrdersDeliveryNotes(
+          [orderId].toString(),
+        );
 
       return deliveryNotesUrl;
     },
