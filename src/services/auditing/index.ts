@@ -4,19 +4,11 @@ import { AuditLogRequestBody } from "@/types/AuditLogRequestBody";
 
 const prisma = new PrismaClient();
 
-async function createAuditLog(req: NextApiRequest, res: NextApiResponse) {
-  const {
-    id,
-    username,
-    userid,
-    action,
-    actionTime,
-    orderid,
-  }: AuditLogRequestBody = req.body;
+async function createAuditLog(auditObject: AuditLogRequestBody) {
+  const { username, userid, action, actionTime, orderid } = auditObject;
   //@ts-ignore
   await prisma.auditLog.create({
     data: {
-      id,
       username,
       userid,
       action,

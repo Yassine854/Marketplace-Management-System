@@ -21,6 +21,15 @@ export const POST = async (request: NextRequest) => {
         state: "canceled",
       },
     });
+    //@ts-ignore
+    await createAuditLog({
+      //id: orderId,
+      username: "fatima",
+      userid: 123,
+      action: `user canceled order `,
+      actionTime: new Date(),
+      orderid: orderId,
+    });
 
     return NextResponse.json(
       {
