@@ -25,10 +25,7 @@ export const populateCollection = async (request: NextRequest) => {
     const [startDay, startMonth, startYear] = unixTimestampToDateDMY(createdAt)
       .split("-")
       .map(Number);
-    console.log("🚀 ~ populateCollection ~ createdAt:", createdAt);
-    console.log("🚀 ~ populateCollection ~ startYear:", startYear);
-    console.log("🚀 ~ populateCollection ~ startMonth:", startMonth);
-    console.log("🚀 ~ populateCollection ~ startDay:", startDay);
+
     for (let year = startYear; year <= currentYear; year++) {
       if (year === currentYear) {
         for (let month = 1; month < currentMonth; month++) {

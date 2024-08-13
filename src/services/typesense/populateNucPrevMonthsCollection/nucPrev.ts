@@ -35,7 +35,6 @@ export const nucPrev = async (month: number, year: number) => {
         hits.map((hit: any) => hit.document.customerId),
       );
       totalOrders = searchResults.found;
-      console.log("🚀 ~ nucPrev ~ totalOrders:", totalOrders);
 
       if (allOrders.length >= totalOrders) {
         break;

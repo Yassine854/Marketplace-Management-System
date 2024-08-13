@@ -1,14 +1,8 @@
 import { createCollection } from "@/clients/typesense/createCollection";
 import { nucPreviousMonthsCollectionSchema } from "@/clients/typesense/schemas/nucPreviousMonthsCollection";
-// import { NextRequest } from "next/server";
-
-// export const GET = async (request: NextRequest) =>
-//   createCollection(nucPreviousMonthsCollectionSchema);
-
 import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
-import { checkApiKey } from "@/services/auth/checkApiKey";
 import { NextResponse, type NextRequest } from "next/server";
 
 export const POST = async (request: NextRequest) => {
