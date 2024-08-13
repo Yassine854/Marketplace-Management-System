@@ -8,12 +8,12 @@ const SupplierSelector = forwardRef(
   ({ suppliers, onChange, direction = "down" }: any, ref) => {
     const { open, ref: DropDownRef, toggleOpen } = useDropdown();
 
-    const [layout, setLayout] = useState("Select Supplier");
+    const [layout, setLayout] = useState("All");
 
     useImperativeHandle(ref, () => ({
       reset: () => {
         onChange("");
-        setLayout("Select Supplier");
+        setLayout("All");
       },
     }));
 
@@ -23,7 +23,7 @@ const SupplierSelector = forwardRef(
           onClick={toggleOpen}
           className={` ${
             true
-              ? "border border-n30 bg-n0 dark:border-n500 dark:bg-bg4"
+              ? "min-w-72 border border-n30 bg-n0 dark:border-n500 dark:bg-bg4"
               : "bg-primary/5 dark:bg-bg3"
           } flex w-full cursor-pointer items-center justify-between gap-2 rounded-[30px] px-4 py-3 xxl:px-6`}
         >
