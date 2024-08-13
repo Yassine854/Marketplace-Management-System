@@ -27,8 +27,6 @@ export const useOrdersData = () => {
   }, [isLoading, setIsOrdersLoading]);
 
   useEffect(() => {
-    console.log("🚀 ~ useEffect ~ data?.orders?.length:", data?.orders?.length);
-
     if (data?.orders?.length) {
       const modifiedOrders = data?.orders?.map((order: any) => ({
         ...order,

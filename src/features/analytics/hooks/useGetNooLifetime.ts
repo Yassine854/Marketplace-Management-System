@@ -11,7 +11,6 @@ export const useGetNooLifetime = () => {
       const { data } = await axios.servicesClient(
         `/api/analytics/noo/lifetime`,
       );
-      console.log("🚀 ~ queryFn: ~ data:", data);
 
       setIsLoading(false);
 

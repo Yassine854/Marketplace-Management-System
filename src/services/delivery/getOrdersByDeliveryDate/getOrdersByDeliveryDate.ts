@@ -11,6 +11,9 @@ export const getOrdersByDeliveryDate = async ({
       deliveryDate,
     );
 
+    if (!storeId) {
+      return { orders: orders || [], count: orders?.length || 0 };
+    }
     const filteredOrders = [];
 
     for (const order of orders) {

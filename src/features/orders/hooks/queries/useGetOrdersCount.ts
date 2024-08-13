@@ -18,6 +18,7 @@ export const useGetOrdersCount = () => {
 
         return data;
       }
+      return null;
     },
     refetchInterval: 180000,
   });
