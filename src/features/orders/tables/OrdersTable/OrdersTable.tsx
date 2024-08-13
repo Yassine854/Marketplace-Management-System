@@ -58,7 +58,6 @@ const OrdersTable = () => {
                     isSomeActionPending={
                       isSomeActionPending && orderUnderActionId === order.id
                     }
-                    // isGenerateSummaryPending={}
                     onClick={() => {
                       onOrderClick(order.id);
                     }}
@@ -73,7 +72,7 @@ const OrdersTable = () => {
         isOpen={isCancelingModalOpen}
         isPending={isCancelingPending}
         onClose={onCancelingModalClose}
-        message=" Are you sure you want to cancel this orders ? "
+        message=" Are you sure you want to cancel this order? "
       />
     </table>
   );
