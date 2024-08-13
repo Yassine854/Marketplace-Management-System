@@ -1,26 +1,16 @@
 import { useMilkRunStore } from "../../stores/milkRunStore";
 import { useNavigation } from "../../../shared/hooks/useNavigation";
-import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useGetMilkRunOrders } from "../../hooks/queries/useGetMilkRunOrders";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 
 export const useMilkRunHistoryPage = () => {
-  const { deliveryDate, setDeliveryDate } = useMilkRunStore();
-
-  const { storeId } = useGlobalStore();
+  const { setDeliveryDate } = useMilkRunStore();
 
   const { setOrderOnReviewId } = useOrderDetailsStore();
 
   const { navigateToOrderDetails } = useNavigation();
 
-  const {
-    orders,
-    count: ordersCount,
-    isLoading,
-  } = useGetMilkRunOrders({
-    deliveryDate,
-    storeId,
-  });
+  const { orders, count: ordersCount, isLoading } = useGetMilkRunOrders();
 
   const onDetailsClick = (orderId: string): void => {
     setOrderOnReviewId(orderId);

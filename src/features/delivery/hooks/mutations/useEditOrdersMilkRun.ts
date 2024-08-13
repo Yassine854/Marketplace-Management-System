@@ -7,7 +7,7 @@ import { useGetMilkRunOrders } from "../queries/useGetMilkRunOrders";
 
 export const useEditOrdersMilkRun = () => {
   const { deliveryDate } = useMilkRunStore();
-  const { refetch } = useGetMilkRunOrders(Number(deliveryDate));
+  const { refetch } = useGetMilkRunOrders();
 
   const { mutate, isPending } = useMutation({
     mutationFn: async ({
