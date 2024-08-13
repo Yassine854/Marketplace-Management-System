@@ -140,7 +140,7 @@ export const useOrderActionsFunctions = () => {
 
   const deliveryNote = {
     key: "deliveryNote",
-    name: "Generate Delivery Note",
+    name: "Generate Delivery Note(BL)",
     action: (orderId: string): void => {
       setOrderUnderActionId(orderId);
       generateDeliveryNote(orderId);
