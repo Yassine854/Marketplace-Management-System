@@ -2,11 +2,9 @@ import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
-import { useMilkRunStore } from "../../stores/milkRunStore";
 import { useGetMilkRunOrders } from "../queries/useGetMilkRunOrders";
 
 export const useEditOrdersMilkRun = () => {
-  const { deliveryDate } = useMilkRunStore();
   const { refetch } = useGetMilkRunOrders();
 
   const { mutate, isPending } = useMutation({
