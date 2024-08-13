@@ -1,7 +1,7 @@
 import { axios } from "@/libs/axios";
 import { logError } from "@/utils/logError";
 
-export const generateDeliveryNotes = async (
+export const generateMultipleOrdersDeliveryNotes = async (
   ordersIdsString: string,
 ): Promise<string> => {
   try {
