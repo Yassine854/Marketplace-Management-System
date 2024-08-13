@@ -5,7 +5,6 @@ export const useOrdersStore = create<any>(
   persist(
     (set, get) => ({
       orders: [],
-
       status: "open",
       selectedOrders: [],
       isOrdersLoading: false,

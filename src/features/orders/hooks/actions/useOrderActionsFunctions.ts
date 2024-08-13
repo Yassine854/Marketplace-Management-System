@@ -12,7 +12,6 @@ export const useOrderActionsFunctions = () => {
     generateSummary,
     generatePickList,
     editStatusAndState,
-    generateDeliveryNote,
     isSomeMutationPending,
   } = useOrderMutations();
 
@@ -138,15 +137,6 @@ export const useOrderActionsFunctions = () => {
     },
   };
 
-  const deliveryNote = {
-    key: "deliveryNote",
-    name: "Generate Delivery Note(BL)",
-    action: (orderId: string): void => {
-      setOrderUnderActionId(orderId);
-      generateDeliveryNote(orderId);
-    },
-  };
-
   const cancel = {
     key: "cancel",
     name: "Cancel",
@@ -185,7 +175,6 @@ export const useOrderActionsFunctions = () => {
     gotToEdit,
     setToValid,
     setToUnpaid,
-    deliveryNote,
     setToArchived,
     setBackToOpen,
     setToDelivered,

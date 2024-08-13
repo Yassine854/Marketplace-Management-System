@@ -10,9 +10,9 @@ import { getDeliveryAgents } from "./queries/getAllDeliveryAgents";
 import { generateAgentReport } from "./mutations/generateAgentReport";
 import { generateOrderSummary } from "./mutations/generateOrderSummary";
 import { getAllOrdersPagesCount } from "./queries/getAllOrdersPagesCount";
-import { generateMultipleOrdersSummary } from "./mutations/generateMultipleOrdersSummary";
 import { getMilkRunOrdersByDate } from "./queries/getMilkRunOrdersByDate";
 import { generateSupplierReport } from "./mutations/generateSupplierReport";
+import { generateMultipleOrdersSummaries } from "./mutations/generateMultipleOrdersSummaries";
 
 export const magento = {
   queries: {
@@ -32,7 +32,7 @@ export const magento = {
     generatePickLists,
     generateAgentReport,
     generateOrderSummary,
-    generateMultipleOrdersSumma,
+    generateMultipleOrdersSummaries,
     generateSupplierReport,
   },
 };

@@ -12,35 +12,20 @@ export const useOrderActionsByStatus = () => {
     cancel,
     gotToEdit,
     pickList,
-    deliveryNote,
     setToArchived,
     setToDelivered,
     setToValid,
   } = useOrderActionsFunctions();
 
   const actions = {
-    valid: [
-      setToReadyToShip,
-      setBackToOpen,
-      cancel,
-      gotToEdit,
-      pickList,
-      deliveryNote,
-    ],
-    shipped: [
-      setToUnpaid,
-      setBackToValid,
-      cancel,
-      gotToEdit,
-      pickList,
-      deliveryNote,
-    ],
-    failed: [pickList, deliveryNote],
-    closed: [pickList, deliveryNote],
-    archived: [pickList, deliveryNote],
-    unpaid: [setToDelivered, pickList, deliveryNote],
-    delivered: [setToArchived, pickList, deliveryNote],
-    open: [setToValid, cancel, gotToEdit, pickList, deliveryNote],
+    valid: [setToReadyToShip, setBackToOpen, cancel, gotToEdit, pickList],
+    shipped: [setToUnpaid, setBackToValid, cancel, gotToEdit, pickList],
+    failed: [pickList],
+    closed: [pickList],
+    archived: [pickList],
+    unpaid: [setToDelivered, pickList],
+    delivered: [setToArchived, pickList],
+    open: [setToValid, cancel, gotToEdit, pickList],
   };
 
   return {
