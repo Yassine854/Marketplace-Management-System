@@ -7,7 +7,6 @@ import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
-import { convertUnixTimestampToIsoDate } from "@/utils/date/convertUnixTimestamp2IsoDate";
 
 export const useEditOrderDetails = () => {
   const { refetch } = useOrdersData();
@@ -40,9 +39,7 @@ export const useEditOrderDetails = () => {
           total,
           orderId: orderOnReviewId,
           items: orderOnReviewItems,
-          deliveryDate: convertUnixTimestampToIsoDate(
-            orderOnReviewDeliveryDate,
-          ),
+          deliveryDate: orderOnReviewDeliveryDate,
         },
       });
 
