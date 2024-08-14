@@ -6,7 +6,7 @@ import { IconCalendar } from "@tabler/icons-react";
 import { useDeliveryDatePicker } from "./useDeliveryDatePicker";
 
 // eslint-disable-next-line react/display-name
-const DeliveryDatePicker = forwardRef(
+const MilkRunDatePicker = forwardRef(
   ({ onChange, direction = "down", isReadOnly = false }: any, ref) => {
     const {
       isOpen,
@@ -59,4 +59,4 @@ const DeliveryDatePicker = forwardRef(
   },
 );
 
-export default DeliveryDatePicker;
+export default MilkRunDatePicker;
