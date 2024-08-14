@@ -1,5 +1,5 @@
 import { Button } from "@nextui-org/react";
-import DeliveryDatePicker from "@/features/shared/inputs/DeliveryDatePicker";
+import MilkRunDatePicker from "./MillkRunDatePicker";
 import Loading from "@/features/shared/elements/Loading";
 
 const MilkRunFloatingSection = ({
@@ -13,7 +13,7 @@ const MilkRunFloatingSection = ({
     <div className="absolute left-1 top-1 z-10 flex   flex-col items-center justify-between rounded-xl p-4 ">
       <div className="m-2 flex w-full flex-col items-center justify-center  rounded-xl bg-n20 p-2 shadow-xl ">
         <p className="mr-3 text-lg font-bold">Delivery Date </p>
-        <DeliveryDatePicker direction="down" onChange={onDeliveryDateChange} />
+        <MilkRunDatePicker direction="down" onChange={onDeliveryDateChange} />
       </div>
 
       <div className="m-1 flex  h-10 w-full items-center  rounded-xl bg-n20 pl-4 shadow-lg ">
