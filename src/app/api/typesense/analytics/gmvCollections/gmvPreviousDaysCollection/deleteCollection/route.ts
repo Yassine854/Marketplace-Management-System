@@ -6,8 +6,8 @@ export async function DELETE(request: any) {
   try {
     await deleteCollection("gmvPreviousDays");
     return NextResponse.json(
-      gmvPreviousDaysCollectionSchema.name +
-        " Collection Deleted Successfully ...",
+      //  gmvPreviousDaysCollectionSchema.name +
+      " Collection Deleted Successfully ...",
       {
         status: 200,
       },

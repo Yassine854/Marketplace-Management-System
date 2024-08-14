@@ -5,13 +5,13 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    const collectionName = gmvPreviousDaysCollectionSchema.name;
-    const result = await getCollectionDocuments(
-      collectionName,
-      "",
-      "year,month",
-    );
-    return NextResponse.json(result, { status: 200 });
+    // const collectionName = gmvPreviousDaysCollectionSchema.name;
+    // const result = await getCollectionDocuments(
+    //   collectionName,
+    //   "",
+    //   "year,month",
+    // );
+    return NextResponse.json({ status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to display GMV previous days data" },
