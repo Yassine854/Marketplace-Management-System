@@ -1,10 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import { NextApiRequest, NextApiResponse } from "next";
 import { AuditLogRequestBody } from "@/types/AuditLogRequestBody";
 
 const prisma = new PrismaClient();
 
-async function createAuditLog(auditObject: AuditLogRequestBody) {
+export async function createAuditLog(auditObject: AuditLogRequestBody) {
   const { username, userid, action, actionTime, orderid } = auditObject;
   //@ts-ignore
   await prisma.auditLog.create({
@@ -17,5 +16,3 @@ async function createAuditLog(auditObject: AuditLogRequestBody) {
     },
   });
 }
-
-export default createAuditLog;

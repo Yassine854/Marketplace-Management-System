@@ -1,7 +1,7 @@
 export type AuditLogRequestBody = {
   username: string;
-  userid: string;
+  userId: string;
   action: string;
   actionTime: Date;
-  orderid: String;
+  orderId: string;
 };

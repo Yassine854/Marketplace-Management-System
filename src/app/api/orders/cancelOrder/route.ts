@@ -3,7 +3,7 @@ import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
-import createAuditLog from "@/services/auditing";
+import { createAuditLog } from "@/services/auditing";
 
 export const POST = async (request: NextRequest) => {
   try {
