@@ -5,7 +5,6 @@ export const useOrdersStore = create<any>(
   persist(
     (set, get) => ({
       orders: [],
-
       status: "open",
       selectedOrders: [],
       isOrdersLoading: false,
@@ -23,7 +22,8 @@ export const useOrdersStore = create<any>(
 
       setOrders: (orders: any[]) => set({ orders }),
       setStatus: (status: string) => set({ status }),
-      resetSelectedOrders: () => set({ selectedOrders: [] }),
+      resetSelectedOrders: () =>
+        set({ selectedOrders: [], isAllOrdersSelected: false }),
       setSelectedOrders: (selectedOrders: any) => set({ selectedOrders }),
 
       setIsOrdersLoading: (loading: boolean) =>
@@ -57,9 +57,11 @@ export const useOrdersStore = create<any>(
         //@ts-ignore
         const { orders, setSelectedOrders } = get();
         if (isChecked) {
+          //  set({ selectedOrders: [], isAllOrdersSelected: false }),
           setSelectedOrders(orders.map((order: any) => order.id));
         } else {
-          setSelectedOrders([]);
+          set({ selectedOrders: [], isAllOrdersSelected: false }),
+            setSelectedOrders([]);
         }
       },
 

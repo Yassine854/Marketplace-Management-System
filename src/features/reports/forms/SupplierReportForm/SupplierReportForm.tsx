@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Loading from "@/features/shared/elements/Loading";
-import TriangleSkeleton from "../../widgets/TriangleSkeleton";
+import RectangleSkeleton from "../../widgets/RectangleSkeleton";
 import SupplierSelector from "../../widgets/SupplierSelector";
 import DateRangePicker from "@/features/shared/inputs/DateRangePicker";
 import ButtonSkeleton from "../../widgets/ButtonSkeleton/ButtonSkeleton";
@@ -50,7 +50,7 @@ const SuppliersReportForm = () => {
             />
           </div>
         )}
-        {isLoading && <TriangleSkeleton />}
+        {isLoading && <RectangleSkeleton />}
         <div className="mt-6">
           <div className="mt-7 flex justify-end gap-4  lg:mt-10">
             {isLoading && <ButtonSkeleton />}
@@ -60,10 +60,6 @@ const SuppliersReportForm = () => {
                 type="submit"
                 className="btn px-4 hover:shadow-none"
                 onClick={() => {
-                  if (!supplierId) {
-                    toast.error(`Please Select a Supplier`, { duration: 5000 });
-                    return;
-                  }
                   if (!toDate || !fromDate) {
                     toast.error(`Please Select Date Range`, { duration: 5000 });
                     return;

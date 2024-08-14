@@ -1,5 +1,6 @@
 import { IconDotsVertical } from "@tabler/icons-react";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
+import { useOrdersStore } from "../../stores/ordersStore";
 
 const TableActions = ({
   actionsList,
@@ -9,14 +10,14 @@ const TableActions = ({
   orderId: any;
 }) => {
   const { open, ref, toggleOpen } = useDropdown();
-
+  const { resetSelectedOrders } = useOrdersStore();
   return (
     <div
       className="relative top-0 rounded-full p-2 hover:bg-n10"
       ref={ref}
       onClick={(event) => {
         event.stopPropagation();
-
+        resetSelectedOrders();
         toggleOpen();
       }}
     >

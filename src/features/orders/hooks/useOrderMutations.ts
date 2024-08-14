@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGeneratePickList } from "./mutations/oneOrder/useGeneratePickList";
 import { useEditOrderDetails } from "./mutations/oneOrder/useEditOrderDetails";
-import { useGenerateDeliveryNote } from "./mutations/oneOrder/useGenerateDeliveryNote";
 import { useChangeOrderStatus } from "./mutations/oneOrder/useChangeOrderStatus";
 import { useGenerateOrderSummary } from "@/features/orders/hooks/mutations/oneOrder/useGenerateOrderSummary";
 
@@ -18,9 +17,6 @@ export const useOrderMutations = () => {
   const { generatePickList, isPending: isGeneratePickListPending } =
     useGeneratePickList();
 
-  const { generateDeliveryNote, isPending: isGenerateDeliveryNotePending } =
-    useGenerateDeliveryNote();
-
   const [isSomeMutationPending, setIsSomeMutationPending] = useState(false);
 
   useEffect(() => {
@@ -28,8 +24,7 @@ export const useOrderMutations = () => {
       isEditStatusPending ||
       isEditingDetailsPending ||
       isGenerateSummaryPending ||
-      isGeneratePickListPending ||
-      isGenerateDeliveryNotePending
+      isGeneratePickListPending
     ) {
       setIsSomeMutationPending(true);
     } else {
@@ -40,7 +35,6 @@ export const useOrderMutations = () => {
     isEditingDetailsPending,
     isGenerateSummaryPending,
     isGeneratePickListPending,
-    isGenerateDeliveryNotePending,
   ]);
 
   return {
@@ -48,7 +42,6 @@ export const useOrderMutations = () => {
     generateSummary,
     generatePickList,
     editStatusAndState,
-    generateDeliveryNote,
     isSomeMutationPending,
   };
 };

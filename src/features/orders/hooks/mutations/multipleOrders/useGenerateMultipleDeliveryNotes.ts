@@ -5,9 +5,10 @@ import { magento } from "@/clients/magento";
 export const useGenerateMultipleDeliveryNotes = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (ordersIds: string[]) => {
-      const deliveryNotesUrl = await magento.mutations.generateDeliveryNotes(
-        ordersIds.toString(),
-      );
+      const deliveryNotesUrl =
+        await magento.mutations.generateMultipleOrdersSummaries(
+          ordersIds.toString(),
+        );
 
       return deliveryNotesUrl;
     },

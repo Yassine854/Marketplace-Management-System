@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Loading from "@/features/shared/elements/Loading";
-import TriangleSkeleton from "../../widgets/TriangleSkeleton";
+import RectangleSkeleton from "../../widgets/RectangleSkeleton";
 import DateRangePicker from "@/features/shared/inputs/DateRangePicker";
 import ButtonSkeleton from "../../widgets/ButtonSkeleton/ButtonSkeleton";
 import DeliveryAgentSelector from "@/features/shared/inputs/DeliveryAgentSelector";
@@ -51,7 +51,7 @@ const AgentReportForm = () => {
             />
           </div>
         )}
-        {isLoading && <TriangleSkeleton />}
+        {isLoading && <RectangleSkeleton />}
         <div className="mt-6">
           <div className="mt-7 flex justify-end gap-4  lg:mt-10">
             {isLoading && <ButtonSkeleton />}
@@ -61,12 +61,12 @@ const AgentReportForm = () => {
                 type="submit"
                 className="btn px-4 hover:shadow-none"
                 onClick={() => {
-                  if (!agentId) {
-                    toast.error(`Please Select an Agent`, {
-                      duration: 5000,
-                    });
-                    return;
-                  }
+                  // if (!agentId) {
+                  //   toast.error(`Please Select an Agent`, {
+                  //     duration: 5000,
+                  //   });
+                  //   return;
+                  // }
                   if (!toDate || !fromDate) {
                     toast.error(`Please Select Date Range`, {
                       duration: 5000,
