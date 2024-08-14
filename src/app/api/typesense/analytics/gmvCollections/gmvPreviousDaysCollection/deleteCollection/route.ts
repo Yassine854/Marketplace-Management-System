@@ -1,5 +1,5 @@
 import { deleteCollection } from "@/clients/typesense/deleteCollection";
-import { gmvPreviousDaysCollectionSchema } from "@/clients/typesense/schemas/gmvPreviousDaysCollection";
+import { gmvPreviousDaysCollectionSchema } from "@/clients/typesense/schemas/GMVPreviousDaysCollection";
 import { NextResponse } from "next/server";
 
 export async function DELETE(request: any) {

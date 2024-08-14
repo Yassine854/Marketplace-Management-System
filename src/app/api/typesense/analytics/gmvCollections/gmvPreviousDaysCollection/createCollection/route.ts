@@ -1,5 +1,5 @@
 import { createCollection } from "@/clients/typesense/createCollection";
-import { gmvPreviousDaysCollectionSchema } from "@/clients/typesense/schemas/gmvPreviousDaysCollection";
+import { gmvPreviousDaysCollectionSchema } from "@/clientstypesense/schemas/GMVPreviousDaysCollection";
 import { NextRequest } from "next/server";
 import {
   successResponse,
