@@ -26,6 +26,14 @@ export const POST = async (request: NextRequest) => {
       status,
       state,
     });
+    //@ts-ignore
+    await createAuditLog({
+      username: "fatima",
+      userId: " 123",
+      action: `user change order status `,
+      actionTime: new Date(),
+      orderId: orderId,
+    });
 
     return NextResponse.json(
       {

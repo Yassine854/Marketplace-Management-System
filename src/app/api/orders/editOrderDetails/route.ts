@@ -27,7 +27,14 @@ export const PUT = async (request: NextRequest) => {
       orderId,
       deliveryDate,
     });
-
+    //@ts-ignore
+    await createAuditLog({
+      username: "fatima",
+      userId: " 123",
+      action: `user edit order `,
+      actionTime: new Date(),
+      orderId: orderId,
+    });
     return NextResponse.json(
       {
         message: "Order Edited  Successfully",

@@ -18,12 +18,11 @@ export const POST = async (request: NextRequest) => {
     await typesense.orders.cancelOne(orderId);
     //@ts-ignore
     await createAuditLog({
-      //id: orderId,
       username: "fatima",
-      userid: " 123",
+      userId: " 123",
       action: `user canceled order `,
       actionTime: new Date(),
-      orderid: orderId,
+      orderId: orderId,
     });
 
     return NextResponse.json(
