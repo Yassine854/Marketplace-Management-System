@@ -5,7 +5,6 @@ export const useOrdersStore = create<any>(
   persist(
     (set, get) => ({
       orders: [],
-
       status: "open",
       selectedOrders: [],
       isOrdersLoading: false,
@@ -23,7 +22,8 @@ export const useOrdersStore = create<any>(
 
       setOrders: (orders: any[]) => set({ orders }),
       setStatus: (status: string) => set({ status }),
-      resetSelectedOrders: () => set({ selectedOrders: [] }),
+      resetSelectedOrders: () =>
+        set({ selectedOrders: [], isAllOrdersSelected: false }),
       setSelectedOrders: (selectedOrders: any) => set({ selectedOrders }),
 
       setIsOrdersLoading: (loading: boolean) =>
@@ -56,18 +56,31 @@ export const useOrdersStore = create<any>(
       selectAllOrders: (isChecked: boolean) => {
         //@ts-ignore
         const { orders, setSelectedOrders } = get();
-        isChecked
-          ? setSelectedOrders(orders.map((order: any) => order.id))
-          : setSelectedOrders([]);
+        if (isChecked) {
+          //  set({ selectedOrders: [], isAllOrdersSelected: false }),
+          setSelectedOrders(orders.map((order: any) => order.id));
+        } else {
+          set({ selectedOrders: [], isAllOrdersSelected: false }),
+            setSelectedOrders([]);
+        }
       },
 
       selectOrder: (isChecked: boolean, orderId: string) => {
         //@ts-ignore
         const { selectedOrders, setSelectedOrders } = get();
-        const updatedSelectedOrders = isChecked
-          ? [...selectedOrders, orderId]
-          : selectedOrders.filter((id: string) => id !== orderId);
-        setSelectedOrders(updatedSelectedOrders);
+
+        let updatedSelectedOrders = [];
+        if (isChecked) {
+          updatedSelectedOrders = [...selectedOrders, orderId];
+        } else {
+          updatedSelectedOrders = selectedOrders.filter(
+            (id: string) => id !== orderId,
+          );
+        }
+        //@ts-ignore
+        const list = [...new Set(updatedSelectedOrders)];
+
+        setSelectedOrders(list);
       },
     }),
     {

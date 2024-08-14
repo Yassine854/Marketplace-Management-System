@@ -12,6 +12,7 @@ import { getNumberOfOrdersByMonth } from "./orders/numberOfOrders/getNumberOfOrd
 import { getGmvByQuarter } from "./orders/gmv/getGmvByQuarter";
 import { getGmvByMonth } from "./orders/gmv/getGmvByMonth";
 import { getGmvByDay } from "./orders/gmv/getGmvByDay";
+import { cancelOrder } from "./orders/cancelOrder";
 
 export const typesense = {
   isCollectionExist,
@@ -20,6 +21,7 @@ export const typesense = {
     addOne: addOrder,
     getMany: getManyOrders,
     updateOne: updateOrder,
+    cancelOne: cancelOrder,
     addMany: addOrdersBatch,
     createCollection: createOrdersCollection,
     deleteCollection: deleteOrdersCollection,

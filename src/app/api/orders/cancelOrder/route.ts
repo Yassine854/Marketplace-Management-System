@@ -14,13 +14,7 @@ export const POST = async (request: NextRequest) => {
 
     await magento.mutations.cancelOrder(orderId);
 
-    await typesense.orders.updateOne({
-      order: {
-        id: orderId,
-        status: "failed",
-        state: "canceled",
-      },
-    });
+    await typesense.orders.cancelOne(orderId);
     //@ts-ignore
     await createAuditLog({
       //id: orderId,

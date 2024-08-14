@@ -1,16 +1,16 @@
 import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
-import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
 import { useOrdersData } from "../../queries/useOrdersData";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
+
 export const useCancelMultipleOrders = () => {
   const { refetch } = useOrdersData();
 
-  const { isNoEditUser, storeId } = useGlobalStore();
+  const { isNoEditUser } = useGlobalStore();
 
-  const { refetch: refetchCount } = useGetOrdersCount({ storeId });
+  const { refetch: refetchCount } = useGetOrdersCount();
 
   const { mutate, isPending, mutateAsync } = useMutation({
     mutationFn: async (ordersIds: string[]) => {
@@ -20,7 +20,7 @@ export const useCancelMultipleOrders = () => {
       }
       return Promise.all(
         ordersIds.map(async (orderId) => {
-          await axios.servicesClient.post("/api/order/cancelOrder", {
+          await axios.servicesClient.post("/api/orders/cancelOrder", {
             orderId,
           });
         }),

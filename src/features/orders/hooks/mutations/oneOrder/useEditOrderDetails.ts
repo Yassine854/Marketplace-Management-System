@@ -12,9 +12,9 @@ import { convertUnixTimestampToIsoDate } from "@/utils/date/convertUnixTimestamp
 export const useEditOrderDetails = () => {
   const { refetch } = useOrdersData();
 
-  const { isNoEditUser, storeId } = useGlobalStore();
+  const { isNoEditUser } = useGlobalStore();
 
-  const { refetch: refetchCount } = useGetOrdersCount({ storeId });
+  const { refetch: refetchCount } = useGetOrdersCount();
 
   const {
     total,

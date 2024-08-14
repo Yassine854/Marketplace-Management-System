@@ -13,10 +13,17 @@ export const generateSupplierReport = async ({
   supplierId,
 }: Params): Promise<string> => {
   try {
-    const res = await axios.magentoClient.get(
-      `orders/saleslist_without_sum?deliveryDateStart=${fromDate}&deliveryDateEnd=${toDate}&manufacturer=${supplierId}`,
-    );
-    return res?.data;
+    if (supplierId) {
+      const res = await axios.magentoClient.get(
+        `orders/saleslist_without_sum?deliveryDateStart=${fromDate}&deliveryDateEnd=${toDate}&manufacturer=${supplierId}`,
+      );
+      return res?.data;
+    } else {
+      const res = await axios.magentoClient.get(
+        `orders/saleslist_without_sum?deliveryDateStart=${fromDate}&deliveryDateEnd=${toDate}`,
+      );
+      return res?.data;
+    }
   } catch (error) {
     logError(error);
     throw new Error();

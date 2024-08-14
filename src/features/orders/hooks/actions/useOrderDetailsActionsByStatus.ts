@@ -8,7 +8,6 @@ export const useOrderDetailsActionsByStatus = () => {
     pickList,
     setToValid,
     setToUnpaid,
-    deliveryNote,
     setToArchived,
     setBackToOpen,
     setToDelivered,
@@ -17,30 +16,14 @@ export const useOrderDetailsActionsByStatus = () => {
   } = useOrderActionsFunctions();
 
   const actions = {
-    valid: [
-      edit,
-      setToReadyToShip,
-      setBackToOpen,
-      cancel,
-      pickList,
-      deliveryNote,
-      summary,
-    ],
-    shipped: [
-      edit,
-      setToUnpaid,
-      setBackToValid,
-      cancel,
-      pickList,
-      deliveryNote,
-      summary,
-    ],
-    failed: [pickList, deliveryNote, summary],
-    closed: [pickList, deliveryNote, summary],
-    archived: [pickList, deliveryNote, summary],
-    unpaid: [setToDelivered, pickList, deliveryNote, summary],
-    delivered: [setToArchived, pickList, deliveryNote, summary],
-    open: [edit, setToValid, cancel, pickList, deliveryNote, summary],
+    valid: [edit, setToReadyToShip, setBackToOpen, cancel, pickList, summary],
+    shipped: [edit, setToUnpaid, setBackToValid, cancel, pickList, summary],
+    failed: [pickList, summary],
+    closed: [pickList, summary],
+    archived: [pickList, summary],
+    unpaid: [setToDelivered, pickList, summary],
+    delivered: [setToArchived, pickList, summary],
+    open: [edit, setToValid, cancel, pickList, summary],
   };
 
   return {

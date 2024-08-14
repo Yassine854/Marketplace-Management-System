@@ -1,8 +1,8 @@
 export const useMultipleOrdersActionsByStatus = ({
+  selectedOrders,
   generatePickLists,
   openCancelingModal,
   generateDeliveryNotes,
-  selectedOrders,
   editStatusesAndStates,
 }: any) => {
   const setToValid = {
@@ -112,7 +112,7 @@ export const useMultipleOrdersActionsByStatus = ({
   };
 
   const deliveryNote = {
-    name: "Generate Delivery Notes",
+    name: "Generate Delivery Notes (BL)",
     key: "10",
 
     action: () => {

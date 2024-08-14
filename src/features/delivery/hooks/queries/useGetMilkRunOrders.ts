@@ -1,20 +1,32 @@
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
+import { useMilkRunStore } from "../../stores/milkRunStore";
 
-export const useGetMilkRunOrders = ({ deliveryDate, storeId }: any) => {
+export const useGetMilkRunOrders = () => {
+  const { deliveryDate } = useMilkRunStore();
+
+  const { storeId } = useGlobalStore();
+
   const { isLoading, data, refetch } = useQuery({
-    queryKey: ["milkRunOrders", deliveryDate?.toString()],
+    queryKey: ["milkRunOrders", deliveryDate],
     queryFn: async () => {
       if (storeId && deliveryDate) {
         const { data } = await axios.servicesClient(
           `/api/delivery/getManyOrdersByDeliveryDate?deliveryDate=${deliveryDate}&storeId=${storeId}`,
         );
 
-        return data;
+        return data || [];
+      } else {
+        const { data } = await axios.servicesClient(
+          `/api/delivery/getManyOrdersByDeliveryDate?deliveryDate=${deliveryDate}`,
+        );
+
+        return data || [];
       }
     },
 
-    refetchInterval: 300000,
+    refetchInterval: 180000,
   });
 
   return {

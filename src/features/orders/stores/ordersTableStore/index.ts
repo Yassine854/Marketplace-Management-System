@@ -7,12 +7,13 @@ export const useOrdersTableStore = create<any>(
       sort: "",
       search: "",
       currentPage: 1,
-      itemsPerPage: 10,
+      itemsPerPage: 25,
 
       reset: () =>
         set({ sort: "", search: "", currentPage: 1, itemsPerPage: 10 }),
 
       setSort: (sort: string) => set({ sort }),
+
       setSearch: (search: string) => set({ search }),
       setCurrentPage: (currentPage: number) => set({ currentPage }),
       setItemsPerPage: (itemsPerPage: number) => set({ itemsPerPage }),

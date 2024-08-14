@@ -11,10 +11,6 @@ export const GET = async (request: NextRequest) => {
 
     const deliveryDate = searchParams.get("deliveryDate");
 
-    if (!storeId) {
-      return responses.invalidRequest("storeId parameter is Required");
-    }
-
     if (!deliveryDate) {
       return responses.invalidRequest("deliveryDate parameter is Required");
     }

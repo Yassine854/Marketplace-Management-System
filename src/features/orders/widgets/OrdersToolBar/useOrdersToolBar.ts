@@ -21,9 +21,8 @@ export const useOrdersToolbar = () => {
 
   const [ordersCount, setOrdersCount] = useState<number>();
 
-  const { storeId } = useGlobalStore();
   const { openOrdersCount, validOrdersCount, readyOrdersCount } =
-    useGetOrdersCount({ storeId });
+    useGetOrdersCount();
 
   const {
     actions,

@@ -10,31 +10,14 @@ export const useOrdersData = () => {
   const { storeId } = useGlobalStore();
   const { sort, search, currentPage, itemsPerPage } = useOrdersTableStore();
 
-  const [filterBy, setFilterBy] = useState("");
-
   const { data, isLoading, refetch } = useGetManyOrders({
     page: currentPage || 1,
     perPage: itemsPerPage || 25,
     search,
     sortBy: sort || "createdAt:desc",
-    filterBy,
+    status,
+    storeId,
   });
-
-  useEffect(() => {
-    let filterBy = "";
-
-    if (status && storeId) {
-      filterBy = `status:=${status} && storeId:=${storeId}`;
-    }
-    if (status && !storeId) {
-      filterBy = `status:=${status}`;
-    }
-    if (!status && storeId) {
-      filterBy = `storeId:=${storeId}`;
-    }
-
-    setFilterBy(filterBy);
-  }, [status, storeId]);
 
   useEffect(() => {
     if (isLoading) {
@@ -44,12 +27,14 @@ export const useOrdersData = () => {
   }, [isLoading, setIsOrdersLoading]);
 
   useEffect(() => {
-    if (data?.orders) {
-      const modifiedOrders = data.orders.map((order: any) => ({
+    if (data?.orders?.length) {
+      const modifiedOrders = data?.orders?.map((order: any) => ({
         ...order,
         isSelected: false,
       }));
       setOrders(modifiedOrders);
+    } else {
+      setOrders([]);
     }
   }, [data?.orders, setOrders]);
 

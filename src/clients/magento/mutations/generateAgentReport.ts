@@ -13,10 +13,18 @@ export const generateAgentReport = async ({
   agentId,
 }: Params): Promise<string> => {
   try {
-    const res = await axios.magentoClient.get(
-      `/agents/agent_report?deliveryDateStart=${fromDate}&deliveryDateEnd=${toDate}&agentId=${agentId}`,
-    );
-    return res?.data;
+    if (agentId) {
+      const res = await axios.magentoClient.get(
+        `/agents/agent_report?deliveryDateStart=${fromDate}&deliveryDateEnd=${toDate}&agentId=${agentId}`,
+      );
+
+      return res?.data;
+    } else {
+      const res = await axios.magentoClient.get(
+        `/agents/agent_report?deliveryDateStart=${fromDate}&deliveryDateEnd=${toDate}`,
+      );
+      return res?.data;
+    }
   } catch (error) {
     logError(error);
     throw new Error();
