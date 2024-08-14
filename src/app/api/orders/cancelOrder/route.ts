@@ -3,6 +3,7 @@ import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
+import createAuditLog from "@/services/auditing";
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -19,7 +20,7 @@ export const POST = async (request: NextRequest) => {
     await createAuditLog({
       //id: orderId,
       username: "fatima",
-      userid: 123,
+      userid: " 123",
       action: `user canceled order `,
       actionTime: new Date(),
       orderid: orderId,
