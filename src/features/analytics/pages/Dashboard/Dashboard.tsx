@@ -8,7 +8,7 @@ const Dashboard = () => {
       <div className="flex flex-col justify-between">
         <GrossMerchandiseValueChart />
         <NumberOfOrdersChart />
-        {/* <NumberOfUniqueCustomer /> */}
+        <NumberOfUniqueCustomer />
       </div>
     </div>
   );
