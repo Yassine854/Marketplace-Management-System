@@ -4,14 +4,14 @@ import { useMutation } from "@tanstack/react-query";
 import { useOrdersData } from "../../queries/useOrdersData";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
-
+import { useAuth } from "@/features/shared/hooks/useAuth";
 export const useCancelMultipleOrders = () => {
   const { refetch } = useOrdersData();
 
   const { isNoEditUser } = useGlobalStore();
 
   const { refetch: refetchCount } = useGetOrdersCount();
-
+  const { user } = useAuth();
   const { mutate, isPending, mutateAsync } = useMutation({
     mutationFn: async (ordersIds: string[]) => {
       if (isNoEditUser) {
@@ -20,8 +20,10 @@ export const useCancelMultipleOrders = () => {
       }
       return Promise.all(
         ordersIds.map(async (orderId) => {
+          //@ts-ignore
           await axios.servicesClient.post("/api/orders/cancelOrder", {
             orderId,
+            username: user?.username,
           });
         }),
       );
