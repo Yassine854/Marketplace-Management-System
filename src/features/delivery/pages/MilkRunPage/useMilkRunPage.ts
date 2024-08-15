@@ -30,10 +30,6 @@ export const useMilkRunPage = () => {
     setDeliveryAgentName,
   } = useMilkRunStore();
 
-  useEffect(() => {
-    console.log("🚀 ~ useMilkRunPage ~ deliveryDate:", deliveryDate);
-  }, [deliveryDate]);
-
   const { storeId } = useGlobalStore();
 
   const { setOrderOnReviewId } = useOrderDetailsStore();

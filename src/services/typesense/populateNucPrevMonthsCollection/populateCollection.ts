@@ -16,6 +16,7 @@ export const populateCollection = async (request: NextRequest) => {
       .collections("orders")
       .documents()
       .search({ q: "*", sort_by: "createdAt:asc" });
+
     const hit: { document: any }[] = allNucPerMonth.hits || [];
     const { createdAt }: any = hit[0]?.document || {};
     const [currentMonth, currentYear] = dayjs()
@@ -43,8 +44,10 @@ export const populateCollection = async (request: NextRequest) => {
           await createDocument(month, year, uniqueCustomersPerMonth);
         }
       }
+      console.info(
+        `NucPrevMonths Collection successfully populated. Processed ${hit.length} out of ${allNucPerMonth.found} documents.`,
+      );
     }
-    return NextResponse.json({ data: true });
   } catch (error: any) {
     logError(error);
     const message: string = error?.message ?? "";

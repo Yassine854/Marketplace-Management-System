@@ -1,5 +1,5 @@
 import { typesenseClient } from "../typesenseClient";
-import { typesenseOrdersCollectionSchema } from "../schemas/OrdersCollectionSchema";
+import { typesenseOrdersCollectionSchema } from "../schemas/ordersCollection";
 
 import { typesense } from "@/clients/typesense";
 import { initialOrder } from "./initialOrder";

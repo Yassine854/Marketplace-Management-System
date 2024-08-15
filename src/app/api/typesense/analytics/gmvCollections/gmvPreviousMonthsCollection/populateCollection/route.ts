@@ -2,24 +2,24 @@ import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextResponse, type NextRequest } from "next/server";
-import { populateCollection } from "@/services/typesense/populateNucPrevMonthsCollection/populateCollection";
+import { populateCollection } from "@/services/typesense/populateGmvPreviousMonthsCollection/populateCollection";
 
 export const POST = async (request: NextRequest) => {
   try {
-    const isNucCollectionExist = await typesense.isCollectionExist(
-      "NucPreviousMonths",
+    const isGmvMonthsCollectionExist = await typesense.isCollectionExist(
+      "gmvPreviousMonths",
     );
 
-    if (isNucCollectionExist) {
-      populateCollection(request);
+    if (isGmvMonthsCollectionExist) {
+      populateCollection();
       return NextResponse.json({
-        message: "nucPreviousMonths Collection populating ...",
+        message: "gmvPreviousMonths Collection populating ...",
         status: 202,
       });
     }
 
     return NextResponse.json({
-      message: "NucPreviousMonths Collection Doesn't Exist ...",
+      message: "gmvPreviousMonths Collection Doesn't Exist ...",
       status: 409,
     });
   } catch (error: any) {
