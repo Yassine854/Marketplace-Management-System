@@ -1,34 +1,36 @@
+import { auth } from "@/services/auth";
 import { magento } from "@/clients/magento";
 import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
 import { createAuditLog } from "@/services/auditing";
-
+import { prisma } from "@/clients/prisma";
 export const POST = async (request: NextRequest) => {
   try {
-    const { orderId } = await request.json();
-
+    const { orderId, username } = await request.json();
     if (!orderId) {
       return responses.invalidRequest("orderId is Required");
     }
+    if (!username) {
+      return responses.invalidRequest("username is Required");
+    }
 
     await magento.mutations.cancelOrder(orderId);
-
     await typesense.orders.cancelOne(orderId);
-    //@ts-ignore
+
+    const user = await prisma.getUser(username);
+
     await createAuditLog({
-      username: "fatima",
-      userId: " 123",
-      action: `user canceled order `,
+      username: user?.username,
+      userId: user?.id,
+      action: `${username} canceled order`,
       actionTime: new Date(),
       orderId: orderId,
     });
 
     return NextResponse.json(
-      {
-        message: "Order Canceled  Successfully",
-      },
+      { message: "Order Canceled Successfully" },
       { status: 200 },
     );
   } catch (error: any) {

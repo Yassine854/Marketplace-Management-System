@@ -8,7 +8,7 @@ import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
-
+import { useAuth } from "@/features/shared/hooks/useAuth";
 export const useCancelOrder = () => {
   const { refetch } = useOrdersData();
 
@@ -21,15 +21,19 @@ export const useCancelOrder = () => {
   const { refetch: refetchOrder } = useGetOrder(orderOnReviewId);
 
   const { setOrderToCancelId, setOrderUnderActionId } = useOrderActionsStore();
-
+  const { user } = useAuth();
   const { mutate, isPending, mutateAsync, isError } = useMutation({
-    mutationFn: async (orderId: string) => {
+    mutationFn: async (orderId: any) => {
       if (isNoEditUser) {
         toast.error(`Action not allowed`, { duration: 5000 });
         throw new Error();
       }
+      //@ts-ignore
 
-      await axios.servicesClient.post("/api/orders/cancelOrder", { orderId });
+      await axios.servicesClient.post("/api/orders/cancelOrder", {
+        orderId,
+        username: user?.username,
+      });
     },
     onSuccess: () => {
       refetch();
