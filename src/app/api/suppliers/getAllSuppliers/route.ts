@@ -6,7 +6,6 @@ import { getAllSuppliers } from "@/services/supplier/getAllSuppliers";
 export const GET = async (request: NextRequest) => {
   try {
     const suppliers = await getAllSuppliers();
-
     return NextResponse.json(
       {
         message: "success",

@@ -6,7 +6,7 @@ export const useGetNumberOfUniqueCustomerByYearAnalytics = (year: number) => {
     queryKey: ["numberOfUniqueCustomerByYearAnalytics", year],
     queryFn: async () => {
       const { data } = await axios.servicesClient(
-        `/api/analytics/numberOfUniqueCustomer/byYear?year=${year}`,
+        `/api/analytics/nuc/byYear?year=${year}`,
       );
       const list: number[] = [];
       data?.data.map((item: any) => {
