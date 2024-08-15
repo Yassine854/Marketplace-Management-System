@@ -1,6 +1,6 @@
 import { createCollection } from "@/clients/typesense/createCollection";
 import { gmvPreviousMonthsCollectionSchema } from "@/clients/typesense/schemas/gmvPreviousMonthsCollection";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import {
   successResponse,
   conflictResponse,
@@ -8,7 +8,7 @@ import {
   internalServerErrorResponse,
 } from "src/utils/responses/typesenseResponses/CollectionHandlingResponse";
 
-export const GET = async (request: NextRequest) => {
+export const POST = async (request: NextRequest) => {
   const result: any = await createCollection(gmvPreviousMonthsCollectionSchema);
 
   if (result.success) {
