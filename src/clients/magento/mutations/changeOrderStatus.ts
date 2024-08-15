@@ -19,17 +19,6 @@ export const changeOrderStatus = async ({
     };
 
     await axios.magentoClient.put("orders/create", data);
-
-    //@ts-ignore
-    /* await createAuditLog({
-      //id: orderId,
-      username,
-      userId: userId,
-      action: `Changed order status to ${status}`,
-      actionTime: new Date(),
-      orderId: orderId,
-    });
-    console.log("🚀 ~ createAuditLog:", createAuditLog);*/
   } catch (error) {
     logError(error);
     throw new Error();
