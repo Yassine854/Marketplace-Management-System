@@ -7,7 +7,7 @@ import { useDeliveryDatePicker } from "./useDeliveryDatePicker";
 
 // eslint-disable-next-line react/display-name
 const DeliveryDatePicker = forwardRef(
-  ({ onChange, direction = "down" }: any, ref) => {
+  ({ onChange, direction = "down", isReadOnly = false }: any, ref) => {
     const {
       isOpen,
       selected,
@@ -21,7 +21,7 @@ const DeliveryDatePicker = forwardRef(
       <div ref={dropDownRef} className="relative  block w-[180px] ">
         <div
           onClick={() => {
-            toggleCalendar();
+            !isReadOnly && toggleCalendar();
           }}
           className="flex w-full cursor-pointer items-center justify-between gap-2
            rounded-[30px] border border-n30 bg-n0 px-4 py-3 dark:border-n500
