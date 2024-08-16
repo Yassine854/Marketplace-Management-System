@@ -5,6 +5,7 @@ import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/clients/prisma";
 import { createAuditLog } from "@/services/auditing";
+import { getOrder } from "@/services/orders/getOrder";
 export const POST = async (request: NextRequest) => {
   try {
     const { orderId, status, state, username } = await request.json();
@@ -30,18 +31,19 @@ export const POST = async (request: NextRequest) => {
       status,
       state,
     });
-
+    const order = await getOrder(orderId);
     const user = await prisma.getUser(username);
     if (!user) {
       return responses.invalidRequest("User not found");
     }
 
     await createAuditLog({
-      username: user?.username,
-      userId: user?.id,
-      action: `${username} change order status to ${status} `,
+      username: user?.username ?? "",
+      userId: user?.id ?? "",
+      action: `${username} changed order status to ${status}`,
       actionTime: new Date(),
       orderId: orderId,
+      storeId: order?.storeId,
     });
 
     return NextResponse.json(
