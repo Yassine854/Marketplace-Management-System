@@ -32,14 +32,13 @@ export const gmvByMonth = async (year: number, month: number) => {
     const hits = searchResults.hits || [];
     //@ts-ignore
     allOrders = hits.map((hit) => hit.document.gmv);
+    const data: DataType[] = monthDays.map((day, index) => ({
+      day,
+      gmv: allOrders[index] || 0,
+    }));
+
+    return data;
   } catch (error: any) {
     logError(error);
   }
-
-  const data: DataType[] = monthDays.map((day, index) => ({
-    day,
-    gmv: allOrders[index] || 0,
-  }));
-
-  return data;
 };
