@@ -3,13 +3,17 @@ import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
-
+import { prisma } from "@/clients/prisma";
+import { createAuditLog } from "@/services/auditing";
 export const PUT = async (request: NextRequest) => {
   try {
-    const { order } = await request.json();
+    const { order, username } = await request.json();
 
     if (!order) {
       return responses.invalidRequest("order is Required");
+    }
+    if (!username) {
+      return responses.invalidRequest("username is Required");
     }
 
     const { total, orderId, items, deliveryDate } = order;
@@ -27,11 +31,11 @@ export const PUT = async (request: NextRequest) => {
       orderId,
       deliveryDate,
     });
-    //@ts-ignore
+    const user = await prisma.getUser(username);
     await createAuditLog({
-      username: "fatima",
-      userId: " 123",
-      action: `user edit order `,
+      username: user?.username,
+      userId: user?.id,
+      action: `${username} edit order `,
       actionTime: new Date(),
       orderId: orderId,
     });
