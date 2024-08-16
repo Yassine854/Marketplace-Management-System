@@ -80,7 +80,7 @@ const Sidebar = ({
             validOrdersCount={validOrdersCount}
             onSubMenuItemClick={onOrderStatusClick}
             isActive={
-              pathname?.includes("order") && !pathname?.includes("logs")
+              pathname?.includes("order") && !pathname?.includes("audit-trail")
             }
           />
 
@@ -152,15 +152,29 @@ const Sidebar = ({
 
           {isAdmin && (
             <>
-              <SidebarButton
+              {/* <SidebarButton
                 name="Audit Trail"
                 icon={<IconList />}
                 onClick={() => {
                   push("/audit-trail");
                 }}
                 isActive={pathname?.includes("audit")}
+              /> */}
+              <SidebarSubMenu
+                icon={<IconMap2 />}
+                name={"Audit Trail"}
+                onClick={() => {
+                  push("/audit-trail/orders-audit-trail");
+                }}
+                isActive={pathname?.includes("audit-trail")}
+                items={[
+                  { name: "Orders", path: "/audit-trail/orders-audit-trail" },
+                  {
+                    name: "Milk Run",
+                    path: "/audit-trail/milkrun-audit-trail",
+                  },
+                ]}
               />
-
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
             </>
           )}
