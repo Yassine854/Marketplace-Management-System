@@ -1,7 +1,6 @@
 import {
   IconX,
   IconBell,
-  IconList,
   IconMap2,
   IconUsers,
   IconReport,
@@ -18,8 +17,8 @@ import SidebarOrdersSubMenu from "@/features/shared/elements/SidebarElements/Sid
 
 const Sidebar = ({
   isAdmin,
-  isNoEditUser,
   setSidebar,
+  isNoEditUser,
   sidebarIsOpen,
   onOrderStatusClick,
 }: any) => {
@@ -152,14 +151,6 @@ const Sidebar = ({
 
           {isAdmin && (
             <>
-              {/* <SidebarButton
-                name="Audit Trail"
-                icon={<IconList />}
-                onClick={() => {
-                  push("/audit-trail");
-                }}
-                isActive={pathname?.includes("audit")}
-              /> */}
               <SidebarSubMenu
                 icon={<IconMap2 />}
                 name={"Audit Trail"}
