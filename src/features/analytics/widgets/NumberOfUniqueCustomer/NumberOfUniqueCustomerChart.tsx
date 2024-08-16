@@ -2,19 +2,64 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import Loading from "@/features/shared/elements/Loading";
 import YearPicker from "../YearPicker";
-import { useGetNumberOfUniqueCustomerByYearAnalytics } from "../../hooks/useGetNumberOfUniqueCustomerByYear";
+import { useGetNumberOfUniqueCustomerByYearAnalytics } from "../../hooks/useGetNucByYear";
+import ChartFilterSelector from "../ChartFilterSelector";
+import { useGetNucLifetime } from "../../hooks/useGetNucLifetime";
+
+export const options = [
+  { name: "By Year", key: "year" },
+  { name: "Lifetime", key: "lifetime" },
+];
 
 const NumberOfUniqueCustomerChart = () => {
   const [date, setDate] = useState(`${new Date().getFullYear()}-01-01`);
   const year = Number(date);
-  const { data, isLoading } = useGetNumberOfUniqueCustomerByYearAnalytics(year);
+  const [selected, setSelected] = useState(options[0]);
   const [chartData, setChartData] = useState<number[]>([]);
+  const [xAxis, setXAxis] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    data: yearData,
+    isLoading: isYearLoading,
+    refetch: refetchYear,
+  } = useGetNumberOfUniqueCustomerByYearAnalytics(year);
+
+  const {
+    data: lifetimeData,
+    isLoading: isLifetimeLoading,
+    refetch: refetchLifetime,
+  } = useGetNucLifetime();
+
   useEffect(() => {
-    console.log(data);
-    if (data) {
-      setChartData(data);
+    if (selected.key === "lifetime" && lifetimeData) {
+      const yAxis = lifetimeData?.map((item: any) => parseInt(item.nuc));
+      setChartData(yAxis);
+      const xAxis = lifetimeData?.map((item: any) => item.quarter);
+      setXAxis(xAxis);
+      refetchLifetime();
     }
-  }, [data]);
+  }, [lifetimeData, selected, refetchLifetime]);
+
+  useEffect(() => {
+    if (selected.key === "year" && yearData) {
+      const yAxis = yearData?.map((item: any) => parseInt(item.nuc));
+      setChartData(yAxis);
+
+      const xAxis = yearData?.map((item: any) => item.month);
+
+      setXAxis(xAxis);
+      refetchYear();
+    }
+  }, [selected, yearData, year, refetchYear]);
+
+  useEffect(() => {
+    if (isYearLoading || isLifetimeLoading) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [isYearLoading, isLifetimeLoading]);
 
   const ReactApexChart = dynamic(() => import("react-apexcharts"), {
     ssr: false,
@@ -22,23 +67,7 @@ const NumberOfUniqueCustomerChart = () => {
 
   const chartOptions = {
     xaxis: {
-      categories:
-        year === 2020
-          ? ["Aug", "Sep", "Oct", "Nov", "Dec"]
-          : [
-              "Jan",
-              "Feb",
-              "Mar",
-              "Apr",
-              "May",
-              "Jun",
-              "Jul",
-              "Aug",
-              "Sep",
-              "Oct",
-              "Nov",
-              "Dec",
-            ],
+      categories: xAxis,
     },
   };
 
@@ -54,11 +83,20 @@ const NumberOfUniqueCustomerChart = () => {
       <div className=" bb-dashed mb-4 flex flex-wrap items-center justify-between gap-3 pb-4 lg:mb-6 lg:pb-6">
         <div className="flex items-center justify-center ">
           <div className=" mx-4 h-8 w-8 items-center justify-center ">
-            {/* {isLoading && <Loading />} */}
+            {isLoading && <Loading />}
           </div>
           <p className="text-2xl font-bold">Number of Unique Customer </p>
         </div>
-        <YearPicker onYearChange={(date: string) => setDate(date)} />
+        <div className="flex flex-row">
+          {selected.key == "year" && (
+            <YearPicker onYearChange={(date: string) => setDate(date)} />
+          )}
+          <ChartFilterSelector
+            selected={selected}
+            onSelect={setSelected}
+            items={options}
+          />
+        </div>
       </div>
       <div className="h-[320px]">
         <ReactApexChart
