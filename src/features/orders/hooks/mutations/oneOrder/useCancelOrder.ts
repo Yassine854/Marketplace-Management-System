@@ -29,9 +29,9 @@ export const useCancelOrder = () => {
         throw new Error();
       }
       //@ts-ignore
-
       await axios.servicesClient.post("/api/orders/cancelOrder", {
         orderId,
+        //@ts-ignore
         username: user?.username,
       });
     },

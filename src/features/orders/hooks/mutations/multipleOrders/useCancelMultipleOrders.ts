@@ -23,6 +23,7 @@ export const useCancelMultipleOrders = () => {
           //@ts-ignore
           await axios.servicesClient.post("/api/orders/cancelOrder", {
             orderId,
+            //@ts-ignore
             username: user?.username,
           });
         }),
