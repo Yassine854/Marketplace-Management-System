@@ -22,20 +22,23 @@ const NumberOfUniqueCustomerChart = () => {
 
   const chartOptions = {
     xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      categories:
+        year === 2020
+          ? ["Aug", "Sep", "Oct", "Nov", "Dec"]
+          : [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec",
+            ],
     },
   };
 

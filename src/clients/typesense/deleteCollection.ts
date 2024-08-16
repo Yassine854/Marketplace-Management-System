@@ -1,15 +1,11 @@
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
+import { isCollectionExist } from "./isCollectionExist";
 
 export const deleteCollection = async (
   collectionName: string,
 ): Promise<any> => {
   try {
-    const collections = await typesenseClient.collections().retrieve();
-    const collectionExists = collections.some(
-      (collection: any) => collection.name === collectionName,
-    );
-
-    if (!collectionExists) {
+    if (!isCollectionExist(collectionName)) {
       throw new Error(`Collection "${collectionName}" does not exist.`);
     }
 

@@ -10,7 +10,7 @@ export const useGetNumberOfUniqueCustomerByYearAnalytics = (year: number) => {
       );
       const list: number[] = [];
       data?.data.map((item: any) => {
-        list.push(item.NumberOfUniqueCustomer);
+        list.push(item.nuc);
       });
       return list;
     },
