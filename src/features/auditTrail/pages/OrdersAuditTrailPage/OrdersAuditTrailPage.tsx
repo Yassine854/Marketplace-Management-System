@@ -1,29 +1,31 @@
-import OrdersTable from "../../tables/OrdersAuditTrailTable";
+import Table from "../../tables/OrdersAuditTrailTable";
 import Pagination from "../../widgets/Pagination";
-//import AnyMatchingResults from "../../widgets/AnyMatchingResults";
-//import { useOrdersData } from "../../hooks/queries/useOrdersData";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
 
-const logs = [
+const trails = [
   {
+    id: "1",
     username: "admin",
     orderId: "12342134",
     time: "2024-12-02",
     action: "cancel",
   },
   {
+    id: "2",
     username: "admin",
     orderId: "12342134",
     time: "2024-12-02",
     action: "cancel",
   },
   {
+    id: "3",
     username: "admin",
     orderId: "12342134",
     time: "2024-12-02",
     action: "cancel",
   },
   {
+    id: "4",
     username: "admin",
     orderId: "12342134",
     time: "2024-12-02",
@@ -39,11 +41,11 @@ const OrdersPage = () => {
       </div>
       <Divider />
       <div className="    relative  flex w-full  flex-grow flex-col overflow-y-scroll  bg-n10 px-3 pb-24">
-        <OrdersTable />
+        <Table trails={trails} isLoading={false} />
       </div>
       <Divider />
       <div className=" flex  w-full items-center justify-center bg-n0 ">
-        <Pagination />
+        <Pagination numberOfItems={10000} />
       </div>
     </div>
   );

@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
-import { useOrdersData } from "@/features/orders/hooks";
-import { useOrdersTableStore } from "@/features/orders/stores/ordersTableStore";
+import { useOrdersAuditTrailTableStore } from "../../stores/ordersAuditTrailTableStore";
 
-export const useOrdersPagination = () => {
+export const usePagination = (totalItems: number) => {
   const [endIndex, setEndIndex] = useState(0);
   const [startIndex, setStartIndex] = useState(0);
 
-  const { totalOrders: totalItems } = useOrdersData();
-
-  const { currentPage, itemsPerPage } = useOrdersTableStore();
+  const { currentPage, itemsPerPage } = useOrdersAuditTrailTableStore();
 
   useEffect(() => {
     setEndIndex(Math.min(startIndex + itemsPerPage - 1, totalItems - 1));
