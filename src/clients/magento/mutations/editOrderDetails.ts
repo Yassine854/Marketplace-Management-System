@@ -1,12 +1,15 @@
 import { axios } from "@/libs/axios";
 import { logError } from "@/utils/logError";
 import { convertIsoDate2MagentoDate } from "@/utils/date/convertIsoDate2MagentoDate";
+import { createAuditLog } from "@/services/auditing";
 
 export const editOrderDetails = async ({
   orderId,
   deliveryDate,
   items,
   total,
+  userId,
+  username,
 }: any): Promise<any> => {
   try {
     const magentoItems = items?.map((item: any) => {
@@ -26,7 +29,18 @@ export const editOrderDetails = async ({
         },
       },
     };
+    /*console.log("🚀 ~ data:", data);
+
     await axios.magentoClient.put("orders/create", data);
+    //@ts-ignore
+    await createAuditLog({
+      username,
+      userId: userId,
+      action: `edit order `,
+      actionTime: new Date(),
+
+      orderId: orderId,
+    });*/
   } catch (error) {
     logError(error);
     throw new Error();

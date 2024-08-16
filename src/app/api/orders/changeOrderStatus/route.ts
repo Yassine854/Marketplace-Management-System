@@ -3,10 +3,11 @@ import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
-
+import { prisma } from "@/clients/prisma";
+import { createAuditLog } from "@/services/auditing";
 export const POST = async (request: NextRequest) => {
   try {
-    const { orderId, status, state } = await request.json();
+    const { orderId, status, state, username } = await request.json();
 
     if (!orderId) {
       return responses.invalidRequest("orderId is Required");
@@ -18,6 +19,9 @@ export const POST = async (request: NextRequest) => {
     if (!state) {
       return responses.invalidRequest("state is Required");
     }
+    if (!username) {
+      return responses.invalidRequest("username is Required");
+    }
 
     await magento.mutations.changeOrderStatus({ orderId, status, state });
 
@@ -25,6 +29,19 @@ export const POST = async (request: NextRequest) => {
       orderId,
       status,
       state,
+    });
+
+    const user = await prisma.getUser(username);
+    if (!user) {
+      return responses.invalidRequest("User not found");
+    }
+
+    await createAuditLog({
+      username: user?.username,
+      userId: user?.id,
+      action: `${username} change order status to ${status} `,
+      actionTime: new Date(),
+      orderId: orderId,
     });
 
     return NextResponse.json(

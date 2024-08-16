@@ -4,14 +4,14 @@ import { useMutation } from "@tanstack/react-query";
 import { useOrdersData } from "../../queries/useOrdersData";
 import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
-
+import { useAuth } from "@/features/shared/hooks/useAuth";
 export const useChangeMultipleOrdersStatuses = () => {
   const { refetch } = useOrdersData();
 
   const { refetch: refetchCount } = useGetOrdersCount();
 
   const { isNoEditUser } = useGlobalStore();
-
+  const { user } = useAuth();
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ ordersIds, status, state }: any) => {
       if (isNoEditUser) {
@@ -25,6 +25,8 @@ export const useChangeMultipleOrdersStatuses = () => {
             orderId,
             status,
             state,
+            //@ts-ignore
+            username: user?.username,
           });
         }),
       );
