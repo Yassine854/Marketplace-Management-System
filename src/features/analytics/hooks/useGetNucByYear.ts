@@ -2,22 +2,19 @@ import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetNumberOfUniqueCustomerByYearAnalytics = (year: number) => {
-  const { isLoading, data } = useQuery({
+  const { isLoading, data, refetch } = useQuery({
     queryKey: ["numberOfUniqueCustomerByYearAnalytics", year],
     queryFn: async () => {
       const { data } = await axios.servicesClient(
         `/api/analytics/nuc/byYear?year=${year}`,
       );
-      const list: number[] = [];
-      data?.data.map((item: any) => {
-        list.push(item.nuc);
-      });
-      return list;
+      return data?.data;
     },
   });
 
   return {
     data,
+    refetch,
     isLoading,
   };
 };
