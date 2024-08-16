@@ -17,6 +17,8 @@ describe("Orders Page ", () => {
 
   it("searches by delivery agent", () => {});
 
+  it("searches by order items products names", () => {});
+
   it("sorts by newest (default)", () => {});
 
   it("sorts by oldest", () => {});
