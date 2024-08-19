@@ -5,7 +5,7 @@ import GrossMerchandiseValueChart from "../../charts/GrossMerchandiseValueChart"
 const Dashboard = () => {
   return (
     <div className="mt-[4.8rem] w-full bg-n20 p-4">
-      <div className="flex flex-col justify-between">
+      <div className="flex h-[1600px] flex-col justify-evenly">
         <GrossMerchandiseValueChart />
         <NumberOfOrdersChart />
         <NumberOfUniqueCustomer />

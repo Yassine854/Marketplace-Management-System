@@ -1,4 +1,3 @@
-import { auth } from "@/services/auth";
 import { magento } from "@/clients/magento";
 import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
@@ -6,6 +5,7 @@ import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
 import { createAuditLog } from "@/services/auditing";
 import { prisma } from "@/clients/prisma";
+import { getOrder } from "@/services/orders/getOrder";
 export const POST = async (request: NextRequest) => {
   try {
     const { orderId, username } = await request.json();
@@ -20,13 +20,15 @@ export const POST = async (request: NextRequest) => {
     await typesense.orders.cancelOne(orderId);
 
     const user = await prisma.getUser(username);
+    const order = await getOrder(orderId);
 
     await createAuditLog({
-      username: user?.username,
-      userId: user?.id,
+      username: user?.username ?? "",
+      userId: user?.id ?? "",
       action: `${username} canceled order`,
       actionTime: new Date(),
       orderId: orderId,
+      storeId: order?.storeId,
     });
 
     return NextResponse.json(

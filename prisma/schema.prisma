@@ -17,12 +17,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-model AuditLog {
+model OrdersAuditTrail {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   username  String
   userId    String 
   action    String
   actionTime DateTime @default(now())
   orderId   String
-  
+  storeId String
 }

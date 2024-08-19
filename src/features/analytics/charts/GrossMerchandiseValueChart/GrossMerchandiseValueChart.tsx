@@ -102,7 +102,7 @@ const GrossMerchandiseValueChart = () => {
   }, [isMonthLoading, isYearLoading, isLifetimeLoading]);
 
   return (
-    <div className="box min-h-92 col-span-12 mb-12 w-full overflow-x-hidden shadow-xl lg:col-span-6">
+    <div className="box min-h-92 col-span-12 w-full overflow-x-hidden shadow-xl lg:col-span-6">
       <div className=" bb-dashed mb-4 flex flex-wrap items-center justify-between gap-3 pb-4 lg:mb-6 lg:pb-6">
         <div className="flex items-center justify-center ">
           <div className=" mx-4 h-8 w-8 items-center justify-center ">

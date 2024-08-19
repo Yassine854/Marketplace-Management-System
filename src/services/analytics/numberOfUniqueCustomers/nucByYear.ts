@@ -1,46 +1,57 @@
-import { responses } from "@/utils/responses";
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import { logError } from "@/utils/logError";
-import dayjs from "dayjs";
-import { nucByMonth } from "./nucByMonth";
-import { unixTimestampToDateDMY } from "@/utils/date/unixTimestamp";
+import { NextResponse } from "next/server";
 
-export const nucByYear = async (date: string) => {
+export const nucByYear = async (year: string) => {
   try {
-    const paramYear = Number(date);
+    const nucData: any[] = [];
+    let allOrders: any[] = [];
 
-    const FirstOrder = await typesenseClient
-      .collections("orders")
-      .documents()
-      .search({ q: "*", sort_by: "createdAt:asc" });
+    try {
+      const searchParams = {
+        filter_by: `year:=${year}`,
+        q: "*",
+        query_by: "year,month",
+        page: 1,
+        per_page: 250,
+      };
 
-    const hit = FirstOrder.hits || [];
+      const searchResults: any = await typesenseClient
+        .collections("NucPreviousMonths")
+        .documents()
+        .search(searchParams);
 
-    const { createdAt }: any = hit[0]?.document;
+      const hits = searchResults.hits || [];
+      allOrders = hits.map((hit: any) => hit.document);
 
-    const [currentMonth, currentYear] = dayjs()
-      .format("MM YYYY")
-      .split(" ")
-      .map(Number);
-    const [startDay, startMonth, startYear] = unixTimestampToDateDMY(createdAt)
-      .split("/")
-      .map(Number);
-
-    const result: any[] = [];
-
-    for (let month = 1; month <= 12; month++) {
-      if (
-        (paramYear === currentYear && month >= currentMonth) ||
-        (paramYear === startYear && month < startMonth)
-      ) {
-        continue;
-      }
-      const numberOfUniqueCustomer = await nucByMonth(`${paramYear}-${month}`);
-      result.push(numberOfUniqueCustomer);
+      // Sort the orders by month to maintain the correct order
+      allOrders.sort(
+        (a, b) =>
+          new Date(`${a.month} 1, ${a.year}`).getTime() -
+          new Date(`${b.month} 1, ${b.year}`).getTime(),
+      );
+    } catch (error: any) {
+      logError(error);
     }
-    return result;
-  } catch (error) {
-    logError(error);
-    return responses.internalServerError();
+
+    // Create an array of data with month and corresponding GMV
+    allOrders.forEach((order) => {
+      nucData.push({
+        month: order.month,
+        nuc: order.nuc,
+      });
+    });
+
+    return nucData;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logError(`Error fetching GMV per year data: ${error.message}`);
+    } else {
+      logError("Unknown error fetching GMV per year data");
+    }
+    return NextResponse.json(
+      { error: "Failed to fetch data" },
+      { status: 500 },
+    );
   }
 };

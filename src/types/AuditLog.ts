@@ -1,7 +1,8 @@
 export type AuditLog = {
-  username: string | undefined;
-  userId: string | undefined;
+  username: string;
+  userId: string;
   action: string;
   actionTime: Date;
   orderId: string;
+  storeId: string;
 };
