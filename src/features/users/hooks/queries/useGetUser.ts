@@ -14,6 +14,7 @@ export const useGetUser = () => {
       const { data } = await axios.servicesClient(
         `/api/users/getUser?username=${username}`,
       );
+      console.log("🚀 ~ queryFn: ~ data:", data);
       return data;
     },
   });
