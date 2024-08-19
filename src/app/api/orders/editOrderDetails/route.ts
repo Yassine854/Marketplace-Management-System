@@ -5,6 +5,7 @@ import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/clients/prisma";
 import { createAuditLog } from "@/services/auditing";
+import { getOrder } from "@/services/orders/getOrder";
 export const PUT = async (request: NextRequest) => {
   try {
     const { order, username } = await request.json();
@@ -31,13 +32,15 @@ export const PUT = async (request: NextRequest) => {
       orderId,
       deliveryDate,
     });
+    const orderObject = await getOrder(orderId);
     const user = await prisma.getUser(username);
     await createAuditLog({
-      username: user?.username,
-      userId: user?.id,
-      action: `${username} edit order `,
+      username: user?.username ?? "",
+      userId: user?.id ?? "",
+      action: `${username} edit order`,
       actionTime: new Date(),
       orderId: orderId,
+      storeId: orderObject?.storeId,
     });
     return NextResponse.json(
       {
