@@ -38,5 +38,5 @@ model MilkRunAuditTrail {
   storeId String
   agentId String
   agentName String
-  deliveryDate DateTime
+  deliveryDate String
 }
