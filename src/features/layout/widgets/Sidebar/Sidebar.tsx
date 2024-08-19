@@ -1,7 +1,6 @@
 import {
   IconX,
   IconBell,
-  IconList,
   IconMap2,
   IconUsers,
   IconReport,
@@ -18,8 +17,8 @@ import SidebarOrdersSubMenu from "@/features/shared/elements/SidebarElements/Sid
 
 const Sidebar = ({
   isAdmin,
-  isNoEditUser,
   setSidebar,
+  isNoEditUser,
   sidebarIsOpen,
   onOrderStatusClick,
 }: any) => {
@@ -80,7 +79,7 @@ const Sidebar = ({
             validOrdersCount={validOrdersCount}
             onSubMenuItemClick={onOrderStatusClick}
             isActive={
-              pathname?.includes("order") && !pathname?.includes("logs")
+              pathname?.includes("order") && !pathname?.includes("audit-trail")
             }
           />
 
@@ -152,15 +151,21 @@ const Sidebar = ({
 
           {isAdmin && (
             <>
-              <SidebarButton
-                name="Audit Trail"
-                icon={<IconList />}
+              <SidebarSubMenu
+                icon={<IconMap2 />}
+                name={"Audit Trail"}
                 onClick={() => {
-                  push("/audit-trail");
+                  push("/audit-trail/orders-audit-trail");
                 }}
-                isActive={pathname?.includes("audit")}
+                isActive={pathname?.includes("audit-trail")}
+                items={[
+                  { name: "Orders", path: "/audit-trail/orders-audit-trail" },
+                  {
+                    name: "Milk Run",
+                    path: "/audit-trail/milkrun-audit-trail",
+                  },
+                ]}
               />
-
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
             </>
           )}
