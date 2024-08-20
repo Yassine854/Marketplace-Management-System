@@ -6,11 +6,34 @@ import PasswordInput from "@/features/shared/inputs/PasswordInput";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useEditUserForm } from "../../hooks/useEditUserForm";
 
+import { Switch } from "@nextui-org/switch";
+import { useEffect, useState } from "react";
+import { useEditUserStatus } from "../../hooks/mutations/useEditUserStatus";
+
 const EditUserForm = () => {
   const { navigateToUsersTable, navigateBack } = useNavigation();
 
   const { handleSubmit, register, setValue, errors, isLoading, user } =
     useEditUserForm();
+
+  const { editUserStatus, isPending } = useEditUserStatus();
+  const [isSelected, setIsSelected] = useState(user?.isActive);
+
+  useEffect(() => {
+    if (!user?.isActive && isSelected) {
+      editUserStatus({
+        username: user?.username,
+        status: "active",
+      });
+    }
+
+    if (user?.isActive && !isSelected) {
+      editUserStatus({
+        username: user?.username,
+        status: "inactive",
+      });
+    }
+  }, [isSelected, user, editUserStatus]);
 
   if (isLoading) {
     return <div>Loading... </div>;
@@ -24,8 +47,10 @@ const EditUserForm = () => {
         <div className="box w-full min-w-[800px]  xl:p-8">
           <div className="bb-dashed mb-6 flex items-center  pb-6">
             <GoBackArrow onClick={navigateBack} />
+
             <p className="ml-4 text-xl font-bold">Edit User</p>
           </div>
+
           <div className="box mb-6 grid grid-cols-2 gap-4 bg-primary/5 dark:bg-bg3 md:p-4 xl:p-6 xxxl:gap-6">
             <div className="">
               <p className="text-xl  font-medium">Username :</p>
@@ -65,8 +90,8 @@ const EditUserForm = () => {
             />
           </div>
 
-          <div className="mt-6">
-            <div className="mt-7 flex gap-4 lg:mt-10">
+          <div className=" flex  h-12 items-center justify-between">
+            <div className=" flex gap-4 ">
               {!isLoading && (
                 <button type="submit" className="btn px-4 hover:shadow-none">
                   Edit
@@ -80,6 +105,16 @@ const EditUserForm = () => {
               >
                 Cancel
               </button>
+            </div>
+            <div className="flex">
+              <p className="mr-4 font-bold">
+                {user?.isActive ? "Active" : "Inactive"}
+              </p>
+              <Switch
+                color="primary"
+                isSelected={isSelected}
+                onValueChange={setIsSelected}
+              />
             </div>
           </div>
         </div>
