@@ -1,13 +1,12 @@
+import { auth } from "@/services/auth";
+import { NextResponse } from "next/server";
+import createIntlMiddleware from "next-intl/middleware";
 import { AllLocales, AppConfig } from "./utils/AppConfig";
 
-import { NextResponse } from "next/server";
-import { auth } from "@/services/auth";
-import createIntlMiddleware from "next-intl/middleware";
-
 const adminRoutes = [
-  "/logs/orders-logs",
   "/access/roles",
   "/access/users",
+  "/logs/orders-logs",
   "/logs/activities-logs",
 ];
 
@@ -20,11 +19,16 @@ const intlMiddleware = createIntlMiddleware({
 const middleware = auth((req: any) => {
   const session = req?.auth;
 
+  const isAdmin = session?.user?.roleId === "1";
+
   const isLoginPage = req.nextUrl.pathname.includes("/login");
-  const isAdmin = session?.user?.roleCode === "ADMIN";
 
   if (!session && !isLoginPage) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
+  }
+
+  if (session && isLoginPage) {
+    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
 
   if (session && !isAdmin && adminRoutes.includes(req.nextUrl.pathname)) {

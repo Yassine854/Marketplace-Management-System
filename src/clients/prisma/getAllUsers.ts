@@ -1,0 +1,13 @@
+import { prismaClient } from "./prismaClient";
+
+export const getAllUsers = async () => {
+  try {
+    const users = await prismaClient.user.findMany();
+    if (!users) {
+      throw new Error();
+    }
+    return users;
+  } catch (err) {
+    console.error("Get Prisma All Users Error ", err);
+  }
+};

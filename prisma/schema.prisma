@@ -7,25 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Role {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  code        String   @unique
-  name        String
-  permissions String[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
 model User {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  username      String   @unique
-  email         String?
-  firstName     String
-  lastName      String
-  password      String
-  status        String
-  warehouseCode String
-  roleCode      String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  username  String   @unique
+  firstName String
+  lastName  String
+  password  String
+  roleId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model OrdersAuditTrail {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  username  String
+  userId    String 
+  action    String
+  actionTime DateTime @default(now())
+  orderId   String
+  storeId String
 }

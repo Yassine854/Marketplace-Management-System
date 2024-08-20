@@ -1,3 +1,3 @@
 "use client";
 
-export { default } from "@/components/pages/OrderDetailsPage";
+export { default } from "@/features/orders/pages/OrderDetailsPage";

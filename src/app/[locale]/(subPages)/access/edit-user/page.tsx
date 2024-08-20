@@ -1,3 +1,3 @@
 "use client";
 
-export { default } from "@/components/pages/CreateUserPage";
+export { default } from "@/features/users/pages/EditUserPage";

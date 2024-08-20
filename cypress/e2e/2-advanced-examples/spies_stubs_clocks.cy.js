@@ -24,9 +24,7 @@ context("Spies, Stubs, and Clock", () => {
        * Prints the argument passed
        * @param x {any}
        */
-      foo(x) {
-        console.log("obj.foo called with", x);
-      },
+      foo(x) {},
     };
 
     cy.spy(obj, "foo").as("foo");
@@ -52,9 +50,7 @@ context("Spies, Stubs, and Clock", () => {
        * @param a {string}
        * @param b {string}
        */
-      foo(a, b) {
-        console.log("a", a, "b", b);
-      },
+      foo(a, b) {},
     };
 
     const stub = cy.stub(obj, "foo").as("foo");
@@ -89,7 +85,7 @@ context("Spies, Stubs, and Clock", () => {
     cy.get("#tick-div").click();
     cy.get("#tick-div").should("have.text", "1489449600");
 
-    cy.tick(10000); // 10 seconds passed
+    cy.tick(180000); // 10 seconds passed
     cy.get("#tick-div").click();
     cy.get("#tick-div").should("have.text", "1489449610");
   });

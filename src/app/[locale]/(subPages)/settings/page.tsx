@@ -1,4 +1,4 @@
-import Box from "@/components/layouts/Box";
+import Box from "@/features/layout/Box";
 
 const Notifications = () => {
   return <Box title="Settings"></Box>;

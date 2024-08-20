@@ -1,10 +1,3 @@
-import MilkRun from "@/components/widgets/MilkRun";
-const MilkRunPage = () => {
-  return (
-    <>
-      <MilkRun />
-    </>
-  );
-};
+"use client";
 
-export default MilkRunPage;
+export { default } from "@/features/delivery/pages/MilkRunPage";

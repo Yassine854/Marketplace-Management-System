@@ -1,2 +1,2 @@
 "use client";
-export { default } from "@/components/pages/OrdersPage";
+export { default } from "@/features/orders/pages/OrdersPage";

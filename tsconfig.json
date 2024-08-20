@@ -25,12 +25,14 @@
       "@/*": ["./src/*"],
       "@/public/*": ["./public/*"],
       "@/utils*": ["./src/utils/*"],
-      "@/hooks*": ["./src/hooks/*"],
+      "@/hooks*": ["src/features/shared/hooks/*"],
+      "@/shared*": ["src/features/shared/*"],
       "@/types*": ["./src/types/*"],
-      "@/libs*": ["./src/libs/*"],
+      "@/libs*": ["src/libs/*"],
       "@/services*": ["./src/services/*"],
-      "@/components*": ["./src/components/*"],
-      "@/stores*": ["./src/stores/*"]
+      "@/stores*": ["./src/stores/*"],
+      "@/clients*": ["./src/clients/*"],
+      "@/features*": ["./src/features/*"]
     }
   },
   "include": [
@@ -38,11 +40,14 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/components/widgets/Sidebar/Sidebar.test.jsx",
-    "src/libs/typesense/typesenseClient.ts",
-    "src/hooks/queries/useGetOrders.ts",
+    "src/features/layout/widgets/Sidebar/Sidebar.test.jsx",
+    "src/clients/typesense/typesenseClient.ts",
+    "src/features/orderManagement/hooks/queries/useGetManyOrders.ts",
     "src/services/auth/auth.js",
-    ".next/types/app/[locale]/(subPages)/access/user/page.tsx"
+    ".next/types/app/[locale]/(subPages)/access/user/page.tsx",
+    "src/services/analytics/numberOfOrders/numberOfOrdersByMonthAnalytics",
+    "src/services/analytics/numberOfOrders/numberOfOrdersByQuarterAnalytics",
+    "src/services/analytics/numberOfOrders/numberOfOrdersLifetimeAnalytics"
   ],
 
   "exclude": [

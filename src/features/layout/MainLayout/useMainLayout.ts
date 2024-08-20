@@ -1,0 +1,125 @@
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/features/shared/hooks/useAuth";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
+import { useUsersStore } from "@/features/users/stores/usersStore";
+import { useOrdersStore } from "@/features/orders/stores/ordersStore";
+import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
+import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
+
+//To Refactor
+export const useMainLayout = () => {
+  const {
+    storeId,
+    setStoreId,
+    setIsAdmin,
+    setIsNoEditUser,
+    setIsMultipleStoreAccessUser,
+  } = useGlobalStore();
+
+  const { user } = useAuth();
+
+  const pathname = usePathname();
+
+  const { setStatus } = useOrdersStore();
+
+  const { navigateToOrders } = useNavigation();
+
+  const { setIsInEditMode } = useOrderDetailsStore();
+
+  const { setUserOnReviewUsername } = useUsersStore();
+
+  const { setSelectedAction } = useOrderActionsStore();
+
+  const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
+
+  const { isAdmin, isNoEditUser, isMultipleStoreAccessUser } = useGlobalStore();
+
+  useEffect(() => {
+    //@ts-ignore
+    if (user?.roleId !== "5") {
+      setIsNoEditUser(false);
+      setIsMultipleStoreAccessUser(false);
+    }
+  }, [storeId, setIsMultipleStoreAccessUser, user, setIsNoEditUser]);
+
+  useEffect(() => {
+    //@ts-ignore
+    if (user?.roleId !== "1") {
+      setIsAdmin(false);
+    }
+  }, [storeId, setIsAdmin, user]);
+
+  useEffect(() => {
+    //@ts-ignore
+    switch (user?.roleId) {
+      case "1":
+        setIsAdmin(true);
+
+        break;
+
+      case "5":
+        setIsNoEditUser(true);
+        setIsMultipleStoreAccessUser(true);
+        break;
+
+      case "2":
+        break;
+
+      case "3":
+        break;
+
+      case "4":
+        break;
+    }
+  }, [
+    user,
+    setStoreId,
+    setIsAdmin,
+    setIsMultipleStoreAccessUser,
+    setIsNoEditUser,
+  ]);
+
+  useEffect(() => {
+    if (pathname !== "/en/order-details") {
+      setIsInEditMode(false);
+      setSelectedAction({});
+    }
+    if (pathname !== "/en/access/edit-user") {
+      setUserOnReviewUsername("");
+    }
+    //NO More Dependencies !!
+  }, [pathname]);
+
+  useEffect(() => {
+    if (window.innerWidth > 1400) {
+      setSidebarIsOpen(true);
+    } else {
+      setSidebarIsOpen(false);
+    }
+    const handleResize = () => {
+      if (window.innerWidth < 1400) {
+        setSidebarIsOpen(false);
+      } else {
+        setSidebarIsOpen(true);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  return {
+    isAdmin,
+    setStatus,
+    isNoEditUser,
+    sidebarIsOpen,
+    navigateToOrders,
+    setSidebarIsOpen,
+    isMultipleStoreAccessUser,
+  };
+};

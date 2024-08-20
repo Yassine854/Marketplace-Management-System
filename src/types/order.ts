@@ -1,4 +1,3 @@
-import { orderLineSchema } from "./orderLine";
 import { z } from "zod";
 
 const orderSchema = z.object({
@@ -12,11 +11,11 @@ const orderSchema = z.object({
   customerFirstname: z.string(),
   customerLastname: z.string(),
   deliveryAgentId: z.string(),
-  deliveryAgent: z.string(),
+  deliveryAgentName: z.string(),
   deliveryDate: z.number(),
   deliveryStatus: z.string(),
   source: z.string(),
-  lines: z.array(orderLineSchema),
+  items: z.array(z.any()),
 });
 
 export type Order = z.infer<typeof orderSchema>;
