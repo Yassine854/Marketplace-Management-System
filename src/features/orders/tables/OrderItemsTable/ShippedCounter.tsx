@@ -29,13 +29,14 @@ const ShippedCounter = ({ id }: any) => {
     }
   }, [id, setItem, orderOnReviewItems]);
 
+  useEffect(() => {}, []);
   return (
     <div className="flex">
       {item && (
         <CustomNumberInput
           max={item?.quantity}
           min={0}
-          step={item?.pcb}
+          step={item?.minSaleQuantity}
           defaultValue={item?.weight}
           onChange={onValueChange}
         />

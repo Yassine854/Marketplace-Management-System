@@ -34,6 +34,14 @@ export const useEditOrderDetails = () => {
         toast.error(`Action not allowed`, { duration: 5000 });
         throw new Error();
       }
+      console.log(
+        "🚀 ~ mutationFn: ~ orderOnReviewDeliveryDate:",
+        orderOnReviewDeliveryDate,
+      );
+
+      if (!orderOnReviewDeliveryDate) {
+        toast.error(`Select a Delivery Date`, { duration: 5000 });
+      }
 
       await axios.servicesClient.put("/api/orders/editOrderDetails", {
         order: {
