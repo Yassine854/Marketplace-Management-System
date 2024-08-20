@@ -1,13 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-import { magento } from "@/clients/magento";
+import { axios } from "@/libs/axios";
 
 export const useGenerateMultiplePickLists = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (ordersIds: string[]) => {
-      const pickListUrl = await magento.mutations.generatePickLists(
-        ordersIds.toString(),
+      const { data } = await axios.servicesClient.post(
+        "/api/orders/generatePickLists",
+        {
+          ordersIds,
+        },
       );
+      const pickListUrl = data?.url;
       return pickListUrl;
     },
     onSuccess: (pickListUrl) => {
