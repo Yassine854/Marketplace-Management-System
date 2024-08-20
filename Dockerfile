@@ -24,6 +24,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN npm install -g pnpm 
+RUN npx prisma db push
 RUN npx prisma generate
 RUN pnpm build
 
