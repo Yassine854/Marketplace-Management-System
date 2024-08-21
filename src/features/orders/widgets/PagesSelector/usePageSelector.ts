@@ -3,6 +3,7 @@ import { useOrdersData } from "@/features/orders/hooks";
 import { usePageSelectorEffects } from "./usePageSelectorEffects";
 import { useOrdersStore } from "@/features/orders/stores/ordersStore";
 import { useOrdersTableStore } from "@/features/orders/stores/ordersTableStore";
+import { useResetPageSelector } from "./useResetPageSelector";
 
 export const usePageSelector = () => {
   const { status } = useOrdersStore();
@@ -33,6 +34,7 @@ export const usePageSelector = () => {
     }
   };
 
+  useResetPageSelector({ status, setCurrentPage, itemsPerPage });
   usePageSelectorEffects({
     status,
     pagesList,

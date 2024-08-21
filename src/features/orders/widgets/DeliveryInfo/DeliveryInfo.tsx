@@ -31,16 +31,6 @@ const DeliveryInfo = ({
               convertUnixTimestampToIsoDate(deliveryDate)}
           </p>
 
-          {}
-          {/* {!!deliveryDate && !isInEditMode && (
-            <DeliveryDatePicker
-              defaultValue={deliveryDate}
-              direction="down"
-              isReadOnly={!isInEditMode}
-              onChange={onDeliveryDateChange}
-            />
-          )} */}
-
           {isInEditMode && (
             <DeliveryDatePicker
               defaultValue={convertUnixTimestampToIsoDate(deliveryDate)}
