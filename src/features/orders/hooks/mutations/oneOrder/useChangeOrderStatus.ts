@@ -23,9 +23,6 @@ export const useChangeOrderStatus = () => {
   const { user } = useAuth();
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ orderId, status, state }: any) => {
-      /*console.log("🚀 ~ mutationFn: ~ state:", state)
-      console.log("🚀 ~ mutationFn: ~ status:", status)
-      console.log("🚀 ~ mutationFn: ~ orderId:", orderId)*/
       if (isNoEditUser) {
         toast.error(`Action not allowed`, { duration: 5000 });
         throw new Error();
