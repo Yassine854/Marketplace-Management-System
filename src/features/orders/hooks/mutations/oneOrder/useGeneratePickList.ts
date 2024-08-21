@@ -1,16 +1,22 @@
 import { toast } from "react-hot-toast";
-import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
 import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
+import { axios } from "@/libs/axios";
 
 export const useGeneratePickList = () => {
   const { setOrderUnderActionId } = useOrderActionsStore();
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (orderId: string) => {
-      const pickListUrl = await magento.mutations.generatePickLists(
-        [orderId].toString(),
+      const { data } = await axios.servicesClient.post(
+        "/api/orders/generatePickLists",
+        {
+          ordersIds: [orderId].toString(),
+        },
       );
+
+      const pickListUrl = data?.url;
+
       return pickListUrl;
     },
     onSuccess: (pickListUrl) => {
