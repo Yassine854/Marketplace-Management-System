@@ -8,6 +8,7 @@ import { useOrderDetailsActions } from "../../hooks/actions/useOrderDetailsActio
 import { useCancelOrderFromDetailsPage } from "../../hooks/useCancelOrderFromDetailsPage";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useOrderOnReviewItems } from "../../hooks/useOrderOnReviewItems/useOrderOnReviewItems";
+import { convertUnixTimestampToIsoDate } from "@/utils/date/convertUnixTimestamp2IsoDate";
 
 export const useOrderDetailsPage = () => {
   useTotal();
@@ -51,7 +52,10 @@ export const useOrderDetailsPage = () => {
   }, [orderUnderActionId, reset]);
 
   useEffect(() => {
-    order && setOrderOnReviewDeliveryDate(order?.deliveryDate);
+    if (order) {
+      const date = convertUnixTimestampToIsoDate(order?.deliveryDate);
+      setOrderOnReviewDeliveryDate(date);
+    }
   }, [order, setOrderOnReviewDeliveryDate]);
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import { getTomorrowIsoDate } from "@/utils/date/getTomorrowIsoDate";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
 import { convertJsDate2IsoDate } from "@/utils/date/convertJsDate2IsoDate";
 
-export const useDeliveryDatePicker = ({ onChange, ref }: any) => {
+export const useDeliveryDatePicker = ({ onChange, ref, defaultValue }: any) => {
   const [selected, setSelected] = useState<Date>(getTomorrowJsDate());
   const [placeholder, setPlaceholder] = useState<string>(getTomorrowIsoDate());
 
@@ -45,6 +45,14 @@ export const useDeliveryDatePicker = ({ onChange, ref }: any) => {
     }
     selected && onChange(convertJsDate2IsoDate(selected));
   }, [selected, onChange]);
+
+  useEffect(() => {
+    if (defaultValue && defaultValue != "1970-01-01") {
+      setPlaceholder(defaultValue);
+
+      onChange(defaultValue);
+    }
+  }, [onChange, defaultValue]);
 
   useImperativeHandle(ref, () => ({
     reset: () => {
