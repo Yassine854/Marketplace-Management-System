@@ -22,7 +22,7 @@ const OrderItemsTable = ({ items, isInEditMode }: any) => {
               <td className="px-3 py-2">
                 {isInEditMode && <ShippedCounter id={item?.id} />}
 
-                {!isInEditMode && <div>{item?.weight}</div>}
+                {!isInEditMode && <div>{Number(item?.weight).toFixed(1)}</div>}
               </td>
               <td className="px-3 py-2">
                 <div className="flex items-center gap-3">

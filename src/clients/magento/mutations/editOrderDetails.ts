@@ -26,7 +26,9 @@ export const editOrderDetails = async ({
         },
       },
     };
-    await axios.magentoClient.put("orders/create", data);
+    console.log("🚀 ~ data:", data);
+    const res = await axios.magentoClient.put("orders/create", data);
+    console.log("🚀 ~ res:", res);
   } catch (error) {
     logError(error);
     throw new Error();

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import CustomNumberInput from "./CustomNumberInput";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
+import NumberInputComponent from "./NumberInputComponent";
 
 const ShippedCounter = ({ id }: any) => {
   const { orderOnReviewItems, setOrderOnReviewItems } = useOrderDetailsStore();
@@ -29,13 +29,14 @@ const ShippedCounter = ({ id }: any) => {
     }
   }, [id, setItem, orderOnReviewItems]);
 
+  useEffect(() => {}, []);
   return (
     <div className="flex">
       {item && (
-        <CustomNumberInput
+        <NumberInputComponent
           max={item?.quantity}
           min={0}
-          step={item?.pcb}
+          step={item?.minSaleQuantity}
           defaultValue={item?.weight}
           onChange={onValueChange}
         />

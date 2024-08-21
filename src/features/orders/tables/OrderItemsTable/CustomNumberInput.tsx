@@ -33,63 +33,7 @@ const CustomNumberInput = React.forwardRef(function CustomNumberInput(
   );
 });
 
-export default function NumberInputIntroduction({
-  max,
-  min,
-  defaultValue,
-  onChange,
-  step,
-}: any) {
-  const [value, setValue] = React.useState<number>(defaultValue);
-
-  const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ): number => {
-    const value = event.target.value;
-    const numValue = Number(value);
-    if (numValue < 0) {
-      event.target.value = "0";
-      return 0;
-    } else if (numValue > max) {
-      event.target.value = max.toString();
-      return max;
-    }
-    return numValue;
-  };
-
-  React.useEffect(() => {
-    onChange && onChange(value);
-  }, [value, onChange]);
-
-  React.useEffect(() => {
-    if (!value) {
-      setValue(0);
-    }
-  }, [value, setValue]);
-
-  React.useCallback(() => {
-    setValue(defaultValue);
-  }, [defaultValue]);
-
-  return (
-    <CustomNumberInput
-      onChange={(_, value) => {
-        setValue(Number(value));
-      }}
-      value={Number(value)}
-      onInputChange={(event) => {
-        if (defaultValue != undefined) {
-          const value = handleInputChange(event);
-          setValue(value);
-        }
-      }}
-      max={max}
-      min={min}
-      step={step}
-      aria-label="Demo number input"
-    />
-  );
-}
+export default CustomNumberInput;
 
 const blue = {
   100: "#DAECFF",
