@@ -15,7 +15,6 @@ export const useOrderOnReviewItems = () => {
 
   useEffect(() => {
     if (order) {
-      console.log("🚀 ~ useEffect ~ order:", order);
       setOrderOnReviewItems(order.items);
       setOrderOnReviewDeliveryDate(
         convertUnixTimestampToIsoDate(order?.deliveryDate),
