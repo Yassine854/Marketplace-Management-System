@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { isArraysEqual } from "@/utils/isArraysEqual";
 
 export const usePageSelectorEffects = ({
-  status,
   pagesList,
   totalPages,
   totalItems,
@@ -11,17 +10,8 @@ export const usePageSelectorEffects = ({
   itemsPerPage,
   setTotalPages,
   showedNumbers,
-  setCurrentPage,
   setShowedNumbers,
 }: any) => {
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [status, setCurrentPage]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [itemsPerPage, setCurrentPage]);
-
   useEffect(() => {
     setTotalPages(Math.ceil(totalItems / itemsPerPage));
   }, [totalItems, itemsPerPage, setTotalPages]);
@@ -37,12 +27,14 @@ export const usePageSelectorEffects = ({
       { length: totalPages },
       (_, index) => index + 1,
     );
+
     if (currentPage <= 5) {
       const res: number[] = showedNumbers.slice(0, Math.min(5, totalPages));
 
       setShowedNumbers(res);
     } else {
-      const res = showedNumbers.slice(currentPage - 5, currentPage);
+      const start = Math.max(0, currentPage - 5); // Ensure non-negative start
+      const res = showedNumbers.slice(start, currentPage);
 
       setShowedNumbers(res);
     }

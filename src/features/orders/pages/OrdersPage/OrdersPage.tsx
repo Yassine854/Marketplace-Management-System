@@ -20,7 +20,7 @@ const OrdersPage = () => {
       </div>
       <Divider />
       <div className=" flex  w-full items-center justify-center bg-n0 ">
-        {orders?.length !== 0 && <OrdersPagination />}
+        <OrdersPagination />
       </div>
     </div>
   );
