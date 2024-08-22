@@ -23,5 +23,10 @@ export const nooByMonth = async (year: string, month: string) => {
       day,
     });
   }
-  return list;
+
+  const total = list.reduce(
+    (total, current) => total + Number(current.numberOfOrders),
+    0,
+  );
+  return { data: list, total };
 };

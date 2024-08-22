@@ -12,11 +12,12 @@ export const GET = async (request: NextRequest) => {
     if (!currentDay) {
       return responses.invalidRequest("day Parameter is Required");
     }
-    const res = await nooByDay(currentDay);
+    const { data, total } = await nooByDay(currentDay);
     return NextResponse.json(
       {
         message: "success",
-        data: res,
+        total: total,
+        data: data,
       },
       {
         status: 200,

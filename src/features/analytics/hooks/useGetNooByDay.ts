@@ -9,12 +9,13 @@ export const useGetNooByDay = (date: number) => {
         `/api/analytics/noo/byDay?date=${date}`,
       );
 
-      return data?.data;
+      return { data: data?.data, total: data?.total };
     },
   });
 
   return {
-    data,
+    data: data?.data,
+    total: data?.total,
     isLoading,
   };
 };

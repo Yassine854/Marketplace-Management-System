@@ -18,7 +18,10 @@ export const GET = async (request: NextRequest) => {
     return NextResponse.json(
       {
         message: "success",
-        data: res,
+        //@ts-ignore
+        total: res?.total,
+        //@ts-ignore
+        data: res?.gmvData,
       },
       {
         status: 200,

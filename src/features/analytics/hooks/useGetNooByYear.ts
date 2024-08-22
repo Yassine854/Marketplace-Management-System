@@ -14,12 +14,13 @@ export const useGetNooByYear = (year: number) => {
 
       setIsLoading(false);
 
-      return data?.data;
+      return { data: data?.data, total: data?.total };
     },
   });
 
   return {
-    data,
+    data: data?.data,
+    total: data?.total,
     isLoading,
   };
 };
