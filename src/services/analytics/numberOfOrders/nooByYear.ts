@@ -23,5 +23,10 @@ export const nooByYear = async (year: string) => {
     });
   }
 
-  return list;
+  const total = list.reduce(
+    (total, current) => total + Number(current.numberOfOrders),
+    0,
+  );
+
+  return { data: list, total };
 };
