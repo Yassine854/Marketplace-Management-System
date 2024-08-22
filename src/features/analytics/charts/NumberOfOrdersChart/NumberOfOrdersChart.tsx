@@ -21,19 +21,26 @@ const NumberOfOrdersChart = () => {
   const [year, month, day] = date.split("-").map(Number);
   const [selected, setSelected] = useState(options[0]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [total, setTotal] = useState(0);
   const [selectedYear, setSelectedYear] = useState<any>(2024);
 
   const [data, setData] = useState();
-  const { data: monthData, isLoading: isByMonthLoading } = useGetNooByMonth(
-    year,
-    month,
-  );
-  const { data: lifeTimeData, isLoading: isLifetimeLoading } =
-    useGetNooLifetime();
+  const {
+    data: monthData,
+    isLoading: isByMonthLoading,
+    total: monthTotal,
+  } = useGetNooByMonth(year, month);
+  const {
+    data: lifeTimeData,
+    isLoading: isLifetimeLoading,
+    total: lifetimeTotal,
+  } = useGetNooLifetime();
 
-  const { data: yearData, isLoading: isYearLoading } =
-    useGetNooByYear(selectedYear);
+  const {
+    data: yearData,
+    isLoading: isYearLoading,
+    total: yearTotal,
+  } = useGetNooByYear(selectedYear);
 
   const [xAxis, setXaxis] = useState([]);
   const [yAxis, setYaxis] = useState([]);
@@ -54,6 +61,20 @@ const NumberOfOrdersChart = () => {
       data: yAxis,
     },
   ];
+
+  useEffect(() => {
+    if (selected.key === "month") {
+      setTotal(monthTotal);
+    }
+
+    if (selected.key === "year") {
+      setTotal(yearTotal);
+    }
+
+    if (selected.key === "lifetime") {
+      setTotal(lifetimeTotal);
+    }
+  }, [selected, lifetimeTotal, yearTotal, monthTotal]);
 
   useEffect(() => {
     if (selected.key === "month" && monthData) {
@@ -106,7 +127,9 @@ const NumberOfOrdersChart = () => {
           <div className=" mx-4 h-8 w-8 items-center justify-center ">
             {isLoading && <Loading />}
           </div>
-          <p className="text-2xl font-bold">Number of Orders Chart</p>
+          <p className="text-2xl font-bold">
+            Number of Orders Chart : {total || 0}
+          </p>
         </div>
         <div className="flex">
           {selected.key === "month" && (

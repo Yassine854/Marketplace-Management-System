@@ -8,11 +8,12 @@ export const useGetGmvLifetime = () => {
       const { data } = await axios.servicesClient(
         `/api/analytics/gmv/lifetime`,
       );
-      return data?.data;
+      return { data: data?.data, total: data?.total };
     },
   });
   return {
-    data,
+    data: data?.data,
+    total: data?.total,
     refetch,
     isLoading: isLoading,
   };

@@ -6,11 +6,12 @@ import { nooLifetime } from "@/services/analytics/numberOfOrders/nooLifetime";
 
 export const GET = async (request: NextRequest) => {
   try {
-    const res = await nooLifetime();
+    const { data, total } = await nooLifetime();
     return NextResponse.json(
       {
         message: "success",
-        data: res,
+        total,
+        data,
       },
       {
         status: 200,

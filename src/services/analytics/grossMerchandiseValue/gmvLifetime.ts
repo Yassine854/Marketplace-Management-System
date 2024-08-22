@@ -64,5 +64,7 @@ export const gmvLifetime = async () => {
     lifetimeList.push(...yearlyAnalytics);
   }
 
-  return lifetimeList;
+  const total = lifetimeList.reduce((total, current) => total + current.gmv, 0);
+
+  return { data: lifetimeList, total };
 };

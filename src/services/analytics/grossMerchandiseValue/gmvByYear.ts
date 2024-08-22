@@ -57,8 +57,9 @@ export const gmvByYear = async (year: number) => {
         gmv: order.gmv,
       });
     });
+    const total = gmvData.reduce((total, current) => total + current.gmv, 0);
 
-    return gmvData;
+    return { gmvData, total };
   } catch (error: unknown) {
     if (error instanceof Error) {
       logError(`Error fetching GMV per year data: ${error.message}`);
