@@ -17,25 +17,30 @@ const intlMiddleware = createIntlMiddleware({
 });
 
 const middleware = auth((req: any) => {
-  // console.log("🚀 ~ middleware ~ req:", req?.cookies["authjs.csrf-token"]);
-  // const session = true;
-  // console.log("🚀 ~ middleware ~ session:", session);
+  const session = req?.auth;
 
-  // const isAdmin = session?.user?.roleId === "1";
+  const isAdmin = session?.user?.roleId === "1";
+  const isActive = session?.user?.isActiv;
+  console.log("🚀 ~ middleware ~ isActive:", isActive);
 
-  // const isLoginPage = req.nextUrl.pathname.includes("/login");
+  const isLoginPage = req.nextUrl.pathname.includes("/login");
 
-  // if (!session && !isLoginPage) {
-  //   return NextResponse.redirect(new URL("/login", req.nextUrl));
-  // }
+  if (session && !isActive) {
+    console.log("hello");
+    return NextResponse.redirect(new URL("/login", req.nextUrl));
+  }
 
-  // if (session && isLoginPage) {
-  //   return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
-  // }
+  if (!session && !isLoginPage) {
+    return NextResponse.redirect(new URL("/login", req.nextUrl));
+  }
 
-  // if (session && !isAdmin && adminRoutes.includes(req.nextUrl.pathname)) {
-  //   return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
-  // }
+  if (session && isLoginPage) {
+    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+  }
+
+  if (session && !isAdmin && adminRoutes.includes(req.nextUrl.pathname)) {
+    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+  }
 
   return intlMiddleware(req);
 });

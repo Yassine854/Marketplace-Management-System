@@ -1,8 +1,6 @@
 import NextAuth from "next-auth";
 import { handleAuthentication } from "./handleAuthentication";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { prismaClient } from "@/clients/prisma/prismaClient";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
@@ -22,7 +20,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  adapter: PrismaAdapter(prismaClient),
+
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
       let isAllowedToSignIn = true;
@@ -49,19 +47,20 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           username: user.username,
           userFirstName: user.firstName,
           userLastName: user.lastName,
+          isActive: user.isActive,
         };
       }
 
       return token;
     },
     async session({ session, token }) {
-      console.log("🚀 ~ session ~ session:", session);
       if (token) {
         session.user.id = token.id;
         session.user.roleId = token.userRoleId;
         session.user.username = token.username;
         session.user.lastName = token.userLastName;
         session.user.firstName = token.userFirstName;
+        session.user.isActive = token.isActive;
       }
 
       return session;
