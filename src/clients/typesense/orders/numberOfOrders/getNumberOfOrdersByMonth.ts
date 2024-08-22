@@ -15,7 +15,7 @@ export const getNumberOfOrdersByMonth = async (
     const searchParams = {
       q: "",
       query_by: "*",
-      filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]`,
+      filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]  && state:!=canceled`,
     };
 
     const allorders = await typesenseClient

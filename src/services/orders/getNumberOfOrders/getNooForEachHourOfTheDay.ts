@@ -18,7 +18,7 @@ export async function getNooForEachHourOfTheDay(date: string) {
       const endTimestamp = item[1];
 
       const searchParamsObj = {
-        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]`,
+        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}] && state:!=canceled`,
         q: "*",
         query_by: "",
       };

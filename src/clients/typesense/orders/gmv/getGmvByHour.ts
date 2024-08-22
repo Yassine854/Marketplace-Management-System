@@ -42,7 +42,7 @@ export const getGmvByHour = async (
         const endTimestamp = item[1];
 
         const searchParamsObj = {
-          filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]`,
+          filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}] && state :!= canceled `,
           q: "*",
           query_by: "",
         };
