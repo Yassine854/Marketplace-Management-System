@@ -52,6 +52,17 @@ export const useMainLayout = () => {
   }, [storeId, setIsAdmin, user]);
 
   useEffect(() => {
+    //admin:1
+    //read only : 5
+    // agent tunis :2
+    // agent sousse :4
+    // agent kmarket :3
+
+    // store default : 0
+    // store tunis :1
+    // store sousse : 2
+    // store kmarket  : 4
+
     //@ts-ignore
     switch (user?.roleId) {
       case "1":
@@ -65,12 +76,16 @@ export const useMainLayout = () => {
         break;
 
       case "2":
+        setStoreId("1");
         break;
 
       case "3":
+        setStoreId("4");
+
         break;
 
       case "4":
+        setStoreId("2");
         break;
     }
   }, [
