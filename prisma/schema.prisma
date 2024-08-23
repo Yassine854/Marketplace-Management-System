@@ -8,16 +8,6 @@ datasource db {
   relationMode = "prisma"
 }
 
-model OrdersAuditTrail {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  username   String
-  userId     String
-  action     String
-  actionTime DateTime @default(now())
-  orderId    String
-  storeId    String
-}
-
 model User {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   username  String   @unique
@@ -31,24 +21,24 @@ model User {
 }
 
 model OrdersAuditTrail {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  username  String
-  userId    String 
-  action    String
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  username   String
+  userId     String
+  action     String
   actionTime DateTime @default(now())
-  orderId   String
-  storeId String
+  orderId    String
+  storeId    String
 }
 
 model MilkRunAuditTrail {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  username  String
-  userId    String 
-  action    String
-  actionTime DateTime @default(now())
-  orderId   String
-  storeId String
-  agentId String
-  agentName String
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  username     String
+  userId       String
+  action       String
+  actionTime   DateTime @default(now())
+  orderId      String
+  storeId      String
+  agentId      String
+  agentName    String
   deliveryDate String
 }
