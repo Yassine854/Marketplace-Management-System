@@ -1,6 +1,7 @@
 
 ### Staging ###
 
+
 FROM node:18-alpine AS base
 
 # Install dependencies only when needed
@@ -24,8 +25,9 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN npm install -g pnpm 
+RUN pnpm i 
 RUN pnpm prisma:push
-RUN npx prisma:generate
+RUN pnpm prisma:generate
 RUN pnpm build
 
 # Production image, copy all the files and run next

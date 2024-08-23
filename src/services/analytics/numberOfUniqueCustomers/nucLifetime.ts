@@ -41,15 +41,17 @@ const nucByQuarterAnalytics = async (year: number) => {
         //   (sum: number, hit: any) => sum + hit.document.nuc,
         //   0,
         // );
-        //@ts-ignore
-        nucForQuarterList = [
-          //@ts-ignore
 
-          ...nucForQuarterList,
+        if (hits.length)
           //@ts-ignore
+          nucForQuarterList = [
+            //@ts-ignore
 
-          ...hits[0].document.customersIds,
-        ];
+            ...nucForQuarterList,
+            //@ts-ignore
+
+            ...hits[0]?.document?.customersIds,
+          ];
         // totalNucForQuarter += nucForMonth;
       } catch (error: any) {
         logError(error);

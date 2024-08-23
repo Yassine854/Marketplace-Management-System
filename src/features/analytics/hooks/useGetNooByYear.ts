@@ -1,15 +1,20 @@
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 export const useGetNooByYear = (year: number) => {
+  const { storeId } = useGlobalStore();
+
   const [isLoading, setIsLoading] = useState(false);
   const { data } = useQuery({
-    queryKey: ["NooByYear", year],
+    queryKey: ["NooByYear", year, storeId],
     queryFn: async () => {
       setIsLoading(true);
       const { data } = await axios.servicesClient(
-        `/api/analytics/noo/byYear?year=${year}`,
+        storeId
+          ? `/api/analytics/noo/byYear?year=${year}&storeId=${storeId}`
+          : `/api/analytics/noo/byYear?year=${year}`,
       );
 
       setIsLoading(false);
