@@ -17,6 +17,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 model OrdersAuditTrail {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   username  String
@@ -25,4 +26,17 @@ model OrdersAuditTrail {
   actionTime DateTime @default(now())
   orderId   String
   storeId String
+}
+
+model MilkRunAuditTrail {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  username  String
+  userId    String 
+  action    String
+  actionTime DateTime @default(now())
+  orderId   String
+  storeId String
+  agentId String
+  agentName String
+  deliveryDate String
 }

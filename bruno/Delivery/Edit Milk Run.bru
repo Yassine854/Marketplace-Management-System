@@ -1,11 +1,11 @@
 meta {
-  name: Edit Order
+  name: Edit Milk Run
   type: http
-  seq: 4
+  seq: 3
 }
 
 put {
-  url: http://localhost:3000/api/typesense/editOrder
+  url: http://localhost:3000/api/delivery/editMilkRun
   body: json
   auth: none
 }
@@ -30,8 +30,8 @@ body:json {
       "customerPhone": "24946132",
       "customerFirstname": "Ikbel",
       "customerLastname": "Sousse",
-      "deliveryAgentId": "",
-      "deliveryAgentName": "",
+      "deliveryAgentId": "agentid",
+      "deliveryAgentName": "agnetName",
       "deliverySlot": "Matin",
       "deliveryDate": 0,
       "deliveryStatus": "",
