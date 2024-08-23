@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Table from "../../tables/MilkRunAuditTrailTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import OrdersAuditTrailPagination from "@/features/orders/widgets/OrdersAuditTrailPagination";
+import OrdersAuditTrailPagination from "@/features/auditTrail/widgets/OrdersAuditTrailPagination";
 import { useMilkRunAuditTrailTableStore } from "../../stores/MilkRunAuditTrailStore";
 import { useGetMilkRunAuditTrail } from "../../hooks/useGetMilkRunAuditTrail";
 
