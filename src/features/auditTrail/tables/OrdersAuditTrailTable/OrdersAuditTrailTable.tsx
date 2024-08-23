@@ -18,13 +18,20 @@ const OrdersAuditTrailTable = ({ auditTrail, isLoading }: any) => {
           ) : (
             <>
               {auditTrail?.map(
-                ({ id, username, action, orderId, time, storeId }: any) => (
+                ({
+                  id,
+                  username,
+                  action,
+                  orderId,
+                  actionTime,
+                  storeId,
+                }: any) => (
                   <TableRow
                     key={id}
                     username={username}
                     action={action}
                     orderId={orderId}
-                    time={time}
+                    time={actionTime}
                     storeId={storeId}
                   />
                 ),
