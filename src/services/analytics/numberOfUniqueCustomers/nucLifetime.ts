@@ -18,7 +18,8 @@ const nucByQuarterAnalytics = async (year: number) => {
 
   for (const quarter in quarterMonths) {
     const [startMonth, endMonth] = quarterMonths[quarter];
-    let totalNucForQuarter = 0;
+    // let totalNucForQuarter = 0;
+    let nucForQuarterList: any = [];
 
     for (let monthIndex = startMonth; monthIndex <= endMonth; monthIndex++) {
       try {
@@ -36,17 +37,29 @@ const nucByQuarterAnalytics = async (year: number) => {
           .search(searchParams);
 
         const hits = searchResults.hits || [];
-        const nucForMonth = hits.reduce(
-          (sum: number, hit: any) => sum + hit.document.nuc,
-          0,
-        );
-        totalNucForQuarter += nucForMonth;
+        // const nucForMonth = hits.reduce(
+        //   (sum: number, hit: any) => sum + hit.document.nuc,
+        //   0,
+        // );
+        //@ts-ignore
+        nucForQuarterList = [
+          //@ts-ignore
+
+          ...nucForQuarterList,
+          //@ts-ignore
+
+          ...hits[0].document.customersIds,
+        ];
+        // totalNucForQuarter += nucForMonth;
       } catch (error: any) {
         logError(error);
       }
     }
 
-    list.push({ quarter: quarter + "-" + year, nuc: totalNucForQuarter });
+    //@ts-ignore
+    const uniqueArray = [...new Set(nucForQuarterList)];
+
+    list.push({ quarter: quarter + "-" + year, nuc: uniqueArray.length });
   }
 
   return list;
