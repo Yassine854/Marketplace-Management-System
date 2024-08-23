@@ -4,26 +4,27 @@ import { useOrdersTableStore } from "@/features/orders/stores/ordersTableStore";
 import { getAllOrdersLogs } from "@/clients/prisma/getAllOrdersLogs";
 import { useOrdersAuditTrailTableStore } from "@/features/auditTrail/stores/ordersAuditTrailTableStore";
 import { useGetOrdersAuditTrail } from "@/features/auditTrail/hooks/useGetOrdersAuditTrail";
-
-export const useOrdersAuditTrailPagination = () => {
+export const useOrdersAuditTrailPagination = (count: number) => {
+  const itemsPerPage = 50;
   const [endIndex, setEndIndex] = useState(0);
   const [startIndex, setStartIndex] = useState(0);
 
-  const { currentPage, itemsPerPage } = useOrdersAuditTrailTableStore();
+  const { currentPage } = useOrdersAuditTrailTableStore();
   const { auditTrail } = useGetOrdersAuditTrail(currentPage - 1);
-  let totalItems = auditTrail?.length;
 
   useEffect(() => {
-    setEndIndex(Math.min(startIndex + itemsPerPage + 1, totalItems - 1));
-  }, [startIndex, itemsPerPage, totalItems, setEndIndex]);
+    setEndIndex(Math.min(startIndex + itemsPerPage + 1, count - 1));
+  }, [startIndex, itemsPerPage, count, setEndIndex]);
 
   useEffect(() => {
     setStartIndex((currentPage - 1) * itemsPerPage);
   }, [currentPage, itemsPerPage, setStartIndex]);
+  useEffect(() => {
+    console.log("🚀 ~ useOrdersAuditTrailPagination ~ auditTrail:", auditTrail);
+  }, [auditTrail]);
 
   return {
     endIndex,
-    totalItems,
     startIndex,
   };
 };

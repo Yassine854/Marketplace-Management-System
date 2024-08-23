@@ -1,4 +1,4 @@
-import { getAllOrdersLogs } from "@/services/orders/getOrdersLogs/getAllOrdersLogs";
+import { getAllMilkRunAuditLogs } from "@/services/delivery/getMilkRunAuditLogs/getAllMilkRunAuditLogs";
 import { responses } from "@/utils/responses";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -11,13 +11,12 @@ export const GET = async (request: NextRequest) => {
     if (!page) {
       return responses.invalidRequest("page parameter is Required");
     }
-    const { ordersLogs, count } = await getAllOrdersLogs(Number(page));
+    const MilkRunLogs = await getAllMilkRunAuditLogs(Number(page));
 
     return NextResponse.json(
       {
         message: "success",
-        count,
-        ordersLogs,
+        MilkRunLogs,
       },
       {
         status: 200,
