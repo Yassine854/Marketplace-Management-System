@@ -11,11 +11,12 @@ export const GET = async (request: NextRequest) => {
     if (!page) {
       return responses.invalidRequest("page parameter is Required");
     }
-    const ordersLogs = await getAllOrdersLogs(Number(page));
+    const { ordersLogs, count } = await getAllOrdersLogs(Number(page));
 
     return NextResponse.json(
       {
         message: "success",
+        count,
         ordersLogs,
       },
       {

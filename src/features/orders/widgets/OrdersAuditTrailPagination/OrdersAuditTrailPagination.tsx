@@ -2,8 +2,8 @@ import PageSelector from "../PagesSelector";
 import ItemsPerPageSelector from "../ItemsPerPageSelector";
 import { useOrdersAuditTrailPagination } from "./useOrdersAuditTrailPagination";
 
-const OrdersAuditTrailPagination = () => {
-  const { totalItems, startIndex, endIndex } = useOrdersAuditTrailPagination();
+const OrdersAuditTrailPagination = ({ count }: any) => {
+  const { startIndex, endIndex } = useOrdersAuditTrailPagination(count);
 
   return (
     <div
@@ -12,11 +12,9 @@ const OrdersAuditTrailPagination = () => {
     >
       <ItemsPerPageSelector />
       <p>
-        {!!totalItems &&
-          `Showing ${startIndex + 1} to ${
-            endIndex + 1
-          } of ${totalItems} orders`}
-        {!totalItems && "Showing  ***  to  ***  of  *** orders"}
+        {!!count &&
+          `Showing ${startIndex + 1} to ${endIndex + 1} of ${count} orders`}
+        {!count && "Showing  ***  to  ***  of  *** orders"}
       </p>
 
       <PageSelector />

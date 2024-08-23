@@ -10,8 +10,8 @@ export const getAllOrdersLogs = async (page: number = 0, take: number = 50) => {
         actionTime: "desc",
       },
     });
-
-    return ordersLogs;
+    const count = await prismaClient.ordersAuditTrail.count();
+    return { ordersLogs, count };
   } catch (err) {
     console.error("Get Prisma All Orders Logs Error ", err);
     throw err;
