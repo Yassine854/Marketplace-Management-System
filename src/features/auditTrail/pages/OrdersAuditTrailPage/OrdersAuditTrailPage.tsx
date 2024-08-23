@@ -2,22 +2,18 @@ import { useEffect } from "react";
 import Table from "../../tables/OrdersAuditTrailTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import { useGetOrdersAuditTrail } from "../../hooks/useGetOrdersAuditTrail";
-import OrdersAuditTrailPagination from "@/features/orders/widgets/OrdersAuditTrailPagination";
+import OrdersAuditTrailPagination from "@/features/auditTrail/widgets/OrdersAuditTrailPagination";
 import { useOrdersAuditTrailTableStore } from "@/features/auditTrail/stores/ordersAuditTrailTableStore";
 
 const OrdersAuditTrailPage = () => {
-  const { currentPage, itemsPerPage } = useOrdersAuditTrailTableStore();
+  const { currentPage } = useOrdersAuditTrailTableStore();
   const { auditTrail, isLoading, refetch, count } = useGetOrdersAuditTrail(
     currentPage - 1,
   );
 
   useEffect(() => {
     refetch();
-  }, [currentPage, itemsPerPage, refetch]);
-  useEffect(() => {
-    console.log("🚀 ~ OrdersAuditTrailPage ~ isLoading:", isLoading);
-    console.log("🚀 ~ OrdersAuditTrailPage ~ auditTrail:", auditTrail);
-  }, [auditTrail, isLoading]);
+  }, [currentPage, refetch]);
 
   return (
     <div className="flex h-full w-full flex-grow flex-col justify-between">

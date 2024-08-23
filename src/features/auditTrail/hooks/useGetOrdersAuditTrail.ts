@@ -14,7 +14,7 @@ export const useGetOrdersAuditTrail = (page: number) => {
 
   return {
     //@ts-ignore
-    auditTrail: data?.ordersLogs,
+    auditTrail: data?.data,
     count: data?.count,
     refetch,
     isLoading,
