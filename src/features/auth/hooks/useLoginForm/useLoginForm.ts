@@ -32,13 +32,19 @@ export const useLoginForm = () => {
     setIsLoading(true);
     const { username, password } = data;
     const res = await login(username, password);
+
     setIsLoading(false);
     if (res?.error === "CredentialsSignin") {
       toast.error("Invalid username or password");
-    } else {
-      toast.success("Welcome To Kamioun OMS !", { duration: 3000 });
-      navigateToDashboard();
+      return;
     }
+
+    if (res?.error === "AccessDenied") {
+      toast.error("Not Allowed to Login");
+      return;
+    }
+    toast.success("Welcome To Kamioun OMS !", { duration: 3000 });
+    navigateToDashboard();
   };
 
   return { handleSubmit: handleSubmit(onSubmit), register, errors, isLoading };

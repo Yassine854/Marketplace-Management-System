@@ -20,8 +20,13 @@ const middleware = auth((req: any) => {
   const session = req?.auth;
 
   const isAdmin = session?.user?.roleId === "1";
+  const isActive = session?.user?.isActive;
 
   const isLoginPage = req.nextUrl.pathname.includes("/login");
+
+  if (session && !isActive) {
+    return NextResponse.redirect(new URL("/login", req.nextUrl));
+  }
 
   if (!session && !isLoginPage) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
