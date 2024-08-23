@@ -34,7 +34,10 @@ const months = [
 
 const MonthPicker = ({ direction = "down", onMonthChange }: any) => {
   const { open, ref: dropDownRef, toggleOpen } = useDropdown();
-  const [selectedMonth, setSelectedMonth] = useState(months[0]);
+
+  const date = new Date();
+  const currentMonthIndex = date.getMonth();
+  const [selectedMonth, setSelectedMonth] = useState(months[currentMonthIndex]);
   const [year, setYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
