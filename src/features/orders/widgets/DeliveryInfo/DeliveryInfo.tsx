@@ -1,5 +1,6 @@
 import { IconTruckDelivery } from "@tabler/icons-react";
 import DeliveryDatePicker from "../../../shared/inputs/DeliveryDatePicker/DeliveryDatePicker";
+import { convertUnixTimestampToIsoDate } from "@/utils/date/convertUnixTimestamp2IsoDate";
 
 const DeliveryInfo = ({
   deliveryAgentName,
@@ -25,21 +26,16 @@ const DeliveryInfo = ({
           <p className="text-black  ">
             <span className="text-n90 ">Delivery Date :</span>{" "}
             {!deliveryDate && !isInEditMode && "*****"}
+            {!!deliveryDate &&
+              !isInEditMode &&
+              convertUnixTimestampToIsoDate(deliveryDate)}
           </p>
-          {!!deliveryDate && (
-            <DeliveryDatePicker
-              defaultValue={deliveryDate}
-              direction="down"
-              isReadOnly={!isInEditMode}
-              onChange={onDeliveryDateChange}
-            />
-          )}
 
-          {!deliveryDate && isInEditMode && (
+          {isInEditMode && (
             <DeliveryDatePicker
-              defaultValue={deliveryDate}
+              defaultValue={convertUnixTimestampToIsoDate(deliveryDate)}
               direction="down"
-              isReadOnly={!isInEditMode}
+              //  isReadOnly={!isInEditMode}
               onChange={onDeliveryDateChange}
             />
           )}

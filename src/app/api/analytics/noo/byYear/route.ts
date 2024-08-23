@@ -10,11 +10,12 @@ export const GET = async (request: NextRequest) => {
     if (!year) {
       return responses.invalidRequest("Year Parameter is Required");
     }
-    const res = await nooByYear(year);
+    const { data, total } = await nooByYear(year);
     return NextResponse.json(
       {
         message: "success",
-        data: res,
+        total,
+        data,
       },
       {
         status: 200,

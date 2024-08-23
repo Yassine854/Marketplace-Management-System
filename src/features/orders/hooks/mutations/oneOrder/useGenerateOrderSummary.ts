@@ -2,13 +2,21 @@ import { toast } from "react-hot-toast";
 import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
 import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
+import { axios } from "@/libs/axios";
 
 export const useGenerateOrderSummary = () => {
   const { setOrderUnderActionId } = useOrderActionsStore();
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (orderId: string) => {
-      const pdfUrl = await magento.mutations.generateOrderSummary(orderId);
+      const { data } = await axios.servicesClient.post(
+        "/api/orders/generateOrderSummary",
+        {
+          orderId,
+        },
+      );
+
+      const pdfUrl = data?.url;
       return pdfUrl;
     },
     onSuccess: (pdfUrl) => {

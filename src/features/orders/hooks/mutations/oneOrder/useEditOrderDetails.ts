@@ -8,12 +8,14 @@ import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
 import { useAuth } from "@/features/shared/hooks/useAuth";
+
 export const useEditOrderDetails = () => {
   const { refetch } = useOrdersData();
 
   const { isNoEditUser } = useGlobalStore();
 
   const { refetch: refetchCount } = useGetOrdersCount();
+
   const { user } = useAuth();
   const {
     total,
@@ -21,7 +23,6 @@ export const useEditOrderDetails = () => {
     orderOnReviewId,
     orderOnReviewItems,
     orderOnReviewDeliveryDate,
-    usernameOnReview,
   } = useOrderDetailsStore();
 
   const { refetch: refetchOrder } = useGetOrder(orderOnReviewId);
@@ -33,6 +34,10 @@ export const useEditOrderDetails = () => {
       if (isNoEditUser) {
         toast.error(`Action not allowed`, { duration: 5000 });
         throw new Error();
+      }
+
+      if (!orderOnReviewDeliveryDate) {
+        toast.error(`Select a Delivery Date`, { duration: 5000 });
       }
 
       await axios.servicesClient.put("/api/orders/editOrderDetails", {

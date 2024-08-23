@@ -4,7 +4,7 @@ import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/clients/prisma";
-import { createAuditLog } from "@/services/auditing";
+import { createAuditLog } from "@/services/auditing/orders";
 import { getOrder } from "@/services/orders/getOrder";
 export const PUT = async (request: NextRequest) => {
   try {
@@ -32,6 +32,7 @@ export const PUT = async (request: NextRequest) => {
       orderId,
       deliveryDate,
     });
+
     const orderObject = await getOrder(orderId);
     const user = await prisma.getUser(username);
     await createAuditLog({
@@ -44,7 +45,7 @@ export const PUT = async (request: NextRequest) => {
     });
     return NextResponse.json(
       {
-        message: "Order Edited  Successfully",
+        message: "Order Edited Successfully",
       },
       { status: 200 },
     );

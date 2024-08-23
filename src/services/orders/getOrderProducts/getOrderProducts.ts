@@ -8,7 +8,8 @@ export const getOrderProducts = async (orderId: string): Promise<any> => {
     );
 
     const orderProducts = magnetoOrderProducts.map((item) => {
-      const { id, sku, name, price, custom_attributes } = item;
+      const { id, sku, name, price, custom_attributes, extension_attributes } =
+        item;
 
       const description = custom_attributes.find(
         (attr: any) => attr.attribute_code === "description",
@@ -17,6 +18,10 @@ export const getOrderProducts = async (orderId: string): Promise<any> => {
       const pcb = Number(
         custom_attributes.find((attr: any) => attr.attribute_code === "qty_pcb")
           ?.value,
+      );
+
+      const minSaleQuantity = Number(
+        extension_attributes.stock_item.min_sale_qty,
       );
 
       const brand = custom_attributes.find(
@@ -31,6 +36,7 @@ export const getOrderProducts = async (orderId: string): Promise<any> => {
         brand,
         price,
         description,
+        minSaleQuantity,
       };
     });
 

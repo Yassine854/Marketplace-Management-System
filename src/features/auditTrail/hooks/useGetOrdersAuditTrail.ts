@@ -1,74 +1,23 @@
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
 
-const auditTrailFake = [
-  {
-    id: "1",
-    username: "admin",
-    orderId: "12342134",
-    storeId: "1",
-    time: "2024-12-02",
-    action: "cancel",
-  },
-  {
-    id: "2124",
-    username: "admin",
-    orderId: "12342134",
-    storeId: "2",
-    time: "2024-12-02",
-    action: "cancel",
-  },
-  {
-    id: "2",
-    username: "admin",
-    orderId: "12342134",
-    storeId: "2",
-    time: "2024-12-02",
-    action: "cancel",
-  },
-  {
-    id: "224",
-    username: "admin",
-    orderId: "12342134",
-    storeId: "3",
-    time: "2024-12-02",
-    action: "cancel",
-  },
-  {
-    id: "3",
-    username: "admin",
-    orderId: "12342134",
-    storeId: "",
-    time: "2024-12-02",
-    action: "cancel",
-  },
-  {
-    id: "4",
-    username: "admin",
-    orderId: "12342134",
-    storeId: "3",
-    time: "2024-12-02",
-    action: "cancel",
-  },
-];
-
-export const useGetOrdersAuditTrail = () => {
-  const {
+export const useGetOrdersAuditTrail = (page: number) => {
+  let {
     isLoading,
     data: auditTrail,
     refetch,
   } = useQuery({
     queryKey: ["ordersAuditTrail"],
-    queryFn: () => {
-      // const { data } = await axios.servicesClient(
-      //   `/api/users/getUser?username=${username}`,
-      // );
-      // return data;
+    queryFn: async () => {
+      const { data } = await axios.servicesClient(
+        `/api/auditTrail/getOrdersAuditTrail?page=${page}`,
+      );
+      return data?.ordersLogs;
     },
   });
 
   return {
-    auditTrail: auditTrailFake,
+    auditTrail,
     refetch,
     isLoading,
   };

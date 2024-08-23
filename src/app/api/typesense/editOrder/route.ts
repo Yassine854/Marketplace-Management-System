@@ -19,10 +19,14 @@ export const PUT = async (request: NextRequest) => {
       return responses.invalidRequest("order is Required");
     }
 
-    await typesense.orders.updateOne({
-      ...order,
-      productsNames: getOrderProductsNames(order?.items),
-    });
+    if (order?.items?.length) {
+      await typesense.orders.updateOne({
+        ...order,
+        productsNames: getOrderProductsNames(order?.items),
+      });
+    } else {
+      await typesense.orders.updateOne(order);
+    }
 
     return NextResponse.json(
       {

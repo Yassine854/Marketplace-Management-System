@@ -37,7 +37,9 @@ export const gmvByMonth = async (year: number, month: number) => {
       gmv: allOrders[index] || 0,
     }));
 
-    return data;
+    const total = data.reduce((total, current) => total + current.gmv, 0);
+
+    return { data, total };
   } catch (error: any) {
     logError(error);
   }

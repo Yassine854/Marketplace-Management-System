@@ -19,5 +19,11 @@ export const nooByDay = async (currentDay: string) => {
       Hour: `${index + 1}:00`,
     });
   });
-  return data;
+
+  const total = data.reduce(
+    (total, current) => total + current.numberOfOrders,
+    0,
+  );
+
+  return { data, total };
 };

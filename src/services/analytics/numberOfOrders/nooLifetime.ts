@@ -37,5 +37,9 @@ export const nooLifetime = async () => {
     lifetimeList.push(...yearlyAnalytics);
   }
 
-  return lifetimeList;
+  const total = lifetimeList.reduce(
+    (total, current) => total + Number(current.numberOfOrders),
+    0,
+  );
+  return { data: lifetimeList, total };
 };

@@ -19,7 +19,7 @@ export const getNumberOfOrdersByDay = async (
       query_by: "*",
       page: 1,
       per_page: 1,
-      filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]`,
+      filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]  && state:!=canceled`,
     };
 
     const { found } = await typesenseClient
