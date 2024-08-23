@@ -17,23 +17,29 @@ const EditUserForm = () => {
     useEditUserForm();
 
   const { editUserStatus, isPending } = useEditUserStatus();
-  const [isSelected, setIsSelected] = useState(user?.isActive);
+  const [isSelected, setIsSelected] = useState(true);
 
-  useEffect(() => {
-    if (!user?.isActive && isSelected) {
+  const onIsActiveChange = (isActive: boolean) => {
+    if (isActive) {
       editUserStatus({
         username: user?.username,
         status: "active",
       });
     }
 
-    if (user?.isActive && !isSelected) {
+    if (!isActive) {
       editUserStatus({
         username: user?.username,
         status: "inactive",
       });
     }
-  }, [isSelected, user, editUserStatus]);
+  };
+
+  useEffect(() => {
+    if (user && !user?.isActive) {
+      setIsSelected(false);
+    }
+  }, [user]);
 
   if (isLoading) {
     return <div>Loading... </div>;
@@ -106,6 +112,7 @@ const EditUserForm = () => {
                 Cancel
               </button>
             </div>
+
             <div className="flex">
               <p className="mr-4 font-bold">
                 {user?.isActive ? "Active" : "Inactive"}
@@ -113,7 +120,10 @@ const EditUserForm = () => {
               <Switch
                 color="primary"
                 isSelected={isSelected}
-                onValueChange={setIsSelected}
+                onValueChange={(e) => {
+                  setIsSelected(e);
+                  onIsActiveChange(e);
+                }}
               />
             </div>
           </div>

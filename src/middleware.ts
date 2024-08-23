@@ -18,9 +18,10 @@ const intlMiddleware = createIntlMiddleware({
 
 const middleware = auth((req: any) => {
   const session = req?.auth;
+  console.log("🚀 ~ middleware ~ session:", session);
 
   const isAdmin = session?.user?.roleId === "1";
-  const isActive = session?.user?.isActiv;
+  const isActive = session?.user?.isActive;
   console.log("🚀 ~ middleware ~ isActive:", isActive);
 
   const isLoginPage = req.nextUrl.pathname.includes("/login");
