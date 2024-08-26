@@ -1,2 +1,2 @@
 "use client";
-export { default } from "@/features/auditTrail/pages/OrdersAuditTrailPage";
+export { default } from "@/features/auditTrail/pages/MilkRunAuditTrailPage";

@@ -4,7 +4,7 @@ import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/clients/prisma";
-import { createAuditLog } from "@/services/auditing";
+import { createAuditLog } from "@/services/auditing/orders";
 import { getOrder } from "@/services/orders/getOrder";
 export const POST = async (request: NextRequest) => {
   try {
@@ -27,7 +27,7 @@ export const POST = async (request: NextRequest) => {
     await magento.mutations.changeOrderStatus({ orderId, status, state });
 
     await typesense.orders.updateOne({
-      orderId,
+      id: orderId,
       status,
       state,
     });

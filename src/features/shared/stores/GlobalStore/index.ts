@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 export const useGlobalStore = create<any>(
   persist(
     (set, get) => ({
-      storeId: "1",
+      storeId: "",
       isNoEditUser: false,
       isAdmin: false,
       isMultipleStoreAccessUser: false,

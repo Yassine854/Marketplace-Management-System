@@ -43,6 +43,11 @@ export const typesenseOrdersCollectionSchema: CollectionCreateSchema = {
       range_index: true,
     },
     {
+      name: "updatedAt",
+      type: "int64",
+      range_index: true,
+    },
+    {
       name: "customerId",
       type: "string",
     },

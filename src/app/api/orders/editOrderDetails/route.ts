@@ -4,14 +4,33 @@ import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/clients/prisma";
-import { createAuditLog } from "@/services/auditing";
+import { createAuditLog } from "@/services/auditing/orders";
 import { getOrder } from "@/services/orders/getOrder";
+
+import { convertIsoDateToUnixTimestamp } from "@/utils/date/convertIsoDateToUnixTimestamp";
+
 export const PUT = async (request: NextRequest) => {
   try {
     const { order, username } = await request.json();
 
     if (!order) {
       return responses.invalidRequest("order is Required");
+    }
+
+    if (!order?.orderId) {
+      return responses.invalidRequest("orderId is Required");
+    }
+
+    if (!order?.items) {
+      return responses.invalidRequest("Items is Required");
+    }
+
+    if (!order?.deliveryDate) {
+      return responses.invalidRequest("deliveryDate is Required");
+    }
+
+    if (!order?.total) {
+      return responses.invalidRequest("total is Required");
     }
     if (!username) {
       return responses.invalidRequest("username is Required");
@@ -29,9 +48,10 @@ export const PUT = async (request: NextRequest) => {
     await typesense.orders.updateOne({
       total,
       items,
-      orderId,
-      deliveryDate,
+      id: orderId,
+      deliveryDate: convertIsoDateToUnixTimestamp(deliveryDate),
     });
+
     const orderObject = await getOrder(orderId);
     const user = await prisma.getUser(username);
     await createAuditLog({
@@ -44,7 +64,7 @@ export const PUT = async (request: NextRequest) => {
     });
     return NextResponse.json(
       {
-        message: "Order Edited  Successfully",
+        message: "Order Edited Successfully",
       },
       { status: 200 },
     );

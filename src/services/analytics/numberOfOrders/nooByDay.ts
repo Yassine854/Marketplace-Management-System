@@ -1,6 +1,6 @@
 import { getNooForEachHourOfTheDay } from "@/services/orders/getNumberOfOrders/getNooForEachHourOfTheDay";
 
-export const nooByDay = async (currentDay: string) => {
+export const nooByDay = async ({ currentDay, storeId }: any) => {
   const [day, month, year] = currentDay.split("-");
 
   let towDigitDay = day.toString();
@@ -11,7 +11,10 @@ export const nooByDay = async (currentDay: string) => {
 
   let data: any[] = [];
 
-  const numberOfOrders = await getNooForEachHourOfTheDay(dayDate);
+  const numberOfOrders = await getNooForEachHourOfTheDay({
+    date: dayDate,
+    storeId,
+  });
   numberOfOrders.map((OrderByHour, index) => {
     data.push({
       numberOfOrders: !!OrderByHour ? OrderByHour : 0,

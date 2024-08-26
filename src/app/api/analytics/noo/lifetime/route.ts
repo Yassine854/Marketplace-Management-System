@@ -6,7 +6,10 @@ import { nooLifetime } from "@/services/analytics/numberOfOrders/nooLifetime";
 
 export const GET = async (request: NextRequest) => {
   try {
-    const { data, total } = await nooLifetime();
+    const { searchParams } = new URL(request.url);
+    const storeId = searchParams.get("storeId");
+
+    const { data, total } = await nooLifetime(storeId);
     return NextResponse.json(
       {
         message: "success",

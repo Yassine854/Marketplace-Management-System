@@ -5,7 +5,9 @@ import {
   IconUsers,
   IconReport,
   IconDashboard,
+  IconList,
 } from "@tabler/icons-react";
+
 import Link from "next/link";
 import Image from "next/image";
 import { statuses } from "./statuses";
@@ -152,7 +154,7 @@ const Sidebar = ({
           {isAdmin && (
             <>
               <SidebarSubMenu
-                icon={<IconMap2 />}
+                icon={<IconList />}
                 name={"Audit Trail"}
                 onClick={() => {
                   push("/audit-trail/orders-audit-trail");

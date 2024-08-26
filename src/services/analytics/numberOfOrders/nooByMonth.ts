@@ -6,14 +6,18 @@ function generateMonthDaysObject({ year, month }: any) {
   return daysArray;
 }
 
-export const nooByMonth = async (year: string, month: string) => {
+export const nooByMonth = async (
+  year: string,
+  month: string,
+  storeId: string | null,
+) => {
   const list: any[] = [];
   const monthDays: any[] = generateMonthDaysObject({ year, month });
   for (const day of monthDays) {
     let towDigitDay = day;
     if (day.toString().length != 2) towDigitDay = "0" + day.toString();
     const dayDate: string = year + "-" + month + "-" + towDigitDay;
-    const numberOfOrders = await getNooByDay(dayDate);
+    const numberOfOrders = await getNooByDay(dayDate, storeId);
     if (!numberOfOrders) {
       break;
     }

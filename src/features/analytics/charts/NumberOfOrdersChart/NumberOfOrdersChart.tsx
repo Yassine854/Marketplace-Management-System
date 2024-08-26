@@ -17,12 +17,16 @@ export const options = [
 const NumberOfOrdersChart = () => {
   // const { theme } = useTheme();
   // const [month, setMonth] = useState(`${new Date().getFullYear()}-01-01`);
+
+  const date1 = new Date();
+  const currentYear = date1.getFullYear();
+
   const [date, setDate] = useState(`${new Date().getFullYear()}-01-01`);
   const [year, month, day] = date.split("-").map(Number);
   const [selected, setSelected] = useState(options[0]);
   const [isLoading, setIsLoading] = useState(false);
   const [total, setTotal] = useState(0);
-  const [selectedYear, setSelectedYear] = useState<any>(2024);
+  const [selectedYear, setSelectedYear] = useState<any>(currentYear);
 
   const [data, setData] = useState();
   const {
