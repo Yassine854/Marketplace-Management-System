@@ -49,11 +49,9 @@ export const getOrdersBatch = (orders: any): Order[] =>
         order?.extension_attributes?.delivery_agent,
       ),
       deliveryStatus: safeString(order?.extension_attributes?.delivery_status),
-      deliveryDate: order?.extension_attributes?.delivery_date
-        ? deliveryDateToUnixTimeStamp(
-            order?.extension_attributes?.delivery_date,
-          )
-        : getCurrentUnixTimestamp(),
+      deliveryDate: deliveryDateToUnixTimeStamp(
+        order?.extension_attributes?.delivery_date,
+      ),
       source: getOrderSource(
         !!order?.extension_attributes?.from_mobile,
         !!order?.extension_attributes?.verified,

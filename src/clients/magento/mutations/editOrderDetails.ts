@@ -1,7 +1,7 @@
 import { axios } from "@/libs/axios";
 import { logError } from "@/utils/logError";
 import { convertIsoDate2MagentoDate } from "@/utils/date/convertIsoDate2MagentoDate";
-
+import { isValidISODate } from "@/utils/date/isValidIsoDate";
 export const editOrderDetails = async ({
   orderId,
   deliveryDate,
@@ -13,20 +13,35 @@ export const editOrderDetails = async ({
       return { item_id: item.id, weight: item.weight };
     });
 
-    const data = {
-      entity: {
-        entity_id: orderId,
-        items: magentoItems,
-        base_subtotal: total,
-        subtotal: total,
-        base_grand_total: total,
-        grand_total: total,
-        extension_attributes: {
-          delivery_date: convertIsoDate2MagentoDate(deliveryDate),
+    let data;
+    if (isValidISODate(deliveryDate)) {
+      data = {
+        entity: {
+          entity_id: orderId,
+          items: magentoItems,
+          base_subtotal: total || 0,
+          subtotal: total || 0,
+          base_grand_total: total || 0,
+          grand_total: total || 0,
+          extension_attributes: {
+            delivery_date: convertIsoDate2MagentoDate(deliveryDate),
+          },
         },
-      },
-    };
-    const res = await axios.magentoClient.put("orders/create", data);
+      };
+    } else {
+      data = {
+        entity: {
+          entity_id: orderId,
+          items: magentoItems,
+          base_subtotal: total || 0,
+          subtotal: total || 0,
+          base_grand_total: total || 0,
+          grand_total: total || 0,
+        },
+      };
+    }
+
+    await axios.magentoClient.put("orders/create", data);
   } catch (error) {
     logError(error);
     throw new Error();

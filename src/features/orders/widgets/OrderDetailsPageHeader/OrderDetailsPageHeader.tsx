@@ -9,9 +9,17 @@ const OrderDetailsPageHeader = ({ onArrowClick, status }: any) => {
       </div>
       <div className=" flex  items-center justify-center ">
         <p className="mr-4 text-2xl font-bold text-black">Status : </p>
-        <Chip color="success" size="lg">
-          <p className="text-xl font-semibold">{status}</p>
-        </Chip>
+        {status != "corrupted" && (
+          <Chip color="success" size="lg">
+            <p className="text-xl font-semibold">{status}</p>
+          </Chip>
+        )}
+
+        {status == "corrupted" && (
+          <Chip color="danger" size="lg">
+            <p className="text-xl font-semibold">Corrupted</p>
+          </Chip>
+        )}
       </div>
     </div>
   );
