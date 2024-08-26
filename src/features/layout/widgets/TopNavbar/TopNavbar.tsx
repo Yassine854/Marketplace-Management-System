@@ -1,9 +1,10 @@
 import { IconMenu2 } from "@tabler/icons-react";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Notification from "@/features/shared/elements/TopNavBarElements/Notification";
 import Profile from "@/features/shared/elements/TopNavBarElements/Profile";
 import StoreSelector from "../StoreSelector/StoreSelector";
 import { useLayout } from "@/utils/LayoutContext";
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
 export const layoutList = ["All", "Tunis", "Sousse", "Kamarket"];
 
@@ -15,6 +16,15 @@ const TopNav = ({
   sidebarIsOpen: boolean;
 }) => {
   const { layout } = useLayout();
+  const { notifications } = useGlobalStore();
+  const [newNotification, setNewNotification] = useState(false);
+  const [updated, setUpdated] = useState(notifications.length);
+  useEffect(() => {
+    if (notifications.length !== updated) {
+      setNewNotification(true);
+      setUpdated(notifications.length);
+    }
+  }, [notifications,updated]);
   return (
     <nav
       className={`navbar-top z-20 px-4  shadow-sm duration-300 dark:border-b dark:border-n700 xxl:px-6 ${
@@ -44,7 +54,12 @@ const TopNav = ({
       <StoreSelector />
       <div className="flex items-center gap-3 sm:gap-4 xxl:gap-6">
         {/* <ModeSwitcher /> */}
-        <Notification />
+        <div className="relative">
+          {newNotification && (
+            <div className="absolute right-0 h-3 w-3 rounded-full bg-red-600"></div>
+          )}
+          <Notification setNewNotification={setNewNotification} />
+        </div>
         {/* <SwitchLanguage /> */}
         <Profile />
       </div>

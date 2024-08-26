@@ -24,6 +24,18 @@ export const POST = async (request: NextRequest) => {
       productsNames: getOrderProductsNames(order?.items),
     });
 
+    order["action"] = "Created";
+
+    await fetch("http://localhost:4001/api", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+    }).catch((error) => {
+      console.error("Error creating order:", error);
+    });
+
     return NextResponse.json(
       {
         message: "Order successfully added.",

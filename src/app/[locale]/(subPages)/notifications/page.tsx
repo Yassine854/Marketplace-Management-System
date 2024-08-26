@@ -1,9 +1,12 @@
 "use client";
+import Notifications from "./NotificationsComponent";
 
 const Page = () => {
   return (
-    <div className=" f flex h-full w-full items-center justify-center text-2xl">
-      Notifications
+    <div className="mt-[4.8rem] w-full bg-n20 p-4">
+      <div className="flex flex-col justify-evenly">
+        <Notifications />
+      </div>
     </div>
   );
 };
