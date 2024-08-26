@@ -27,7 +27,7 @@ export const POST = async (request: NextRequest) => {
     await magento.mutations.changeOrderStatus({ orderId, status, state });
 
     await typesense.orders.updateOne({
-      orderId,
+      id: orderId,
       status,
       state,
     });

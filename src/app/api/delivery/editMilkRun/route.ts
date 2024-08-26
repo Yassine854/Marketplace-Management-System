@@ -1,33 +1,46 @@
 import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
-import { checkApiKey } from "@/services/auth/checkApiKey";
 import { NextResponse, type NextRequest } from "next/server";
-import { getOrderProductsNames } from "@/services/typesense/getOrderProductsNames";
 import { prisma } from "@/clients/prisma";
 import { createMilkRunAuditLog } from "@/services/auditing/milkRun";
+import { magento } from "@/clients/magento";
 
 export const PUT = async (request: NextRequest) => {
   try {
-    const isAuthorized = await checkApiKey(request);
-
-    if (!isAuthorized) {
-      return responses.unauthorized();
-    }
     const { order, username } = await request.json();
 
     if (!order) {
       return responses.invalidRequest("order is Required");
     }
 
+    if (!order?.id) {
+      return responses.invalidRequest("id is Required");
+    }
+
+    if (!order?.deliverySlot) {
+      return responses.invalidRequest("deliverySlot is Required");
+    }
+
+    if (!order?.deliveryAgentId) {
+      return responses.invalidRequest("deliveryAgentId  is Required");
+    }
+
+    if (!order?.deliveryAgentName) {
+      return responses.invalidRequest("deliveryAgentName  is Required");
+    }
     if (!username) {
       return responses.invalidRequest("username is Required");
     }
 
-    await typesense.orders.updateOne({
-      ...order,
-      productsNames: getOrderProductsNames(order?.items),
+    await magento.mutations.editOrderMilkRun({
+      orderId: order?.id,
+      deliverySlot: order?.deliverySlot,
+      deliveryAgentName: order?.deliveryAgentName,
+      deliveryAgentId: order?.deliveryAgentId,
     });
+
+    await typesense.orders.updateOne(order);
 
     const user = await prisma.getUser(username);
 

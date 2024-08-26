@@ -2,6 +2,11 @@ import { Order } from "@/types/order";
 import { getOrderItems } from "../getOrderItems";
 import { getOrderSource } from "../getOrderSource";
 import { getOrderProductsNames } from "../../getOrderProductsNames";
+import { convertIsoDateToUnixTimestamp } from "@/utils/date/convertIsoDateToUnixTimestamp";
+
+function getCurrentUnixTimestamp() {
+  return Math.floor(Date.now() / 1000);
+}
 
 const deliveryDateToUnixTimeStamp = (
   deliveryDate: string,
@@ -29,8 +34,11 @@ export const getOrdersBatch = (orders: any): Order[] =>
       storeId: safeString(order?.store_id),
       state: safeString(order?.state),
       status: safeString(order?.status),
-      total: Number(order?.subtotal) || 0,
-      createdAt: new Date(order?.created_at).getTime() || 0,
+      total: Number(order?.subtotal) || getCurrentUnixTimestamp(),
+      createdAt:
+        new Date(order?.created_at).getTime() || getCurrentUnixTimestamp(),
+      updatedAt:
+        new Date(order?.created_at).getTime() || getCurrentUnixTimestamp(),
       customerId: safeString(order?.customer_id),
       customerFirstname: safeString(order?.customer_firstname),
       customerLastname: safeString(order?.customer_lastname),
@@ -42,9 +50,11 @@ export const getOrdersBatch = (orders: any): Order[] =>
         order?.extension_attributes?.delivery_agent,
       ),
       deliveryStatus: safeString(order?.extension_attributes?.delivery_status),
-      deliveryDate: deliveryDateToUnixTimeStamp(
-        order?.extension_attributes?.delivery_date,
-      ),
+      deliveryDate: order?.extension_attributes?.delivery_date
+        ? deliveryDateToUnixTimeStamp(
+            order?.extension_attributes?.delivery_date,
+          )
+        : getCurrentUnixTimestamp(),
       source: getOrderSource(
         !!order?.extension_attributes?.from_mobile,
         !!order?.extension_attributes?.verified,
