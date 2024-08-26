@@ -1,6 +1,5 @@
 import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
-import { magento } from "@/clients/magento";
 import { useMutation } from "@tanstack/react-query";
 import { useGetOrder } from "../../queries/useGetOrder";
 import { useOrdersData } from "../../queries/useOrdersData";
@@ -9,6 +8,7 @@ import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useGetOrdersCount } from "../../queries/useGetOrdersCount";
 import { useAuth } from "@/features/shared/hooks/useAuth";
+
 export const useCancelOrder = () => {
   const { refetch } = useOrdersData();
 
