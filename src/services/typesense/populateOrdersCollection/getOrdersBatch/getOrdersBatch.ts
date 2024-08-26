@@ -3,6 +3,10 @@ import { getOrderItems } from "../getOrderItems";
 import { getOrderSource } from "../getOrderSource";
 import { getOrderProductsNames } from "../../getOrderProductsNames";
 
+function getCurrentUnixTimestamp() {
+  return Math.floor(Date.now() / 1000);
+}
+
 const deliveryDateToUnixTimeStamp = (
   deliveryDate: string,
 ): number | undefined => {
@@ -29,8 +33,11 @@ export const getOrdersBatch = (orders: any): Order[] =>
       storeId: safeString(order?.store_id),
       state: safeString(order?.state),
       status: safeString(order?.status),
-      total: Number(order?.subtotal) || 0,
-      createdAt: new Date(order?.created_at).getTime() || 0,
+      total: Number(order?.subtotal) || getCurrentUnixTimestamp(),
+      createdAt:
+        new Date(order?.created_at).getTime() || getCurrentUnixTimestamp(),
+      updatedAt:
+        new Date(order?.created_at).getTime() || getCurrentUnixTimestamp(),
       customerId: safeString(order?.customer_id),
       customerFirstname: safeString(order?.customer_firstname),
       customerLastname: safeString(order?.customer_lastname),

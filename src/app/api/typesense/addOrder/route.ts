@@ -4,7 +4,30 @@ import { typesense } from "@/clients/typesense";
 import { checkApiKey } from "@/services/auth/checkApiKey";
 import { NextResponse, type NextRequest } from "next/server";
 import { getOrderProductsNames } from "@/services/typesense/getOrderProductsNames";
+import { convertIsoDateToUnixTimestamp } from "@/utils/date/convertIsoDateToUnixTimestamp";
 
+function findMissingProperties(order: any) {
+  const requiredProperties = [
+    "id",
+    "orderId",
+    "incrementId",
+    "kamiounId",
+    "state",
+    "status",
+    "total",
+    "createdAt",
+    "customerId",
+    "storeId",
+    "customerFirstname",
+    "customerLastname",
+  ];
+
+  const missingProperties = requiredProperties.filter((prop) => {
+    return !order.hasOwnProperty(prop);
+  });
+
+  return missingProperties;
+}
 export const POST = async (request: NextRequest) => {
   try {
     const isAuthorized = await checkApiKey(request);
@@ -19,8 +42,24 @@ export const POST = async (request: NextRequest) => {
       return responses.invalidRequest("order is Required");
     }
 
+    if (order) {
+      const missing = findMissingProperties(order);
+
+      if (missing?.length) {
+        return responses.invalidRequest(
+          "those properties are missing :" + "[" + missing + "]",
+        );
+      }
+    }
+    const unixTimestamp = Math.floor(Date.now() / 1000);
+
     await typesense.orders.addOne({
       ...order,
+      deliveryDate:
+        convertIsoDateToUnixTimestamp(order?.deliveryDate) || unixTimestamp,
+      createdAt:
+        convertIsoDateToUnixTimestamp(order?.createdAt) || unixTimestamp,
+      updatedAt: unixTimestamp,
       productsNames: getOrderProductsNames(order?.items),
     });
 
