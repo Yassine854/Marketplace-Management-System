@@ -2,7 +2,6 @@ import { Order } from "@/types/order";
 import { getOrderItems } from "../getOrderItems";
 import { getOrderSource } from "../getOrderSource";
 import { getOrderProductsNames } from "../../getOrderProductsNames";
-import { convertIsoDateToUnixTimestamp } from "@/utils/date/convertIsoDateToUnixTimestamp";
 
 function getCurrentUnixTimestamp() {
   return Math.floor(Date.now() / 1000);
