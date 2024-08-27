@@ -18,7 +18,7 @@ const Notifications = () => {
   const { notifications } = useGlobalStore();
   return (
     <Box title="Notifications">
-      {notifications.map((notification: any) => (
+      {notifications?.map((notification: any) => (
         <div className="py-4" key={notification.id}>
           <NotificationComponent key={notification.id} data={notification} />
         </div>

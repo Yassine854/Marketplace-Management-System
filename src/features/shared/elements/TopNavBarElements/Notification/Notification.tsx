@@ -28,7 +28,7 @@ const Notification = ({
         <IconBell />
       </button>
       <div
-        className={`absolute h-80 overflow-scroll top-full rounded-md border bg-n0 shadow-lg duration-300 dark:border-n500 dark:bg-n800 max-sm:origin-top ltr:max-sm:-right-[142px] ltr:sm:right-0 ltr:sm:origin-top-right rtl:max-sm:-left-[142px] rtl:sm:left-0 rtl:sm:origin-top-left ${
+        className={`absolute top-full h-80 overflow-scroll rounded-md border bg-n0 shadow-lg duration-300 dark:border-n500 dark:bg-n800 max-sm:origin-top ltr:max-sm:-right-[142px] ltr:sm:right-0 ltr:sm:origin-top-right rtl:max-sm:-left-[142px] rtl:sm:left-0 rtl:sm:origin-top-left ${
           open ? "visible scale-100 opacity-100" : "invisible scale-0 opacity-0"
         }`}
       >
@@ -49,7 +49,7 @@ const Notification = ({
               className="flex cursor-pointer gap-2 rounded-md p-2 duration-300 hover:bg-primary/10"
             >
               <Image
-                src="/images/user image.jpg"
+                src="/profile.png"
                 width={50}
                 height={50}
                 className="rounded-full"
