@@ -4,6 +4,10 @@ import OrdersTableRow from "../../elements/OrdersTableRow";
 import { useOrderTableActions } from "./useOrderTableActions";
 import OrdersTableHead from "../../elements/OrdersTableHead/OrdersTableHead";
 import OrderCancelingModal from "@/features/orders/widgets/OrderCancelingModal/OrderCancelingModal";
+import { logError } from "@/utils/logError";
+import OrderInvoiceTemplate from "../../elements/OrderInvoiceTemplate";
+import { pdf } from "@react-pdf/renderer";
+import { axios } from "@/libs/axios";
 
 const OrdersTable = () => {
   const {
@@ -26,6 +30,21 @@ const OrdersTable = () => {
     isCancelingPending,
     onCancelingModalClose,
   } = useOrderTableActions();
+
+  const handlePDFGeneration = async (orderId: string) => {
+    try {
+      const { data } = await axios.servicesClient(
+        `/api/orders/getOrder?id=${orderId}`,
+      );
+      const blob = await pdf(
+        <OrderInvoiceTemplate order={data?.order} />,
+      ).toBlob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch (error) {
+      logError(error);
+    }
+  };
 
   return (
     <table border={0} cellPadding={0} cellSpacing={0}>
@@ -54,7 +73,7 @@ const OrdersTable = () => {
                     key={order.id}
                     actionsList={actions}
                     onSelectClick={selectOrder}
-                    onPDFIconClick={() => summary.action(order.id)}
+                    onPDFIconClick={() => handlePDFGeneration(order.id)}
                     isSomeActionPending={
                       isSomeActionPending && orderUnderActionId === order.id
                     }
