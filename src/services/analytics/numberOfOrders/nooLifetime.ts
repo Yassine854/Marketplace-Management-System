@@ -1,6 +1,6 @@
 import { getNooByMonth } from "@/services/orders/getNumberOfOrders/getNooByMonth";
 
-export const nooLifetime = async () => {
+export const nooLifetime = async (storeId: string | null) => {
   const startYear = 2020;
   const currentYear = new Date().getFullYear();
 
@@ -22,7 +22,7 @@ export const nooLifetime = async () => {
 
       for (const month of months) {
         const date = year + "-" + month;
-        const numberOfOrders = await getNooByMonth(date);
+        const numberOfOrders = await getNooByMonth(date, storeId);
         if (numberOfOrders) {
           totalOrders += numberOfOrders;
         }
@@ -37,5 +37,9 @@ export const nooLifetime = async () => {
     lifetimeList.push(...yearlyAnalytics);
   }
 
-  return lifetimeList;
+  const total = lifetimeList.reduce(
+    (total, current) => total + Number(current.numberOfOrders),
+    0,
+  );
+  return { data: lifetimeList, total };
 };

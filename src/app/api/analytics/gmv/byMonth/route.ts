@@ -15,11 +15,13 @@ export const GET = async (request: NextRequest) => {
       return responses.invalidRequest("Year Parameter is Required");
     }
     //const res = await getgmvByMonthAnalytics(year, month);
-    const res = await gmvByMonth(Number(year), Number(month));
+    //@ts-ignore
+    const { data, total } = await gmvByMonth(Number(year), Number(month));
     return NextResponse.json(
       {
         message: "success",
-        data: res,
+        total,
+        data,
       },
       {
         status: 200,

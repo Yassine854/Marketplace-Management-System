@@ -1,6 +1,6 @@
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 
-export async function getNooForEachHourOfTheDay(date: string) {
+export async function getNooForEachHourOfTheDay({ date, storeId }: any) {
   const [day, month, year] = date.split("-").map(Number);
   const resultTable = [];
 
@@ -17,11 +17,20 @@ export async function getNooForEachHourOfTheDay(date: string) {
       const startTimestamp = item[0];
       const endTimestamp = item[1];
 
-      const searchParamsObj = {
-        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]`,
-        q: "*",
-        query_by: "",
-      };
+      let searchParamsObj;
+      if (storeId) {
+        searchParamsObj = {
+          filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}] && state:!=canceled && storeId :=${storeId}`,
+          q: "*",
+          query_by: "",
+        };
+      } else {
+        searchParamsObj = {
+          filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}] && state:!=canceled`,
+          q: "*",
+          query_by: "",
+        };
+      }
 
       const response = await typesenseClient
         .collections("orders")

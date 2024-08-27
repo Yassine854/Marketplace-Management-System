@@ -23,6 +23,7 @@ const GrossMerchandiseValueChart = () => {
   const [chartData, setChartData] = useState<number[]>([]);
   const [xAxis, setXAxis] = useState<string[]>([]);
 
+  const [total, setTotal] = useState(0);
   const ReactApexChart = dynamic(() => import("react-apexcharts"), {
     ssr: false,
   });
@@ -42,6 +43,7 @@ const GrossMerchandiseValueChart = () => {
 
   const {
     data: monthData,
+    total: totalByMonth,
     isLoading: isMonthLoading,
     refetch: refetchMonth,
   } = useGetGmvByMonth({
@@ -51,12 +53,14 @@ const GrossMerchandiseValueChart = () => {
 
   const {
     data: yearData,
+    total: totalByYear,
     isLoading: isYearLoading,
     refetch: refetchYear,
   } = useGetGmvByYear(dateYear);
 
   const {
     data: lifetimeData,
+    total: totalLifetime,
     isLoading: isLifetimeLoading,
     refetch: refetchLifetime,
   } = useGetGmvLifetime();
@@ -70,6 +74,20 @@ const GrossMerchandiseValueChart = () => {
       refetchMonth();
     }
   }, [monthData, selected, year, month, refetchMonth]);
+
+  useEffect(() => {
+    if (selected.key == "month") {
+      setTotal(totalByMonth);
+    }
+
+    if (selected.key == "year") {
+      setTotal(totalByYear);
+    }
+
+    if (selected.key == "lifetime") {
+      setTotal(totalLifetime);
+    }
+  }, [selected, totalByMonth, totalByYear, setTotal, totalLifetime]);
 
   useEffect(() => {
     if (selected.key === "lifetime" && lifetimeData) {
@@ -108,7 +126,9 @@ const GrossMerchandiseValueChart = () => {
           <div className=" mx-4 h-8 w-8 items-center justify-center ">
             {isLoading && <Loading />}
           </div>
-          <p className="text-2xl font-bold">Gross Merchandise Value</p>
+          <p className="text-2xl font-bold">
+            Gross Merchandise Value : {Math.floor(total) || 0} TND
+          </p>
         </div>
         <div className="flex flex-row">
           {selected.key === "year" && (

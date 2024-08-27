@@ -4,8 +4,35 @@ import { typesense } from "@/clients/typesense";
 import { checkApiKey } from "@/services/auth/checkApiKey";
 import { NextResponse, type NextRequest } from "next/server";
 import { getOrderProductsNames } from "@/services/typesense/getOrderProductsNames";
+import { convertIsoDateToUnixTimestamp } from "@/utils/date/convertIsoDateToUnixTimestamp";
+function findExtraFields(order: any, predefinedFields: string[]): string[] {
+  // Get the keys of the order object
+  const orderKeys = Object.keys(order);
+
+  // Find keys that are not in the predefinedFields list
+  const extraFields = orderKeys.filter(
+    (key) => !predefinedFields.includes(key),
+  );
+
+  // Return an array containing only the names of the extra fields
+  return extraFields;
+}
+
+const list = [
+  "deliveryDate",
+  "id",
+  "state",
+  "status",
+  "total",
+  "deliveryAgentId",
+  "deliveryAgentName",
+  "deliverySlot",
+  "deliveryStatus",
+  "items",
+];
 
 export const PUT = async (request: NextRequest) => {
+  // Only update  : deliveryDate, items, state,status,   deliverySlot,
   try {
     const isAuthorized = await checkApiKey(request);
 
@@ -19,10 +46,84 @@ export const PUT = async (request: NextRequest) => {
       return responses.invalidRequest("order is Required");
     }
 
-    await typesense.orders.updateOne({
-      ...order,
-      productsNames: getOrderProductsNames(order?.items),
-    });
+    if (!order?.id) {
+      return responses.invalidRequest("order id  is Required");
+    }
+
+    if (order) {
+      const fields = findExtraFields(order, list);
+
+      if (fields?.length) {
+        return responses.invalidRequest(
+          "you can't update those fields : " + "[" + fields + "]",
+        );
+      }
+    }
+    const unixTimestamp = Math.floor(Date.now() / 1000);
+
+    if (order?.status) {
+      await typesense.orders.updateOne({
+        id: order?.id,
+        updatedAt: unixTimestamp,
+        state: order?.state,
+      });
+    }
+    if (order?.state) {
+      await typesense.orders.updateOne({
+        id: order?.id,
+        updatedAt: unixTimestamp,
+        state: order?.state,
+      });
+    }
+
+    if (order?.deliverySlot) {
+      await typesense.orders.updateOne({
+        id: order?.id,
+        updatedAt: unixTimestamp,
+        deliverySlot: order?.deliverySlot,
+      });
+    }
+
+    if (order?.deliveryAgentId) {
+      await typesense.orders.updateOne({
+        id: order?.id,
+        updatedAt: unixTimestamp,
+        deliveryAgentId: order?.deliveryAgentId,
+      });
+    }
+
+    if (order?.deliveryAgentName) {
+      await typesense.orders.updateOne({
+        id: order?.id,
+        updatedAt: unixTimestamp,
+        deliveryAgentName: order?.deliveryAgentName,
+      });
+    }
+    if (order?.deliverySlot) {
+      await typesense.orders.updateOne({
+        id: order?.id,
+        updatedAt: unixTimestamp,
+        deliverySlot: order?.deliverySlot,
+      });
+    }
+
+    if (order?.deliveryDate) {
+      await typesense.orders.updateOne({
+        id: order?.id,
+        updatedAt: unixTimestamp,
+        deliveryDate:
+          convertIsoDateToUnixTimestamp(order?.deliveryDate) || unixTimestamp,
+      });
+    }
+
+    if (order?.items?.length) {
+      await typesense.orders.updateOne({
+        id: order?.id,
+        updatedAt: unixTimestamp,
+        items: order?.items,
+        productsNames: getOrderProductsNames(order?.items),
+      });
+    }
 
     order["action"] = "Update";
 

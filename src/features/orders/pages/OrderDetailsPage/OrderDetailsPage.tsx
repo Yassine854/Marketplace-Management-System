@@ -7,8 +7,10 @@ import OrderActions from "../../widgets/OrderDetailsActions/OrderDetailsActions"
 import OrderDetailsPageHeader from "../../widgets/OrderDetailsPageHeader/OrderDetailsPageHeader";
 import { useOrderDetailsPage } from "@/features/orders/pages/OrderDetailsPage/useOrderDetailsPage";
 import OrderCancelingModal from "@/features/orders/widgets/OrderCancelingModal/OrderCancelingModal";
+import { useEffect, useState } from "react";
 
 const OrderDetailsPage = () => {
+  const [isCorrupted, setIsCorrupted] = useState(false);
   const {
     order,
     total,
@@ -26,13 +28,25 @@ const OrderDetailsPage = () => {
     onCancelingModalClose,
   } = useOrderDetailsPage();
 
+  useEffect(() => {
+    if (order && !order?.deliveryDate) {
+      setIsCorrupted(true);
+      return;
+    }
+    if (order && !order?.items) {
+      setIsCorrupted(true);
+      return;
+    }
+    setIsCorrupted(false);
+  }, [order]);
+
   return (
     <div className="mt-[4.8rem] flex flex-grow flex-col justify-between bg-n20 p-4 ">
       <div className=" flex flex-grow flex-col overflow-hidden  rounded-2xl  bg-n10 p-2 shadow-2xl ">
         <>
           {!isLoading && (
             <OrderDetailsPageHeader
-              status={order?.status}
+              status={order?.deliveryDate ? order?.status : "corrupted"}
               onArrowClick={onArrowClick}
             />
           )}
@@ -64,13 +78,15 @@ const OrderDetailsPage = () => {
                   onDeliveryDateChange={onDeliveryDateChange}
                 />
 
-                <OrderActions
-                  dropRef={dropRef}
-                  actions={actions}
-                  orderId={order?.id}
-                  isInEditMode={isInEditMode}
-                  isPending={isSomeActionPending}
-                />
+                {order?.deliveryDate && (
+                  <OrderActions
+                    dropRef={dropRef}
+                    actions={actions}
+                    orderId={order?.id}
+                    isInEditMode={isInEditMode}
+                    isPending={isSomeActionPending}
+                  />
+                )}
               </div>
             </>
           )}

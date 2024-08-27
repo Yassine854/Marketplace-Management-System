@@ -27,6 +27,9 @@ export const useChangeOrderStatus = () => {
         toast.error(`Action not allowed`, { duration: 5000 });
         throw new Error();
       }
+
+      console.log("🚀 ~ useChangeOrderStatus ~ user:", user);
+
       await axios.servicesClient.post("api/orders/changeOrderStatus", {
         orderId,
         status,

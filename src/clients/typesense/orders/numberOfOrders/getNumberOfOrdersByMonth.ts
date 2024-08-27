@@ -3,6 +3,7 @@ import { typesenseClient } from "../../typesenseClient";
 
 export const getNumberOfOrdersByMonth = async (
   isoDate: string,
+  storeId: string | null,
 ): Promise<number | undefined> => {
   try {
     const [year, month] = isoDate.split("-").map(Number);
@@ -12,16 +13,27 @@ export const getNumberOfOrdersByMonth = async (
     const startTimestamp = Math.floor(startTime);
     const endTimestamp = Math.floor(endTime);
 
-    const searchParams = {
-      q: "",
-      query_by: "*",
-      filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]`,
-    };
+    let searchParams;
+
+    if (storeId) {
+      searchParams = {
+        q: "",
+        query_by: "*",
+        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]  && state:!=canceled && storeId:=${storeId}`,
+      };
+    } else {
+      searchParams = {
+        q: "",
+        query_by: "*",
+        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]  && state:!=canceled`,
+      };
+    }
 
     const allorders = await typesenseClient
       .collections("orders")
       .documents()
       .search(searchParams);
+
     return allorders.found;
   } catch (error) {
     logError(error);
