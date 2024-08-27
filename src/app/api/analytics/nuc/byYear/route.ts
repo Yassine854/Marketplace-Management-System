@@ -7,12 +7,12 @@ export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
 
-    const date = searchParams.get("year");
+    const year = searchParams.get("year");
 
-    if (!date) {
-      return responses.invalidRequest("Date Parameter is Required");
+    if (!year) {
+      return responses.invalidRequest("year Parameter is Required");
     }
-    const res = await nucByYear(date);
+    const res = await nucByYear(year);
 
     return NextResponse.json(
       {
