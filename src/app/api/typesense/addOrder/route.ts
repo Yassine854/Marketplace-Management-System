@@ -28,6 +28,9 @@ function findMissingProperties(order: any) {
 
   return missingProperties;
 }
+
+const webSocketApiUrl = process.env.WEBSOCKET_API_URL;
+
 export const POST = async (request: NextRequest) => {
   try {
     const isAuthorized = await checkApiKey(request);
@@ -65,7 +68,7 @@ export const POST = async (request: NextRequest) => {
 
     order["action"] = "Created";
 
-    await fetch("http://localhost:4001/api", {
+    await fetch(`${webSocketApiUrl}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

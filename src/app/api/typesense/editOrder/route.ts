@@ -31,6 +31,7 @@ const list = [
   "items",
 ];
 
+const webSocketApiUrl = process.env.WEBSOCKET_API_URL;
 export const PUT = async (request: NextRequest) => {
   // Only update  : deliveryDate, items, state,status,   deliverySlot,
   try {
@@ -50,15 +51,16 @@ export const PUT = async (request: NextRequest) => {
       return responses.invalidRequest("order id  is Required");
     }
 
-    if (order) {
-      const fields = findExtraFields(order, list);
+    // if (order) {
+    //   const fields = findExtraFields(order, list);
 
-      if (fields?.length) {
-        return responses.invalidRequest(
-          "you can't update those fields : " + "[" + fields + "]",
-        );
-      }
-    }
+    //   if (fields?.length) {
+    //     return responses.invalidRequest(
+    //       "you can't update those fields : " + "[" + fields + "]",
+    //     );
+    //   }
+    // }
+
     const unixTimestamp = Math.floor(Date.now() / 1000);
 
     if (order?.status) {
@@ -127,7 +129,7 @@ export const PUT = async (request: NextRequest) => {
 
     order["action"] = "Update";
 
-    await fetch("http://localhost:4001/api", {
+    await fetch(`${webSocketApiUrl}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
