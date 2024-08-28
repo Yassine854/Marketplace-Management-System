@@ -6,13 +6,20 @@ import {
   View,
   StyleSheet,
   Image,
-  Font,
 } from "@react-pdf/renderer";
 
 const OrderInvoiceTemplate = ({ order }: { order: any }) => {
   const creationDate = new Date().toLocaleString();
   const items = order.items;
-  const deliveryDateYMD = unixTimestampToDateYMD(order.deliveryDate);
+  const orderObject = {
+    id: order.id || "N/A",
+    deliveryDateYMD: unixTimestampToDateYMD(order.deliveryDate) || "0000/00/00",
+    items: items || [],
+    customerFirstname: order.customerFirstname || "Unknown",
+    customerLastname: order.customerLastname || "",
+    customerPhone: order.customerPhone || "N/A",
+    total: order.total || "0.00",
+  };
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -22,13 +29,13 @@ const OrderInvoiceTemplate = ({ order }: { order: any }) => {
               <Image
                 src="/images/kamioun-logo.b3a50ae8.png"
                 alt="kamioun-logo"
-                width={10}
-                height={10}
+                width={12}
+                height={12}
               />
             </View>
             <View style={styles.headerText}>
-              <Text>Commande N°: {order?.id}</Text>
-              <Text>Livraison: {deliveryDateYMD}</Text>
+              <Text>Commande N°: {orderObject.id}</Text>
+              <Text>Livraison: {orderObject.deliveryDateYMD}</Text>
             </View>
           </View>
           <View style={styles.invoiceDetails}>
@@ -41,10 +48,10 @@ const OrderInvoiceTemplate = ({ order }: { order: any }) => {
             <View style={styles.details}>
               <Text>Client</Text>
               <Text>
-                {order.customerFirstname}
-                {order.customerLastname}
+                {orderObject.customerFirstname}
+                {orderObject.customerLastname}
               </Text>
-              <Text>Tél: {order.customerPhone}</Text>
+              <Text>Tél: {orderObject.customerPhone}</Text>
             </View>
           </View>
         </View>
@@ -66,7 +73,7 @@ const OrderInvoiceTemplate = ({ order }: { order: any }) => {
               <Text style={styles.tableCellHeader}>Prix Total (TND)</Text>
             </View>
           </View>
-          {items.map((item: any, index: any) => (
+          {orderObject.items.map((item: any, index: any) => (
             <View style={styles.tableRow} key={index}>
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>
@@ -102,7 +109,7 @@ const OrderInvoiceTemplate = ({ order }: { order: any }) => {
           <View style={styles.total}>
             <View style={styles.totalItem}>
               <Text style={styles.totalItemLabel}>Total TTC à payer (TND)</Text>
-              <Text style={styles.totalItemValue}>{order.total}</Text>
+              <Text style={styles.totalItemValue}>{orderObject.total}</Text>
             </View>
           </View>
         </View>
