@@ -1,4 +1,4 @@
-import { unixTimestampToDateYMD } from "@/utils/date/unixTimestamp";
+import { convertUnixTimestampToIsoDate } from "@/utils/date/convertUnixTimestamp2IsoDate";
 import {
   Document,
   Page,
@@ -9,11 +9,13 @@ import {
 } from "@react-pdf/renderer";
 
 const OrderInvoiceTemplate = ({ order }: { order: any }) => {
+  const deliveryDate = order?.deliveryDate;
   const creationDate = new Date().toLocaleString();
   const items = order.items;
   const orderObject = {
-    id: order.id || "N/A",
-    deliveryDateYMD: unixTimestampToDateYMD(order.deliveryDate) || "0000/00/00",
+    id: order?.incrementId || "N/A",
+    deliveryDateYMD:
+      convertUnixTimestampToIsoDate(deliveryDate) || "0000/00/00",
     items: items || [],
     customerFirstname: order.customerFirstname || "Unknown",
     customerLastname: order.customerLastname || "",

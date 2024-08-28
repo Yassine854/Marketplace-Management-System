@@ -34,6 +34,7 @@ const OrdersTableRow = ({
   order,
   onSelectClick,
   onPDFIconClick,
+  onPDFIconClick2,
   isGenerateSummaryPending,
   actionsList,
   isSomeActionPending,
@@ -93,6 +94,17 @@ const OrdersTableRow = ({
               }}
             >
               <IconPdf />
+            </div>
+          )}
+          {!isGenerateSummaryPending && (
+            <div
+              className="rounded-full p-2 hover:bg-n10"
+              onClick={(event: any) => {
+                event.stopPropagation();
+                onPDFIconClick2(order.id);
+              }}
+            >
+              <IconPdf color="red" />
             </div>
           )}
         </div>
