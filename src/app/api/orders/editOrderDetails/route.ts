@@ -38,12 +38,13 @@ export const PUT = async (request: NextRequest) => {
 
     const { total, orderId, items, deliveryDate } = order;
 
-    await magento.mutations.editOrderDetails({
+    const res = await magento.mutations.editOrderDetails({
       total,
       items,
       orderId,
       deliveryDate,
     });
+    console.log("🚀 ~ PUT ~ res:", res);
 
     await typesense.orders.updateOne({
       total,
