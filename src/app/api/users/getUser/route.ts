@@ -1,3 +1,5 @@
+export const revalidate = 0;
+
 import { responses } from "@/utils/responses";
 import { getUser } from "@/services/users/getUser";
 import { NextRequest, NextResponse } from "next/server";

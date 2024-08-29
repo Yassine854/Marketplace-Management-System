@@ -9,6 +9,8 @@ export async function populateCollection() {
     const [month, year] = currentDate.split("-").map(Number);
     let endMonth = 12;
     for (let j = startYear; j <= year; j++) {
+      console.info("populate GMV Previous Months Collection ~ Year:", j);
+
       if (j === year) {
         endMonth = month - 1;
       }

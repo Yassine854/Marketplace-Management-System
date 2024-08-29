@@ -33,7 +33,7 @@ export const getOrdersBatch = (orders: any): Order[] =>
       storeId: safeString(order?.store_id),
       state: safeString(order?.state),
       status: safeString(order?.status),
-      total: Number(order?.subtotal) || getCurrentUnixTimestamp(),
+      total: Number(order?.subtotal) || 0,
       createdAt:
         new Date(order?.created_at).getTime() || getCurrentUnixTimestamp(),
       updatedAt:

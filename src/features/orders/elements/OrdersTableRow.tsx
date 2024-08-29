@@ -96,7 +96,7 @@ const OrdersTableRow = ({
               <IconPdf />
             </div>
           )}
-          {!isGenerateSummaryPending && (
+          {/* {!isGenerateSummaryPending && (
             <div
               className="rounded-full p-2 hover:bg-n10"
               onClick={(event: any) => {
@@ -106,7 +106,7 @@ const OrdersTableRow = ({
             >
               <IconPdf color="red" />
             </div>
-          )}
+          )} */}
         </div>
       </OrdersTableCell>
       <td className="px-3 py-4">

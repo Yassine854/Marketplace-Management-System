@@ -20,7 +20,9 @@ export const getGmvByDay = async (
     let totalOrders = 0;
     while (true) {
       const searchParameters = {
-        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}] && state:!=canceled`,
+        //   filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}] && state:!=canceled`,
+        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]`,
+
         q: "*",
         query_by: "",
         page: currentPage,

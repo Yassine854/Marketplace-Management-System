@@ -28,12 +28,7 @@ const OrderInvoiceTemplate = ({ order }: { order: any }) => {
         <View style={styles.section}>
           <View style={styles.header}>
             <View style={styles.headerImage}>
-              <Image
-                src="/images/kamioun-logo.b3a50ae8.png"
-                alt="kamioun-logo"
-                width={12}
-                height={12}
-              />
+              <Image src="/images/kamioun-logo.b3a50ae8.png" />
             </View>
             <View style={styles.headerText}>
               <Text>Commande N°: {orderObject.id}</Text>
@@ -108,7 +103,7 @@ const OrderInvoiceTemplate = ({ order }: { order: any }) => {
                             <Text style={styles.bonusText}>5123 points Bonus Total</Text>
                         </View> */}
           </View>
-          <View style={styles.total}>
+          <View>
             <View style={styles.totalItem}>
               <Text style={styles.totalItemLabel}>Total TTC à payer (TND)</Text>
               <Text style={styles.totalItemValue}>{orderObject.total}</Text>
@@ -185,7 +180,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   table: {
-    display: "table",
+    //display: "table",
     borderStyle: "solid",
     borderWidth: 1,
     borderRightWidth: 0,

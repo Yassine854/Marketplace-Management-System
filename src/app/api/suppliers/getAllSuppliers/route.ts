@@ -1,3 +1,5 @@
+export const revalidate = 0;
+
 import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { NextResponse, type NextRequest } from "next/server";
