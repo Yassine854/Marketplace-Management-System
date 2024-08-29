@@ -24,7 +24,7 @@ const TopNav = ({
       setNewNotification(true);
       setUpdated(notifications.length);
     }
-  }, [notifications,updated]);
+  }, [notifications, updated]);
   return (
     <nav
       className={`navbar-top z-20 px-4  shadow-sm duration-300 dark:border-b dark:border-n700 xxl:px-6 ${
