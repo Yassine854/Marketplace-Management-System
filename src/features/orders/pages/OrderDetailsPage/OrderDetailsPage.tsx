@@ -7,10 +7,10 @@ import OrderActions from "../../widgets/OrderDetailsActions/OrderDetailsActions"
 import OrderDetailsPageHeader from "../../widgets/OrderDetailsPageHeader/OrderDetailsPageHeader";
 import { useOrderDetailsPage } from "@/features/orders/pages/OrderDetailsPage/useOrderDetailsPage";
 import OrderCancelingModal from "@/features/orders/widgets/OrderCancelingModal/OrderCancelingModal";
-import { useEffect, useState } from "react";
+//import { useEffect, useState } from "react";
 
 const OrderDetailsPage = () => {
-  const [isCorrupted, setIsCorrupted] = useState(false);
+  // const [isCorrupted, setIsCorrupted] = useState(false);
   const {
     order,
     total,
@@ -28,34 +28,37 @@ const OrderDetailsPage = () => {
     onCancelingModalClose,
   } = useOrderDetailsPage();
 
-  useEffect(() => {
-    if (order && !order?.deliveryDate) {
-      setIsCorrupted(true);
-      return;
-    }
-    if (order && !order?.items) {
-      setIsCorrupted(true);
-      return;
-    }
-    setIsCorrupted(false);
-  }, [order]);
+  // useEffect(() => {
+  //   if (order && !order?.deliveryDate) {
+  //     setIsCorrupted(true);
+  //     return;
+  //   }
+  //   if (order && !order?.items) {
+  //     setIsCorrupted(true);
+  //     return;
+  //   }
+  //   setIsCorrupted(false);
+  // }, [order]);
 
   return (
     <div className="mt-[4.8rem] flex flex-grow flex-col justify-between bg-n20 p-4 ">
       <div className=" flex flex-grow flex-col overflow-hidden  rounded-2xl  bg-n10 p-2 shadow-2xl ">
         <>
-          {!isLoading && (
+          {!isLoading && order?.status && (
             <OrderDetailsPageHeader
               status={order?.deliveryDate ? order?.status : "corrupted"}
               onArrowClick={onArrowClick}
             />
           )}
-          {isLoading && <div className="h-12 w-full animate-pulse bg-n40" />}
+          {isLoading ||
+            (!order?.status && (
+              <div className="h-12 w-full animate-pulse bg-n40" />
+            ))}
         </>
 
         <Divider />
         <>
-          {!isLoading && (
+          {!isLoading && order?.status && (
             <>
               <div className=" mt-8  flex justify-between px-4">
                 <OrderInfo
@@ -90,17 +93,23 @@ const OrderDetailsPage = () => {
               </div>
             </>
           )}
-          {isLoading && <div className="h-48 w-full animate-pulse bg-n40" />}
+          {isLoading ||
+            (!order?.status && (
+              <div className="h-48 w-full animate-pulse bg-n40" />
+            ))}
         </>
         <Divider />
         <div className="relative mb-4 mt-1 flex flex-grow overflow-y-scroll ">
-          {!isLoading && orderOnReviewItems && (
+          {!isLoading && order?.status && orderOnReviewItems && (
             <OrderItemsTable
               items={orderOnReviewItems}
               isInEditMode={isInEditMode}
             />
           )}
-          {isLoading && <div className="h-full w-full animate-pulse bg-n40" />}
+          {isLoading ||
+            (!order?.status && (
+              <div className="h-full w-full animate-pulse bg-n40" />
+            ))}
         </div>
       </div>
       <OrderCancelingModal
