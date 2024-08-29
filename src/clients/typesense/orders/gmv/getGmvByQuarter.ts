@@ -34,6 +34,8 @@ export const getGmvByQuarter = async (
     while (true) {
       const searchParameters = {
         filter_by: `createdAt:=[${startDate}..${endDate}] && state :!= canceled `,
+
+        //  filter_by: `createdAt:=[${startDate}..${endDate}] && state :!= canceled `,
         q: "*",
         query_by: "",
         page: currentPage,
