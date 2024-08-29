@@ -3,7 +3,6 @@ import { logError } from "@/utils/logError";
 import { NextResponse } from "next/server";
 
 export const nucByYear = async (year: string) => {
-  console.log("🚀 ~ nucByYear ~ year:", year);
   try {
     const nucData: any[] = [];
     let all: any[] = [];
@@ -21,11 +20,9 @@ export const nucByYear = async (year: string) => {
         .collections("NucPreviousMonths")
         .documents()
         .search(searchParams);
-      //  console.log("🚀 ~ nucByYear ~ searchResults:", searchResults);
 
       const hits = searchResults.hits || [];
       all = hits.map((hit: any) => hit.document);
-      console.log("🚀 ~ nucByYear ~ all:", all.length);
 
       // Sort the orders by month to maintain the correct order
       all.sort(

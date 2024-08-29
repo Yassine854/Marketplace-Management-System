@@ -1,4 +1,3 @@
-import { getGmvByDay } from "@/clients/typesense/orders/gmv/getGmvByDay";
 import { typesenseClient } from "@/clients/typesense/typesenseClient";
 import { logError } from "@/utils/logError";
 //import { dateYMDToUnixTimestamp } from "@/utils/unixTimestamp";

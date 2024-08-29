@@ -11,7 +11,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const { setNotifications } = useGlobalStore();
   useEffect(() => {
     socket.on("connect", () => {
-      console.log("connected to socket");
+      console.info("connected to socket");
     });
     socket.on("notification", (data: Notification) => {
       setNotifications(data);
