@@ -7,7 +7,7 @@ import OrderActions from "../../widgets/OrderDetailsActions/OrderDetailsActions"
 import OrderDetailsPageHeader from "../../widgets/OrderDetailsPageHeader/OrderDetailsPageHeader";
 import { useOrderDetailsPage } from "@/features/orders/pages/OrderDetailsPage/useOrderDetailsPage";
 import OrderCancelingModal from "@/features/orders/widgets/OrderCancelingModal/OrderCancelingModal";
-//import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 
 const OrderDetailsPage = () => {
   // const [isCorrupted, setIsCorrupted] = useState(false);
