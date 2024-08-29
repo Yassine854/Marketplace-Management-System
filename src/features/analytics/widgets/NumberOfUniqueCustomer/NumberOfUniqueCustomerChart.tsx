@@ -104,7 +104,7 @@ const NumberOfUniqueCustomerChart = () => {
           width={"100%"}
           series={series}
           options={chartOptions}
-          type="line"
+          type={selected.key == "year" ? "bar" : "line"}
         />
       </div>
     </div>

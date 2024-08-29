@@ -33,7 +33,7 @@ export const getGmvByQuarter = async (
     let totalOrders = 0;
     while (true) {
       const searchParameters = {
-        filter_by: `deliveryDate:=[${startDate}..${endDate}] && state :!= canceled `,
+        filter_by: `createdAt:=[${startDate}..${endDate}] && state :!= canceled `,
         q: "*",
         query_by: "",
         page: currentPage,
