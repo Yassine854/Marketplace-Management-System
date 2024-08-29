@@ -8,7 +8,21 @@ export const useGlobalStore = create<any>(
       isNoEditUser: false,
       isAdmin: false,
       isMultipleStoreAccessUser: false,
+      notifications: [],
 
+      reset: () =>
+        set({
+          notifications: [],
+        }),
+
+      setNotifications: (data: any) =>
+        set((state: any) => ({
+          notifications: [data, ...state.notifications],
+        })),
+      clearNotifications: () =>
+        set(() => ({
+          notifications: [],
+        })),
       setStoreId: (storeId: string) => set({ storeId }),
       setIsAdmin: (isAdmin: boolean) => set({ isAdmin }),
       setIsMultipleStoreAccessUser: (isMultipleStoreAccessUser: boolean) =>
@@ -18,6 +32,10 @@ export const useGlobalStore = create<any>(
     {
       name: "globalStore",
       getStorage: () => localStorage,
+      // partialize: (state) => {
+      //   const { socket, notifications, ...rest } = state;
+      //   return rest;
+      // },
     },
   ),
 );
