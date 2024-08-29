@@ -3,9 +3,10 @@ import { logError } from "@/utils/logError";
 import { NextResponse } from "next/server";
 
 export const nucByYear = async (year: string) => {
+  console.log("🚀 ~ nucByYear ~ year:", year);
   try {
     const nucData: any[] = [];
-    let allOrders: any[] = [];
+    let all: any[] = [];
 
     try {
       const searchParams = {
@@ -20,12 +21,14 @@ export const nucByYear = async (year: string) => {
         .collections("NucPreviousMonths")
         .documents()
         .search(searchParams);
+      //  console.log("🚀 ~ nucByYear ~ searchResults:", searchResults);
 
       const hits = searchResults.hits || [];
-      allOrders = hits.map((hit: any) => hit.document);
+      all = hits.map((hit: any) => hit.document);
+      console.log("🚀 ~ nucByYear ~ all:", all.length);
 
       // Sort the orders by month to maintain the correct order
-      allOrders.sort(
+      all.sort(
         (a, b) =>
           new Date(`${a.month} 1, ${a.year}`).getTime() -
           new Date(`${b.month} 1, ${b.year}`).getTime(),
@@ -35,10 +38,10 @@ export const nucByYear = async (year: string) => {
     }
 
     // Create an array of data with month and corresponding GMV
-    allOrders.forEach((order) => {
+    all.forEach((e) => {
       nucData.push({
-        month: order.month,
-        nuc: order.nuc,
+        month: e.month,
+        nuc: e.nuc,
       });
     });
 
