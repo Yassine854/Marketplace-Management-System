@@ -44,7 +44,6 @@ export const PUT = async (request: NextRequest) => {
       orderId,
       deliveryDate,
     });
-    console.log("🚀 ~ PUT ~ res:", res);
 
     await typesense.orders.updateOne({
       total,

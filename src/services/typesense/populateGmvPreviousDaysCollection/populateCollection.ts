@@ -16,9 +16,13 @@ export async function populateCollection() {
     const currentDay = currentDate.date();
 
     for (let year = startYear; year <= currentYear; year++) {
+      console.info(" populate GMV Previous Days Collection ~ year:", year);
+
       const finalMonth = year === currentYear ? currentMonth : 12;
 
       for (let month = 1; month <= finalMonth; month++) {
+        console.info(" populate GMV Previous Days Collection  ~ month:", month);
+
         const endDay =
           year === currentYear && month === currentMonth
             ? currentDay - 1
@@ -49,8 +53,9 @@ export async function populateCollection() {
           }
         }
       }
-      console.info(`GmvPrevDays Collection successfully populated.`);
     }
+
+    console.info(`GmvPrevDays Collection successfully populated.`);
   } catch (error) {
     console.error("Error populating gmvPreviousDays:", error);
     throw error;
