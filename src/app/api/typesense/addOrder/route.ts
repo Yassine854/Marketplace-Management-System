@@ -28,6 +28,9 @@ function findMissingProperties(order: any) {
 
   return missingProperties;
 }
+
+const webSocketApiUrl = process.env.WEBSOCKET_API_URL;
+
 export const POST = async (request: NextRequest) => {
   try {
     const isAuthorized = await checkApiKey(request);
@@ -61,6 +64,18 @@ export const POST = async (request: NextRequest) => {
         convertIsoDateToUnixTimestamp(order?.createdAt) || unixTimestamp,
       updatedAt: unixTimestamp,
       productsNames: getOrderProductsNames(order?.items),
+    });
+
+    order["action"] = "Created";
+
+    await fetch(`${webSocketApiUrl}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+    }).catch((error) => {
+      console.error("Error creating order:", error);
     });
 
     return NextResponse.json(

@@ -5,32 +5,33 @@ import { checkApiKey } from "@/services/auth/checkApiKey";
 import { NextResponse, type NextRequest } from "next/server";
 import { getOrderProductsNames } from "@/services/typesense/getOrderProductsNames";
 import { convertIsoDateToUnixTimestamp } from "@/utils/date/convertIsoDateToUnixTimestamp";
-function findExtraFields(order: any, predefinedFields: string[]): string[] {
-  // Get the keys of the order object
-  const orderKeys = Object.keys(order);
+// function findExtraFields(order: any, predefinedFields: string[]): string[] {
+//   // Get the keys of the order object
+//   const orderKeys = Object.keys(order);
 
-  // Find keys that are not in the predefinedFields list
-  const extraFields = orderKeys.filter(
-    (key) => !predefinedFields.includes(key),
-  );
+//   // Find keys that are not in the predefinedFields list
+//   const extraFields = orderKeys.filter(
+//     (key) => !predefinedFields.includes(key),
+//   );
 
-  // Return an array containing only the names of the extra fields
-  return extraFields;
-}
+//   // Return an array containing only the names of the extra fields
+//   return extraFields;
+// }
 
-const list = [
-  "deliveryDate",
-  "id",
-  "state",
-  "status",
-  "total",
-  "deliveryAgentId",
-  "deliveryAgentName",
-  "deliverySlot",
-  "deliveryStatus",
-  "items",
-];
+// const list = [
+//   "deliveryDate",
+//   "id",
+//   "state",
+//   "status",
+//   "total",
+//   "deliveryAgentId",
+//   "deliveryAgentName",
+//   "deliverySlot",
+//   "deliveryStatus",
+//   "items",
+// ];
 
+const webSocketApiUrl = process.env.WEBSOCKET_API_URL;
 export const PUT = async (request: NextRequest) => {
   // Only update  : deliveryDate, items, state,status,   deliverySlot,
   try {
@@ -50,15 +51,16 @@ export const PUT = async (request: NextRequest) => {
       return responses.invalidRequest("order id  is Required");
     }
 
-    if (order) {
-      const fields = findExtraFields(order, list);
+    // if (order) {
+    //   const fields = findExtraFields(order, list);
 
-      if (fields?.length) {
-        return responses.invalidRequest(
-          "you can't update those fields : " + "[" + fields + "]",
-        );
-      }
-    }
+    //   if (fields?.length) {
+    //     return responses.invalidRequest(
+    //       "you can't update those fields : " + "[" + fields + "]",
+    //     );
+    //   }
+    // }
+
     const unixTimestamp = Math.floor(Date.now() / 1000);
 
     if (order?.status) {
@@ -124,6 +126,18 @@ export const PUT = async (request: NextRequest) => {
         productsNames: getOrderProductsNames(order?.items),
       });
     }
+
+    order["action"] = "Update";
+
+    await fetch(`${webSocketApiUrl}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+    }).catch((error) => {
+      console.error("Error creating order:", error);
+    });
 
     return NextResponse.json(
       {

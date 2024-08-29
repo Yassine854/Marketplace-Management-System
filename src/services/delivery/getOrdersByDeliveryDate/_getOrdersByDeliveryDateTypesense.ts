@@ -14,7 +14,7 @@ export const getOrdersByDeliveryDateTypesense = async (
     const lastSecondTimestamp = Math.floor(date.getTime() / 1000);
 
     const res = await typesense.orders.getMany({
-      filterBy: `deliveryDate:=[${deliveryDate}..${lastSecondTimestamp}]`,
+      filterBy: `createdAt:=[${deliveryDate}..${lastSecondTimestamp}]`,
     });
 
     return res;

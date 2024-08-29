@@ -28,8 +28,6 @@ export const useChangeOrderStatus = () => {
         throw new Error();
       }
 
-      console.log("🚀 ~ useChangeOrderStatus ~ user:", user);
-
       await axios.servicesClient.post("api/orders/changeOrderStatus", {
         orderId,
         status,

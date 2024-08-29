@@ -7,6 +7,8 @@ export const initialOrder = {
   status: "",
   total: 0,
   createdAt: 0,
+  updatedAt: 0,
+  deliveryDate: 0,
   customerId: "999",
   storeId: "999",
   customerPhone: "999",
@@ -15,7 +17,7 @@ export const initialOrder = {
   deliveryAgentId: "",
   deliveryAgentName: "",
   deliverySlot: "999",
-  deliveryDate: 0,
+
   deliveryStatus: "",
   source: "online",
   productsNames: [],
