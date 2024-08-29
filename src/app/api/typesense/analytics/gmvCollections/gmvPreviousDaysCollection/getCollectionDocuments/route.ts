@@ -1,3 +1,5 @@
+export const revalidate = 0;
+
 //import { getCollectionDocuments } from "@/clients/typesense/getCollectionDocuments";
 //import { gmvPreviousDaysCollectionSchema } from "@/clients/typesense/schemas/GMVPreviousDaysCollection";
 import { NextRequest } from "next/server";

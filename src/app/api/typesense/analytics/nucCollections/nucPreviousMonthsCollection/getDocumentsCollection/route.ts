@@ -1,3 +1,5 @@
+export const revalidate = 0;
+
 import { getCollectionDocuments } from "@/clients/typesense/getCollectionDocuments";
 import { nucPreviousMonthsCollectionSchema } from "@/clients/typesense/schemas/nucPreviousMonthsCollection";
 import { NextRequest } from "next/server";
