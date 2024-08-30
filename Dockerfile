@@ -26,7 +26,6 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN npm install -g pnpm 
 RUN pnpm i 
-RUN pnpm prisma:push
 RUN pnpm prisma:generate
 RUN pnpm build
 
@@ -35,7 +34,7 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
-ENV PORT 3003
+ENV PORT 3002
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -53,7 +52,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-EXPOSE 3003
+EXPOSE 3002
 
 
 # server.js is created by next build from the standalone output

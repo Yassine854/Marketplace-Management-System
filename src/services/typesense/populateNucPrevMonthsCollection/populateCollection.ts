@@ -29,7 +29,7 @@ export const populateCollection = async (request: NextRequest) => {
 
     for (let year = startYear; year <= currentYear; year++) {
       if (year === currentYear) {
-        for (let month = 1; month < currentMonth; month++) {
+        for (let month = 1; currentMonth <= currentMonth; month++) {
           const uniqueCustomersPerMonth = await nucPrev(month, year);
           await createDocument(month, year, uniqueCustomersPerMonth);
         }
