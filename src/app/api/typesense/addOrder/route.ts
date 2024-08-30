@@ -6,6 +6,18 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getOrderProductsNames } from "@/services/typesense/getOrderProductsNames";
 import { convertIsoDateToUnixTimestamp } from "@/utils/date/convertIsoDateToUnixTimestamp";
 
+function getUnixTimestampTomorrow() {
+  // Get the current date
+  const today = new Date();
+
+  // Create a new date object for tomorrow
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  // Convert the date object to a UNIX timestamp (in seconds)
+  return Math.floor(tomorrow.getTime() / 1000);
+}
+
 function findMissingProperties(order: any) {
   const requiredProperties = [
     "id",
@@ -56,10 +68,22 @@ export const POST = async (request: NextRequest) => {
     }
     const unixTimestamp = Math.floor(Date.now() / 1000);
 
+    // if (!order.deliveryDate) {
+    //   return responses.invalidRequest(
+    //     "deliveryDate is required and must be a valid date.",
+    //   );
+    // }
+
+    const date = new Date(order.deliveryDate);
+    // if (isNaN(date.getTime())) {
+    //   return responses.invalidRequest("deliveryDate is invalid.");
+    // }
+
+    const deliveryDate =
+      Math.floor(date.getTime() / 1000) || getUnixTimestampTomorrow();
     await typesense.orders.addOne({
       ...order,
-      deliveryDate:
-        convertIsoDateToUnixTimestamp(order?.deliveryDate) || unixTimestamp,
+      deliveryDate,
       createdAt:
         convertIsoDateToUnixTimestamp(order?.createdAt) || unixTimestamp,
       updatedAt: unixTimestamp,

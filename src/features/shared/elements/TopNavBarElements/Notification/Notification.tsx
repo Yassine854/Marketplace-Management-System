@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
+import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
 const Notification = ({
   isWhite,
   setNewNotification,
@@ -12,6 +14,9 @@ const Notification = ({
 }) => {
   const { open, ref, toggleOpen } = useDropdown();
   const { notifications } = useGlobalStore();
+
+  const { navigateToOrderDetails } = useNavigation();
+  const { setOrderOnReviewId } = useOrderDetailsStore();
   return (
     <div className="relative" ref={ref}>
       <button
@@ -46,6 +51,11 @@ const Notification = ({
           {notifications.map((notification: any) => (
             <div
               key={notification.id}
+              onClick={() => {
+                setOrderOnReviewId(notification.orderId);
+                navigateToOrderDetails();
+                toggleOpen();
+              }}
               className="flex cursor-pointer gap-2 rounded-md p-2 duration-300 hover:bg-primary/10"
             >
               <Image

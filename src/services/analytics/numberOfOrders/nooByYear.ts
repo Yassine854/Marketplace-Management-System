@@ -14,11 +14,11 @@ export const nooByYear = async (year: string, storeId: string | null) => {
     const numberOfOrders = await getNooByMonth(monthDate, storeId);
 
     if (!numberOfOrders) {
-      break;
+      // break;
     }
 
     list.push({
-      numberOfOrders: numberOfOrders.toString(),
+      numberOfOrders: numberOfOrders?.toString(),
       date: monthDate,
     });
   }
