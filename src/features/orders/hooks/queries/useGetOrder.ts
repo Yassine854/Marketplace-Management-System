@@ -1,9 +1,12 @@
+import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { axios } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 export const useGetOrder = (id: number) => {
   const pathname = usePathname();
+  const { notifications } = useGlobalStore();
 
   const {
     isLoading,
@@ -23,6 +26,12 @@ export const useGetOrder = (id: number) => {
     },
     refetchInterval: 180000,
   });
+
+  useEffect(() => {
+    if (notifications?.length > 0) {
+      refetch();
+    }
+  }, [notifications, refetch]);
 
   return {
     order,
