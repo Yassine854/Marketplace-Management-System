@@ -19,10 +19,10 @@ export const nooByMonth = async (
     const dayDate: string = year + "-" + month + "-" + towDigitDay;
     const numberOfOrders = await getNooByDay(dayDate, storeId);
     if (!numberOfOrders) {
-      break;
+      // break;
     }
     list.push({
-      numberOfOrders: numberOfOrders.toString(),
+      numberOfOrders: numberOfOrders?.toString(),
       date: dayDate,
       day,
     });
