@@ -32,10 +32,6 @@ export const useGlobalStore = create<any>(
     {
       name: "globalStore",
       getStorage: () => localStorage,
-      // partialize: (state) => {
-      //   const { socket, notifications, ...rest } = state;
-      //   return rest;
-      // },
     },
   ),
 );
