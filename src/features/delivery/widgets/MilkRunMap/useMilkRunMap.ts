@@ -24,7 +24,7 @@ export const useMilkRunMap = ({ ordersMarkers }: any) => {
     const newList: any[] = [];
 
     // Iterate through the orders and assign colors from the predefined list
-    ordersMarkers.forEach((order: any) => {
+    ordersMarkers?.forEach((order: any) => {
       const agentId = order.delivery_agent_id;
       //@ts-ignore
       if (!agentColors[agentId]) {
