@@ -1,6 +1,8 @@
 import Box from "@/features/layout/Box/Box";
 import NotificationComponent from "./NotificationComponent";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
+import { useNavigation } from "@/features/shared/hooks/useNavigation";
+import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 
 type Notification = {
   id: number;
@@ -16,10 +18,21 @@ type Notification = {
 
 const Notifications = () => {
   const { notifications } = useGlobalStore();
+  const { navigateToOrderDetails } = useNavigation();
+  const { setOrderOnReviewId } = useOrderDetailsStore();
+
   return (
     <Box title="Notifications">
       {notifications?.map((notification: any) => (
-        <div className="py-4" key={notification.id}>
+        <div
+          className="cursor-pointer py-4"
+          key={notification.id}
+          onClick={() => {
+            console.log(notification);
+            // setOrderOnReviewId(notification.id);
+            // navigateToOrderDetails();
+          }}
+        >
           <NotificationComponent key={notification.id} data={notification} />
         </div>
       ))}

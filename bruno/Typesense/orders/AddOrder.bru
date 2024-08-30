@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:3000/api/typesense/addOrder
+  url: https://oms.sandbox.kamioun.com/api/typesense/addOrder
   body: json
   auth: none
 }
@@ -16,6 +16,39 @@ headers {
 
 body:json {
   {
-  "order":   {"id":"60094","orderId":"60094","incrementId":"000050114","kamiounId":"000050114","state":"new","status":"open","total":5.1,"createdAt":"2024-08-26T15:56:18.000+01:00","customerId":7043,"storeId":1,"customerPhone":"50885777","customerFirstname":"najeh","customerLastname":"abassi","deliveryAgentId":"","deliveryAgentName":"","deliverySlot":"","deliveryDate":"","deliveryStatus":"","source":"UNKNOWN","items":[{"id":"736885","orderId":"60094","productId":"154","productName":"Bonna - Pot moutarde 263ml (Unit\u00e9)","productPrice":5.1,"totalPrice":5.1,"quantity":1,"sku":"001-001001","weight":1}]}
+    "order": {
+      "id": "60202594",
+      "orderId": "600954",
+      "incrementId": "0000501184",
+      "kamiounId": "0000501814",
+      "state": "new",
+      "status": "open",
+      "total": 500.1,
+      "createdAt": "2024-09-26T15:56:18.000+01:00",
+      "customerId": 7043,
+      "storeId": 1,
+      "customerPhone": "50885777",
+      "customerFirstname": "Bruno ",
+      "customerLastname": "Test",
+      "deliveryAgentId": "",
+      "deliveryAgentName": "",
+      "deliverySlot": "",
+      "deliveryDate": "",
+      "deliveryStatus": "",
+      "source": "UNKNOWN",
+      "items": [
+        {
+          "id": "736885",
+          "orderId": "60094",
+          "productId": "154",
+          "productName": "Bonna - Pot moutarde 263ml (Unit\u00e9)",
+          "productPrice": 5.1,
+          "totalPrice": 5.1,
+          "quantity": 1,
+          "sku": "001-001001",
+          "weight": 1
+        }
+      ]
+    }
   }
 }

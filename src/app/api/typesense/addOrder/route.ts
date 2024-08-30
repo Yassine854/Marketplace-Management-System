@@ -56,10 +56,21 @@ export const POST = async (request: NextRequest) => {
     }
     const unixTimestamp = Math.floor(Date.now() / 1000);
 
+    if (!order.deliveryDate) {
+      return responses.invalidRequest(
+        "deliveryDate is required and must be a valid date.",
+      );
+    }
+
+    const date = new Date(order.deliveryDate);
+    if (isNaN(date.getTime())) {
+      return responses.invalidRequest("deliveryDate is invalid.");
+    }
+
+    const deliveryDate = Math.floor(date.getTime() / 1000);
     await typesense.orders.addOne({
       ...order,
-      deliveryDate:
-        convertIsoDateToUnixTimestamp(order?.deliveryDate) || unixTimestamp,
+      deliveryDate,
       createdAt:
         convertIsoDateToUnixTimestamp(order?.createdAt) || unixTimestamp,
       updatedAt: unixTimestamp,
