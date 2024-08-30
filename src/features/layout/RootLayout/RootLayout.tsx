@@ -14,7 +14,6 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       console.info("connected to socket");
     });
     socket.on("notification", (data: Notification) => {
-      console.log("🚀 ~ socket.on ~ data:", data);
       setNotifications(data);
     });
   }, [setNotifications]);

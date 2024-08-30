@@ -28,9 +28,8 @@ const Notifications = () => {
           className="cursor-pointer py-4"
           key={notification.id}
           onClick={() => {
-            console.log(notification);
-            // setOrderOnReviewId(notification.id);
-            // navigateToOrderDetails();
+            setOrderOnReviewId(notification.orderId);
+            navigateToOrderDetails();
           }}
         >
           <NotificationComponent key={notification.id} data={notification} />
