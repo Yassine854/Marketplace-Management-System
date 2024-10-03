@@ -47,7 +47,7 @@ const RootLayout = ({
           <Next13NProgress color="#5D69F4" height={3} />
           <LayoutProvider>
             <NextUIProvider
-            ///  locale="fr-FR"
+            ///  locale="fr-FR"c
             >
               {children}
             </NextUIProvider>
