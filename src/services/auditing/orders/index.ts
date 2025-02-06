@@ -7,6 +7,7 @@ export async function createAuditLog(auditObject: AuditLog) {
   const { username, userId, action, actionTime, orderId, storeId } =
     auditObject;
   //@ts-ignore
+  /*
   await prisma.ordersAuditTrail.create({
     data: {
       username,
@@ -17,4 +18,5 @@ export async function createAuditLog(auditObject: AuditLog) {
       storeId,
     },
   });
+  */
 }

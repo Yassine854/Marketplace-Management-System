@@ -8,33 +8,35 @@ import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useAuth } from "@/features/shared/hooks/useAuth";
+import React from "react";
+
 export const useChangeOrderStatus = () => {
   const { refetch } = useOrdersData();
-
   const { isNoEditUser } = useGlobalStore();
-
   const { orderOnReviewId } = useOrderDetailsStore();
-
   const { refetch: refetchCount } = useGetOrdersCount();
-
   const { setOrderUnderActionId } = useOrderActionsStore();
-
   const { refetch: refetchOrder } = useGetOrder(orderOnReviewId);
   const { user } = useAuth();
+
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ orderId, status, state }: any) => {
       if (isNoEditUser) {
-        toast.error(`Action not allowed`, { duration: 5000 });
-        throw new Error();
+        toast.error("Action not allowed", { duration: 5000 });
+        throw new Error("Action not allowed");
       }
 
-      await axios.servicesClient.post("api/orders/changeOrderStatus", {
+      const response = await axios.servicesClient.post("api/orders/changeOrderStatus", {
         orderId,
         status,
         state,
         //@ts-ignore
         username: user?.username,
       });
+
+      if (response.status !== 200) {
+        throw new Error(response.data.message || "Something went wrong");
+      }
 
       return orderId;
     },
@@ -43,11 +45,37 @@ export const useChangeOrderStatus = () => {
       refetchOrder();
       refetchCount();
       setOrderUnderActionId("");
-      toast.success(`Order Status Updated Successfully`, { duration: 5000 });
+      toast.success("Order Status Updated Successfully", { duration: 5000 });
     },
-    onError: () => {
+    onError: (error: any) => {
       setOrderUnderActionId("");
-      toast.error(`Something Went Wrong`, { duration: 5000 });
+      const errorMessage = error.response?.data?.message || error.message || "Something Went Wrong";
+
+  
+      toast.custom((t) => 
+        React.createElement(
+          'div', 
+          { style: { padding: '16px', background: 'red', color: 'white' } }, 
+          [
+            React.createElement('p', { key: 'message' }, errorMessage),
+            React.createElement('button', {
+              key: 'button',
+              onClick: () => toast.dismiss(t.id),
+              style: { 
+                marginTop: '8px', 
+                backgroundColor: 'white', 
+                color: 'black', 
+                border: 'none', 
+                padding: '8px 16px', 
+                cursor: 'pointer' 
+              }
+            }, 'OK')
+          ]
+        ),
+        {
+          duration: Infinity, 
+        }
+      );
     },
   });
 

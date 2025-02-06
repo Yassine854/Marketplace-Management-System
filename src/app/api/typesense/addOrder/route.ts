@@ -73,14 +73,17 @@ export const POST = async (request: NextRequest) => {
     //     "deliveryDate is required and must be a valid date.",
     //   );
     // }
-
+    let delivdate= 0;
     const date = new Date(order.deliveryDate);
-    // if (isNaN(date.getTime())) {
-    //   return responses.invalidRequest("deliveryDate is invalid.");
-    // }
+     if (isNaN(date.getTime()) ) {
+      delivdate=getUnixTimestampTomorrow();
+     }
+else 
+{
+  delivdate= Math.floor(date.getTime() / 1000);
 
-    const deliveryDate =
-      Math.floor(date.getTime() / 1000) || getUnixTimestampTomorrow();
+}
+    const deliveryDate=delivdate;
     await typesense.orders.addOne({
       ...order,
       deliveryDate,

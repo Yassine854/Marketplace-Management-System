@@ -6,5 +6,5 @@ export const matcher = (day: Date) => {
   const isSunday = day.getDay() === 0;
 
   // Return false for all previous days (including today) and all upcoming Sundays
-  return day <= today || isSunday;
+  return day <= today ;
 };

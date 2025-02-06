@@ -8,6 +8,8 @@ import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 import { useOrderDetailsStore } from "@/features/orders/stores/orderDetailsStore";
 import { useOrderActionsStore } from "@/features/orders/stores/orderActionsStore";
 import { useAuth } from "@/features/shared/hooks/useAuth";
+import { typesense } from "@/clients/typesense";
+
 
 export const useEditOrderDetails = () => {
   const { refetch } = useOrdersData();
@@ -39,6 +41,7 @@ export const useEditOrderDetails = () => {
       if (!orderOnReviewDeliveryDate) {
         toast.error(`Select a Delivery Date`, { duration: 5000 });
       }
+      const sorder: any = await typesense.orders.getOne(orderOnReviewId);
 
       await axios.servicesClient.put("/api/orders/editOrderDetails", {
         order: {
@@ -46,6 +49,8 @@ export const useEditOrderDetails = () => {
           orderId: orderOnReviewId,
           items: orderOnReviewItems,
           deliveryDate: orderOnReviewDeliveryDate,
+          status:sorder?.status,
+          state:sorder?.state, 
         },
         //@ts-ignore
         username: user?.username,

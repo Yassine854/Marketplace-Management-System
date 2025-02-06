@@ -3,11 +3,13 @@ import { useGetManyOrders } from "./useGetManyOrders";
 import { useOrdersStore } from "@/features/orders/stores/ordersStore";
 import { useOrdersTableStore } from "@/features/orders/stores/ordersTableStore";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
+import { useFiltersStore} from "@/featuresorders/stores/useFiltersStore"
 
 export const useOrdersData = () => {
   const { status, orders, setOrders, setIsOrdersLoading } = useOrdersStore();
 
   const { storeId } = useGlobalStore();
+  const { filters } = useFiltersStore();
   const { sort, search, currentPage, itemsPerPage } = useOrdersTableStore();
 
   const { data, isLoading, refetch } = useGetManyOrders({
@@ -17,6 +19,7 @@ export const useOrdersData = () => {
     sortBy: sort || "createdAt:desc",
     status,
     storeId,
+    filters,
   });
 
   useEffect(() => {

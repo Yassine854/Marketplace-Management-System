@@ -8,7 +8,7 @@ export const tailwind = {
   },
   list(width: string, open: boolean): string {
     return `absolute z-20 flex-col rounded-md ${
-      width ? width : "min-w-max sm:min-w-[140px]"
+      width ? width : " w-full "
     } top-full max-h-72 origin-top overflow-y-auto rounded-md border border-n30 bg-n0 p-1 shadow-md duration-300 dark:border-n500 dark:bg-bg4 ltr:right-0 rtl:left-0 ${
       open
         ? "visible flex scale-100 opacity-100"

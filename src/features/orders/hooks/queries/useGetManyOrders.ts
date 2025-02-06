@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+
 export const useGetManyOrders = ({
   page,
   perPage,
@@ -12,6 +13,7 @@ export const useGetManyOrders = ({
   filterBy,
   storeId,
   status,
+  filters,
 }: any) => {
   const pathname = usePathname();
   const { notifications } = useGlobalStore();
@@ -25,12 +27,13 @@ export const useGetManyOrders = ({
       sortBy,
       storeId,
       status,
+      filters,
     ],
     queryFn: async () => {
       const isOnOrdersPage = pathname?.includes("orders");
       if (isOnOrdersPage) {
         const { data } = await axios.servicesClient(
-          `/api/orders/getManyOrders?sortBy=${sortBy}&search=${search}&page=${page}&storeId=${storeId}&status=${status}&perPage=${perPage}`,
+          `/api/orders/getManyOrders?sortBy=${sortBy}&filters=${filters}&search=${search}&page=${page}&storeId=${storeId}&status=${status}&perPage=${perPage}`,
         );
 
         return data;

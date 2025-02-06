@@ -16,7 +16,7 @@ const OrdersPagination = () => {
           `Showing ${startIndex + 1} to ${
             endIndex + 1
           } of ${totalItems} orders`}
-        {!totalItems && "Showing  ***  to  ***  of  *** orders"}
+        {!totalItems && "No orders found"}
       </p>
 
       <PageSelector />

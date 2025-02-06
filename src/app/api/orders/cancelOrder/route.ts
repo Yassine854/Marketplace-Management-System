@@ -6,37 +6,60 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAuditLog } from "@/services/auditing/orders";
 import { prisma } from "@/clients/prisma";
 import { getOrder } from "@/services/orders/getOrder";
+
 export const POST = async (request: NextRequest) => {
   try {
     const { orderId, username } = await request.json();
+
     if (!orderId) {
       return responses.invalidRequest("orderId is Required");
     }
     if (!username) {
       return responses.invalidRequest("username is Required");
     }
+    await magento.mutations.cancelOrder(orderId);  
 
-    await magento.mutations.cancelOrder(orderId);
-    await typesense.orders.cancelOne(orderId);
+    // Ensure orderId is a string, if it's an array, join it into a string
+    const orderIds = Array.isArray(orderId) 
+      ? orderId 
+      : orderId.split(',').map((id: string) => id.trim());
 
-    const user = await prisma.getUser(username);
-    const order = await getOrder(orderId);
+    // Check if orderIds is an array of order IDs
+    if (!Array.isArray(orderIds)) {
+      return responses.invalidRequest("Invalid orderId format");
+    }
 
-    await createAuditLog({
-      username: user?.username ?? "",
-      userId: user?.id ?? "",
-      action: `${username} canceled order`,
-      actionTime: new Date(),
-      orderId: orderId,
-      storeId: order?.storeId,
-    });
+    // Ensure the user exists
+    const user = await prisma.getUser(username.username);
+
+    for (let id of orderIds) {
+      try {
+        // Process each order ID separately
+        await typesense.orders.cancelOne(id);
+
+        const order = await getOrder(id);
+
+        await createAuditLog({
+          username: user?.username ?? "",
+          userId: user?.id ?? "",
+          action: `${user?.firstName}-${user?.lastName} canceled order`,
+          actionTime: new Date(),
+          orderId: id,
+          storeId: order?.storeId,
+        });
+
+        //console.log(`Order ${id} processed successfully.`);
+      } catch (error) {
+        console.error(`Failed to process order ${id}:`, error);
+      }
+    }
 
     return NextResponse.json(
-      { message: "Order Canceled Successfully" },
-      { status: 200 },
+      { message: "Orders Canceled Successfully" },
+      { status: 200 }
     );
   } catch (error: any) {
-    logError(error);
-    return responses.internalServerError(error);
+    console.error("Unexpected error:", error);
+    return responses.internalServerError(error.message);
   }
 };

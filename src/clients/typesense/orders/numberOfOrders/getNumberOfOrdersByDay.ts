@@ -8,9 +8,8 @@ export const getNumberOfOrdersByDay = async (
   try {
     const [year, month, day] = isoDate.split("-").map(Number);
 
-    const startOfDay = new Date(year, month - 1, day).getTime();
-
-    const endOfDay = new Date(year, month - 1, day, 23, 55, 999).getTime();
+    const startOfDay = new Date(year, month - 1, day).getTime() + (1 * 60 * 60 * 1000);
+    const endOfDay = new Date(year, month - 1, day, 24, 59, 59, 999).getTime();
 
     const startTimestamp = Math.floor(startOfDay);
     const endTimestamp = Math.floor(endOfDay);
@@ -22,7 +21,7 @@ export const getNumberOfOrdersByDay = async (
         query_by: "*",
         page: 1,
         per_page: 1,
-        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]  && state:!=canceled && storeId :=${storeId}`,
+        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]  && status:!=canceled && status:!=failed &&  storeId :=${storeId}`,
       };
     } else {
       searchParams = {
@@ -30,7 +29,7 @@ export const getNumberOfOrdersByDay = async (
         query_by: "*",
         page: 1,
         per_page: 1,
-        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]  && state:!=canceled `,
+        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]  && status:!=canceled && status:!=failed `,
       };
     }
 

@@ -7,16 +7,25 @@ function getCurrentUnixTimestamp() {
   return Math.floor(Date.now() / 1000);
 }
 
-const deliveryDateToUnixTimeStamp = (
-  deliveryDate: string,
-): number | undefined => {
+
+function getUnixTimestampTomorrow() {
+  // Get the current date
+  const today = new Date();
+
+  // Create a new date object for tomorrow
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  // Convert the date object to a UNIX timestamp (in seconds)
+  return Math.floor(tomorrow.getTime() / 1000);
+}
+const deliveryDateToUnixTimeStamp = (deliveryDate: string): number | undefined => {
   if (!deliveryDate) {
-    return undefined;
+    return getUnixTimestampTomorrow();
   }
 
   const date = new Date(deliveryDate);
-  const unixTimestampToDate = Math.floor(date.getTime() / 1000);
-  return unixTimestampToDate;
+  return Math.floor(date.getTime() / 1000);
 };
 
 const safeString = (value: any): string => (value ? String(value) : "");

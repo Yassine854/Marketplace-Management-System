@@ -7,6 +7,8 @@ export const editOrderDetails = async ({
   deliveryDate,
   items,
   total,
+  status,
+  state,
 }: any): Promise<any> => {
   try {
     const magentoItems = items?.map((item: any) => {
@@ -14,15 +16,15 @@ export const editOrderDetails = async ({
     });
 
     let data;
+
     if (isValidISODate(deliveryDate)) {
       data = {
         entity: {
           entity_id: orderId,
+        
           items: magentoItems,
-          base_subtotal: total || 0,
-          subtotal: total || 0,
-          base_grand_total: total || 0,
-          grand_total: total || 0,
+          total: total || 0,
+         
           extension_attributes: {
             delivery_date: convertIsoDate2MagentoDate(deliveryDate),
           },
@@ -33,15 +35,14 @@ export const editOrderDetails = async ({
         entity: {
           entity_id: orderId,
           items: magentoItems,
-          base_subtotal: total || 0,
-          subtotal: total || 0,
-          base_grand_total: total || 0,
-          grand_total: total || 0,
+          total: total || 0,
+        
+          
         },
       };
     }
 
-    await axios.magentoClient.put("orders/create", data);
+    await axios.magentoClient.put("orders/update_qty", data);
   } catch (error) {
     logError(error);
     throw new Error();

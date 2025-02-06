@@ -16,6 +16,7 @@ export async function createMilkRunAuditLog(auditObject: MilkRunAuditLog) {
     deliveryDate,
   } = auditObject;
   //@ts-ignore
+  /*
   await prisma.milkRunAuditTrail.create({
     data: {
       username,
@@ -28,5 +29,5 @@ export async function createMilkRunAuditLog(auditObject: MilkRunAuditLog) {
       agentName,
       deliveryDate,
     },
-  });
+  });*/
 }

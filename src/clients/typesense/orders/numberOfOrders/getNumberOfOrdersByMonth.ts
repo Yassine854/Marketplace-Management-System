@@ -19,13 +19,13 @@ export const getNumberOfOrdersByMonth = async (
       searchParams = {
         q: "",
         query_by: "*",
-        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]  && state:!=canceled && storeId:=${storeId}`,
+        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]  && status:!=canceled && storeId:=${storeId}`,
       };
     } else {
       searchParams = {
         q: "",
         query_by: "*",
-        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]  && state:!=canceled`,
+        filter_by: `createdAt:=[${startTimestamp}..${endTimestamp}]  && status:!=canceled`,
       };
     }
 

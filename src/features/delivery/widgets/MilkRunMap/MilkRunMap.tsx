@@ -63,17 +63,20 @@ const MilkRunMap = ({
                   onMouseEnter={() => {
                     setPopupInfo(marker);
                   }}
+                  onMouseLeave={() => {
+                    setPopupInfo(null);
+                  }}
                 >
                   {selectedOrdersIds?.includes(marker.order_id) && (
                     <IconMapPinFilled
-                      size={38}
+                      size={60}
                       className={`[&_path]:fill-green-800`}
                     />
                   )}
                   {!selectedOrdersIds?.includes(marker.order_id) && (
                     <IconMapPin
                       color={marker?.markerColor}
-                      size={38}
+                      size={60}
                       className="[&_path]:green"
                     />
                   )}
@@ -88,7 +91,7 @@ const MilkRunMap = ({
                 setPopupInfo(null);
               }}
               orderId={popupInfo?.order_id}
-              customer={popupInfo?.creator}
+              customer={popupInfo?.name}
               latitude={popupInfo?.latitude}
               total={popupInfo?.order_amount}
               longitude={popupInfo?.longitude}

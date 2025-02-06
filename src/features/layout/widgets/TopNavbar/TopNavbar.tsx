@@ -6,7 +6,8 @@ import StoreSelector from "../StoreSelector/StoreSelector";
 import { useLayout } from "@/utils/LayoutContext";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
-export const layoutList = ["All", "Tunis", "Sousse", "Kamarket"];
+export const layoutList = ["All", "Old Mghira", "Sousse", "Kamarket" , "Mnihla", "Charguia","Mghira"];
+//export const layoutList = ["All", "Tunis", "Sousse", "Kamarket" , "Mnihla", "Charguia"];
 
 const TopNav = ({
   setSidebar,
@@ -27,7 +28,7 @@ const TopNav = ({
   }, [notifications, updated]);
   return (
     <nav
-      className={`navbar-top z-20 px-4  shadow-sm duration-300 dark:border-b dark:border-n700 xxl:px-6 ${
+      className={`navbar-top z-20 px-4   duration-300 dark:border-b dark:border-n700 xxl:px-6 ${
         sidebarIsOpen
           ? "w-full xxl:w-[calc(100%-280px)] xxxl:w-[calc(100%-336px)] ltr:xxl:ml-[280px] ltr:xxxl:ml-[336px] rtl:xxl:mr-[280px] rtl:xxxl:mr-[336px]"
           : "w-full"

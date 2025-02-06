@@ -67,7 +67,7 @@ export const PUT = async (request: NextRequest) => {
       await typesense.orders.updateOne({
         id: order?.id,
         updatedAt: unixTimestamp,
-        state: order?.state,
+        status: order?.status,
       });
     }
     if (order?.state) {

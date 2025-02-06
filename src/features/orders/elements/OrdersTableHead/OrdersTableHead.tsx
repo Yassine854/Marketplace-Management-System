@@ -14,7 +14,7 @@ const OrdersTableHead = ({
     useOrdersTableHead(changeSelectedSort);
   const { selectedOrders } = useOrdersStore();
   return (
-    <thead className="sticky left-0 right-0 top-0 z-10 bg-n40 ">
+    <thead className="sticky left-0 right-0 top-0  bg-n40 ">
       <tr>
         <OrdersTableHeadSmallCell>
           <div className="relative flex w-full items-center justify-center">

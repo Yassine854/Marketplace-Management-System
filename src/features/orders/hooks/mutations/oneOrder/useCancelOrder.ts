@@ -1,3 +1,4 @@
+import { useUsersStore } from "@/features/users/stores/usersStore"; 
 import { axios } from "@/libs/axios";
 import { toast } from "react-hot-toast";
 import { useMutation } from "@tanstack/react-query";
@@ -11,28 +12,30 @@ import { useAuth } from "@/features/shared/hooks/useAuth";
 
 export const useCancelOrder = () => {
   const { refetch } = useOrdersData();
-
   const { isNoEditUser } = useGlobalStore();
-
   const { orderOnReviewId } = useOrderDetailsStore();
-
   const { refetch: refetchCount } = useGetOrdersCount();
-
   const { refetch: refetchOrder } = useGetOrder(orderOnReviewId);
-
   const { setOrderToCancelId, setOrderUnderActionId } = useOrderActionsStore();
+
+  const { userOnReviewUsername } = useUsersStore();  
   const { user } = useAuth();
+
   const { mutate, isPending, mutateAsync, isError } = useMutation({
-    mutationFn: async (orderId: any) => {
+    mutationFn: async (orderId: string[]) => {
       if (isNoEditUser) {
         toast.error(`Action not allowed`, { duration: 5000 });
         throw new Error();
       }
-      //@ts-ignore
+
+    /*  if (!userOnReviewUsername) {
+        toast.error(`User is not authenticated properly`, { duration: 5000 });
+        throw new Error("No username found");
+      }*/
+
       await axios.servicesClient.post("/api/orders/cancelOrder", {
         orderId,
-        //@ts-ignore
-        username: user?.username,
+        username: user,  
       });
     },
     onSuccess: () => {
@@ -41,12 +44,11 @@ export const useCancelOrder = () => {
       refetchOrder();
       setOrderToCancelId("");
       setOrderUnderActionId("");
-      toast.success(`Order Canceled  Successfully`, { duration: 5000 });
+      toast.success(`Orders Canceled Successfully`, { duration: 5000 });
     },
     onError: () => {
       setOrderToCancelId("");
       setOrderUnderActionId("");
-
       toast.error(`Something Went Wrong`, { duration: 5000 });
     },
   });

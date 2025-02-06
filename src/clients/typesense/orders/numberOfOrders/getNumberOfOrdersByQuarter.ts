@@ -30,7 +30,7 @@ export const getNumberOfOrdersByQuarter = async (
     const searchParams = {
       q: "",
       query_by: "*",
-      filter_by: `createdAt:=[${startDate}..${endDate}]  && state:!=canceled`,
+      filter_by: `createdAt:=[${startDate}..${endDate}]  && status:!=canceled`,
     };
 
     const allorders = await typesenseClient

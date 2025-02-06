@@ -1,14 +1,16 @@
 import NumberOfOrdersChart from "../../charts/NumberOfOrdersChart";
 import NumberOfUniqueCustomer from "../../widgets/NumberOfUniqueCustomer";
 import GrossMerchandiseValueChart from "../../charts/GrossMerchandiseValueChart";
+import Nbrcustomerchart from "../../charts/Nbrcustomerchart";
 
 const Dashboard = () => {
   return (
     <div className="mt-[4.8rem] w-full bg-n20 p-4">
-      <div className="flex h-[1600px] flex-col justify-evenly">
+      <div className="flex flex-col gap-[5px]">
         <GrossMerchandiseValueChart />
         <NumberOfOrdersChart />
-        <NumberOfUniqueCustomer />
+        
+        <Nbrcustomerchart />
       </div>
     </div>
   );

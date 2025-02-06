@@ -87,6 +87,15 @@ export const useMainLayout = () => {
       case "4":
         setStoreId("2");
         break;
+        case "6":
+          setStoreId("6");
+          break;
+          case "7":
+            setStoreId("7");
+            break;
+            case "8":
+              setStoreId("8");
+              break;
     }
   }, [
     user,

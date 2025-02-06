@@ -22,7 +22,7 @@ export const getGmvByMonth = async (
     let totalOrders = 0;
     while (true) {
       const searchParameters = {
-        filter_by: `createdAt:=[${startDate}..${endDate}] && state:!=canceled`,
+        filter_by: `createdAt:=[${startDate}..${endDate}] && status:!=canceled`,
         q: "*",
         query_by: "",
         page: currentPage,

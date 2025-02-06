@@ -5,7 +5,8 @@ import { IconChevronDown } from "@tabler/icons-react";
 import { useAuth } from "@/features/shared/hooks/useAuth";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
-export const layoutList = ["All", "Tunis", "Sousse", "Kamarket"];
+export const layoutList = ["All", "Old Mghira", "Sousse", "Kamarket" , "Mnihla" , "Charguia","Mghira"];
+//export const layoutList = ["All", "Tunis", "Sousse", "Kamarket" , "Mnihla" , "Charguia"];
 
 const StoreSelector = ({ isWhite }: { isWhite?: boolean }) => {
   const { open, ref, toggleOpen } = useDropdown();
@@ -18,13 +19,13 @@ const StoreSelector = ({ isWhite }: { isWhite?: boolean }) => {
     //@ts-ignore
     switch (user?.roleId) {
       case "1":
-        setStoresList(["All", "Tunis", "Sousse", "Kamarket"]);
+        setStoresList(["All", "Old Mghira", "Sousse", "Kamarket" , "Mnihla" , "Charguia","Mghira"]);
         break;
       case "5":
-        setStoresList(["All", "Tunis", "Sousse", "Kamarket"]);
+        setStoresList(["All", "Old Mghira", "Sousse", "Kamarket" , "Mnihla" , "Charguia","Mghira"]);
         break;
       case "2":
-        setStoresList(["Tunis"]);
+        setStoresList(["Old Mghira"]);
         break;
       case "3":
         setStoresList(["Kmarket"]);
@@ -32,6 +33,15 @@ const StoreSelector = ({ isWhite }: { isWhite?: boolean }) => {
       case "4":
         setStoresList(["Sousse"]);
         break;
+        case "6":
+          setStoresList(["Mnihla"]);
+          break;
+          case "7":
+            setStoresList(["Charguia"]);
+            break;
+            case "8":
+            setStoresList(["Mghira"]);
+            break;
     }
   }, [user]);
 
@@ -42,7 +52,7 @@ const StoreSelector = ({ isWhite }: { isWhite?: boolean }) => {
       case "All":
         setStoreId("");
         break;
-      case "Tunis":
+      case "Old Mghira":
         setStoreId("1");
         break;
       case "Sousse":
@@ -52,6 +62,15 @@ const StoreSelector = ({ isWhite }: { isWhite?: boolean }) => {
       case "Kamarket":
         setStoreId("4");
         break;
+        case "Mnihla":
+          setStoreId("6");
+          break;
+          case "Charguia":
+            setStoreId("7");
+            break;
+          case "Mghira":
+              setStoreId("8");
+              break;
     }
   }, [layout, setStoreId]);
 

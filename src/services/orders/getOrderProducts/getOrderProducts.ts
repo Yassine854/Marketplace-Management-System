@@ -19,10 +19,9 @@ export const getOrderProducts = async (orderId: string): Promise<any> => {
         custom_attributes.find((attr: any) => attr.attribute_code === "qty_pcb")
           ?.value,
       );
-
-      const minSaleQuantity = Number(
-        extension_attributes.stock_item.min_sale_qty,
-      );
+   //const minSaleQuantity = Number(extension_attributes.stock_item.qty_increments,);
+      const qtyIncrements = Number(extension_attributes.stock_item.qty_increments,);
+const minSaleQuantity = qtyIncrements === 0 ? 1 : qtyIncrements;
 
       const brand = custom_attributes.find(
         (attr: any) => attr.attribute_code === "brand",

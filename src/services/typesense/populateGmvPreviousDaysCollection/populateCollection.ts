@@ -23,14 +23,18 @@ export async function populateCollection() {
       for (let month = 1; month <= finalMonth; month++) {
         console.info(" populate GMV Previous Days Collection  ~ month:", month);
 
-        const endDay =
+      const endDay =
           year === currentYear && month === currentMonth
-            ? currentDay - 1
+            ? currentDay 
             : dayjs(`${year}-${month}`).daysInMonth();
-
+         /*   const endDay =
+            year === currentYear && month === currentMonth
+              ? dayjs().endOf('month').date()
+              : dayjs(`${year}-${month}`).daysInMonth();*/
         for (let day = 1; day <= endDay; day++) {
           try {
             const date = dayjs(`${year}-${month}-${day}`);
+          
             const week = date.isoWeek();
             const result = await getGmvByDay(year, month, day);
             const document = {

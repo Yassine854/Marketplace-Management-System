@@ -33,11 +33,15 @@ export const PUT = async (request: NextRequest) => {
       return responses.invalidRequest("username is Required");
     }
 
+    const sorder: any = await typesense.orders.getOne(order.id);
     await magento.mutations.editOrderMilkRun({
       orderId: order?.id,
       deliverySlot: order?.deliverySlot,
       deliveryAgentName: order?.deliveryAgentName,
       deliveryAgentId: order?.deliveryAgentId,
+      status:sorder?.status,
+      state:sorder?.state, 
+      
     });
 
     await typesense.orders.updateOne(order);
@@ -49,11 +53,11 @@ export const PUT = async (request: NextRequest) => {
       userId: user?.id ?? "",
       action: `${username} edit order`,
       actionTime: new Date(),
-      orderId: order.orderId,
-      storeId: order?.storeId,
-      agentId: order.deliveryAgentId,
-      agentName: order.deliveryAgentName,
-      deliveryDate: order.deliveryDate.toString(),
+      orderId: order?.id,
+      storeId: "0",
+      agentId: order?.deliveryAgentId,
+      agentName: order?.deliveryAgentName,
+      deliveryDate: order.deliveryDate ? order.deliveryDate.toString() : 'N/A',
     });
 
     return NextResponse.json(
