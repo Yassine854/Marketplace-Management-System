@@ -4,10 +4,10 @@ import CredentialsProvider from "next-auth/providers/credentials";
 // Static user data for testing purposes
 let staticUser = {
   id: "100",
-  username: "admin",
-  firstName: "admin",
-  lastName: "admin",
-  password: "admin2025", // Remember to hash passwords in production
+  username: "intern",
+  firstName: "intern",
+  lastName: "intern",
+  password: "intern", // Remember to hash passwords in production
   roleId: "1",
   isActive: true,
   createdAt: new Date(),
