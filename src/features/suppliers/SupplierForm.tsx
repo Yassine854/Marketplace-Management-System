@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import emailjs from "@emailjs/browser";
 import toast from "react-hot-toast";
+import { DatePicker } from "@heroui/react";
 
 type Supplier = {
   manufacturer_id: string;
@@ -32,13 +33,11 @@ const SupplierSelector = ({
     null,
   );
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [quantity, setQuantity] = useState(0);
-  const [totalPayment, setTotalPayment] = useState(0);
-  const [selectedPaymentMode, setSelectedPaymentMode] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-
-  const detailsRef = useRef<HTMLDivElement | null>(null);
-  const paymentModeRef = useRef<HTMLSelectElement | null>(null);
+  const [quantity, setQuantity] = useState<number>(0);
+  const [totalPayment, setTotalPayment] = useState<number>(0);
+  const [selectedPaymentMode, setSelectedPaymentMode] = useState<string>("");
+  const [deliveryDate, setDeliveryDate] = useState<Date | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     fetch("/data/data.json")
@@ -52,30 +51,12 @@ const SupplierSelector = ({
   }, []);
 
   useEffect(() => {
-    if (selectedProduct && quantity) {
+    if (selectedProduct && quantity > 0) {
       setTotalPayment(Number(selectedProduct.productPrice) * quantity);
     } else {
       setTotalPayment(0);
     }
   }, [selectedProduct, quantity]);
-
-  useEffect(() => {
-    if (selectedPaymentMode) {
-      paymentModeRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [selectedPaymentMode]);
-
-  useEffect(() => {
-    if (selectedSupplier) {
-      detailsRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [selectedSupplier]);
-
-  const filteredSuppliers = suppliers.filter(
-    (supplier) =>
-      supplier.company_name.toLowerCase().includes(query.toLowerCase()) &&
-      supplier.manufacturer_id !== selectedSupplier?.manufacturer_id,
-  );
 
   const handleSelectSupplier = (supplier: Supplier) => {
     setQuery(supplier.company_name);
@@ -89,29 +70,26 @@ const SupplierSelector = ({
     setSelectedProduct(null);
     setTotalPayment(0);
     setSelectedPaymentMode("");
-  };
-
-  const handleQuantityBlur = () => {
-    if (selectedProduct && quantity > 0 && !selectedPaymentMode) {
-      paymentModeRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
+    setDeliveryDate(null);
   };
 
   const handleSubmit = () => {
     if (
       selectedSupplier &&
       selectedProduct &&
-      quantity &&
-      selectedPaymentMode
+      quantity > 0 &&
+      selectedPaymentMode &&
+      deliveryDate
     ) {
       const templateParams = {
         to_name: selectedSupplier.contact_name,
         from_name: "Kamioun",
         to_email: selectedSupplier.email,
         product_name: selectedProduct.productName,
-        quantity: quantity,
+        quantity,
         total_payment: totalPayment,
         payment_mode: selectedPaymentMode,
+        delivery_date: deliveryDate.toLocaleDateString(),
       };
 
       const loadingToast = toast.loading("Email sending in progress...");
@@ -147,6 +125,12 @@ const SupplierSelector = ({
       });
     }
   };
+
+  const filteredSuppliers = suppliers.filter(
+    (supplier) =>
+      supplier.company_name.toLowerCase().includes(query.toLowerCase()) &&
+      supplier.manufacturer_id !== selectedSupplier?.manufacturer_id,
+  );
 
   return (
     <div className="flex h-full flex-grow">
@@ -191,10 +175,7 @@ const SupplierSelector = ({
             )}
 
             {selectedSupplier && (
-              <div
-                ref={detailsRef}
-                className="mt-8 rounded-lg border border-gray-300 bg-white p-4 shadow-lg"
-              >
+              <div className="mt-8 rounded-lg border border-gray-300 bg-white p-4 shadow-lg">
                 <h3 className="mb-4 text-xl font-semibold">Supplier Details</h3>
                 <form>
                   <InputField
@@ -263,11 +244,11 @@ const SupplierSelector = ({
                     label="Quantity"
                     type="number"
                     value={quantity.toString()}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setQuantity(Number(e.target.value))
                     }
-                    onBlur={handleQuantityBlur}
                   />
+
                   {selectedProduct && (
                     <InputField
                       label="SKU"
@@ -283,39 +264,62 @@ const SupplierSelector = ({
                     />
                   )}
 
-                  {totalPayment > 0 &&
-                    selectedSupplier.payment_modes.length > 0 && (
+                  {totalPayment > 0 && (
+                    <>
+                      <div className="mb-4">
+                        <DatePicker
+                          label="Delivery Date"
+                          defaultValue={null}
+                          onChange={(date) => {
+                            if (date) {
+                              const formattedDate = new Date(
+                                date.year,
+                                date.month - 1,
+                                date.day,
+                              );
+                              setDeliveryDate(formattedDate);
+                            } else {
+                              setDeliveryDate(null);
+                            }
+                          }}
+                          showMonthAndYearPickers
+                          hideTimeZone
+                          variant="bordered"
+                          className="w-full"
+                        />
+                      </div>
+
                       <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">
                           Payment Mode
                         </label>
                         <select
-                          ref={paymentModeRef}
                           value={selectedPaymentMode}
                           onChange={(e) =>
                             setSelectedPaymentMode(e.target.value)
                           }
-                          className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                          className="w-full rounded-md border border-gray-300 p-2"
                         >
                           <option value="">Select a payment mode</option>
-                          {selectedSupplier.payment_modes.map((mode, index) => (
-                            <option key={index} value={mode}>
+                          {selectedSupplier.payment_modes.map((mode) => (
+                            <option key={mode} value={mode}>
                               {mode}
                             </option>
                           ))}
                         </select>
                       </div>
-                    )}
+                    </>
+                  )}
 
-                  {totalPayment > 0 && selectedPaymentMode && (
+                  <div className="flex justify-between gap-2">
                     <button
                       type="button"
                       onClick={handleSubmit}
-                      className="mt-4 w-full rounded-md bg-blue-500 p-2 font-semibold text-white hover:bg-blue-600"
+                      className="w-full rounded-lg bg-primary py-2 text-white"
                     >
-                      Confirm
+                      Submit Order
                     </button>
-                  )}
+                  </div>
                 </form>
               </div>
             )}
@@ -325,14 +329,19 @@ const SupplierSelector = ({
     </div>
   );
 };
-
 const InputField = ({
   label,
   value,
   onChange,
   type = "text",
   disabled = false,
-}: any) => (
+}: {
+  label: string;
+  value: string | number;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
+  disabled?: boolean;
+}) => (
   <div className="mb-4">
     <label className="block text-sm font-medium text-gray-700">{label}</label>
     <input
@@ -346,7 +355,6 @@ const InputField = ({
     />
   </div>
 );
-
 const RectangleSkeleton = () => (
   <div className="h-12 w-full animate-pulse rounded-lg bg-gray-300"></div>
 );
