@@ -3,6 +3,12 @@ import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 import supplierData from "../../../../data_test.json";
 
+const currentYear = new Date().getFullYear();
+const months = Array.from(
+  { length: 12 },
+  (_, i) => `${currentYear}-${(i + 1).toString().padStart(2, "0")}-01`,
+);
+
 const options: ApexOptions = {
   legend: {
     show: false,
@@ -33,20 +39,7 @@ const options: ApexOptions = {
   },
   xaxis: {
     type: "datetime",
-    categories: [
-      "2024-01-01",
-      "2024-02-01",
-      "2024-03-01",
-      "2024-04-01",
-      "2024-05-01",
-      "2024-06-01",
-      "2024-07-01",
-      "2024-08-01",
-      "2024-09-01",
-      "2024-10-01",
-      "2024-11-01",
-      "2024-12-01",
-    ],
+    categories: months, // Dynamic months for the current year
     axisBorder: { show: false },
     axisTicks: { show: false },
   },
@@ -71,7 +64,6 @@ const SupplierAreaChart: React.FC<{ supplierId: string }> = ({
   });
 
   useEffect(() => {
-    // Extract revenue data for the supplier
     const monthlyRevenue: Record<string, number> = {};
 
     supplierData.forEach((order) => {
@@ -79,21 +71,34 @@ const SupplierAreaChart: React.FC<{ supplierId: string }> = ({
         (s) => s.manufacturer_id === supplierId,
       );
       if (supplier) {
-        const orderDate =
-          order.supplier_orders_summary.by_supplier[
-            supplierId as keyof typeof order.supplier_orders_summary.by_supplier
-          ]?.last_order_date;
+        const orderDate = (
+          order.supplier_orders_summary.by_supplier as Record<string, any>
+        )[supplierId]?.last_order_date;
+
         if (orderDate) {
-          const month = orderDate.substring(0, 7); // Get YYYY-MM format
+          const month = orderDate.substring(0, 7); // Extract YYYY-MM format
+
+          let revenueAfterDiscounts = supplier.totals.grand_total;
+
+          // Track products with discounts and adjust revenue
+          supplier.items.forEach((item) => {
+            if (item.discount && item.discount.discount_amount > 0) {
+              // Subtract the discount amount from the total revenue
+              revenueAfterDiscounts -= item.discount.discount_amount;
+            }
+          });
+
+          // Accumulate the adjusted revenue for the given month
           monthlyRevenue[month] =
-            (monthlyRevenue[month] || 0) + supplier.totals.grand_total;
+            (monthlyRevenue[month] || 0) + revenueAfterDiscounts;
         }
       }
     });
 
-    const formattedData = Object.keys(monthlyRevenue)
-      .sort()
-      .map((month) => monthlyRevenue[month]);
+    // Format data to match dynamic months
+    const formattedData = months.map(
+      (month) => monthlyRevenue[month.slice(0, 7)] || 0,
+    );
 
     setState({ series: [{ name: "Revenue", data: formattedData }] });
   }, [supplierId]);

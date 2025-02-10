@@ -4,7 +4,7 @@
     "increment_id": "000060260",
     "suppliers": [
       {
-        "manufacturer_id": "9",
+        "manufacturer_id": "10",
         "company_name": "Technofood",
         "contact": {
           "name": "Mehdi Bourguiba",
@@ -20,22 +20,40 @@
             "qty_ordered": 1,
             "price": 290.97,
             "row_total": 290.97,
-            "categories": ["Beverages", "Mineral Water"]
+            "categories": ["Beverages", "Mineral Water"],
+            "discount": {
+              "discount_amount": 20.0,
+              "discounted_price": 270.97
+            }
+          },
+          {
+            "item_id": 951064,
+            "product_id": 6789,
+            "name": "Natural Orange Juice - 1L",
+            "sku": "6192000456789",
+            "qty_ordered": 3,
+            "price": 5.99,
+            "row_total": 17.97,
+            "categories": ["Juices", "Organic"],
+            "discount": {
+              "discount_amount": 2.0,
+              "discounted_price": 15.97
+            }
           }
         ],
         "invoices": [
           {
             "invoice_id": "INV-73818",
-            "amount": 290.97,
+            "amount": 286.94,
             "payment_status": "Pending",
-            "due_date": "2024-12-01"
+            "due_date": "2025-12-01"
           }
         ],
         "returns": [],
         "totals": {
-          "subtotal": 290.97,
+          "subtotal": 286.94,
           "tax": 0,
-          "grand_total": 290.97
+          "grand_total": 286.94
         }
       },
       {
@@ -55,15 +73,33 @@
             "qty_ordered": 1,
             "price": 269.15,
             "row_total": 269.15,
-            "categories": ["Juices"]
+            "categories": ["Juices"],
+            "discount": {
+              "discount_amount": 10.0,
+              "discounted_price": 259.15
+            }
+          },
+          {
+            "item_id": 951065,
+            "product_id": 6785,
+            "name": "Apple Juice - 500ml",
+            "sku": "6191577600099",
+            "qty_ordered": 4,
+            "price": 3.5,
+            "row_total": 14.0,
+            "categories": ["Juices"],
+            "discount": {
+              "discount_amount": 1.5,
+              "discounted_price": 12.5
+            }
           }
         ],
         "invoices": [
           {
             "invoice_id": "INV-73818",
-            "amount": 269.15,
+            "amount": 271.65,
             "payment_status": "Pending",
-            "due_date": "2024-12-01"
+            "due_date": "2025-12-01"
           }
         ],
         "returns": [
@@ -75,32 +111,26 @@
           }
         ],
         "totals": {
-          "subtotal": 269.15,
+          "subtotal": 271.65,
           "tax": 0,
-          "grand_total": 269.15
+          "grand_total": 271.65
         }
       }
     ],
     "supplier_orders_summary": {
       "by_supplier": {
-        "9": {
-          "total_orders": 1,
-          "total_revenue": 290.97,
-          "pending_returns": 0,
-          "last_order_date": "2024-11-25"
-        },
         "10": {
-          "total_orders": 1,
-          "total_revenue": 269.15,
+          "total_orders": 2,
+          "total_revenue": 286.94,
           "pending_returns": 1,
-          "last_order_date": "2024-11-25"
+          "last_order_date": "2025-11-25"
         }
       },
       "combined": {
-        "grand_total": 560.12,
-        "total_items": 2,
+        "grand_total": 558.59,
+        "total_items": 5,
         "order_status": "open",
-        "delivery_date": "2024-11-27"
+        "delivery_date": "2025-11-27"
       }
     },
     "customer_info": {
@@ -114,8 +144,8 @@
     },
     "payment_details": {
       "method": "Check / Money order",
-      "total_due": 560.12,
-      "due_date": "2024-12-01"
+      "total_due": 558.59,
+      "due_date": "2025-12-01"
     }
   },
   {
@@ -139,15 +169,33 @@
             "qty_ordered": 3,
             "price": 150.0,
             "row_total": 450.0,
-            "categories": ["Dry Fruits", "Organic"]
+            "categories": ["Dry Fruits", "Organic"],
+            "discount": {
+              "discount_amount": 30.0,
+              "discounted_price": 420.0
+            }
+          },
+          {
+            "item_id": 951066,
+            "product_id": 6766,
+            "name": "Premium Almonds - 1kg",
+            "sku": "ALMOND001",
+            "qty_ordered": 2,
+            "price": 90.0,
+            "row_total": 180.0,
+            "categories": ["Nuts"],
+            "discount": {
+              "discount_amount": 10.0,
+              "discounted_price": 170.0
+            }
           }
         ],
         "invoices": [
           {
             "invoice_id": "INV-73819",
-            "amount": 450.0,
+            "amount": 590.0,
             "payment_status": "Paid",
-            "due_date": "2024-12-05"
+            "due_date": "2025-12-05"
           }
         ],
         "returns": [
@@ -159,9 +207,9 @@
           }
         ],
         "totals": {
-          "subtotal": 450.0,
+          "subtotal": 590.0,
           "tax": 22.5,
-          "grand_total": 472.5
+          "grand_total": 612.5
         }
       }
     ],
@@ -169,16 +217,16 @@
       "by_supplier": {
         "11": {
           "total_orders": 3,
-          "total_revenue": 472.5,
+          "total_revenue": 612.5,
           "pending_returns": 1,
-          "last_order_date": "2024-11-28"
+          "last_order_date": "2025-11-28"
         }
       },
       "combined": {
-        "grand_total": 472.5,
-        "total_items": 3,
+        "grand_total": 612.5,
+        "total_items": 5,
         "order_status": "processing",
-        "delivery_date": "2024-11-30"
+        "delivery_date": "2025-11-30"
       }
     },
     "customer_info": {
@@ -192,120 +240,8 @@
     },
     "payment_details": {
       "method": "Credit Card",
-      "total_due": 472.5,
-      "due_date": "2024-12-05"
-    }
-  },
-  {
-    "order_id": 73820,
-    "increment_id": "000060262",
-    "suppliers": [
-      {
-        "manufacturer_id": "9",
-        "company_name": "Technofood",
-        "contact": {
-          "name": "Mehdi Bourguiba",
-          "email": "slim.boughzala@technofoodindustries.com",
-          "phone": "22218000"
-        },
-        "items": [
-          {
-            "item_id": 951062,
-            "product_id": 5547,
-            "name": "Elixir Sparkling Water - 24pk",
-            "sku": "ELXSPARK24",
-            "qty_ordered": 2,
-            "price": 180.0,
-            "row_total": 360.0,
-            "categories": ["Beverages", "Sparkling Water"]
-          }
-        ],
-        "invoices": [
-          {
-            "invoice_id": "INV-73820-1",
-            "amount": 360.0,
-            "payment_status": "Partial",
-            "due_date": "2024-12-10"
-          }
-        ],
-        "returns": [],
-        "totals": {
-          "subtotal": 360.0,
-          "tax": 18.0,
-          "grand_total": 378.0
-        }
-      },
-      {
-        "manufacturer_id": "12",
-        "company_name": "BeverageMaster",
-        "contact": {
-          "name": "Leila Trabelsi",
-          "email": "sales@bevmaster.tn",
-          "phone": "36001122"
-        },
-        "items": [
-          {
-            "item_id": 951063,
-            "product_id": 6677,
-            "name": "Energy Drink Mix - 20ct",
-            "sku": "ENGMIX20",
-            "qty_ordered": 5,
-            "price": 25.0,
-            "row_total": 125.0,
-            "categories": ["Energy Drinks"]
-          }
-        ],
-        "invoices": [
-          {
-            "invoice_id": "INV-73820-2",
-            "amount": 125.0,
-            "payment_status": "Unpaid",
-            "due_date": "2024-12-15"
-          }
-        ],
-        "returns": [],
-        "totals": {
-          "subtotal": 125.0,
-          "tax": 6.25,
-          "grand_total": 131.25
-        }
-      }
-    ],
-    "supplier_orders_summary": {
-      "by_supplier": {
-        "9": {
-          "total_orders": 2,
-          "total_revenue": 378.0,
-          "pending_returns": 0,
-          "last_order_date": "2024-12-01"
-        },
-        "12": {
-          "total_orders": 5,
-          "total_revenue": 131.25,
-          "pending_returns": 0,
-          "last_order_date": "2024-12-01"
-        }
-      },
-      "combined": {
-        "grand_total": 509.25,
-        "total_items": 7,
-        "order_status": "partially_shipped",
-        "delivery_date": "2024-12-03"
-      }
-    },
-    "customer_info": {
-      "id": 6648,
-      "name": "Tunisian Catering Co.",
-      "contact": {
-        "email": "orders@tuncatering.tn",
-        "phone": "70123456"
-      },
-      "shipping_address": "Zone Industrielle, Ben Arous, Tunisia 2033"
-    },
-    "payment_details": {
-      "method": "Bank Transfer",
-      "total_due": 509.25,
-      "due_date": "2024-12-15"
+      "total_due": 612.5,
+      "due_date": "2025-12-05"
     }
   }
 ]
