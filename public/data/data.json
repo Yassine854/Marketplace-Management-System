@@ -1,0 +1,177 @@
+{
+  "suppliers": [
+    {
+      "manufacturer_id": "9",
+      "code": "001",
+      "company_name": "Technofood",
+      "contact_name": "Mehdi Bourguiba",
+      "phone_number": "22218000",
+      "postal_code": "2082",
+      "city": "Tunis",
+      "country": "Tunisia",
+      "capital": "Tunis",
+      "email": "slim.boughzala@technofoodindustries.com",
+      "payment_modes": ["Carte Bancaire"]
+    },
+    {
+      "manufacturer_id": "10",
+      "code": "002",
+      "company_name": "STIFEN",
+      "contact_name": "Ahlem Ben Slimen",
+      "phone_number": "94856975",
+      "city": "Tunis",
+      "country": "Tunisia",
+      "capital": "Tunis",
+      "email": "ahlem.benslimen@stifen.com",
+      "payment_modes": []
+    },
+    {
+      "manufacturer_id": "11",
+      "code": "003",
+      "company_name": "Manar Thon",
+      "tax_registration_number": "912362/Y",
+      "contact_name": "Oussama Naguez",
+      "phone_number": "26 750 314",
+      "city": "Tunis",
+      "country": "Tunisia",
+      "capital": "Tunis",
+      "email": "fact.manarthon@horchani.com",
+      "payment_modes": ["Virement Bancaire"]
+    },
+    {
+      "manufacturer_id": "12",
+      "code": "004",
+      "company_name": "Socohuiles",
+      "contact_name": "Hacem Kamoun",
+      "phone_number": "96460005",
+      "city": "Tunis",
+      "country": "Tunisia",
+      "capital": "Tunis",
+      "email": "direction.commerciale@socohuile.com.tn",
+      "payment_modes": ["Paiement à la Livraison", "Espèces"]
+    },
+    {
+      "manufacturer_id": "13",
+      "code": "005",
+      "company_name": "Société L'Appétissante S.A",
+      "contact_name": "Tom",
+      "email": "TOM@kamioun.tn",
+      "payment_modes": []
+    },
+    {
+      "manufacturer_id": "14",
+      "code": "006",
+      "company_name": "Fruity Fresh",
+      "contact_name": "Sami Bakkar",
+      "phone_number": "98234567",
+      "city": "Sousse",
+      "country": "Tunisia",
+      "capital": "Sousse",
+      "email": "sales@fruityfresh.com",
+      "payment_modes": ["Carte Bancaire", "Virement Bancaire"]
+    }
+  ],
+  "categories": [
+    {
+      "id_category": "1",
+      "name_category": "Food & Beverage",
+      "description": "All kinds of food products and beverages",
+      "created_at": "2024-01-01T10:00:00Z"
+    },
+    {
+      "id_category": "2",
+      "name_category": "Electronics",
+      "description": "Electronic gadgets and accessories",
+      "created_at": "2024-01-02T12:30:00Z"
+    },
+    {
+      "id_category": "3",
+      "name_category": "Household",
+      "description": "Home and kitchen essentials",
+      "created_at": "2024-01-05T15:45:00Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "999",
+      "productId": "999",
+      "productName": "Olive Oil Extra Virgin",
+      "productPrice": "20",
+      "totalPrice": "200",
+      "quantity": "10",
+      "sku": "999-OLV",
+      "weight": "999",
+      "manufacturer_id": "9"
+    },
+    {
+      "id": "1000",
+      "productId": "1000",
+      "productName": "Canned Tuna",
+      "productPrice": "5",
+      "totalPrice": "50",
+      "quantity": "10",
+      "sku": "1000-TUNA",
+      "weight": "500",
+      "manufacturer_id": "11"
+    },
+    {
+      "id": "1002",
+      "productId": "1002",
+      "productName": "Thouna 2",
+      "productPrice": "299",
+      "totalPrice": "299",
+      "quantity": "1",
+      "sku": "1002-WM",
+      "weight": "30000",
+      "manufacturer_id": "11"
+    }
+  ],
+  "invoices": [
+    {
+      "InvoiceId": "9001",
+      "orderId": "5001",
+      "invoiceNumber": "INV-2024-0001",
+      "date": "2024-01-11T10:00:00Z",
+      "tax": "10",
+      "total_amount": "260",
+      "discount": "10",
+      "methode_paiement": "Carte Bancaire"
+    },
+    {
+      "InvoiceId": "9002",
+      "orderId": "5002",
+      "invoiceNumber": "INV-2024-0002",
+      "date": "2024-01-13T08:30:00Z",
+      "tax": "5",
+      "total_amount": "105",
+      "discount": "5",
+      "methode_paiement": "Espèces"
+    }
+  ],
+  "returns": [
+    {
+      "retour_id": "8001",
+      "order_id": "5001",
+      "product_id": "999",
+      "customer_id": "1001",
+      "reason": "Defective product",
+      "status": "Approved",
+      "quantity": "1",
+      "approval_date": "2024-01-15T12:00:00Z",
+      "return_date": "2024-01-16T09:00:00Z",
+      "created_at": "2024-01-15T12:00:00Z"
+    },
+    {
+      "retour_id": "8002",
+      "order_id": "5002",
+      "product_id": "1000",
+      "customer_id": "1002",
+      "reason": "Wrong item received",
+      "status": "Pending",
+      "quantity": "2",
+      "approval_date": null,
+      "return_date": null,
+      "created_at": "2024-01-16T14:00:00Z"
+    }
+  ]
+}
