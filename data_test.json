@@ -1,0 +1,311 @@
+[
+  {
+    "order_id": 73818,
+    "increment_id": "000060260",
+    "suppliers": [
+      {
+        "manufacturer_id": "9",
+        "company_name": "Technofood",
+        "contact": {
+          "name": "Mehdi Bourguiba",
+          "email": "slim.boughzala@technofoodindustries.com",
+          "phone": "22218000"
+        },
+        "items": [
+          {
+            "item_id": 951059,
+            "product_id": 5546,
+            "name": "Elixir Eau - Palette 1.5",
+            "sku": "6191400100019",
+            "qty_ordered": 1,
+            "price": 290.97,
+            "row_total": 290.97,
+            "categories": ["Beverages", "Mineral Water"]
+          }
+        ],
+        "invoices": [
+          {
+            "invoice_id": "INV-73818",
+            "amount": 290.97,
+            "payment_status": "Pending",
+            "due_date": "2024-12-01"
+          }
+        ],
+        "returns": [],
+        "totals": {
+          "subtotal": 290.97,
+          "tax": 0,
+          "grand_total": 290.97
+        }
+      },
+      {
+        "manufacturer_id": "10",
+        "company_name": "STIFEN",
+        "contact": {
+          "name": "AHLEM BEN SLIMEN",
+          "email": "ahlem.benslimen@stifen.com",
+          "phone": "94856975"
+        },
+        "items": [
+          {
+            "item_id": 951060,
+            "product_id": 5534,
+            "name": "Dima - Palette 2L",
+            "sku": "6191577600046",
+            "qty_ordered": 1,
+            "price": 269.15,
+            "row_total": 269.15,
+            "categories": ["Juices"]
+          }
+        ],
+        "invoices": [
+          {
+            "invoice_id": "INV-73818",
+            "amount": 269.15,
+            "payment_status": "Pending",
+            "due_date": "2024-12-01"
+          }
+        ],
+        "returns": [
+          {
+            "return_id": 18023,
+            "reason": "Damaged packaging",
+            "status": "pending",
+            "qty": 1
+          }
+        ],
+        "totals": {
+          "subtotal": 269.15,
+          "tax": 0,
+          "grand_total": 269.15
+        }
+      }
+    ],
+    "supplier_orders_summary": {
+      "by_supplier": {
+        "9": {
+          "total_orders": 1,
+          "total_revenue": 290.97,
+          "pending_returns": 0,
+          "last_order_date": "2024-11-25"
+        },
+        "10": {
+          "total_orders": 1,
+          "total_revenue": 269.15,
+          "pending_returns": 1,
+          "last_order_date": "2024-11-25"
+        }
+      },
+      "combined": {
+        "grand_total": 560.12,
+        "total_items": 2,
+        "order_status": "open",
+        "delivery_date": "2024-11-27"
+      }
+    },
+    "customer_info": {
+      "id": 6646,
+      "name": "Aya Wrtani Test",
+      "contact": {
+        "email": "orders@kamioun.tn",
+        "phone": "29070023"
+      },
+      "shipping_address": "Route sans nom, Manouba, Tunisia 1000"
+    },
+    "payment_details": {
+      "method": "Check / Money order",
+      "total_due": 560.12,
+      "due_date": "2024-12-01"
+    }
+  },
+  {
+    "order_id": 73819,
+    "increment_id": "000060261",
+    "suppliers": [
+      {
+        "manufacturer_id": "11",
+        "company_name": "FreshGoods",
+        "contact": {
+          "name": "Samira Nasri",
+          "email": "orders@freshgoods.tn",
+          "phone": "70234567"
+        },
+        "items": [
+          {
+            "item_id": 951061,
+            "product_id": 6655,
+            "name": "Organic Dates - 5kg Box",
+            "sku": "FRESH001",
+            "qty_ordered": 3,
+            "price": 150.0,
+            "row_total": 450.0,
+            "categories": ["Dry Fruits", "Organic"]
+          }
+        ],
+        "invoices": [
+          {
+            "invoice_id": "INV-73819",
+            "amount": 450.0,
+            "payment_status": "Paid",
+            "due_date": "2024-12-05"
+          }
+        ],
+        "returns": [
+          {
+            "return_id": 18024,
+            "reason": "Wrong item shipped",
+            "status": "processing",
+            "qty": 1
+          }
+        ],
+        "totals": {
+          "subtotal": 450.0,
+          "tax": 22.5,
+          "grand_total": 472.5
+        }
+      }
+    ],
+    "supplier_orders_summary": {
+      "by_supplier": {
+        "11": {
+          "total_orders": 3,
+          "total_revenue": 472.5,
+          "pending_returns": 1,
+          "last_order_date": "2024-11-28"
+        }
+      },
+      "combined": {
+        "grand_total": 472.5,
+        "total_items": 3,
+        "order_status": "processing",
+        "delivery_date": "2024-11-30"
+      }
+    },
+    "customer_info": {
+      "id": 6647,
+      "name": "Mohamed Ali",
+      "contact": {
+        "email": "m.ali@business.tn",
+        "phone": "98765432"
+      },
+      "shipping_address": "12 Rue du Commerce, Tunis, Tunisia 1001"
+    },
+    "payment_details": {
+      "method": "Credit Card",
+      "total_due": 472.5,
+      "due_date": "2024-12-05"
+    }
+  },
+  {
+    "order_id": 73820,
+    "increment_id": "000060262",
+    "suppliers": [
+      {
+        "manufacturer_id": "9",
+        "company_name": "Technofood",
+        "contact": {
+          "name": "Mehdi Bourguiba",
+          "email": "slim.boughzala@technofoodindustries.com",
+          "phone": "22218000"
+        },
+        "items": [
+          {
+            "item_id": 951062,
+            "product_id": 5547,
+            "name": "Elixir Sparkling Water - 24pk",
+            "sku": "ELXSPARK24",
+            "qty_ordered": 2,
+            "price": 180.0,
+            "row_total": 360.0,
+            "categories": ["Beverages", "Sparkling Water"]
+          }
+        ],
+        "invoices": [
+          {
+            "invoice_id": "INV-73820-1",
+            "amount": 360.0,
+            "payment_status": "Partial",
+            "due_date": "2024-12-10"
+          }
+        ],
+        "returns": [],
+        "totals": {
+          "subtotal": 360.0,
+          "tax": 18.0,
+          "grand_total": 378.0
+        }
+      },
+      {
+        "manufacturer_id": "12",
+        "company_name": "BeverageMaster",
+        "contact": {
+          "name": "Leila Trabelsi",
+          "email": "sales@bevmaster.tn",
+          "phone": "36001122"
+        },
+        "items": [
+          {
+            "item_id": 951063,
+            "product_id": 6677,
+            "name": "Energy Drink Mix - 20ct",
+            "sku": "ENGMIX20",
+            "qty_ordered": 5,
+            "price": 25.0,
+            "row_total": 125.0,
+            "categories": ["Energy Drinks"]
+          }
+        ],
+        "invoices": [
+          {
+            "invoice_id": "INV-73820-2",
+            "amount": 125.0,
+            "payment_status": "Unpaid",
+            "due_date": "2024-12-15"
+          }
+        ],
+        "returns": [],
+        "totals": {
+          "subtotal": 125.0,
+          "tax": 6.25,
+          "grand_total": 131.25
+        }
+      }
+    ],
+    "supplier_orders_summary": {
+      "by_supplier": {
+        "9": {
+          "total_orders": 2,
+          "total_revenue": 378.0,
+          "pending_returns": 0,
+          "last_order_date": "2024-12-01"
+        },
+        "12": {
+          "total_orders": 5,
+          "total_revenue": 131.25,
+          "pending_returns": 0,
+          "last_order_date": "2024-12-01"
+        }
+      },
+      "combined": {
+        "grand_total": 509.25,
+        "total_items": 7,
+        "order_status": "partially_shipped",
+        "delivery_date": "2024-12-03"
+      }
+    },
+    "customer_info": {
+      "id": 6648,
+      "name": "Tunisian Catering Co.",
+      "contact": {
+        "email": "orders@tuncatering.tn",
+        "phone": "70123456"
+      },
+      "shipping_address": "Zone Industrielle, Ben Arous, Tunisia 2033"
+    },
+    "payment_details": {
+      "method": "Bank Transfer",
+      "total_due": 509.25,
+      "due_date": "2024-12-15"
+    }
+  }
+]

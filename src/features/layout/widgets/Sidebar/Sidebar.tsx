@@ -6,6 +6,7 @@ import {
   IconReport,
   IconDashboard,
   IconList,
+  IconDeviceAnalytics,
 } from "@tabler/icons-react";
 
 import Link from "next/link";
@@ -69,6 +70,20 @@ const Sidebar = ({
             isActive={pathname?.includes("dashboard")}
           />
           <Divider />
+
+          {/* Suppliers Analytics */}
+
+          <SidebarButton
+            onClick={() => {
+              push("/supplierDashboard");
+            }}
+            name={"Supplier Dashboard"}
+            icon={<IconDeviceAnalytics />}
+            isActive={pathname?.includes("supplierDashboard")}
+          />
+
+          <Divider />
+
           <SidebarOrdersSubMenu
             onClick={() => {
               push("/orders");
