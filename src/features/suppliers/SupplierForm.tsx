@@ -1,7 +1,8 @@
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import toast from "react-hot-toast";
 import { DatePicker } from "@heroui/react";
+import "@/styles/NeonButton.css";
 
 type Supplier = {
   manufacturer_id: string;
@@ -39,6 +40,9 @@ const SupplierSelector = ({
   const [deliveryDate, setDeliveryDate] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const datePickerRef = useRef<HTMLDivElement | null>(null);
+  const productSelectRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     fetch("/data/data.json")
       .then((response) => response.json())
@@ -63,6 +67,13 @@ const SupplierSelector = ({
     setSelectedSupplier(supplier);
     onChange?.(supplier);
     resetFormFields();
+
+    setTimeout(() => {
+      productSelectRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 300);
   };
 
   const resetFormFields = () => {
@@ -156,7 +167,6 @@ const SupplierSelector = ({
                     }}
                     className="w-full rounded-md border border-gray-300 p-2"
                   />
-
                   {query && filteredSuppliers.length > 0 && (
                     <ul className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg">
                       {filteredSuppliers.map((supplier) => (
@@ -208,7 +218,7 @@ const SupplierSelector = ({
                     />
                   )}
 
-                  <div className="mb-4">
+                  <div className="mb-4" ref={productSelectRef}>
                     <label className="block text-sm font-medium text-gray-700">
                       Product
                     </label>
@@ -247,6 +257,12 @@ const SupplierSelector = ({
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setQuantity(Number(e.target.value))
                     }
+                    onBlur={() =>
+                      totalPayment > 0 &&
+                      datePickerRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                      })
+                    }
                   />
 
                   {selectedProduct && (
@@ -266,17 +282,13 @@ const SupplierSelector = ({
 
                   {totalPayment > 0 && (
                     <>
-                      <div className="mb-4">
+                      <div className="mb-4" ref={datePickerRef}>
                         <DatePicker
                           label="Delivery Date"
                           defaultValue={null}
                           onChange={(date) => {
                             if (date) {
-                              const formattedDate = new Date(
-                                date.year,
-                                date.month - 1,
-                                date.day,
-                              );
+                              const formattedDate = new Date(date);
                               setDeliveryDate(formattedDate);
                             } else {
                               setDeliveryDate(null);
@@ -311,13 +323,17 @@ const SupplierSelector = ({
                     </>
                   )}
 
-                  <div className="flex justify-between gap-2">
+                  <div className="flex justify-end">
                     <button
                       type="button"
                       onClick={handleSubmit}
-                      className="w-full rounded-lg bg-primary py-2 text-white"
+                      className="neon-button"
                     >
-                      Submit Order
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      Submit
                     </button>
                   </div>
                 </form>
@@ -329,16 +345,19 @@ const SupplierSelector = ({
     </div>
   );
 };
+
 const InputField = ({
   label,
   value,
   onChange,
+  onBlur,
   type = "text",
   disabled = false,
 }: {
   label: string;
   value: string | number;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   type?: string;
   disabled?: boolean;
 }) => (
@@ -348,6 +367,7 @@ const InputField = ({
       type={type}
       value={value}
       onChange={onChange}
+      onBlur={onBlur}
       disabled={disabled}
       className={`mt-1 w-full rounded-md border border-gray-300 p-2 ${
         disabled ? "bg-gray-100" : ""
@@ -355,6 +375,7 @@ const InputField = ({
     />
   </div>
 );
+
 const RectangleSkeleton = () => (
   <div className="h-12 w-full animate-pulse rounded-lg bg-gray-300"></div>
 );

@@ -11,7 +11,14 @@
       "country": "Tunisia",
       "capital": "Tunis",
       "email": "slim.boughzala@technofoodindustries.com",
-      "payment_modes": ["Carte Bancaire"]
+      "payment_modes": [
+        "Carte Bancaire",
+        "Chèque",
+        "Crédit",
+        "Traite",
+        "Espèces",
+        "Virement Bancaire"
+      ]
     },
     {
       "manufacturer_id": "10",
@@ -23,7 +30,7 @@
       "country": "Tunisia",
       "capital": "Tunis",
       "email": "ahlem.benslimen@stifen.com",
-      "payment_modes": []
+      "payment_modes": ["Chèque", "Virement Bancaire"]
     },
     {
       "manufacturer_id": "11",
@@ -36,7 +43,7 @@
       "country": "Tunisia",
       "capital": "Tunis",
       "email": "fact.manarthon@horchani.com",
-      "payment_modes": ["Virement Bancaire"]
+      "payment_modes": ["Virement Bancaire", "Espèces"]
     },
     {
       "manufacturer_id": "12",
@@ -48,7 +55,12 @@
       "country": "Tunisia",
       "capital": "Tunis",
       "email": "direction.commerciale@socohuile.com.tn",
-      "payment_modes": ["Paiement à la Livraison", "Espèces"]
+      "payment_modes": [
+        "Paiement à la Livraison",
+        "Espèces",
+        "Chèque",
+        "Traite"
+      ]
     },
     {
       "manufacturer_id": "13",
@@ -56,7 +68,7 @@
       "company_name": "Société L'Appétissante S.A",
       "contact_name": "Tom",
       "email": "TOM@kamioun.tn",
-      "payment_modes": []
+      "payment_modes": ["Crédit", "Virement Bancaire"]
     },
     {
       "manufacturer_id": "14",
@@ -68,7 +80,7 @@
       "country": "Tunisia",
       "capital": "Sousse",
       "email": "sales@fruityfresh.com",
-      "payment_modes": ["Carte Bancaire", "Virement Bancaire"]
+      "payment_modes": ["Carte Bancaire", "Virement Bancaire", "Espèces"]
     }
   ],
   "categories": [
@@ -104,6 +116,17 @@
       "manufacturer_id": "9"
     },
     {
+      "id": "1001",
+      "productId": "1001",
+      "productName": "Sunflower Oil",
+      "productPrice": "15",
+      "totalPrice": "150",
+      "quantity": "10",
+      "sku": "1001-SUN",
+      "weight": "1000",
+      "manufacturer_id": "9"
+    },
+    {
       "id": "1000",
       "productId": "1000",
       "productName": "Canned Tuna",
@@ -124,6 +147,39 @@
       "sku": "1002-WM",
       "weight": "30000",
       "manufacturer_id": "11"
+    },
+    {
+      "id": "1003",
+      "productId": "1003",
+      "productName": "Tomato Paste",
+      "productPrice": "3",
+      "totalPrice": "30",
+      "quantity": "10",
+      "sku": "1003-TMP",
+      "weight": "400",
+      "manufacturer_id": "12"
+    },
+    {
+      "id": "1004",
+      "productId": "1004",
+      "productName": "Fresh Apples",
+      "productPrice": "2",
+      "totalPrice": "20",
+      "quantity": "10",
+      "sku": "1004-APP",
+      "weight": "200",
+      "manufacturer_id": "14"
+    },
+    {
+      "id": "1005",
+      "productId": "1005",
+      "productName": "Orange Juice",
+      "productPrice": "4",
+      "totalPrice": "40",
+      "quantity": "10",
+      "sku": "1005-OJ",
+      "weight": "500",
+      "manufacturer_id": "14"
     }
   ],
   "invoices": [
