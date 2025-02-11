@@ -1,118 +1,148 @@
 import { ApexOptions } from "apexcharts";
 import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
-import supplierData from "../../../../data_test.json";
+import supplierData from "../../../../data_test.json"; // Make sure your path is correct
 
-const currentYear = new Date().getFullYear();
-const months = Array.from(
-  { length: 12 },
-  (_, i) => `${currentYear}-${(i + 1).toString().padStart(2, "0")}-01`,
-);
-
-const options: ApexOptions = {
-  legend: {
-    show: false,
-    position: "top",
-    horizontalAlign: "left",
-  },
-  colors: ["#3C50E0", "#80CAEE"],
-  chart: {
-    fontFamily: "Satoshi, sans-serif",
-    height: 335,
-    type: "area",
-    zoom: { enabled: false },
-    toolbar: { show: false },
-  },
-  stroke: { curve: "straight" },
-  dataLabels: { enabled: false },
-  grid: {
-    borderColor: "#EDEFF1",
-    strokeDashArray: 5,
-  },
-  title: {
-    text: "Supplier Revenue Over Time",
-    align: "left",
-  },
-  subtitle: {
-    text: "Total Revenue per Month",
-    align: "left",
-  },
-  xaxis: {
-    type: "datetime",
-    categories: months, // Dynamic months for the current year
-    axisBorder: { show: false },
-    axisTicks: { show: false },
-  },
-  yaxis: {
-    opposite: true,
-    min: 0,
-  },
-};
-
-interface ChartState {
-  series: {
-    name: string;
-    data: number[];
-  }[];
+interface RevenueOverTimeChartProps {
+  supplierId: string;
 }
 
-const SupplierAreaChart: React.FC<{ supplierId: string }> = ({
+const SupplierAreaChart: React.FC<RevenueOverTimeChartProps> = ({
   supplierId,
 }) => {
-  const [state, setState] = useState<ChartState>({
-    series: [{ name: "Revenue", data: [] }],
-  });
+  const [chartData, setChartData] = useState<any>(null);
 
-  useEffect(() => {
-    const monthlyRevenue: Record<string, number> = {};
+  // Helper function to calculate revenue for each order based on the product price and quantity
+  const calculateRevenue = (order: any) => {
+    let revenueByMonth: { [key: string]: number } = {};
 
-    supplierData.forEach((order) => {
-      const supplier = order.suppliers.find(
-        (s) => s.manufacturer_id === supplierId,
-      );
-      if (supplier) {
-        const orderDate = (
-          order.supplier_orders_summary.by_supplier as Record<string, any>
-        )[supplierId]?.last_order_date;
+    // Only consider confirmed orders
+    if (order.state !== "confirmed") {
+      return revenueByMonth; // If not confirmed, return empty revenue
+    }
 
-        if (orderDate) {
-          const month = orderDate.substring(0, 7); // Extract YYYY-MM format
+    // Get current year
+    const currentYear = new Date().getFullYear();
 
-          let revenueAfterDiscounts = supplier.totals.grand_total;
+    order.items.forEach((item: any) => {
+      if (item.supplier.manufacturer_id === supplierId) {
+        const productPrice = parseFloat(item.productPrice);
+        const quantityOrdered = parseInt(item.quantity, 10);
 
-          // Track products with discounts and adjust revenue
-          supplier.items.forEach((item) => {
-            if (item.discount && item.discount.discount_amount > 0) {
-              // Subtract the discount amount from the total revenue
-              revenueAfterDiscounts -= item.discount.discount_amount;
-            }
-          });
+        // Calculate the revenue for the product in the current order
+        const revenue = productPrice * quantityOrdered;
 
-          // Accumulate the adjusted revenue for the given month
-          monthlyRevenue[month] =
-            (monthlyRevenue[month] || 0) + revenueAfterDiscounts;
+        // Convert the deliveryDate to a Date object
+        const deliveryDate = new Date(order.deliveryDate * 1000); // Multiply by 1000 to convert to milliseconds
+        console.log(deliveryDate);
+
+        // Check if the delivery date is in the current year
+        const deliveryYear = deliveryDate.getFullYear();
+        if (deliveryYear !== currentYear) {
+          return; // Skip orders with delivery dates not in the current year
         }
+
+        // Convert the order's creation date to a Date object
+        const orderDate = new Date(order.createdAt * 1000); // Multiply by 1000 to convert to milliseconds
+        const month = orderDate.getMonth(); // 0 = January, 11 = December
+
+        // Accumulate the revenue for this month
+        if (!revenueByMonth[month]) {
+          revenueByMonth[month] = 0;
+        }
+        revenueByMonth[month] += revenue;
       }
     });
 
-    // Format data to match dynamic months
-    const formattedData = months.map(
-      (month) => monthlyRevenue[month.slice(0, 7)] || 0,
-    );
+    return revenueByMonth;
+  };
 
-    setState({ series: [{ name: "Revenue", data: formattedData }] });
+  useEffect(() => {
+    const revenueByMonth: { [key: string]: number } = {};
+
+    // Loop through all orders to calculate the revenue by month
+    supplierData.orders.forEach((order: any) => {
+      const revenueForOrder = calculateRevenue(order.order);
+      for (const month in revenueForOrder) {
+        if (!revenueByMonth[month]) {
+          revenueByMonth[month] = 0;
+        }
+        revenueByMonth[month] += revenueForOrder[month];
+      }
+    });
+
+    // Prepare chart data
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const revenueValues = months.map((_, index) => revenueByMonth[index] || 0);
+
+    const currentYear = new Date().getFullYear(); // Get the current year dynamically
+
+    setChartData({
+      series: [
+        {
+          name: "Revenue",
+          data: revenueValues,
+        },
+      ],
+      options: {
+        chart: {
+          type: "area",
+          height: 400, // Set the height for the area chart
+          background: "#FFFFFF",
+        },
+        xaxis: {
+          categories: months, // Set the months as categories on the x-axis
+          title: {
+            text: "Months",
+          },
+        },
+        yaxis: {
+          title: {
+            text: "Revenue (in TND)",
+          },
+          labels: {
+            formatter: (val: number) => `${val.toFixed(2)} TND`, // Format y-axis labels as currency
+          },
+        },
+        title: {
+          text: `Revenue in ${currentYear}`, // Dynamically set the title with the current year
+          align: "center",
+        },
+        tooltip: {
+          y: {
+            formatter: (val: number) => `${val.toFixed(2)} TND`, // Format tooltip as currency
+          },
+        },
+      },
+    });
   }, [supplierId]);
 
   return (
-    <div className="border-stroke pt-7.5 dark:border-strokedark dark:bg-boxdark rounded-sm border bg-white px-5 pb-5 shadow-default">
-      <div id="areaChart" className="-ml-5">
+    <div className="mt-6 w-full bg-white p-4">
+      {chartData ? (
         <ReactApexChart
-          options={options}
-          series={state.series}
+          options={chartData.options}
+          series={chartData.series}
           type="area"
-          height={350}
+          height={400}
         />
-      </div>
+      ) : (
+        <p>Loading chart data...</p>
+      )}
     </div>
   );
 };

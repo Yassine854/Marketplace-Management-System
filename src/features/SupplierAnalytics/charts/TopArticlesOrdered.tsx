@@ -1,8 +1,9 @@
 import { ApexOptions } from "apexcharts";
 import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
-import supplierData from "../../../../data_test.json";
+import supplierData from "../../../../data_test.json"; // Make sure your path is correct
 
+// Generate random colors
 const generateColors = (num: number): string[] => {
   const colors = [
     "#3C50E0",
@@ -26,9 +27,10 @@ const generateColors = (num: number): string[] => {
     "#D2691E",
     "#BC8F8F",
   ];
-  // Extend the array if there are more products than the predefined colors
+
+  // Extend the array if needed
   while (colors.length < num) {
-    colors.push(`#${Math.floor(Math.random() * 16777215).toString(16)}`); // Generate random color
+    colors.push(`#${Math.floor(Math.random() * 16777215).toString(16)}`);
   }
   return colors.slice(0, num);
 };
@@ -44,16 +46,16 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
   useEffect(() => {
     const productOrders: Record<string, number> = {};
 
-    supplierData.forEach((order) => {
-      const supplier = order.suppliers.find(
-        (s) => s.manufacturer_id === supplierId,
-      );
-      if (supplier) {
-        supplier.items.forEach((item) => {
-          productOrders[item.name] =
-            (productOrders[item.name] || 0) + item.qty_ordered;
-        });
-      }
+    supplierData.orders.forEach((order) => {
+      order.order.items.forEach((item) => {
+        if (item.supplier.manufacturer_id === supplierId) {
+          const productName = item.productName;
+          const quantity = parseFloat(item.quantity);
+
+          productOrders[productName] =
+            (productOrders[productName] || 0) + quantity;
+        }
+      });
     });
 
     const totalOrders = Object.values(productOrders).reduce(
@@ -78,6 +80,8 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
     chart: {
       fontFamily: "Satoshi, sans-serif",
       type: "donut",
+      height: 500,
+      background: "#FFFFFF",
     },
     labels: state.labels,
     colors: generateColors(state.labels.length), // Dynamically assign colors
@@ -96,22 +100,42 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
     dataLabels: {
       enabled: true,
       formatter: function (val: number) {
-        return `${Number(val).toFixed(1)}%`; // ✅ Cast val to number
+        return `${Number(val).toFixed(1)}%`;
       },
       style: {
         fontSize: "14px",
         fontWeight: "bold",
       },
     },
+    title: {
+      text: "Most Ordered Products",
+      align: "center",
+    },
   };
 
   return (
-    <div className="border-stroke dark:border-strokedark dark:bg-boxdark pt-7.5 rounded-sm border bg-white px-5 pb-5 shadow-default">
-      <h5 className="mb-3 text-xl font-semibold text-black dark:text-white">
-        Most Ordered Products
-      </h5>
+    <div className="mt-6 w-full bg-white p-4">
       <div className="mx-auto flex justify-center">
-        <ReactApexChart options={options} series={state.series} type="donut" />
+        <ReactApexChart
+          options={options}
+          series={state.series}
+          type="donut"
+          height={500}
+        />
+      </div>
+      {/* Product details section */}
+      <div className="mt-6 flex flex-wrap justify-center">
+        {state.labels.map((label, index) => (
+          <div key={index} className="mb-2 flex items-center space-x-2">
+            <div
+              className="h-4 w-4 rounded-full"
+              style={{
+                backgroundColor: generateColors(state.labels.length)[index],
+              }}
+            ></div>
+            <span className="text-sm font-semibold">{label}</span>
+          </div>
+        ))}
       </div>
     </div>
   );

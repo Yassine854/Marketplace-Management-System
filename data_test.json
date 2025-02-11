@@ -1,247 +1,432 @@
-[
-  {
-    "order_id": 73818,
-    "increment_id": "000060260",
-    "suppliers": [
-      {
-        "manufacturer_id": "10",
-        "company_name": "Technofood",
-        "contact": {
-          "name": "Mehdi Bourguiba",
-          "email": "slim.boughzala@technofoodindustries.com",
-          "phone": "22218000"
-        },
+{
+  "orders": [
+    {
+      "order": {
+        "id": "6427153",
+        "orderId": "63453",
+        "incrementId": "000052675",
+        "kamiounId": "000052675",
+        "state": "confirmed",
+        "status": "valid",
+        "total": 159.09,
+        "createdAt": 1722350694,
+        "customerId": "6324",
+        "storeId": "1",
+        "customerPhone": "24946132",
+        "customerFirstname": "Ikbel",
+        "customerLastname": "Sousse",
+        "deliveryAgentId": "agentid",
+        "deliveryAgentName": "agnetName",
+        "deliverySlot": "Matin",
+        "deliveryDate": 1739232000,
+        "deliveryStatus": "",
+        "source": "online",
         "items": [
           {
-            "item_id": 951059,
-            "product_id": 5546,
-            "name": "Elixir Eau - Palette 1.5",
-            "sku": "6191400100019",
-            "qty_ordered": 1,
-            "price": 290.97,
-            "row_total": 290.97,
-            "categories": ["Beverages", "Mineral Water"],
-            "discount": {
-              "discount_amount": 20.0,
-              "discounted_price": 270.97
+            "id": "797787",
+            "orderId": "63453",
+            "productId": "3244",
+            "productName": "La Goulette - Thon entier HV 2.1kg",
+            "productPrice": "46.2",
+            "totalPrice": "138.6000",
+            "quantity": "3.0000",
+            "sku": "61915718013445",
+            "weight": "6",
+            "category": {
+              "categoryId": "2",
+              "categoryName": "Food",
+              "parentCategoryId": null,
+              "subcategories": [
+                {
+                  "subcategoryId": "201",
+                  "subcategoryName": "snacks",
+                  "description": "bla bla."
+                }
+              ]
+            },
+            "supplier": {
+              "manufacturer_id": "9",
+              "code": "001",
+              "company_name": "Technofood",
+              "contact_name": "Mehdi Bourguiba",
+              "phone_number": "22218000",
+              "postal_code": "2082",
+              "city": "Tunis",
+              "country": "Tunisia",
+              "capital": "Tunis",
+              "email": "slim.boughzala@technofoodindustries.com"
             }
           },
           {
-            "item_id": 951064,
-            "product_id": 6789,
-            "name": "Natural Orange Juice - 1L",
-            "sku": "6192000456789",
-            "qty_ordered": 3,
-            "price": 5.99,
-            "row_total": 17.97,
-            "categories": ["Juices", "Organic"],
-            "discount": {
-              "discount_amount": 2.0,
-              "discounted_price": 15.97
-            }
-          }
-        ],
-        "invoices": [
-          {
-            "invoice_id": "INV-73818",
-            "amount": 286.94,
-            "payment_status": "Pending",
-            "due_date": "2025-12-01"
-          }
-        ],
-        "returns": [],
-        "totals": {
-          "subtotal": 286.94,
-          "tax": 0,
-          "grand_total": 286.94
-        }
-      },
-      {
-        "manufacturer_id": "10",
-        "company_name": "STIFEN",
-        "contact": {
-          "name": "AHLEM BEN SLIMEN",
-          "email": "ahlem.benslimen@stifen.com",
-          "phone": "94856975"
-        },
-        "items": [
-          {
-            "item_id": 951060,
-            "product_id": 5534,
-            "name": "Dima - Palette 2L",
-            "sku": "6191577600046",
-            "qty_ordered": 1,
-            "price": 269.15,
-            "row_total": 269.15,
-            "categories": ["Juices"],
-            "discount": {
-              "discount_amount": 10.0,
-              "discounted_price": 259.15
+            "id": "797788",
+            "orderId": "63453",
+            "productId": "3952",
+            "productName": "Oliv+ Trio d'Or - 50% Huile d'Olive 1L",
+            "productPrice": "15.39",
+            "totalPrice": "15.3900",
+            "quantity": "1.0000",
+            "sku": "6194017409148",
+            "weight": "6",
+            "category": {
+              "categoryId": "3",
+              "categoryName": "Beverages",
+              "parentCategoryId": null,
+              "subcategories": [
+                {
+                  "subcategoryId": "301",
+                  "subcategoryName": "Olive Oils",
+                  "description": "Cold-pressed olive oils."
+                }
+              ]
+            },
+            "supplier": {
+              "manufacturer_id": "9",
+              "code": "001",
+              "company_name": "Technofood",
+              "contact_name": "Mehdi Bourguiba",
+              "phone_number": "22218000",
+              "postal_code": "2082",
+              "city": "Tunis",
+              "country": "Tunisia",
+              "capital": "Tunis",
+              "email": "slim.boughzala@technofoodindustries.com"
             }
           },
           {
-            "item_id": 951065,
-            "product_id": 6785,
-            "name": "Apple Juice - 500ml",
-            "sku": "6191577600099",
-            "qty_ordered": 4,
-            "price": 3.5,
-            "row_total": 14.0,
-            "categories": ["Juices"],
-            "discount": {
-              "discount_amount": 1.5,
-              "discounted_price": 12.5
+            "id": "797789",
+            "orderId": "63453",
+            "productId": "154",
+            "productName": "Bonna - Pot moutarde 263ml (Unité)",
+            "productPrice": "5.1",
+            "totalPrice": "5.1000",
+            "quantity": "1.0000",
+            "sku": "001-001001",
+            "weight": "6",
+            "category": {
+              "categoryId": "2",
+              "categoryName": "Food",
+              "parentCategoryId": null,
+              "subcategories": [
+                {
+                  "subcategoryId": "202",
+                  "subcategoryName": "Condiments",
+                  "description": "Various sauces, mustards, and condiments."
+                }
+              ]
+            },
+            "supplier": {
+              "manufacturer_id": "178",
+              "code": "516",
+              "company_name": "CAC DG",
+              "tax_registration_number": "1668051/B/P/E/000",
+              "contact_name": "agence wed elil",
+              "address": "wed elili",
+              "email": "cacdg.commercial@gmail.com"
             }
           }
         ],
-        "invoices": [
-          {
-            "invoice_id": "INV-73818",
-            "amount": 271.65,
-            "payment_status": "Pending",
-            "due_date": "2025-12-01"
-          }
-        ],
-        "returns": [
-          {
-            "return_id": 18023,
-            "reason": "Damaged packaging",
-            "status": "pending",
-            "qty": 1
-          }
-        ],
-        "totals": {
-          "subtotal": 271.65,
-          "tax": 0,
-          "grand_total": 271.65
+        "invoice": {
+          "invoiceId": "INV-20240211-002",
+          "orderId": "63453",
+          "invoiceDate": "2025-02-11",
+          "dueDate": "2025-02-18",
+          "paymentMethod": "Credit Card",
+          "paymentStatus": "Paid",
+          "totalAmount": 159.09,
+          "taxAmount": 7.59,
+          "discountAmount": 3.0,
+          "netAmount": 156.09,
+          "billingAddress": {
+            "customerFirstname": "Ikbel",
+            "customerLastname": "Sousse",
+            "phone": "24946132",
+            "address": "15, Rue de Marseille",
+            "city": "Sousse",
+            "postal_code": "4000",
+            "country": "Tunisia"
+          },
+          "invoiceItems": [
+            {
+              "productId": "3244",
+              "productName": "La Goulette - Thon entier HV 2.1kg",
+              "quantity": "3",
+              "unitPrice": "46.2",
+              "totalPrice": "138.6000"
+            },
+            {
+              "productId": "3952",
+              "productName": "Oliv+ Trio d'Or - 50% Huile d'Olive 1L",
+              "quantity": "1",
+              "unitPrice": "15.39",
+              "totalPrice": "15.3900"
+            },
+            {
+              "productId": "154",
+              "productName": "Bonna - Pot moutarde 263ml (Unité)",
+              "quantity": "1",
+              "unitPrice": "5.1",
+              "totalPrice": "5.1000"
+            }
+          ]
         }
       }
-    ],
-    "supplier_orders_summary": {
-      "by_supplier": {
-        "10": {
-          "total_orders": 2,
-          "total_revenue": 286.94,
-          "pending_returns": 1,
-          "last_order_date": "2025-11-25"
+    },
+
+    {
+      "order": {
+        "id": "6427155",
+        "orderId": "63455",
+        "incrementId": "000052677",
+        "kamiounId": "000052677",
+        "state": "confirmed",
+        "status": "valid",
+        "total": 210.5,
+        "createdAt": 1722350694,
+        "customerId": "7890",
+        "storeId": "2",
+        "customerPhone": "55223344",
+        "customerFirstname": "Ahmed",
+        "customerLastname": "Ben Salah",
+        "deliveryAgentId": "agent002",
+        "deliveryAgentName": "Khalil Mohamed",
+        "deliverySlot": "Après-midi",
+        "deliveryDate": 1739232000,
+        "deliveryStatus": "delivered",
+        "source": "online",
+        "items": [
+          {
+            "id": "898900",
+            "orderId": "63455",
+            "productId": "5001",
+            "productName": "Barilla - Pâtes Spaghetti 500g",
+            "productPrice": "12.5",
+            "totalPrice": "25.00",
+            "quantity": "2",
+            "sku": "8001001234567",
+            "weight": "1",
+            "category": {
+              "categoryId": "2",
+              "categoryName": "Food",
+              "parentCategoryId": null,
+              "subcategories": [
+                {
+                  "subcategoryId": "202",
+                  "subcategoryName": "Pasta",
+                  "description": "Various pasta products."
+                }
+              ]
+            },
+
+            "supplier": {
+              "manufacturer_id": "22",
+              "code": "BAR001",
+              "company_name": "Barilla Group",
+              "contact_name": "Luca Rossi",
+              "phone_number": "33445566",
+              "postal_code": "2016",
+              "city": "Milan",
+              "country": "Italy",
+              "capital": "Rome",
+              "email": "sales@barillagroup.com"
+            }
+          },
+          {
+            "id": "797787",
+            "orderId": "63455",
+            "productId": "3244",
+            "productName": "La Goulette - Thon entier HV 2.1kg",
+            "productPrice": "46.2",
+            "totalPrice": "138.6000",
+            "quantity": "3.0000",
+            "sku": "61915718013445",
+            "weight": "6",
+            "category": {
+              "categoryId": "2",
+              "categoryName": "Food",
+              "parentCategoryId": null,
+              "subcategories": [
+                {
+                  "subcategoryId": "201",
+                  "subcategoryName": "snacks",
+                  "description": "bla bla."
+                }
+              ]
+            },
+            "supplier": {
+              "manufacturer_id": "9",
+              "code": "001",
+              "company_name": "Technofood",
+              "contact_name": "Mehdi Bourguiba",
+              "phone_number": "22218000",
+              "postal_code": "2082",
+              "city": "Tunis",
+              "country": "Tunisia",
+              "capital": "Tunis",
+              "email": "slim.boughzala@technofoodindustries.com"
+            }
+          },
+          {
+            "id": "898901",
+            "orderId": "63455",
+            "productId": "6100",
+            "productName": "Coca Cola - 1.5L",
+            "productPrice": "5.00",
+            "totalPrice": "30.00",
+            "quantity": "6",
+            "sku": "5449000000996",
+            "weight": "1.5",
+            "category": {
+              "categoryId": "3",
+              "categoryName": "Beverages",
+              "parentCategoryId": null,
+              "subcategories": [
+                {
+                  "subcategoryId": "303",
+                  "subcategoryName": "Soft Drinks",
+                  "description": "Carbonated beverages."
+                }
+              ]
+            },
+            "supplier": {
+              "manufacturer_id": "10",
+              "code": "COCA001",
+              "company_name": "Coca Cola Company",
+              "contact_name": "John Doe",
+              "phone_number": "11223344",
+              "postal_code": "10001",
+              "city": "Atlanta",
+              "country": "USA",
+              "capital": "Washington DC",
+              "email": "support@cocacola.com"
+            }
+          }
+        ],
+        "invoice": {
+          "invoiceId": "INV-20240211-001",
+          "orderId": "63455",
+          "invoiceDate": "2025-02-11",
+          "dueDate": "2025-02-18",
+          "paymentMethod": "Credit Card",
+          "paymentStatus": "Paid",
+          "totalAmount": 210.5,
+          "taxAmount": 10.5,
+          "discountAmount": 5.0,
+          "netAmount": 205.5,
+          "billingAddress": {
+            "customerFirstname": "Ahmed",
+            "customerLastname": "Ben Salah",
+            "phone": "55223344",
+            "address": "12, Avenue Habib Bourguiba",
+            "city": "Tunis",
+            "postal_code": "1000",
+            "country": "Tunisia"
+          },
+          "invoiceItems": [
+            {
+              "productId": "5001",
+              "productName": "Barilla - Pâtes Spaghetti 500g",
+              "quantity": "2",
+              "unitPrice": "12.5",
+              "totalPrice": "25.00"
+            },
+            {
+              "productId": "6100",
+              "productName": "Coca Cola - 1.5L",
+              "quantity": "6",
+              "unitPrice": "5.00",
+              "totalPrice": "30.00"
+            }
+          ]
         }
-      },
-      "combined": {
-        "grand_total": 558.59,
-        "total_items": 5,
-        "order_status": "open",
-        "delivery_date": "2025-11-27"
       }
     },
-    "customer_info": {
-      "id": 6646,
-      "name": "Aya Wrtani Test",
-      "contact": {
-        "email": "orders@kamioun.tn",
-        "phone": "29070023"
-      },
-      "shipping_address": "Route sans nom, Manouba, Tunisia 1000"
-    },
-    "payment_details": {
-      "method": "Check / Money order",
-      "total_due": 558.59,
-      "due_date": "2025-12-01"
+
+    {
+      "order": {
+        "id": "6427154",
+        "orderId": "63454",
+        "incrementId": "000052676",
+        "kamiounId": "000052676",
+        "state": "cancelled",
+        "status": "valid",
+        "total": 55.59,
+        "createdAt": 1722350694,
+        "customerId": "6324",
+        "storeId": "1",
+        "customerPhone": "24946132",
+        "customerFirstname": "Ikbel",
+        "customerLastname": "Sousse",
+        "deliveryAgentId": "agentid",
+        "deliveryAgentName": "agnetName",
+        "deliverySlot": "Matin",
+        "deliveryDate": 0,
+        "deliveryStatus": "",
+        "source": "online",
+        "items": [
+          {
+            "id": "797787",
+            "orderId": "63454",
+            "productId": "3244",
+            "productName": "La Goulette - Thon entier HV 2.1kg",
+            "productPrice": "46.2",
+            "totalPrice": "138.6000",
+            "quantity": "2.0000",
+            "sku": "61915718013445",
+            "weight": "6",
+            "supplier": {
+              "manufacturer_id": "9",
+              "code": "001",
+              "company_name": "Technofood",
+              "contact_name": "Mehdi Bourguiba",
+              "phone_number": "22218000",
+              "postal_code": "2082",
+              "city": "Tunis",
+              "country": "Tunisia",
+              "capital": "Tunis",
+              "email": "slim.boughzala@technofoodindustries.com"
+            },
+            "return": {
+              "type": "partial",
+              "returned_products": 1,
+              "ordered_products": 2,
+              "reason": "Defective product"
+            }
+          },
+          {
+            "id": "797788",
+            "orderId": "63454",
+            "productId": "3952",
+            "productName": "Oliv+ Trio d'Or - 50% Huile d'Olive 1L",
+            "productPrice": "15.39",
+            "totalPrice": "15.3900",
+            "quantity": "1",
+            "sku": "6194017409148",
+            "weight": "6",
+            "supplier": {
+              "manufacturer_id": "9",
+              "code": "001",
+              "company_name": "Technofood",
+              "contact_name": "Mehdi Bourguiba",
+              "phone_number": "22218000",
+              "postal_code": "2082",
+              "city": "Tunis",
+              "country": "Tunisia",
+              "capital": "Tunis",
+              "email": "slim.boughzala@technofoodindustries.com"
+            },
+            "return": {
+              "type": "total",
+              "returned_products": 1,
+              "ordered_products": 1,
+              "reason": "Unsatisfied with the product"
+            }
+          }
+        ],
+        "return_summary": {
+          "total_returned_products": 2,
+          "total_ordered_products": 3
+        }
+      }
     }
-  },
-  {
-    "order_id": 73819,
-    "increment_id": "000060261",
-    "suppliers": [
-      {
-        "manufacturer_id": "11",
-        "company_name": "FreshGoods",
-        "contact": {
-          "name": "Samira Nasri",
-          "email": "orders@freshgoods.tn",
-          "phone": "70234567"
-        },
-        "items": [
-          {
-            "item_id": 951061,
-            "product_id": 6655,
-            "name": "Organic Dates - 5kg Box",
-            "sku": "FRESH001",
-            "qty_ordered": 3,
-            "price": 150.0,
-            "row_total": 450.0,
-            "categories": ["Dry Fruits", "Organic"],
-            "discount": {
-              "discount_amount": 30.0,
-              "discounted_price": 420.0
-            }
-          },
-          {
-            "item_id": 951066,
-            "product_id": 6766,
-            "name": "Premium Almonds - 1kg",
-            "sku": "ALMOND001",
-            "qty_ordered": 2,
-            "price": 90.0,
-            "row_total": 180.0,
-            "categories": ["Nuts"],
-            "discount": {
-              "discount_amount": 10.0,
-              "discounted_price": 170.0
-            }
-          }
-        ],
-        "invoices": [
-          {
-            "invoice_id": "INV-73819",
-            "amount": 590.0,
-            "payment_status": "Paid",
-            "due_date": "2025-12-05"
-          }
-        ],
-        "returns": [
-          {
-            "return_id": 18024,
-            "reason": "Wrong item shipped",
-            "status": "processing",
-            "qty": 1
-          }
-        ],
-        "totals": {
-          "subtotal": 590.0,
-          "tax": 22.5,
-          "grand_total": 612.5
-        }
-      }
-    ],
-    "supplier_orders_summary": {
-      "by_supplier": {
-        "11": {
-          "total_orders": 3,
-          "total_revenue": 612.5,
-          "pending_returns": 1,
-          "last_order_date": "2025-11-28"
-        }
-      },
-      "combined": {
-        "grand_total": 612.5,
-        "total_items": 5,
-        "order_status": "processing",
-        "delivery_date": "2025-11-30"
-      }
-    },
-    "customer_info": {
-      "id": 6647,
-      "name": "Mohamed Ali",
-      "contact": {
-        "email": "m.ali@business.tn",
-        "phone": "98765432"
-      },
-      "shipping_address": "12 Rue du Commerce, Tunis, Tunisia 1001"
-    },
-    "payment_details": {
-      "method": "Credit Card",
-      "total_due": 612.5,
-      "due_date": "2025-12-05"
-    }
-  }
-]
+  ]
+}

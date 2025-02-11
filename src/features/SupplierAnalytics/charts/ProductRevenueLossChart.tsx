@@ -6,201 +6,123 @@ interface ProductRevenueLossChartProps {
   supplierId: string; // Accept supplierId as a prop
 }
 
-// Define the type for the chart state
 interface ChartState {
-  series: { data: number[] }[]; // The series should be an array of objects, each having a 'data' property (array of numbers)
+  series: Array<{ name: string; data: number[] }>;
   options: {
-    chart: {
-      type: "bar"; // Explicitly define the type as 'bar'
-      height: number;
-    };
-    plotOptions: {
-      bar: {
-        horizontal: boolean;
-      };
-    };
-    dataLabels: {
-      enabled: boolean;
-    };
-    xaxis: {
-      categories: string[]; // categories should be an array of strings
-    };
-    annotations: {
-      xaxis: {
-        x: number;
-        borderColor: string;
-        label: {
-          text: string;
-          borderColor: string;
-          style: { color: string; background: string };
-        };
-      }[];
-      yaxis: { y: string; y2: string; label: { text: string } }[];
-    };
-    grid: {
-      xaxis: {
-        lines: { show: boolean };
-      };
-    };
-    yaxis: {
-      reversed: boolean;
-      axisTicks: {
-        show: boolean;
-      };
-    };
+    chart: { type: "bar"; height: number; background: string }; // Specify background property for chart
+    xaxis: { categories: string[] };
+    yaxis: { title: { text: string } };
+    tooltip: { y: { formatter: (val: number) => string } };
+    title: { text: string; align: "center" | "left" | "right" }; // Restrict align to specific values
   };
 }
 
 const ProductRevenueLossChart: React.FC<ProductRevenueLossChartProps> = ({
   supplierId,
 }) => {
-  const [state, setState] = useState<ChartState>({
-    series: [{ data: [] }],
-    options: {
-      chart: {
-        type: "bar", // Correctly set the type here as 'bar'
-        height: 350,
-      },
-      annotations: {
-        xaxis: [
-          {
-            x: 500,
-            borderColor: "#00E396",
-            label: {
-              borderColor: "#00E396",
-              style: {
-                color: "#fff",
-                background: "#00E396",
-              },
-              text: "X annotation",
-            },
-          },
-        ],
-        yaxis: [
-          {
-            y: "July",
-            y2: "September",
-            label: {
-              text: "Y annotation",
-            },
-          },
-        ],
-      },
-      plotOptions: {
-        bar: {
-          horizontal: true,
-        },
-      },
-      dataLabels: {
-        enabled: true,
-      },
-      xaxis: {
-        categories: [],
-      },
-      grid: {
-        xaxis: {
-          lines: {
-            show: true,
-          },
-        },
-      },
-      yaxis: {
-        reversed: true,
-        axisTicks: {
-          show: true,
-        },
-      },
-    },
-  });
+  const [chartData, setChartData] = useState<ChartState | null>(null);
 
-  const [totalRevenueLoss, setTotalRevenueLoss] = useState<number>(0);
+  // Helper function to calculate the revenue loss for each product due to returns
+  const calculateRevenueLoss = (order: any) => {
+    let lossByProduct: { [key: string]: number } = {};
+
+    // Loop through each item in the order
+    order.items.forEach((item: any) => {
+      if (item.supplier.manufacturer_id === supplierId) {
+        const productName = item.productName;
+        const productPrice = parseFloat(item.productPrice);
+        const quantityOrdered = parseInt(item.quantity, 10);
+        const returnedQuantity = item.return
+          ? item.return.type === "partial"
+            ? item.return.returned_products
+            : quantityOrdered
+          : 0;
+
+        // Calculate the loss if there was a return
+        const loss = productPrice * returnedQuantity;
+
+        if (loss > 0) {
+          // Accumulate the loss for this product
+          if (!lossByProduct[productName]) {
+            lossByProduct[productName] = 0;
+          }
+          lossByProduct[productName] += loss;
+        }
+      }
+    });
+
+    return lossByProduct;
+  };
 
   useEffect(() => {
-    const revenueLossPerProduct: Record<string, number> = {};
-    let totalLoss = 0;
+    const revenueLossByProduct: { [key: string]: number } = {};
 
-    // Loop through the data and filter based on the supplierId passed as prop
-    supplierData.forEach((order) => {
-      order.suppliers.forEach((supplier) => {
-        if (supplier.manufacturer_id === supplierId) {
-          supplier.items.forEach((item) => {
-            // Check if there are returns and if any item is marked as 'pending'
-            const returnInfo = supplier.returns.find(
-              (r) => r.status === "pending" && r.return_id,
-            );
-
-            if (returnInfo) {
-              // Calculate the lost revenue per item due to the unavailability of the product
-              const discountAmount = item.discount?.discount_amount || 0;
-              const lossPerProduct =
-                item.qty_ordered * (item.price - discountAmount);
-
-              // Add the product's loss to the total
-              if (revenueLossPerProduct[item.name]) {
-                revenueLossPerProduct[item.name] += lossPerProduct;
-              } else {
-                revenueLossPerProduct[item.name] = lossPerProduct;
-              }
-              totalLoss += lossPerProduct;
-            }
-          });
+    // Loop through all orders to calculate revenue loss
+    supplierData.orders.forEach((order: any) => {
+      const lossByProduct = calculateRevenueLoss(order.order);
+      for (const product in lossByProduct) {
+        if (!revenueLossByProduct[product]) {
+          revenueLossByProduct[product] = 0;
         }
-      });
+        revenueLossByProduct[product] += lossByProduct[product];
+      }
     });
 
-    // Prepare the chart data (names of products and their respective revenue loss)
-    const categories = Object.keys(revenueLossPerProduct);
-    const data = categories.map((product) => revenueLossPerProduct[product]);
+    // Prepare chart data
+    const productNames = Object.keys(revenueLossByProduct);
+    const revenueLossValues = productNames.map(
+      (product) => revenueLossByProduct[product],
+    );
 
-    // Update the chart state with the data and categories
-    setState({
-      series: [{ data }],
+    // Set the chart data state
+    setChartData({
+      series: [
+        {
+          name: "Loss Due to Returns",
+          data: revenueLossValues,
+        },
+      ],
       options: {
-        ...state.options,
+        chart: {
+          type: "bar", // Explicitly specify the type here
+          height: 500, // Set a large height here (custom height)
+          background: "#FFFFFF", // Set background to white
+        },
         xaxis: {
-          categories,
+          categories: productNames,
+        },
+        yaxis: {
+          title: {
+            text: "Revenue Loss (in TND)",
+          },
+        },
+        tooltip: {
+          y: {
+            formatter: (val: number) => `${val.toFixed(2)} TND`,
+          },
+        },
+        title: {
+          text: "Loss Due to Products Return",
+          align: "center", // This should be valid now
         },
       },
     });
-
-    // Set the total revenue loss
-    setTotalRevenueLoss(totalLoss);
-  }, [supplierId]); // Re-run the effect if supplierId changes
+  }, [supplierId]);
 
   return (
-    <div className="border-stroke pt-7.5 dark:border-strokedark dark:bg-boxdark rounded-sm border bg-white px-5 pb-5 shadow-default">
-      {/* Product Revenue Loss Details */}
-      <div className="mt-5">
-        <h3 className="mb-3 text-center text-xl font-bold">
-          LOSS OF REVENUE BY PRODUCT DUE TO PRODUCT UNAVAILABILITY
-        </h3>
-
-        {/* Bar Chart Display */}
-        <div id="chart">
-          <ReactApexChart
-            options={state.options}
-            series={state.series}
-            type="bar" // Ensure the 'type' is properly set
-            height={350}
-          />
-        </div>
-
-        {/* List of Product Losses */}
-        <ul className="mt-5">
-          {state.options.xaxis.categories.map((product, index) => (
-            <li key={index} className="flex justify-between">
-              <span>{product}</span>
-              <span>{`$${state.series[0].data[index].toFixed(2)}`}</span>
-            </li>
-          ))}
-        </ul>
-
-        {/* Total Loss */}
-        <div className="mt-4 text-right text-xl font-semibold">
-          <span>Total Revenue Loss: </span>
-          <span>{`$${totalRevenueLoss.toFixed(2)}`}</span>
-        </div>
-      </div>
+    <div className="mt-6 w-full bg-white p-4">
+      {" "}
+      {/* Container with white background and padding */}
+      {chartData ? (
+        <ReactApexChart
+          options={chartData.options}
+          series={chartData.series}
+          type="bar"
+          height={500} // Chart will occupy large height
+        />
+      ) : (
+        <p>Loading chart data...</p>
+      )}
     </div>
   );
 };

@@ -3,7 +3,7 @@ import React from "react";
 type CardDataStatsProps = {
   title: string;
   total: string;
-  rate: string;
+  // rate: string;
   levelUp?: boolean;
   className?: string;
   children: React.ReactNode; // <-- Add this line to accept children
@@ -12,7 +12,7 @@ type CardDataStatsProps = {
 const CardDataStats = ({
   title,
   total,
-  rate,
+  // rate,
   levelUp,
   className,
   children,
@@ -27,8 +27,8 @@ const CardDataStats = ({
         <div className="ml-2 flex-grow">
           <h4 className="text-lg font-semibold text-gray-700">{title}</h4>
           <p className="text-xl font-bold text-gray-800">{total}</p>
-          {rate && <p className="text-sm text-green-500">{rate}</p>}
-          {levelUp && <span className="text-green-600">Level Up</span>}
+          {/* {rate && <p className="text-sm text-green-500">{rate}</p>} */}
+          {/* {levelUp && <span className="text-green-600">Level Up</span>} */}
         </div>
       </div>
     </div>
