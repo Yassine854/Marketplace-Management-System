@@ -106,80 +106,129 @@
   "products": [
     {
       "id": "999",
-      "productId": "999",
       "productName": "Olive Oil Extra Virgin",
       "productPrice": "20",
-      "totalPrice": "200",
-      "quantity": "10",
+      "quantity": 10,
       "sku": "999-OLV",
-      "weight": "999",
-      "manufacturer_id": "9"
+      "manufacturer_id": "9",
+      "warehouses": [
+        {
+          "name": "Warehouse charguia",
+          "quantity": 5
+        },
+        {
+          "name": "Warehouse mghira",
+          "quantity": 5
+        }
+      ]
     },
     {
       "id": "1001",
-      "productId": "1001",
       "productName": "Sunflower Oil",
       "productPrice": "15",
-      "totalPrice": "150",
-      "quantity": "10",
+      "quantity": 15,
       "sku": "1001-SUN",
-      "weight": "1000",
-      "manufacturer_id": "9"
+      "manufacturer_id": "9",
+      "warehouses": [
+        {
+          "name": "Warehouse charguia",
+          "quantity": 7
+        },
+        {
+          "name": "Warehouse mghira",
+          "quantity": 8
+        }
+      ]
     },
     {
       "id": "1000",
-      "productId": "1000",
       "productName": "Canned Tuna",
       "productPrice": "5",
-      "totalPrice": "50",
-      "quantity": "10",
+      "quantity": 20,
       "sku": "1000-TUNA",
-      "weight": "500",
-      "manufacturer_id": "11"
+      "manufacturer_id": "11",
+      "warehouses": [
+        {
+          "name": "Warehouse charguia",
+          "quantity": 10
+        },
+        {
+          "name": "Warehouse mghira",
+          "quantity": 10
+        }
+      ]
     },
     {
       "id": "1002",
-      "productId": "1002",
       "productName": "Thouna 2",
       "productPrice": "299",
-      "totalPrice": "299",
-      "quantity": "1",
+      "quantity": 5,
       "sku": "1002-WM",
-      "weight": "30000",
-      "manufacturer_id": "11"
+      "manufacturer_id": "11",
+      "warehouses": [
+        {
+          "name": "Warehouse Charguia",
+          "quantity": 3
+        },
+        {
+          "name": "Warehouse mghira",
+          "quantity": 2
+        }
+      ]
     },
     {
       "id": "1003",
-      "productId": "1003",
       "productName": "Tomato Paste",
       "productPrice": "3",
-      "totalPrice": "30",
-      "quantity": "10",
+      "quantity": 30,
       "sku": "1003-TMP",
-      "weight": "400",
-      "manufacturer_id": "12"
+      "manufacturer_id": "12",
+      "warehouses": [
+        {
+          "name": "Warehouse Charguia",
+          "quantity": 15
+        },
+        {
+          "name": "Warehouse mghira",
+          "quantity": 15
+        }
+      ]
     },
     {
       "id": "1004",
-      "productId": "1004",
       "productName": "Fresh Apples",
       "productPrice": "2",
-      "totalPrice": "20",
-      "quantity": "10",
+      "quantity": 10,
       "sku": "1004-APP",
-      "weight": "200",
-      "manufacturer_id": "14"
+      "manufacturer_id": "14",
+      "warehouses": [
+        {
+          "name": "Warehouse Charguia",
+          "quantity": 5
+        },
+        {
+          "name": "Warehouse mghira",
+          "quantity": 5
+        }
+      ]
     },
     {
       "id": "1005",
-      "productId": "1005",
       "productName": "Orange Juice",
       "productPrice": "4",
-      "totalPrice": "40",
-      "quantity": "10",
+      "quantity": 25,
       "sku": "1005-OJ",
-      "weight": "500",
-      "manufacturer_id": "14"
+      "manufacturer_id": "14",
+      "warehouses": [
+        {
+          "name": "Warehouse charguia",
+          "quantity": 10
+        },
+        {
+          "name": "Warehouse mghira",
+          "quantity": 15
+        }
+      ]
     }
   ],
   "invoices": [
