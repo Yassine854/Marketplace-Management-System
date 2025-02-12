@@ -1,26 +1,9 @@
 import { useState, useEffect, ChangeEvent, useRef } from "react";
-import emailjs from "@emailjs/browser";
 import toast from "react-hot-toast";
 import { DatePicker } from "@heroui/react";
-import "@/styles/NeonButton.css";
-
-type Supplier = {
-  manufacturer_id: string;
-  company_name: string;
-  contact_name: string;
-  email: string;
-  phone_number?: string;
-  city?: string;
-  payment_modes: string[];
-};
-
-type Product = {
-  id: string;
-  productName: string;
-  productPrice: string;
-  sku: string;
-  manufacturer_id: string;
-};
+import "./styles/NeonButton.css";
+import { sendOrderEmail } from "./services/emailService";
+import { Supplier, Product, EmailParams } from "./types/types";
 
 const SupplierSelector = ({
   onChange,
@@ -29,7 +12,7 @@ const SupplierSelector = ({
 }) => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState<string>("");
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
     null,
   );
@@ -46,11 +29,11 @@ const SupplierSelector = ({
   useEffect(() => {
     fetch("/data/data.json")
       .then((response) => response.json())
-      .then((data) => {
+      .then((data: { suppliers: Supplier[]; products: Product[] }) => {
         setSuppliers(data.suppliers);
         setProducts(data.products);
       })
-      .catch((error) => console.error("Error loading data:", error))
+      .catch((error: Error) => console.error("Error loading data:", error))
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -62,7 +45,7 @@ const SupplierSelector = ({
     }
   }, [selectedProduct, quantity]);
 
-  const handleSelectSupplier = (supplier: Supplier) => {
+  const handleSelectSupplier = (supplier: Supplier): void => {
     setQuery(supplier.company_name);
     setSelectedSupplier(supplier);
     onChange?.(supplier);
@@ -76,7 +59,7 @@ const SupplierSelector = ({
     }, 300);
   };
 
-  const resetFormFields = () => {
+  const resetFormFields = (): void => {
     setQuantity(0);
     setSelectedProduct(null);
     setTotalPayment(0);
@@ -84,7 +67,7 @@ const SupplierSelector = ({
     setDeliveryDate(null);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async (): Promise<void> => {
     if (
       selectedSupplier &&
       selectedProduct &&
@@ -92,7 +75,7 @@ const SupplierSelector = ({
       selectedPaymentMode &&
       deliveryDate
     ) {
-      const templateParams = {
+      const templateParams: EmailParams = {
         to_name: selectedSupplier.contact_name,
         from_name: "Kamioun",
         to_email: selectedSupplier.email,
@@ -103,32 +86,13 @@ const SupplierSelector = ({
         delivery_date: deliveryDate.toLocaleDateString(),
       };
 
-      const loadingToast = toast.loading("Email sending in progress...");
+      const emailSent: boolean = await sendOrderEmail(templateParams);
 
-      emailjs
-        .send(
-          "service_z1bkm7y",
-          "template_b63ikd2",
-          templateParams,
-          "1I-USeEEq-xcp9edT",
-        )
-        .then(() => {
-          toast.success("Order validated and email sent successfully!", {
-            id: loadingToast,
-            duration: 4000,
-            style: { background: "#4caf50", color: "#fff", fontWeight: "bold" },
-          });
-          resetFormFields();
-          setSelectedSupplier(null);
-          setQuery("");
-        })
-        .catch(() => {
-          toast.error("Error sending email.", {
-            id: loadingToast,
-            duration: 4000,
-            style: { background: "#f44336", color: "#fff", fontWeight: "bold" },
-          });
-        });
+      if (emailSent) {
+        resetFormFields();
+        setSelectedSupplier(null);
+        setQuery("");
+      }
     } else {
       toast.error("Please complete all fields before submitting.", {
         duration: 4000,
@@ -203,6 +167,7 @@ const SupplierSelector = ({
                     value={selectedSupplier.email}
                     disabled
                   />
+
                   {selectedSupplier.phone_number && (
                     <InputField
                       label="Phone Number"
@@ -210,6 +175,7 @@ const SupplierSelector = ({
                       disabled
                     />
                   )}
+
                   {selectedSupplier.city && (
                     <InputField
                       label="City"
@@ -286,14 +252,9 @@ const SupplierSelector = ({
                         <DatePicker
                           label="Delivery Date"
                           defaultValue={null}
-                          onChange={(date) => {
-                            if (date) {
-                              const formattedDate = new Date(date);
-                              setDeliveryDate(formattedDate);
-                            } else {
-                              setDeliveryDate(null);
-                            }
-                          }}
+                          onChange={(date) =>
+                            setDeliveryDate(date ? new Date(date) : null)
+                          }
                           showMonthAndYearPickers
                           hideTimeZone
                           variant="bordered"
@@ -307,7 +268,7 @@ const SupplierSelector = ({
                         </label>
                         <select
                           value={selectedPaymentMode}
-                          onChange={(e) =>
+                          onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                             setSelectedPaymentMode(e.target.value)
                           }
                           className="w-full rounded-md border border-gray-300 p-2"
@@ -376,7 +337,7 @@ const InputField = ({
   </div>
 );
 
-const RectangleSkeleton = () => (
+const RectangleSkeleton = (): JSX.Element => (
   <div className="h-12 w-full animate-pulse rounded-lg bg-gray-300"></div>
 );
 
