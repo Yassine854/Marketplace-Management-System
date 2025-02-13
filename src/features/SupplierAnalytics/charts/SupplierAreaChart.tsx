@@ -11,85 +11,73 @@ const SupplierAreaChart: React.FC<RevenueOverTimeChartProps> = ({
   supplierId,
 }) => {
   const [chartData, setChartData] = useState<any>(null);
+  const [timeFilter, setTimeFilter] = useState("yearly");
 
-  // Helper function to calculate revenue for each order based on the product price and quantity
   const calculateRevenue = (order: any) => {
-    let revenueByMonth: { [key: string]: number } = {};
-
-    // Only consider confirmed orders
+    let revenueByTime: { [key: string]: number } = {};
     if (order.state !== "confirmed") {
-      return revenueByMonth; // If not confirmed, return empty revenue
+      return revenueByTime;
     }
 
-    // Get current year
     const currentYear = new Date().getFullYear();
-
     order.items.forEach((item: any) => {
       if (item.supplier.manufacturer_id === supplierId) {
         const productPrice = parseFloat(item.productPrice);
         const quantityOrdered = parseInt(item.quantity, 10);
-
-        // Calculate the revenue for the product in the current order
         const revenue = productPrice * quantityOrdered;
+        const deliveryDate = new Date(order.deliveryDate * 1000);
+        const orderDate = new Date(order.createdAt * 1000);
 
-        // Convert the deliveryDate to a Date object
-        const deliveryDate = new Date(order.deliveryDate * 1000); // Multiply by 1000 to convert to milliseconds
-        console.log(deliveryDate);
-
-        // Check if the delivery date is in the current year
-        const deliveryYear = deliveryDate.getFullYear();
-        if (deliveryYear !== currentYear) {
-          return; // Skip orders with delivery dates not in the current year
+        if (deliveryDate.getFullYear() !== currentYear) {
+          return;
         }
 
-        // Convert the order's creation date to a Date object
-        const orderDate = new Date(order.createdAt * 1000); // Multiply by 1000 to convert to milliseconds
-        const month = orderDate.getMonth(); // 0 = January, 11 = December
-
-        // Accumulate the revenue for this month
-        if (!revenueByMonth[month]) {
-          revenueByMonth[month] = 0;
+        let key;
+        switch (timeFilter) {
+          case "monthly":
+            key = `${orderDate.getFullYear()}-${orderDate.getMonth() + 1}`;
+            break;
+          case "weekly":
+            key = `${orderDate.getFullYear()}-W${Math.ceil(
+              orderDate.getDate() / 7,
+            )}`;
+            break;
+          case "daily":
+            key = orderDate.toISOString().split("T")[0];
+            break;
+          case "semestrial":
+            key = `${orderDate.getFullYear()}-S${
+              orderDate.getMonth() < 6 ? 1 : 2
+            }`;
+            break;
+          default:
+            key = orderDate.getFullYear().toString();
         }
-        revenueByMonth[month] += revenue;
+
+        if (!revenueByTime[key]) {
+          revenueByTime[key] = 0;
+        }
+        revenueByTime[key] += revenue;
       }
     });
 
-    return revenueByMonth;
+    return revenueByTime;
   };
 
   useEffect(() => {
-    const revenueByMonth: { [key: string]: number } = {};
-
-    // Loop through all orders to calculate the revenue by month
+    const revenueByTime: { [key: string]: number } = {};
     supplierData.orders.forEach((order: any) => {
       const revenueForOrder = calculateRevenue(order.order);
-      for (const month in revenueForOrder) {
-        if (!revenueByMonth[month]) {
-          revenueByMonth[month] = 0;
+      for (const time in revenueForOrder) {
+        if (!revenueByTime[time]) {
+          revenueByTime[time] = 0;
         }
-        revenueByMonth[month] += revenueForOrder[month];
+        revenueByTime[time] += revenueForOrder[time];
       }
     });
 
-    // Prepare chart data
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-
-    const revenueValues = months.map((_, index) => revenueByMonth[index] || 0);
-
-    const currentYear = new Date().getFullYear(); // Get the current year dynamically
+    const timeLabels = Object.keys(revenueByTime).sort();
+    const revenueValues = timeLabels.map((time) => revenueByTime[time] || 0);
 
     setChartData({
       series: [
@@ -101,13 +89,13 @@ const SupplierAreaChart: React.FC<RevenueOverTimeChartProps> = ({
       options: {
         chart: {
           type: "area",
-          height: 400, // Set the height for the area chart
+          height: 400,
           background: "#FFFFFF",
         },
         xaxis: {
-          categories: months, // Set the months as categories on the x-axis
+          categories: timeLabels,
           title: {
-            text: "Months",
+            text: "Time",
           },
         },
         yaxis: {
@@ -115,24 +103,38 @@ const SupplierAreaChart: React.FC<RevenueOverTimeChartProps> = ({
             text: "Revenue (in TND)",
           },
           labels: {
-            formatter: (val: number) => `${val.toFixed(2)} TND`, // Format y-axis labels as currency
+            formatter: (val: number) => `${val.toFixed(2)} TND`,
           },
         },
         title: {
-          text: `Revenue in ${currentYear}`, // Dynamically set the title with the current year
+          text: `Revenue (${timeFilter})`,
           align: "center",
         },
         tooltip: {
           y: {
-            formatter: (val: number) => `${val.toFixed(2)} TND`, // Format tooltip as currency
+            formatter: (val: number) => `${val.toFixed(2)} TND`,
           },
         },
       },
     });
-  }, [supplierId]);
+  }, [supplierId, timeFilter]);
 
   return (
     <div className="mt-6 w-full bg-white p-4">
+      <div className="mb-4">
+        <label className="mr-2">Filter:</label>
+        <select
+          value={timeFilter}
+          onChange={(e) => setTimeFilter(e.target.value)}
+          className="border p-2"
+        >
+          <option value="yearly">Yearly</option>
+          <option value="monthly">Monthly</option>
+          <option value="weekly">Weekly</option>
+          <option value="daily">Daily</option>
+          <option value="semestrial">Semestrial</option>
+        </select>
+      </div>
       {chartData ? (
         <ReactApexChart
           options={chartData.options}

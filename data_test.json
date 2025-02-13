@@ -9,7 +9,7 @@
         "state": "confirmed",
         "status": "valid",
         "total": 159.09,
-        "createdAt": 1722350694,
+        "createdAt": 1720569600,
         "customerId": "6324",
         "storeId": "1",
         "customerPhone": "24946132",
@@ -371,7 +371,7 @@
         "state": "canceled",
         "status": "invalid",
         "total": 0.0,
-        "createdAt": 1722350694,
+        "createdAt": 1742040000,
         "customerId": "7891",
         "storeId": "3",
         "customerPhone": "51223344",
@@ -445,6 +445,37 @@
               "totalPrice": "60.00"
             }
           ]
+        }
+      }
+    }
+  ],
+
+  "products": [
+    {
+      "product": {
+        "productId": "3952",
+        "productName": "Oliv+ Trio d'Or - 50% Huile d'Olive 1L",
+        "stock_id": "1",
+        "qty": "45.5",
+        "min_qty": "0",
+        "is_qty_decimal": "1",
+        "backorders": "0",
+        "min_sale_qty": "1",
+        "max_sale_qty": "110",
+        "is_in_stock": "1",
+        "manage_stock": "1",
+        "qty_increments": "0.5",
+        "supplier": {
+          "manufacturer_id": "9",
+          "code": "001",
+          "company_name": "Technofood",
+          "contact_name": "Mehdi Bourguiba",
+          "phone_number": "22218000",
+          "postal_code": "2082",
+          "city": "Tunis",
+          "country": "Tunisia",
+          "capital": "Tunis",
+          "email": "slim.boughzala@technofoodindustries.com"
         }
       }
     }
