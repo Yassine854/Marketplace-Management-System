@@ -2,7 +2,6 @@
   "suppliers": [
     {
       "manufacturer_id": "9",
-      "code": "001",
       "company_name": "Technofood",
       "contact_name": "Mehdi Bourguiba",
       "phone_number": "22218000",
@@ -22,7 +21,6 @@
     },
     {
       "manufacturer_id": "10",
-      "code": "002",
       "company_name": "STIFEN",
       "contact_name": "Ahlem Ben Slimen",
       "phone_number": "94856975",
@@ -34,7 +32,6 @@
     },
     {
       "manufacturer_id": "11",
-      "code": "003",
       "company_name": "Manar Thon",
       "tax_registration_number": "912362/Y",
       "contact_name": "Oussama Naguez",
@@ -47,7 +44,6 @@
     },
     {
       "manufacturer_id": "12",
-      "code": "004",
       "company_name": "Socohuiles",
       "contact_name": "Hacem Kamoun",
       "phone_number": "96460005",
@@ -64,7 +60,6 @@
     },
     {
       "manufacturer_id": "13",
-      "code": "005",
       "company_name": "Société L'Appétissante S.A",
       "contact_name": "Tom",
       "email": "TOM@kamioun.tn",
@@ -72,7 +67,6 @@
     },
     {
       "manufacturer_id": "14",
-      "code": "006",
       "company_name": "Fruity Fresh",
       "contact_name": "Sami Bakkar",
       "phone_number": "98234567",
@@ -107,8 +101,7 @@
     {
       "id": "999",
       "productName": "Olive Oil Extra Virgin",
-      "productPrice": "20",
-      "quantity": 10,
+      "productPrice": 20,
       "sku": "999-OLV",
       "manufacturer_id": "9",
       "warehouses": [
@@ -125,8 +118,7 @@
     {
       "id": "1001",
       "productName": "Sunflower Oil",
-      "productPrice": "15",
-      "quantity": 15,
+      "productPrice": 15,
       "sku": "1001-SUN",
       "manufacturer_id": "9",
       "warehouses": [
@@ -143,8 +135,7 @@
     {
       "id": "1000",
       "productName": "Canned Tuna",
-      "productPrice": "5",
-      "quantity": 20,
+      "productPrice": 5,
       "sku": "1000-TUNA",
       "manufacturer_id": "11",
       "warehouses": [
@@ -161,8 +152,7 @@
     {
       "id": "1002",
       "productName": "Thouna 2",
-      "productPrice": "299",
-      "quantity": 5,
+      "productPrice": 299,
       "sku": "1002-WM",
       "manufacturer_id": "11",
       "warehouses": [
@@ -179,8 +169,7 @@
     {
       "id": "1003",
       "productName": "Tomato Paste",
-      "productPrice": "3",
-      "quantity": 30,
+      "productPrice": 3,
       "sku": "1003-TMP",
       "manufacturer_id": "12",
       "warehouses": [
@@ -197,8 +186,7 @@
     {
       "id": "1004",
       "productName": "Fresh Apples",
-      "productPrice": "2",
-      "quantity": 10,
+      "productPrice": 2,
       "sku": "1004-APP",
       "manufacturer_id": "14",
       "warehouses": [
@@ -215,8 +203,7 @@
     {
       "id": "1005",
       "productName": "Orange Juice",
-      "productPrice": "4",
-      "quantity": 25,
+      "productPrice": 4,
       "sku": "1005-OJ",
       "manufacturer_id": "14",
       "warehouses": [
@@ -231,15 +218,37 @@
       ]
     }
   ],
+  "warehouses": [
+    {
+      "name": "Warehouse charguia",
+      "location": "Tunis",
+      "capacity": 100
+    },
+    {
+      "name": "Warehouse sousse",
+      "location": "Sousse",
+      "capacity": 200
+    },
+    {
+      "name": "Warehouse mghira",
+      "location": "Mghira",
+      "capacity": 150
+    },
+    {
+      "name": "Warehouse mnihla",
+      "location": "Mnihla",
+      "capacity": 120
+    }
+  ],
   "invoices": [
     {
       "InvoiceId": "9001",
       "orderId": "5001",
       "invoiceNumber": "INV-2024-0001",
       "date": "2024-01-11T10:00:00Z",
-      "tax": "10",
-      "total_amount": "260",
-      "discount": "10",
+      "tax": 10,
+      "total_amount": 260,
+      "discount": 10,
       "methode_paiement": "Carte Bancaire"
     },
     {
@@ -247,9 +256,9 @@
       "orderId": "5002",
       "invoiceNumber": "INV-2024-0002",
       "date": "2024-01-13T08:30:00Z",
-      "tax": "5",
-      "total_amount": "105",
-      "discount": "5",
+      "tax": 5,
+      "total_amount": 105,
+      "discount": 5,
       "methode_paiement": "Espèces"
     }
   ],
@@ -261,7 +270,7 @@
       "customer_id": "1001",
       "reason": "Defective product",
       "status": "Approved",
-      "quantity": "1",
+      "quantity": 1,
       "approval_date": "2024-01-15T12:00:00Z",
       "return_date": "2024-01-16T09:00:00Z",
       "created_at": "2024-01-15T12:00:00Z"
@@ -273,7 +282,7 @@
       "customer_id": "1002",
       "reason": "Wrong item received",
       "status": "Pending",
-      "quantity": "2",
+      "quantity": 2,
       "approval_date": null,
       "return_date": null,
       "created_at": "2024-01-16T14:00:00Z"

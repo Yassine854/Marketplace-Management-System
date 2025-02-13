@@ -1,27 +1,34 @@
-// Correction de Product et Supplier types pour correspondre avec ton JSON
+// Type pour Warehouse
+export type Warehouse = {
+  name: string; // Le nom de l'entrepôt
+  quantity: number; // La quantité de produits dans cet entrepôt
+};
 
+// Type pour Supplier
 export type Supplier = {
   manufacturer_id: string;
   company_name: string;
   contact_name: string;
   email: string;
   phone_number?: string;
+  postal_code?: string;
   city?: string;
+  country?: string;
+  capital?: string;
   payment_modes: string[];
 };
 
+// Type pour Product
 export type Product = {
-  id: string; // Utilise "id" au lieu de "productId" comme tu l'utilises dans ton code.
+  id: string;
   productName: string;
-  productPrice: number; // Utilise "number" pour un traitement facile des calculs
+  productPrice: number;
   sku: string;
   manufacturer_id: string;
-  warehouses: {
-    name: string;
-    quantity: number;
-  }[];
+  warehouses: Warehouse[]; // Référence au type Warehouse ici
 };
 
+// Type pour les paramètres de l'email
 export type EmailParams = {
   to_name: string;
   from_name: string;

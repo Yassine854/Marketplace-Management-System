@@ -1,11 +1,8 @@
-import { useState, useEffect, ChangeEvent, useRef } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import toast from "react-hot-toast";
-import { DatePicker } from "@heroui/react";
-import Select, { MultiValue } from "react-select";
-import "./styles/NeonButton.css";
 import { sendOrderEmail } from "./services/emailService";
-import { Supplier, Product, EmailParams } from "./types/types";
-import jsPDF from "jspdf";
+import { Supplier, Product, EmailParams, Warehouse } from "./types/types";
+import "./styles/NeonButton.css";
 
 const SupplierForm = ({
   onChange,
@@ -25,18 +22,39 @@ const SupplierForm = ({
   const [totalPayment, setTotalPayment] = useState<number>(0);
   const [selectedPaymentMode, setSelectedPaymentMode] = useState<string>("");
   const [deliveryDate, setDeliveryDate] = useState<Date | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const datePickerRef = useRef<HTMLDivElement | null>(null);
+  const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(
+    null,
+  );
+  const [selectedState, setSelectedState] = useState<string>("");
+  const [createdAt] = useState<Date>(new Date());
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+
+  const [productsWithQuantities, setProductsWithQuantities] = useState<
+    {
+      product: Product;
+      quantity: number;
+      sku: string;
+      id: string;
+      priceExclTax: number;
+      total: number;
+    }[]
+  >([]);
 
   useEffect(() => {
     fetch("/data/data.json")
       .then((response) => response.json())
-      .then((data: { suppliers: Supplier[]; products: Product[] }) => {
-        setSuppliers(data.suppliers);
-        setProducts(data.products);
-      })
-      .catch((error: Error) => console.error("Error loading data:", error))
-      .finally(() => setIsLoading(false));
+      .then(
+        (data: {
+          suppliers: Supplier[];
+          products: Product[];
+          warehouses: Warehouse[];
+        }) => {
+          setSuppliers(data.suppliers);
+          setProducts(data.products);
+          setWarehouses(data.warehouses);
+        },
+      )
+      .catch((error: Error) => console.error("Error loading data:", error));
   }, []);
 
   const handleSelectSupplier = (supplier: Supplier): void => {
@@ -46,52 +64,124 @@ const SupplierForm = ({
     resetFormFields();
   };
 
+  const handleSelectWarehouse = (warehouseName: string): void => {
+    const warehouse = warehouses.find((w) => w.name === warehouseName);
+    if (warehouse) {
+      setSelectedWarehouse(warehouse);
+      setProductsWithQuantities((prevState) => [
+        ...prevState,
+        {
+          product: {
+            id: "",
+            productName: "",
+            productPrice: 0,
+            manufacturer_id: "",
+            sku: "",
+            warehouses: [],
+          },
+          quantity: 1,
+          sku: "",
+          id: `new-product-${Date.now()}`,
+          priceExclTax: 0,
+          total: 0,
+        },
+      ]);
+    }
+  };
+
+  const handleQuantityChange = (productId: string, quantity: number): void => {
+    setProductsWithQuantities((prevState) => {
+      const updatedProducts = prevState.map((item) => {
+        if (item.id === productId) {
+          const newTotal = item.priceExclTax * quantity;
+          return { ...item, quantity, total: newTotal };
+        }
+        return item;
+      });
+
+      if (quantity !== 1) {
+        const newProductWithQuantity = {
+          product: {
+            id: "",
+            productName: "",
+            productPrice: 0,
+            manufacturer_id: "",
+            sku: "",
+            warehouses: [],
+          },
+          quantity: 1,
+          sku: "",
+          id: "",
+          priceExclTax: 0,
+          total: 0,
+        };
+        updatedProducts.push(newProductWithQuantity);
+      }
+
+      const newTotalPayment = updatedProducts.reduce(
+        (total, item) => total + item.total,
+        0,
+      );
+      setTotalPayment(newTotalPayment);
+
+      return updatedProducts;
+    });
+  };
+
   const resetFormFields = (): void => {
     setQuantities({});
     setSelectedProducts([]);
     setTotalPayment(0);
     setSelectedPaymentMode("");
     setDeliveryDate(null);
+    setSelectedWarehouse(null);
+    setSelectedState("");
+    setProductsWithQuantities([]);
   };
 
-  const handleQuantityChange = (product: Product, value: number) => {
-    const orderedQty = Math.max(value, 1);
-    const maxQuantity = Math.max(
-      ...product.warehouses.map((warehouse) => warehouse.quantity),
+  const handleSelectState = (state: string): void => {
+    setSelectedState(state);
+  };
+
+  const handleSelectProductInLine = (
+    selectedProductId: string,
+    index: number,
+  ) => {
+    const selectedProduct = products.find(
+      (product) => product.id === selectedProductId,
     );
-    if (orderedQty > maxQuantity) {
-      toast.error(
-        `Quantity exceeds available stock. Max available quantity: ${maxQuantity}`,
-        {
-          duration: 4000,
-          style: { background: "#ff9800", color: "#fff", fontWeight: "bold" },
-        },
-      );
-      return;
+
+    if (selectedProduct) {
+      setProductsWithQuantities((prevState) => {
+        const updatedProducts = [...prevState];
+
+        updatedProducts[index] = {
+          ...updatedProducts[index],
+          product: selectedProduct,
+          sku: selectedProduct.sku,
+          priceExclTax: selectedProduct.productPrice,
+          total: selectedProduct.productPrice * updatedProducts[index].quantity,
+          id: selectedProduct.id,
+        };
+
+        return updatedProducts;
+      });
     }
-    setQuantities((prev) => {
-      const updatedQuantities = { ...prev, [product.id]: orderedQty };
-      // Recalculate total payment when quantity changes
-      const total = selectedProducts.reduce((acc, product) => {
-        const qty = updatedQuantities[product.id] || 0;
-        return acc + product.productPrice * qty;
-      }, 0);
-      setTotalPayment(total);
-      return updatedQuantities;
-    });
   };
 
   const handleSubmit = async (): Promise<void> => {
     if (
       selectedSupplier &&
-      selectedProducts.length > 0 &&
+      productsWithQuantities.length > 0 &&
       selectedPaymentMode &&
-      deliveryDate
+      deliveryDate &&
+      selectedWarehouse &&
+      selectedState
     ) {
-      const productsDetailsText = selectedProducts
-        .map((product) => {
-          const quantity = quantities[product.id] || 0;
-          return `- **Product:** ${product.productName}\n- **Quantity:** ${quantity}\n- **Price:** ${product.productPrice}\n`;
+      const productsDetailsText = productsWithQuantities
+        .map((item) => {
+          const totalPrice = item.product.productPrice * item.quantity;
+          return `- **Product:** ${item.product.productName}\n- **Quantity:** ${item.quantity}\n- **Price:** ${item.product.productPrice}\n- **Total Price:** ${totalPrice}\n`;
         })
         .join("\n");
 
@@ -120,53 +210,30 @@ const SupplierForm = ({
     }
   };
 
-  const handleDownloadPDF = (): void => {
-    if (!selectedSupplier) {
-      toast.error("No supplier selected!");
-      return;
-    }
-
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text(`Order for ${selectedSupplier.company_name}`, 20, 20);
-    doc.setFontSize(12);
-    doc.text(`Contact: ${selectedSupplier.contact_name}`, 20, 30);
-    doc.text(`Email: ${selectedSupplier.email}`, 20, 40);
-    let yPosition = 50;
-    doc.text("Products Ordered:", 20, yPosition);
-    yPosition += 10;
-
-    selectedProducts.forEach((product) => {
-      const quantity = quantities[product.id] || 0;
-      const totalPrice = (product.productPrice * quantity).toFixed(2);
-      doc.text(
-        `${product.productName} - ${quantity} x ${product.productPrice} = ${totalPrice} DT`,
-        20,
-        yPosition,
-      );
-      yPosition += 10;
-    });
-
-    doc.text(`Total Payment: ${totalPayment.toFixed(2)} DT`, 20, yPosition);
-    yPosition += 10;
-
-    doc.text(`Payment Mode: ${selectedPaymentMode}`, 20, yPosition);
-    yPosition += 10;
-    doc.text(
-      `Delivery Date: ${deliveryDate?.toLocaleDateString()}`,
-      20,
-      yPosition,
+  const handleSelectProduct = (selectedProductId: string) => {
+    const selectedProduct = products.find(
+      (product) => product.id === selectedProductId,
     );
 
-    const fileName = `Order_${selectedSupplier.company_name}.pdf`;
-    doc.save(fileName);
-  };
+    if (selectedProduct) {
+      const existingProduct = productsWithQuantities.find(
+        (item) => item.id === selectedProduct.id,
+      );
 
-  const filteredSuppliers = suppliers.filter(
-    (supplier) =>
-      supplier.company_name.toLowerCase().includes(query.toLowerCase()) &&
-      supplier.manufacturer_id !== selectedSupplier?.manufacturer_id,
-  );
+      if (!existingProduct) {
+        const newProductWithQuantity = {
+          product: selectedProduct,
+          quantity: 1,
+          sku: selectedProduct.sku,
+          id: selectedProduct.id,
+          priceExclTax: selectedProduct.productPrice,
+          total: selectedProduct.productPrice * 1,
+        };
+
+        setProductsWithQuantities((prev) => [...prev, newProductWithQuantity]);
+      }
+    }
+  };
 
   return (
     <div className="flex h-full flex-grow">
@@ -177,24 +244,27 @@ const SupplierForm = ({
               <p className="ml-4 text-xl font-bold">Select Supplier</p>
             </div>
 
-            {isLoading ? (
-              <RectangleSkeleton />
-            ) : (
-              <div className="box flex w-full justify-between rounded-lg bg-primary/5 p-4 dark:bg-bg3">
-                <div className="relative flex w-full flex-col gap-4">
-                  <input
-                    type="text"
-                    placeholder="Search and select supplier..."
-                    value={query}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      setQuery(e.target.value);
-                      setSelectedSupplier(null);
-                    }}
-                    className="w-full rounded-md border border-gray-300 p-2"
-                  />
-                  {query && filteredSuppliers.length > 0 && (
-                    <ul className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg">
-                      {filteredSuppliers.map((supplier) => (
+            <div className="box flex w-full justify-between rounded-lg bg-primary/5 p-4 dark:bg-bg3">
+              <div className="relative flex w-full flex-col gap-4">
+                <input
+                  type="text"
+                  placeholder="Search and select supplier..."
+                  value={query}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    setQuery(e.target.value);
+                    setSelectedSupplier(null);
+                  }}
+                  className="w-full rounded-md border border-gray-300 p-2"
+                />
+                {query && !selectedSupplier && suppliers.length > 0 && (
+                  <ul className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg">
+                    {suppliers
+                      .filter((supplier) =>
+                        supplier.company_name
+                          .toLowerCase()
+                          .includes(query.toLowerCase()),
+                      )
+                      .map((supplier) => (
                         <li
                           key={supplier.manufacturer_id}
                           onClick={() => handleSelectSupplier(supplier)}
@@ -203,168 +273,211 @@ const SupplierForm = ({
                           {supplier.company_name}
                         </li>
                       ))}
-                    </ul>
-                  )}
-                </div>
+                  </ul>
+                )}
               </div>
-            )}
+            </div>
 
             {selectedSupplier && (
               <div className="mt-8 rounded-lg border border-gray-300 bg-white p-4 shadow-lg">
                 <h3 className="mb-4 text-xl font-semibold">Supplier Details</h3>
                 <form>
-                  <InputField
-                    label="Company Name"
-                    value={selectedSupplier.company_name}
-                    disabled
-                  />
-                  <InputField
-                    label="Contact Name"
-                    value={selectedSupplier.contact_name}
-                    disabled
-                  />
-                  <InputField
-                    label="Email"
-                    value={selectedSupplier.email}
-                    disabled
-                  />
-
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Products
-                    </label>
-                    <Select
-                      isMulti
-                      options={products
-                        .filter(
-                          (prod) =>
-                            prod.manufacturer_id ===
-                            selectedSupplier.manufacturer_id,
-                        )
-                        .map((prod) => ({
-                          value: prod.id,
-                          label: prod.productName,
-                          ...prod,
-                        }))}
-                      onChange={(selectedOptions: MultiValue<any>) => {
-                        setSelectedProducts(
-                          selectedOptions.map((option) => option),
-                        );
-                      }}
-                      className="mt-1 w-full"
-                    />
-                  </div>
-
-                  {selectedProducts.map((product) => (
-                    <div key={product.id} className="mb-4">
+                  <div className="flex gap-4">
+                    <div className="mb-4 w-1/2">
                       <label className="block text-sm font-medium text-gray-700">
-                        {product.productName} (SKU: {product.sku})
+                        Created At
                       </label>
-                      <ul className="mb-2 text-sm text-gray-600">
-                        {product.warehouses.map((warehouse) => (
-                          <li key={warehouse.name}>
-                            {warehouse.name}:{" "}
-                            <strong>{warehouse.quantity}</strong> units
-                          </li>
+                      <input
+                        type="text"
+                        value={createdAt.toLocaleDateString()}
+                        disabled
+                        className="w-full rounded-md border border-gray-300 bg-gray-100 p-2"
+                      />
+                    </div>
+
+                    <div className="mb-4 w-1/2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        From
+                      </label>
+                      <input
+                        type="text"
+                        value={selectedSupplier.company_name}
+                        disabled
+                        className="w-full rounded-md border border-gray-300 bg-gray-100 p-2"
+                      />
+                    </div>
+
+                    <div className="mb-4 w-1/2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Select Warehouse
+                      </label>
+                      <select
+                        value={selectedWarehouse?.name || ""}
+                        onChange={(e) => handleSelectWarehouse(e.target.value)}
+                        className="w-full rounded-md border border-gray-300 p-2"
+                      >
+                        <option value="">Select Warehouse</option>
+                        {warehouses.map((warehouse) => (
+                          <option key={warehouse.name} value={warehouse.name}>
+                            {warehouse.name}
+                          </option>
                         ))}
-                      </ul>
+                      </select>
+                    </div>
+
+                    <div className="mb-4 w-1/2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        State
+                      </label>
+                      <select
+                        value={selectedState}
+                        onChange={(e) => handleSelectState(e.target.value)}
+                        className="w-full rounded-md border border-gray-300 p-2"
+                      >
+                        <option value="">Select State</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {selectedWarehouse && selectedSupplier && (
+              <div className="mt-8 max-h-96 overflow-y-auto rounded-lg border border-gray-300 bg-white p-4 shadow-lg">
+                <h4 className="mb-4 text-lg font-semibold">Select Product</h4>
+                <div className="space-y-4">
+                  {productsWithQuantities.map((item, index) => (
+                    <div
+                      key={item.id}
+                      className="mb-4 flex items-center justify-between gap-4"
+                    >
+                      <div className="w-1/4">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Product
+                        </label>
+                        <select
+                          value={item.product.id}
+                          onChange={(e) =>
+                            handleSelectProductInLine(e.target.value, index)
+                          }
+                          className="w-full rounded-md border border-gray-300 p-2"
+                        >
+                          <option value="">Select a product</option>
+                          {products
+                            .filter(
+                              (product) =>
+                                product.manufacturer_id ===
+                                selectedSupplier?.manufacturer_id,
+                            )
+                            .map((product) => (
+                              <option key={product.id} value={product.id}>
+                                {product.productName}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
 
                       <div className="flex items-center gap-4">
-                        <input
-                          type="number"
-                          placeholder="Quantity to order"
-                          value={quantities[product.id] || ""}
-                          onChange={(e) =>
-                            handleQuantityChange(
-                              product,
-                              Number(e.target.value),
-                            )
-                          }
-                          className="mt-1 w-full rounded-md border border-gray-300 p-2"
-                        />
-                        <div className="text-sm text-gray-600">
-                          <strong>Cost:</strong> {product.productPrice} x{" "}
-                          {quantities[product.id] || 0} ={" "}
-                          {(
-                            product.productPrice * (quantities[product.id] || 0)
-                          ).toFixed(2)}{" "}
-                          DT
+                        <div className="w-1/3">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Quantity
+                          </label>
+                          <input
+                            type="number"
+                            value={item.quantity}
+                            onChange={(e) =>
+                              handleQuantityChange(
+                                item.id,
+                                Number(e.target.value),
+                              )
+                            }
+                            className="w-full rounded-md border border-gray-300 p-2"
+                          />
+                        </div>
+
+                        <div className="w-1/3">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Total
+                          </label>
+                          <input
+                            type="text"
+                            value={item.total}
+                            disabled
+                            className="w-full rounded-md border border-gray-300 bg-gray-100 p-2"
+                          />
+                        </div>
+
+                        <div className="w-1/4">
+                          <label className="block text-sm font-medium text-gray-700">
+                            SKU
+                          </label>
+                          <input
+                            type="text"
+                            value={item.sku}
+                            disabled
+                            className="w-full rounded-md border border-gray-300 bg-gray-100 p-2"
+                          />
+                        </div>
+
+                        <div className="w-1/4">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Product ID
+                          </label>
+                          <input
+                            type="text"
+                            value={item.id}
+                            disabled
+                            className="w-full rounded-md border border-gray-300 bg-gray-100 p-2"
+                          />
+                        </div>
+
+                        <div className="w-1/4">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Price (Excl. Tax)
+                          </label>
+                          <input
+                            type="text"
+                            value={item.priceExclTax}
+                            disabled
+                            className="w-full rounded-md border border-gray-300 bg-gray-100 p-2"
+                          />
                         </div>
                       </div>
                     </div>
                   ))}
-
-                  {totalPayment > 0 && (
-                    <InputField
-                      label="Total Payment"
-                      value={totalPayment.toString()}
-                      disabled
-                    />
-                  )}
-
-                  {totalPayment > 0 && (
-                    <>
-                      <div className="mb-4" ref={datePickerRef}>
-                        <DatePicker
-                          label="Delivery Date"
-                          defaultValue={null}
-                          onChange={(date) =>
-                            setDeliveryDate(date ? new Date(date) : null)
-                          }
-                          showMonthAndYearPickers
-                          hideTimeZone
-                          variant="bordered"
-                          className="w-full"
-                        />
-                      </div>
-
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">
-                          Payment Mode
-                        </label>
-                        <select
-                          value={selectedPaymentMode}
-                          onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                            setSelectedPaymentMode(e.target.value)
-                          }
-                          className="w-full rounded-md border border-gray-300 p-2"
-                        >
-                          <option value="">Select a payment mode</option>
-                          {selectedSupplier.payment_modes.map((mode) => (
-                            <option key={mode} value={mode}>
-                              {mode}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </>
-                  )}
-
-                  <div className="flex justify-end space-x-4">
-                    <button
-                      type="button"
-                      onClick={handleSubmit}
-                      className="neon-button"
-                    >
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                      Submit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleDownloadPDF}
-                      className="neon-button mt-4"
-                    >
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                      Download PDF
-                    </button>
+                </div>
+                <div className="mt-4 flex items-center justify-between">
+                  <div className="text-lg font-semibold">Total Amount</div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-lg font-semibold">
+                      {totalPayment.toFixed(2)} DT
+                    </div>
+                    <div className="w-1/4">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Payment Type
+                      </label>
+                      <select
+                        value={selectedPaymentMode}
+                        onChange={(e) => setSelectedPaymentMode(e.target.value)}
+                        className="w-full rounded-md border border-gray-300 p-2"
+                      >
+                        <option value="">Select Payment Type</option>
+                        <option value="Credit">Credit</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                      </select>
+                    </div>
                   </div>
-                </form>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-4">
+                  <button onClick={handleSubmit} className="neon-button">
+                    Submit Order
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -373,39 +486,5 @@ const SupplierForm = ({
     </div>
   );
 };
-
-const InputField = ({
-  label,
-  value,
-  onChange,
-  onBlur,
-  type = "text",
-  disabled = false,
-}: {
-  label: string;
-  value: string | number;
-  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
-  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
-  type?: string;
-  disabled?: boolean;
-}) => (
-  <div className="mb-4">
-    <label className="block text-sm font-medium text-gray-700">{label}</label>
-    <input
-      type={type}
-      value={value}
-      onChange={onChange}
-      onBlur={onBlur}
-      disabled={disabled}
-      className={`mt-1 w-full rounded-md border border-gray-300 p-2 ${
-        disabled ? "bg-gray-100" : ""
-      }`}
-    />
-  </div>
-);
-
-const RectangleSkeleton = (): JSX.Element => (
-  <div className="h-12 w-full animate-pulse rounded-lg bg-gray-300"></div>
-);
 
 export default SupplierForm;
