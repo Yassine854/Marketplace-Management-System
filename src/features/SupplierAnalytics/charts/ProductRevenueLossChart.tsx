@@ -1,128 +1,117 @@
-import React, { useState, useEffect } from "react";
-import ReactApexChart from "react-apexcharts";
-import supplierData from "../../../../data_test.json";
+import React from "react";
+import ApexCharts from "react-apexcharts";
+import supplierData from "../../../../data_test.json"; // Ensure the path is correct
 
 interface ProductRevenueLossChartProps {
-  supplierId: string; // Accept supplierId as a prop
-}
-
-interface ChartState {
-  series: Array<{ name: string; data: number[] }>;
-  options: {
-    chart: { type: "bar"; height: number; background: string }; // Specify background property for chart
-    xaxis: { categories: string[] };
-    yaxis: { title: { text: string } };
-    tooltip: { y: { formatter: (val: number) => string } };
-    title: { text: string; align: "center" | "left" | "right" }; // Restrict align to specific values
-  };
+  supplierId: string;
 }
 
 const ProductRevenueLossChart: React.FC<ProductRevenueLossChartProps> = ({
   supplierId,
 }) => {
-  const [chartData, setChartData] = useState<ChartState | null>(null);
+  const currentYear = new Date().getFullYear(); // Get the current year
 
-  // Helper function to calculate the revenue loss for each product due to returns
-  const calculateRevenueLoss = (order: any) => {
-    let lossByProduct: { [key: string]: number } = {};
+  // Filter orders based on the supplierId
+  const orders = supplierData.orders.filter((order) =>
+    order.order.items.some(
+      (item) => item.supplier.manufacturer_id === supplierId,
+    ),
+  );
 
-    // Loop through each item in the order
-    order.items.forEach((item: any) => {
-      if (item.supplier.manufacturer_id === supplierId) {
-        const productName = item.productName;
-        const productPrice = parseFloat(item.productPrice);
-        const quantityOrdered = parseInt(item.quantity, 10);
-        const returnedQuantity = item.return
-          ? item.return.type === "partial"
-            ? item.return.returned_products
-            : quantityOrdered
-          : 0;
+  // Prepare the data for the chart
+  const data = orders.flatMap((order) =>
+    order.order.state === "canceled" && order.order.return
+      ? order.order.return.returnItems
+          .map((returnItem) => {
+            const returnDate = new Date(returnItem.returnDate * 1000);
+            const returnYear = returnDate.getFullYear();
 
-        // Calculate the loss if there was a return
-        const loss = productPrice * returnedQuantity;
+            return returnYear === currentYear && returnItem.productId
+              ? {
+                  productName: returnItem.productName,
+                  returnedQuantity: parseInt(returnItem.quantity, 10),
+                  totalCost: parseFloat(returnItem.totalPrice),
+                }
+              : null;
+          })
+          .filter(
+            (
+              item,
+            ): item is {
+              productName: string;
+              returnedQuantity: number;
+              totalCost: number;
+            } => item !== null,
+          )
+      : [],
+  );
 
-        if (loss > 0) {
-          // Accumulate the loss for this product
-          if (!lossByProduct[productName]) {
-            lossByProduct[productName] = 0;
-          }
-          lossByProduct[productName] += loss;
-        }
-      }
-    });
-
-    return lossByProduct;
+  // Prepare the chart data for the bar chart
+  const chartData = {
+    series: [
+      {
+        name: "Total Cost of Returns",
+        data: data.map((item) => item.totalCost),
+      },
+    ],
+    options: {
+      chart: {
+        type: "bar" as "bar",
+        height: 300,
+        background: "#ffffff", // Set white background
+        responsive: [
+          {
+            breakpoint: 768,
+            options: {
+              chart: {
+                height: 300,
+              },
+              xaxis: {
+                labels: {
+                  rotate: -45,
+                },
+              },
+            },
+          },
+          {
+            breakpoint: 480,
+            options: {
+              chart: {
+                height: 250,
+              },
+              xaxis: {
+                labels: {
+                  show: false,
+                },
+              },
+            },
+          },
+        ],
+      },
+      xaxis: {
+        categories: data.map((item) => item.productName),
+      },
+      title: {
+        text: "Product Revenue Loss (Returns)",
+        align: "center" as "center",
+      },
+    },
   };
 
-  useEffect(() => {
-    const revenueLossByProduct: { [key: string]: number } = {};
-
-    // Loop through all orders to calculate revenue loss
-    supplierData.orders.forEach((order: any) => {
-      const lossByProduct = calculateRevenueLoss(order.order);
-      for (const product in lossByProduct) {
-        if (!revenueLossByProduct[product]) {
-          revenueLossByProduct[product] = 0;
-        }
-        revenueLossByProduct[product] += lossByProduct[product];
-      }
-    });
-
-    // Prepare chart data
-    const productNames = Object.keys(revenueLossByProduct);
-    const revenueLossValues = productNames.map(
-      (product) => revenueLossByProduct[product],
-    );
-
-    // Set the chart data state
-    setChartData({
-      series: [
-        {
-          name: "Loss Due to Returns",
-          data: revenueLossValues,
-        },
-      ],
-      options: {
-        chart: {
-          type: "bar", // Explicitly specify the type here
-          height: 500, // Set a large height here (custom height)
-          background: "#FFFFFF", // Set background to white
-        },
-        xaxis: {
-          categories: productNames,
-        },
-        yaxis: {
-          title: {
-            text: "Revenue Loss (in TND)",
-          },
-        },
-        tooltip: {
-          y: {
-            formatter: (val: number) => `${val.toFixed(2)} TND`,
-          },
-        },
-        title: {
-          text: "Loss Due to Products Return",
-          align: "center", // This should be valid now
-        },
-      },
-    });
-  }, [supplierId]);
-
   return (
-    <div className="mt-6 w-full bg-white p-4">
-      {" "}
-      {/* Container with white background and padding */}
-      {chartData ? (
-        <ReactApexChart
-          options={chartData.options}
-          series={chartData.series}
-          type="bar"
-          height={500} // Chart will occupy large height
-        />
-      ) : (
-        <p>Loading chart data...</p>
-      )}
+    <div
+      style={{
+        backgroundColor: "#ffffff",
+        padding: "20px",
+        borderRadius: "10px",
+      }}
+    >
+      <ApexCharts
+        options={chartData.options}
+        series={chartData.series}
+        type="bar"
+        height={400}
+      />
     </div>
   );
 };

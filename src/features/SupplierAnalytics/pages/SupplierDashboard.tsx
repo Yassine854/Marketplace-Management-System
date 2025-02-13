@@ -13,31 +13,42 @@ import orderData from "../../../../data_test.json";
 import ProductRevenueLossChart from "../charts/ProductRevenueLossChart";
 import TopArticlesOrdered from "../charts/TopArticlesOrdered";
 import SupplierAreaChart from "../charts/SupplierAreaChart";
+import SalesByCategory from "../charts/SalesByCategory";
+import RegionsOrders from "../charts/RegionsOrders";
 
-// Define the supplier ID you're interested in
 const supplierId = "9"; // Example supplier ID (e.g., Technofood)
 
-// Aggregate stats from the provided order data
+const currentYear = new Date().getFullYear();
 const supplierStats = orderData.orders.reduce(
   (acc, { order }) => {
     const uniqueOrders = new Set(); // Set to ensure unique orderIds
     const uniqueCustomers = new Set(acc.uniqueCustomers); // Preserve unique customers across iterations
 
     // Process each order and its items
+    let orderProcessed = false; // Flag to track if the order has been processed for deliveredOrders
+
     if (order.items) {
       order.items.forEach((item) => {
         if (
           "supplier" in item &&
           item.supplier?.manufacturer_id === supplierId
         ) {
-          // Add unique orderId to the set
+          // Only process the order once
+          if (!orderProcessed) {
+            // Check if the order is confirmed and valid (we process it only once)
+            if (order.state === "confirmed" && order.status === "valid") {
+              acc.deliveredOrders += 1; // Increment deliveredOrders only once
+            }
+            orderProcessed = true; // Mark the order as processed
+          }
+
+          // Add unique orderId to the set (count the order only once, no matter how many items)
           if (!uniqueOrders.has(order.orderId)) {
             uniqueOrders.add(order.orderId);
-            acc.totalOrders += 1;
+            acc.totalOrders += 1; // Increment totalOrders only once per unique order
           }
 
           // Calculate revenue for the supplier
-
           if (order.state === "confirmed" && order.status === "valid") {
             acc.totalRevenue += parseFloat(item.totalPrice);
           }
@@ -47,27 +58,15 @@ const supplierStats = orderData.orders.reduce(
             uniqueCustomers.add(order.customerId);
           }
 
-          // Type assertion to tell TypeScript `return` might be present
-          const returnInfo = (item as any).return;
-          if (returnInfo) {
-            // Count returned items based on the return summary in the item
-            if (returnInfo.type === "partial") {
-              acc.totalReturns += returnInfo.returned_products;
-            } else if (returnInfo.type === "total") {
-              acc.totalReturns += returnInfo.returned_products;
-            }
+          // Track returned products
+          if (order.state === "canceled" && order.status === "invalid") {
+            acc.totalReturns += parseInt(item.quantity); // Add the quantity of returned items
           }
         }
       });
     }
 
-    // Count delivered orders
-    if (order.state === "confirmed" && order.status === "valid") {
-      acc.deliveredOrders += 1;
-    }
-
     acc.totalCustomers = uniqueCustomers.size; // Update total unique paying customers
-    acc.totalTax += order.invoice?.taxAmount || 0; // Total tax if invoice exists
     acc.uniqueCustomers = uniqueCustomers; // Persist unique customers across iterations
 
     return acc;
@@ -77,7 +76,6 @@ const supplierStats = orderData.orders.reduce(
     totalRevenue: 0,
     deliveredOrders: 0,
     totalCustomers: 0,
-    totalTax: 0,
     totalReturns: 0, // Track total returned items
     uniqueCustomers: new Set(), // Track unique customers separately
   },
@@ -101,9 +99,18 @@ const SupplierDashboard = () => {
           <FaClipboardList className="text-blue-500" />
         </CardDataStats>
 
+        <CardDataStats
+          title="Average Order Value"
+          total={`${(
+            supplierStats.totalRevenue / supplierStats.totalOrders
+          ).toFixed(2)} TND`}
+        >
+          <FaBox className="text-purple-500" />
+        </CardDataStats>
+
         {/* Card for Total Customers who Paid for this supplier */}
         <CardDataStats
-          title="Total Paying Customers"
+          title="Unique Paying Customers"
           total={supplierStats.totalCustomers.toString()}
         >
           <FaUsers className="text-orange-500" />
@@ -116,13 +123,6 @@ const SupplierDashboard = () => {
           <FaCheckCircle className="text-green-500" />
         </CardDataStats>
 
-        <CardDataStats
-          title="Total Taxes"
-          total={`${supplierStats.totalTax.toFixed(2)} TND`}
-        >
-          <FaDollarSign className="text-red-500" />
-        </CardDataStats>
-
         {/* New Card for Total Returns */}
         <CardDataStats
           title="Returned Products"
@@ -132,7 +132,7 @@ const SupplierDashboard = () => {
         </CardDataStats>
 
         {/* Supplier Bar Chart */}
-        <div className="mt-6">
+        <div className="mt-12">
           <ProductRevenueLossChart supplierId={supplierId} />
         </div>
 
@@ -144,6 +144,16 @@ const SupplierDashboard = () => {
         {/* Supplier Area Chart */}
         <div className="mt-6">
           <SupplierAreaChart supplierId={supplierId} />
+        </div>
+
+        {/* Sales Bar category Chart */}
+        <div className="mt-6">
+          <SalesByCategory supplierId={supplierId} />
+        </div>
+
+        {/*  Chart */}
+        <div className="mt-6">
+          <RegionsOrders />
         </div>
       </div>
     </div>

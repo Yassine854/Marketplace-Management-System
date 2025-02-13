@@ -19,8 +19,18 @@
         "deliveryAgentName": "agnetName",
         "deliverySlot": "Matin",
         "deliveryDate": 1739232000,
-        "deliveryStatus": "",
+        "deliveryStatus": null,
         "source": "online",
+        "shippingAddress": {
+          "customerFirstname": "Ikbel",
+          "customerLastname": "Sousse",
+          "phone": "24946132",
+          "address": "Sarah Jouini",
+          "city": "Tunis",
+          "postal_code": "1002",
+          "region": "ben arous",
+          "country": "Tunisia"
+        },
         "items": [
           {
             "id": "797787",
@@ -139,6 +149,7 @@
           "billingAddress": {
             "customerFirstname": "Ikbel",
             "customerLastname": "Sousse",
+            "segment": "Sousse",
             "phone": "24946132",
             "address": "15, Rue de Marseille",
             "city": "Sousse",
@@ -193,6 +204,17 @@
         "deliveryDate": 1739232000,
         "deliveryStatus": "delivered",
         "source": "online",
+        "shippingAddress": {
+          "customerFirstname": "Ahmed",
+          "customerLastname": "Ben Salah",
+          "phone": "55223344",
+          "address": "24, Rue Ibn Khaldoun",
+          "city": "Tunis",
+          "postal_code": "1001",
+          "region": "ariana",
+          "country": "Tunisia"
+        },
+
         "items": [
           {
             "id": "898900",
@@ -216,7 +238,6 @@
                 }
               ]
             },
-
             "supplier": {
               "manufacturer_id": "22",
               "code": "BAR001",
@@ -347,84 +368,83 @@
         "orderId": "63454",
         "incrementId": "000052676",
         "kamiounId": "000052676",
-        "state": "cancelled",
-        "status": "valid",
-        "total": 55.59,
+        "state": "canceled",
+        "status": "invalid",
+        "total": 0.0,
         "createdAt": 1722350694,
-        "customerId": "6324",
-        "storeId": "1",
-        "customerPhone": "24946132",
-        "customerFirstname": "Ikbel",
-        "customerLastname": "Sousse",
-        "deliveryAgentId": "agentid",
-        "deliveryAgentName": "agnetName",
+        "customerId": "7891",
+        "storeId": "3",
+        "customerPhone": "51223344",
+        "customerFirstname": "Samir",
+        "customerLastname": "Sami",
+        "deliveryAgentId": "agent003",
+        "deliveryAgentName": "Sarah Jouini",
         "deliverySlot": "Matin",
-        "deliveryDate": 0,
-        "deliveryStatus": "",
+        "deliveryDate": null,
+        "deliveryStatus": "canceled",
         "source": "online",
+        "shippingAddress": {
+          "customerFirstname": "Samir",
+          "customerLastname": "Sami",
+          "phone": "51223344",
+          "address": "Sarah Jouini",
+          "city": "Tunis",
+          "postal_code": "1001",
+          "region": "ariana",
+          "country": "Tunisia"
+        },
         "items": [
           {
-            "id": "797787",
+            "id": "797790",
             "orderId": "63454",
-            "productId": "3244",
-            "productName": "La Goulette - Thon entier HV 2.1kg",
-            "productPrice": "46.2",
-            "totalPrice": "138.6000",
-            "quantity": "2.0000",
-            "sku": "61915718013445",
-            "weight": "6",
-            "supplier": {
-              "manufacturer_id": "9",
-              "code": "001",
-              "company_name": "Technofood",
-              "contact_name": "Mehdi Bourguiba",
-              "phone_number": "22218000",
-              "postal_code": "2082",
-              "city": "Tunis",
-              "country": "Tunisia",
-              "capital": "Tunis",
-              "email": "slim.boughzala@technofoodindustries.com"
-            },
-            "return": {
-              "type": "partial",
-              "returned_products": 1,
-              "ordered_products": 2,
-              "reason": "Defective product"
-            }
-          },
-          {
-            "id": "797788",
-            "orderId": "63454",
-            "productId": "3952",
-            "productName": "Oliv+ Trio d'Or - 50% Huile d'Olive 1L",
-            "productPrice": "15.39",
-            "totalPrice": "15.3900",
+            "productId": "5648",
+            "productName": "Moulinex - Mixeur 600W",
+            "productPrice": "60.0",
+            "totalPrice": "60.00",
             "quantity": "1",
-            "sku": "6194017409148",
-            "weight": "6",
-            "supplier": {
-              "manufacturer_id": "9",
-              "code": "001",
-              "company_name": "Technofood",
-              "contact_name": "Mehdi Bourguiba",
-              "phone_number": "22218000",
-              "postal_code": "2082",
-              "city": "Tunis",
-              "country": "Tunisia",
-              "capital": "Tunis",
-              "email": "slim.boughzala@technofoodindustries.com"
+            "sku": "9876543210",
+            "weight": "3",
+            "category": {
+              "categoryId": "1",
+              "categoryName": "Electronics",
+              "parentCategoryId": null,
+              "subcategories": [
+                {
+                  "subcategoryId": "101",
+                  "subcategoryName": "Kitchen Appliances",
+                  "description": "Kitchen equipment and appliances."
+                }
+              ]
             },
-            "return": {
-              "type": "total",
-              "returned_products": 1,
-              "ordered_products": 1,
-              "reason": "Unsatisfied with the product"
+            "supplier": {
+              "manufacturer_id": "54",
+              "code": "MOU001",
+              "company_name": "Moulinex",
+              "contact_name": "Sara Hamdi",
+              "phone_number": "333445566",
+              "postal_code": "2111",
+              "city": "Paris",
+              "country": "France",
+              "capital": "Paris",
+              "email": "service@moulinex.com"
             }
           }
         ],
-        "return_summary": {
-          "total_returned_products": 2,
-          "total_ordered_products": 3
+        "return": {
+          "returnId": "RNT-20240211-003",
+          "orderId": "63454",
+          "returnStatus": "completed",
+          "refundAmount": 60.0,
+          "returnItems": [
+            {
+              "productId": "5648",
+              "productName": "Moulinex - Mixeur 600W",
+              "quantity": "1",
+              "returnDate": 1742040000,
+              "unitPrice": "60.00",
+              "totalPrice": "60.00"
+            }
+          ]
         }
       }
     }
