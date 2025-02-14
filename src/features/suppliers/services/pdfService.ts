@@ -7,7 +7,6 @@ export const generatePDF = (
   quantities: { [productId: string]: number },
   totalPayment: number,
   selectedPaymentMode: string,
-  deliveryDate: Date | null,
 ) => {
   const doc = new jsPDF();
 
@@ -32,10 +31,6 @@ export const generatePDF = (
 
   doc.text(`Total Payment: ${totalPayment.toFixed(2)} DT`, 14, 100);
   doc.text(`Payment Mode: ${selectedPaymentMode}`, 14, 110);
-
-  if (deliveryDate) {
-    doc.text(`Delivery Date: ${deliveryDate.toLocaleDateString()}`, 14, 120);
-  }
 
   doc.save(`Order_${selectedSupplier.company_name}.pdf`);
 };

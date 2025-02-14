@@ -33,7 +33,7 @@ export type EmailParams = {
   to_name: string;
   from_name: string;
   to_email: string;
-  products: string;
+  products: { name: string; quantity: number; price: number }[];
   total_payment: number;
   payment_mode: string;
   delivery_date: string;
