@@ -7,74 +7,39 @@ import {
   FaBox,
   FaUsers,
   FaUndo,
-  FaArrowUp,
-  FaArrowDown,
 } from "react-icons/fa";
 import orderData from "../../../../data_test.json";
 import ProductRevenueLossChart from "../charts/ProductRevenueLossChart";
 import TopArticlesOrdered from "../charts/TopArticlesOrdered";
 import SupplierAreaChart from "../charts/SupplierAreaChart";
-import SalesByCategory from "../charts/SalesByCategory";
 import RegionsOrders from "../charts/RegionsOrders";
+import AvailableProducts from "../charts/AvailableProducts";
+import DatePicker from "react-datepicker";
+import ClientSegment from "../charts/ClientSegment";
+
+import "react-datepicker/dist/react-datepicker.css";
 
 const supplierId = "9"; // Example supplier ID (e.g., Technofood)
 
 const SupplierDashboard = () => {
-  const [yearFilter, setYearFilter] = useState(new Date().getFullYear());
-  const [monthFilter, setMonthFilter] = useState(new Date().getMonth() + 1);
-  const [dayFilter, setDayFilter] = useState(new Date().getDate());
-  const [isMonthChecked, setIsMonthChecked] = useState(false);
-  const [isDayChecked, setIsDayChecked] = useState(false);
+  const [startDate, setStartDate] = useState(new Date()); // Default to current date
+  const [endDate, setEndDate] = useState(new Date()); // Default to current date
 
-  // Functions to increment and decrement year, month, and day
-  const incrementYear = () => setYearFilter(yearFilter + 1);
-  const decrementYear = () => setYearFilter(yearFilter - 1);
-
-  const incrementMonth = () => {
-    if (monthFilter < 12) {
-      setMonthFilter(monthFilter + 1);
-    } else {
-      setMonthFilter(1);
-    }
+  // Function to handle null date values
+  const handleStartDateChange = (date: Date | null) => {
+    setStartDate(date || new Date()); // Default to current date if null
   };
 
-  const decrementMonth = () => {
-    if (monthFilter > 1) {
-      setMonthFilter(monthFilter - 1);
-    } else {
-      setMonthFilter(12);
-    }
+  const handleEndDateChange = (date: Date | null) => {
+    setEndDate(date || new Date()); // Default to current date if null
   };
 
-  const incrementDay = () => {
-    const maxDay = new Date(yearFilter, monthFilter, 0).getDate();
-    if (dayFilter < maxDay) {
-      setDayFilter(dayFilter + 1);
-    } else {
-      setDayFilter(1);
-    }
-  };
-
-  const decrementDay = () => {
-    if (dayFilter > 1) {
-      setDayFilter(dayFilter - 1);
-    } else {
-      setDayFilter(new Date(yearFilter, monthFilter - 1, 0).getDate());
-    }
-  };
-
+  // Filter orders based on the selected date range
   const filteredOrders = orderData.orders.filter(({ order }) => {
     const orderDate = new Date(order.createdAt * 1000);
-    const orderYear = orderDate.getFullYear();
-    const orderMonth = orderDate.getMonth() + 1;
-    const orderDay = orderDate.getDate();
 
-    // Apply filters based on the month and day checkboxes
-    return (
-      orderYear === yearFilter &&
-      (isMonthChecked ? orderMonth === monthFilter : true) &&
-      (isDayChecked && isMonthChecked ? orderDay === dayFilter : true)
-    );
+    // Check if the order date is within the selected date range
+    return orderDate >= startDate && orderDate <= endDate;
   });
 
   const supplierStats = filteredOrders.reduce(
@@ -133,105 +98,39 @@ const SupplierDashboard = () => {
 
   return (
     <div className="mt-[4.8rem] w-full bg-n20 p-6">
-      {/* Date Search Input */}
-      <div className="mb-6 flex flex-col items-center space-y-4 md:flex-row md:justify-center md:space-x-6 md:space-y-0">
-        {/* Year Filter */}
-        <div className="flex items-center space-x-2">
-          <label htmlFor="yearFilter" className="text-lg">
-            Year:
+      {/* Date Range Filter */}
+      <div className="mb-6 flex justify-center space-x-6">
+        <div>
+          <label htmlFor="startDate" className="text-lg">
+            Start Date:
           </label>
-          <button
-            onClick={decrementYear}
+          <DatePicker
+            id="startDate"
+            selected={startDate}
+            onChange={handleStartDateChange}
+            dateFormat="yyyy/MM/dd"
             className="rounded border p-2 text-lg"
-          >
-            <FaArrowDown />
-          </button>
-          <input
-            id="yearFilter"
-            type="number"
-            value={yearFilter}
-            onChange={(e) => setYearFilter(parseInt(e.target.value))}
-            className="w-24 rounded border p-2 text-lg"
-            min="2000"
-            max="2099"
           />
-          <button
-            onClick={incrementYear}
-            className="rounded border p-2 text-lg"
-          >
-            <FaArrowUp />
-          </button>
         </div>
 
-        {/* Month Filter */}
-        <div className="flex items-center space-x-2">
-          <label htmlFor="monthFilter" className="text-lg">
-            Month:
+        <div>
+          <label htmlFor="endDate" className="text-lg">
+            End Date:
           </label>
-          <input
-            type="checkbox"
-            checked={isMonthChecked}
-            onChange={(e) => setIsMonthChecked(e.target.checked)}
-            className="mr-2"
-          />
-          <button
-            onClick={decrementMonth}
+          <DatePicker
+            id="endDate"
+            selected={endDate}
+            onChange={handleEndDateChange}
+            dateFormat="yyyy/MM/dd"
             className="rounded border p-2 text-lg"
-          >
-            <FaArrowDown />
-          </button>
-          <input
-            id="monthFilter"
-            type="number"
-            value={monthFilter}
-            onChange={(e) => setMonthFilter(parseInt(e.target.value))}
-            className="w-24 rounded border p-2 text-lg"
-            min="1"
-            max="12"
-            disabled={!isMonthChecked}
           />
-          <button
-            onClick={incrementMonth}
-            className="rounded border p-2 text-lg"
-          >
-            <FaArrowUp />
-          </button>
-        </div>
-
-        {/* Day Filter */}
-        <div className="flex items-center space-x-2">
-          <label htmlFor="dayFilter" className="text-lg">
-            Day:
-          </label>
-          <input
-            type="checkbox"
-            checked={isDayChecked}
-            onChange={(e) => setIsDayChecked(e.target.checked)}
-            disabled={!isMonthChecked}
-            className="mr-2"
-          />
-          <button onClick={decrementDay} className="rounded border p-2 text-lg">
-            <FaArrowDown />
-          </button>
-          <input
-            id="dayFilter"
-            type="number"
-            value={dayFilter}
-            onChange={(e) => setDayFilter(parseInt(e.target.value))}
-            className="w-24 rounded border p-2 text-lg"
-            min="1"
-            max={new Date(yearFilter, monthFilter, 0).getDate()}
-            disabled={!isDayChecked || !isMonthChecked}
-          />
-          <button onClick={incrementDay} className="rounded border p-2 text-lg">
-            <FaArrowUp />
-          </button>
         </div>
       </div>
 
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <CardDataStats
-          title="Total Revenue"
+          title="Turnover"
           total={`${supplierStats.totalRevenue.toFixed(2)} TND`}
         >
           <FaMoneyBillWave className="text-green-500" />
@@ -251,24 +150,23 @@ const SupplierDashboard = () => {
           <FaUsers className="text-orange-500" />
         </CardDataStats>
 
-        <CardDataStats
+        {/* <CardDataStats
           title="Average Order Value"
-          total={`${(isNaN(
-            supplierStats.totalRevenue / (supplierStats.deliveredOrders ?? 0),
-          )
-            ? 0
-            : supplierStats.totalRevenue / (supplierStats.deliveredOrders ?? 0)
+          total={`${(
+            isNaN(supplierStats.totalRevenue / (supplierStats.deliveredOrders ?? 0))
+              ? 0
+              : supplierStats.totalRevenue / (supplierStats.deliveredOrders ?? 0)
           ).toFixed(2)} TND`}
         >
           <FaBox className="text-purple-500" />
-        </CardDataStats>
+        </CardDataStats> */}
 
-        <CardDataStats
+        {/* <CardDataStats
           title="Paid Orders"
           total={supplierStats.deliveredOrders.toString()}
         >
           <FaCheckCircle className="text-green-500" />
-        </CardDataStats>
+        </CardDataStats> */}
 
         <CardDataStats
           title="Returned Products"
@@ -276,25 +174,36 @@ const SupplierDashboard = () => {
         >
           <FaUndo className="text-red-500" />
         </CardDataStats>
+      </div>
 
-        <div className="col-span-3 mt-12 w-full">
+      {/* Charts */}
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+        {/* Revenue Chart taking 2 columns on medium screens and above */}
+        <div className="md:col-span-2">
           <SupplierAreaChart supplierId={supplierId} />
         </div>
 
-        <div className="mt-12">
-          <ProductRevenueLossChart supplierId={supplierId} />
+        {/* Available Products taking 1 column */}
+        <div>
+          <AvailableProducts supplierId={supplierId} />
         </div>
+      </div>
 
-        <div className="mt-6">
+      <div className="col-span-3 mt-12 w-full">
+        <ProductRevenueLossChart supplierId={supplierId} />
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div>
           <TopArticlesOrdered supplierId={supplierId} />
         </div>
 
-        <div className="mt-6">
-          <SalesByCategory supplierId={supplierId} />
+        <div>
+          <RegionsOrders supplierId={supplierId} />
         </div>
 
-        <div className="mt-6">
-          <RegionsOrders />
+        <div>
+          <ClientSegment supplierId={supplierId} />
         </div>
       </div>
     </div>

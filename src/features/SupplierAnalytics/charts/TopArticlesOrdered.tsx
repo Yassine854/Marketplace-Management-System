@@ -1,7 +1,9 @@
 import { ApexOptions } from "apexcharts";
 import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
-import supplierData from "../../../../data_test.json"; // Make sure your path is correct
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import supplierData from "../../../../data_test.json"; // Ensure the path is correct
 
 // Generate random colors
 const generateColors = (num: number): string[] => {
@@ -28,7 +30,6 @@ const generateColors = (num: number): string[] => {
     "#BC8F8F",
   ];
 
-  // Extend the array if needed
   while (colors.length < num) {
     colors.push(`#${Math.floor(Math.random() * 16777215).toString(16)}`);
   }
@@ -38,43 +39,73 @@ const generateColors = (num: number): string[] => {
 const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
   supplierId,
 }) => {
-  const [state, setState] = useState<{ series: number[]; labels: string[] }>({
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [state, setState] = useState<{
+    series: number[];
+    labels: string[];
+    ordersCount: number[];
+  }>({
     series: [],
     labels: [],
+    ordersCount: [],
   });
 
+  const getDateDetails = (timestamp: number) => {
+    const date = new Date(timestamp * 1000);
+    return {
+      year: date.getFullYear(),
+      month: date.getMonth() + 1,
+      day: date.getDate(),
+    };
+  };
+
   useEffect(() => {
-    const productOrders: Record<string, number> = {};
+    const productOrders: Record<
+      string,
+      { quantity: number; orderCount: number }
+    > = {};
 
     supplierData.orders.forEach((order) => {
-      order.order.items.forEach((item) => {
-        if (item.supplier.manufacturer_id === supplierId) {
-          const productName = item.productName;
-          const quantity = parseFloat(item.quantity);
+      const { year, month, day } = getDateDetails(order.order.createdAt);
 
-          productOrders[productName] =
-            (productOrders[productName] || 0) + quantity;
-        }
-      });
+      if (
+        (startDate
+          ? new Date(order.order.createdAt * 1000) >= startDate
+          : true) &&
+        (endDate ? new Date(order.order.createdAt * 1000) <= endDate : true)
+      ) {
+        order.order.items.forEach((item) => {
+          if (item.supplier.manufacturer_id === supplierId) {
+            const productName = item.productName;
+            const quantity = parseFloat(item.quantity);
+
+            if (!productOrders[productName]) {
+              productOrders[productName] = { quantity: 0, orderCount: 0 };
+            }
+
+            productOrders[productName].quantity += quantity;
+            productOrders[productName].orderCount += 1;
+          }
+        });
+      }
     });
 
     const totalOrders = Object.values(productOrders).reduce(
-      (acc, val) => acc + val,
+      (acc, val) => acc + val.quantity,
       0,
     );
-
     const productNames = Object.keys(productOrders);
     const productPercentages = productNames.map((name) =>
-      ((productOrders[name] / totalOrders) * 100).toFixed(2),
+      ((productOrders[name].quantity / totalOrders) * 100).toFixed(2),
     );
 
     setState({
       series: productPercentages.map(Number),
-      labels: productNames.map(
-        (name, index) => `${name} (${productPercentages[index]}%)`,
-      ),
+      labels: productNames.map((name, index) => `${name}`),
+      ordersCount: productNames.map((name) => productOrders[name].orderCount),
     });
-  }, [supplierId]);
+  }, [supplierId, startDate, endDate]);
 
   const options: ApexOptions = {
     chart: {
@@ -84,7 +115,7 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
       background: "#FFFFFF",
     },
     labels: state.labels,
-    colors: generateColors(state.labels.length), // Dynamically assign colors
+    colors: generateColors(state.labels.length),
     legend: {
       show: true,
       position: "bottom",
@@ -99,22 +130,58 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
     },
     dataLabels: {
       enabled: true,
-      formatter: function (val: number) {
-        return `${Number(val).toFixed(1)}%`;
-      },
+      formatter: (val: number) => `${Number(val).toFixed(1)}%`,
       style: {
         fontSize: "14px",
         fontWeight: "bold",
       },
     },
+    tooltip: {
+      y: {
+        formatter: (val: number, { seriesIndex }: any) => {
+          const segment = state.labels[seriesIndex];
+          const orderCount = state.ordersCount[seriesIndex];
+          return `${orderCount} Orders`;
+        },
+      },
+    },
     title: {
-      text: "Most Ordered Products",
+      text: `Most Ordered Products in ${
+        startDate && endDate
+          ? `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`
+          : "All Time"
+      }`,
       align: "center",
+      style: {
+        fontSize: "16px", // Increase font size
+        fontWeight: "bold",
+        color: "#333", // Title color
+      },
     },
   };
 
   return (
     <div className="mt-6 w-full bg-white p-4">
+      {/* Date Range Selection */}
+      <div className="mb-4 text-center">
+        <label className="text-sm font-semibold">Start Date:</label>
+        <DatePicker
+          selected={startDate}
+          onChange={(date: Date | null) => setStartDate(date)} // Handle null
+          dateFormat="yyyy/MM/dd"
+          className="ml-2 w-24 rounded border p-1 text-xs" // Added width class for smaller width
+        />
+
+        <label className="ml-4 text-sm font-semibold">End Date:</label>
+        <DatePicker
+          selected={endDate}
+          onChange={(date: Date | null) => setEndDate(date)} // Handle null
+          dateFormat="yyyy/MM/dd"
+          className="ml-2 w-24 rounded border p-1 text-xs" // Added width class for smaller width
+        />
+      </div>
+
+      {/* Chart */}
       <div className="mx-auto flex justify-center">
         <ReactApexChart
           options={options}
@@ -123,6 +190,7 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
           height={500}
         />
       </div>
+
       {/* Product details section */}
       <div className="mt-6 flex flex-wrap justify-center">
         {state.labels.map((label, index) => (
@@ -132,8 +200,13 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
               style={{
                 backgroundColor: generateColors(state.labels.length)[index],
               }}
-            ></div>
-            <span className="text-sm font-semibold">{label}</span>
+            />
+            {/* Display the label with order count */}
+            <span className="text-sm ">{label} :</span>
+            {/* Display the order count */}
+            <span className="text-xs text-gray-600">
+              <b>({state.ordersCount[index]} Orders)</b>
+            </span>
           </div>
         ))}
       </div>
