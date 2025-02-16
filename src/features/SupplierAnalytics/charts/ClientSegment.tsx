@@ -6,8 +6,9 @@ import supplierData from "../../../../data_test.json";
 
 const ClientSegment: React.FC<{ supplierId: string }> = ({ supplierId }) => {
   const [chartData, setChartData] = useState<any>(null);
-  const [startDate, setStartDate] = useState<Date | null>(null); // Start date for filtering
-  const [endDate, setEndDate] = useState<Date | null>(null); // End date for filtering
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [totalCustomers, setTotalCustomers] = useState<number>(0);
 
   const handleStartDateChange = (date: Date | null) => {
     setStartDate(date);
@@ -18,7 +19,6 @@ const ClientSegment: React.FC<{ supplierId: string }> = ({ supplierId }) => {
   };
 
   useEffect(() => {
-    // Step 1: Filter orders based on the criteria and supplierId as manufacturer_id
     let filteredOrders = supplierData.orders.filter((order: any) => {
       return (
         order.order.state === "confirmed" &&
@@ -29,47 +29,50 @@ const ClientSegment: React.FC<{ supplierId: string }> = ({ supplierId }) => {
       );
     });
 
-    // Step 2: Filter orders by date range if startDate and endDate are provided
     if (startDate) {
       filteredOrders = filteredOrders.filter((order: any) => {
-        const deliveredAt = new Date(order.order.deliveryDate * 1000); // Convert from Unix timestamp to Date object
+        const deliveredAt = new Date(order.order.deliveryDate * 1000);
         return deliveredAt >= startDate;
       });
     }
 
     if (endDate) {
       filteredOrders = filteredOrders.filter((order: any) => {
-        const deliveredAt = new Date(order.order.deliveryDate * 1000); // Convert from Unix timestamp to Date object
+        const deliveredAt = new Date(order.order.deliveryDate * 1000);
         return deliveredAt <= endDate;
       });
     }
 
-    // Step 3: Track unique customerIds per segment_type
-    const processedCustomersBySegment: Record<string, Set<string>> = {}; // Map to track unique customerIds per segment_type
+    const processedCustomersBySegment: Record<string, Set<string>> = {};
     const segmentTypeCounts: Record<string, number> = {};
+    const allCustomers = new Set<string>();
 
     filteredOrders.forEach((order: any) => {
-      const customerId = order.order.customerId; // Use customerId from the order
-      const segmentType = order.order.segment_type; // Get the segment type
+      const customerId = order.order.customerId;
+      const segmentType = order.order.segment_type;
 
-      // Ensure segmentType exists and initialize if necessary
       if (segmentType) {
         if (!processedCustomersBySegment[segmentType]) {
           processedCustomersBySegment[segmentType] = new Set();
         }
 
-        // Only count the customer once per segment_type
         if (!processedCustomersBySegment[segmentType].has(customerId)) {
           processedCustomersBySegment[segmentType].add(customerId);
           segmentTypeCounts[segmentType] =
             (segmentTypeCounts[segmentType] || 0) + 1;
+          allCustomers.add(customerId);
         }
       }
     });
 
-    // Step 4: Prepare data for the chart
+    // Calculate total unique customers across all segments
+    setTotalCustomers(allCustomers.size);
+
+    // Prepare chart data
     const chartSeries = Object.values(segmentTypeCounts);
-    const chartLabels = Object.keys(segmentTypeCounts);
+    const chartLabels = Object.keys(segmentTypeCounts).map(
+      (label) => `${label} (${segmentTypeCounts[label]})`,
+    );
 
     setChartData({
       series: chartSeries,
@@ -77,47 +80,70 @@ const ClientSegment: React.FC<{ supplierId: string }> = ({ supplierId }) => {
         chart: {
           type: "pie",
           width: "100%",
+          events: {
+            dataPointSelection: (
+              event: any,
+              chartContext: any,
+              config: any,
+            ) => {
+              console.log(
+                "Selected segment:",
+                chartLabels[config.dataPointIndex],
+              );
+            },
+          },
         },
         labels: chartLabels,
         responsive: [
           {
             breakpoint: 480,
             options: {
-              chart: {
-                width: "100%",
-              },
-              legend: {
-                position: "bottom",
-              },
+              chart: { width: "100%" },
+              legend: { position: "bottom" },
             },
           },
         ],
         title: {
-          text: "Segment Type Distribution (Unique Customers)",
+          text: `Client Segments - Total Unique Customers: ${totalCustomers}`,
           align: "center",
+          style: {
+            fontSize: "16px",
+            fontWeight: "bold",
+          },
+        },
+        tooltip: {
+          y: {
+            formatter: (value: number) => `${value} unique customers`,
+          },
         },
       },
     });
-  }, [supplierId, startDate, endDate]); // Re-run the effect when supplierId, startDate, or endDate changes
+  }, [supplierId, startDate, endDate, totalCustomers]);
 
   return (
-    <div>
-      <div className="mb-4 text-center">
-        <label className="text-sm font-semibold">Start Date:</label>
-        <DatePicker
-          selected={startDate}
-          onChange={(date: Date | null) => setStartDate(date)} // Handle null
-          dateFormat="yyyy/MM/dd"
-          className="ml-2 w-24 rounded border p-1 text-xs" // Added width class for smaller width
-        />
-
-        <label className="ml-4 text-sm font-semibold">End Date:</label>
-        <DatePicker
-          selected={endDate}
-          onChange={(date: Date | null) => setEndDate(date)} // Handle null
-          dateFormat="yyyy/MM/dd"
-          className="ml-2 w-24 rounded border p-1 text-xs" // Added width class for smaller width
-        />
+    <div className="rounded-lg bg-white p-4 shadow">
+      <div className="mb-4 flex flex-col space-y-2">
+        <div className="mb-4 flex items-center justify-between">
+          <label className="text-sm font-medium">Date Range:</label>
+          <div className="flex space-x-2">
+            <DatePicker
+              selected={startDate}
+              onChange={handleStartDateChange}
+              dateFormat="MMM dd, yyyy"
+              placeholderText="Start Date"
+              className="w-32 rounded border p-1 text-sm"
+              isClearable
+            />
+            <DatePicker
+              selected={endDate}
+              onChange={handleEndDateChange}
+              dateFormat="MMM dd, yyyy"
+              placeholderText="End Date"
+              className="w-32 rounded border p-1 text-sm"
+              isClearable
+            />
+          </div>
+        </div>
       </div>
 
       {chartData ? (
@@ -125,10 +151,12 @@ const ClientSegment: React.FC<{ supplierId: string }> = ({ supplierId }) => {
           options={chartData.options}
           series={chartData.series}
           type="pie"
-          width="400"
+          height={350}
         />
       ) : (
-        <p>Loading...</p>
+        <p className="text-center text-gray-500">
+          Loading customer segments...
+        </p>
       )}
     </div>
   );

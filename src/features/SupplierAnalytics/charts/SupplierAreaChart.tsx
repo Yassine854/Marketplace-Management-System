@@ -1,7 +1,7 @@
 import { ApexOptions } from "apexcharts";
 import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
-import supplierData from "../../../../data_test.json"; // Make sure your path is correct
+import supplierData from "../../../../data_test.json";
 
 interface RevenueOverTimeChartProps {
   supplierId: string;
@@ -13,111 +13,107 @@ const SupplierAreaChart: React.FC<RevenueOverTimeChartProps> = ({
   const [chartData, setChartData] = useState<any>(null);
   const [timeFilter, setTimeFilter] = useState("yearly");
 
-  const calculateRevenue = (order: any) => {
-    let revenueByTime: { [key: string]: number } = {};
-    if (order.state !== "confirmed") {
-      return revenueByTime;
-    }
+  // Get supplier products and pre-cache costPrice/qty
+  const supplierProducts = supplierData.products.filter(
+    (p: any) => p.product.supplier?.manufacturer_id === supplierId,
+  );
 
-    const currentYear = new Date().getFullYear();
-    order.items.forEach((item: any) => {
-      if (item.supplier.manufacturer_id === supplierId) {
-        const productPrice = parseFloat(item.productPrice);
-        const quantityOrdered = parseInt(item.quantity, 10);
-        const revenue = productPrice * quantityOrdered;
-        const deliveryDate = new Date(order.deliveryDate * 1000);
-        const orderDate = new Date(order.createdAt * 1000);
-
-        if (deliveryDate.getFullYear() !== currentYear) {
-          return;
-        }
-
-        let key;
-        switch (timeFilter) {
-          case "monthly":
-            key = `${orderDate.getFullYear()}-${orderDate.getMonth() + 1}`;
-            break;
-          case "weekly":
-            key = `${orderDate.getFullYear()}-W${Math.ceil(
-              orderDate.getDate() / 7,
-            )}`;
-            break;
-          case "daily":
-            key = orderDate.toISOString().split("T")[0];
-            break;
-          case "semestrial":
-            key = `${orderDate.getFullYear()}-S${
-              orderDate.getMonth() < 6 ? 1 : 2
-            }`;
-            break;
-          default:
-            key = orderDate.getFullYear().toString();
-        }
-
-        if (!revenueByTime[key]) {
-          revenueByTime[key] = 0;
-        }
-        revenueByTime[key] += revenue;
-      }
-    });
-
-    return revenueByTime;
-  };
+  // Pre-map products for quick lookup
+  const productMap = new Map(
+    supplierProducts.map((p: any) => [
+      p.product.productId,
+      {
+        costPrice: parseFloat(p.product.costPrice),
+        qty: parseFloat(p.product.qty),
+        orderedQty: 0,
+      },
+    ]),
+  );
 
   useEffect(() => {
-    const revenueByTime: { [key: string]: number } = {};
-    supplierData.orders.forEach((order: any) => {
-      const revenueForOrder = calculateRevenue(order.order);
-      for (const time in revenueForOrder) {
-        if (!revenueByTime[time]) {
-          revenueByTime[time] = 0;
-        }
-        revenueByTime[time] += revenueForOrder[time];
-      }
+    const timeSeries: { [key: string]: number } = {};
+
+    // First pass: Calculate base turnover from inventory
+    const baseTurnover = Array.from(productMap.values()).reduce(
+      (sum, product) => sum + product.costPrice * product.qty,
+      0,
+    );
+
+    // Second pass: Process orders and accumulate ordered quantities
+    supplierData.orders.forEach(({ order }: any) => {
+      if (order.state !== "confirmed") return;
+
+      const orderDate = new Date(order.createdAt * 1000);
+      const timeKey = getTimeKey(orderDate);
+
+      order.items.forEach((item: any) => {
+        if (item.supplier.manufacturer_id !== supplierId) return;
+
+        const product = productMap.get(item.productId);
+        if (!product) return;
+
+        const orderedQty = parseFloat(item.quantity);
+        product.orderedQty += orderedQty;
+
+        const turnoverContribution = product.costPrice * orderedQty;
+        timeSeries[timeKey] = (timeSeries[timeKey] || 0) + turnoverContribution;
+      });
     });
 
-    const timeLabels = Object.keys(revenueByTime).sort();
-    const revenueValues = timeLabels.map((time) => revenueByTime[time] || 0);
+    // Combine base turnover with time-based contributions
+    const timeLabels = Object.keys(timeSeries).sort();
+    const turnoverData = timeLabels.map(
+      (time) => baseTurnover + timeSeries[time],
+    );
 
     setChartData({
-      series: [
-        {
-          name: "Revenue",
-          data: revenueValues,
-        },
-      ],
-      options: {
-        chart: {
-          type: "area",
-          height: 400,
-          background: "#FFFFFF",
-        },
-        xaxis: {
-          categories: timeLabels,
-          title: {
-            text: "Time",
-          },
-        },
-        yaxis: {
-          title: {
-            text: "Revenue (in TND)",
-          },
-          labels: {
-            formatter: (val: number) => `${val.toFixed(2)} TND`,
-          },
-        },
-        title: {
-          text: `Revenue (${timeFilter})`,
-          align: "center",
-        },
-        tooltip: {
-          y: {
-            formatter: (val: number) => `${val.toFixed(2)} TND`,
-          },
-        },
-      },
+      series: [{ name: "Turnover", data: turnoverData }],
+      options: getChartOptions(timeLabels, timeFilter),
     });
   }, [supplierId, timeFilter]);
+
+  // Helper function to generate time keys
+  const getTimeKey = (date: Date) => {
+    switch (timeFilter) {
+      case "monthly":
+        return `${date.getFullYear()}-${date.getMonth() + 1}`;
+      case "weekly":
+        return `${date.getFullYear()}-W${Math.ceil(date.getDate() / 7)}`;
+      case "daily":
+        return date.toISOString().split("T")[0];
+      case "semestrial":
+        return `${date.getFullYear()}-S${date.getMonth() < 6 ? 1 : 2}`;
+      default:
+        return date.getFullYear().toString();
+    }
+  };
+
+  // Chart options configuration
+  const getChartOptions = (
+    categories: string[],
+    filter: string,
+  ): ApexOptions => ({
+    chart: {
+      type: "area",
+      height: 400,
+      background: "#FFFFFF",
+    },
+    xaxis: {
+      categories,
+      title: { text: "Time" },
+    },
+    yaxis: {
+      title: { text: "Turnover (TND)" },
+      labels: { formatter: (val: number) => `${val.toFixed(0)} TND` },
+    },
+    title: {
+      text: `Turnover (${filter})`,
+      align: "center",
+    },
+    tooltip: {
+      y: { formatter: (val: number) => `${val.toFixed(2)} TND` },
+    },
+  });
 
   return (
     <div className="mt-6 w-full bg-white p-4">

@@ -41,6 +41,9 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
 }) => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const handleStartDateChange = (date: Date | null) => setStartDate(date);
+  const handleEndDateChange = (date: Date | null) => setEndDate(date);
+
   const [state, setState] = useState<{
     series: number[];
     labels: string[];
@@ -153,7 +156,7 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
       }`,
       align: "center",
       style: {
-        fontSize: "16px", // Increase font size
+        fontSize: "10px", // Increase font size
         fontWeight: "bold",
         color: "#333", // Title color
       },
@@ -163,22 +166,26 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
   return (
     <div className="mt-6 w-full bg-white p-4">
       {/* Date Range Selection */}
-      <div className="mb-4 text-center">
-        <label className="text-sm font-semibold">Start Date:</label>
-        <DatePicker
-          selected={startDate}
-          onChange={(date: Date | null) => setStartDate(date)} // Handle null
-          dateFormat="yyyy/MM/dd"
-          className="ml-2 w-24 rounded border p-1 text-xs" // Added width class for smaller width
-        />
-
-        <label className="ml-4 text-sm font-semibold">End Date:</label>
-        <DatePicker
-          selected={endDate}
-          onChange={(date: Date | null) => setEndDate(date)} // Handle null
-          dateFormat="yyyy/MM/dd"
-          className="ml-2 w-24 rounded border p-1 text-xs" // Added width class for smaller width
-        />
+      <div className="mb-4 flex items-center justify-between">
+        <label className="text-sm font-medium">Date Range:</label>
+        <div className="flex space-x-2">
+          <DatePicker
+            selected={startDate}
+            onChange={handleStartDateChange}
+            dateFormat="MMM dd, yyyy"
+            placeholderText="Start Date"
+            className="w-32 rounded border p-1 text-sm"
+            isClearable
+          />
+          <DatePicker
+            selected={endDate}
+            onChange={handleEndDateChange}
+            dateFormat="MMM dd, yyyy"
+            placeholderText="End Date"
+            className="w-32 rounded border p-1 text-sm"
+            isClearable
+          />
+        </div>
       </div>
 
       {/* Chart */}

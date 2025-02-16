@@ -13,16 +13,13 @@ const OrdersByRegion: React.FC<{ supplierId: string }> = ({ supplierId }) => {
   >({});
 
   useEffect(() => {
-    // Reset the regions object when selectedYear changes
-    const newRegions: Record<string, { [key: string]: number }> = {};
+    const newRegions: Record<string, { [key: string]: Set<string> }> = {};
 
-    // Filter orders by supplierId and selected delivery year
     const filteredOrders = supplierData.orders.filter((orderData) => {
       const order = orderData.order;
       const deliveryDate = order.deliveryDate
         ? new Date(order.deliveryDate * 1000)
         : null;
-      // Only include orders where the delivery date year matches the selected year
       return (
         order.items?.some(
           (item) => item.supplier?.manufacturer_id === supplierId,
@@ -30,31 +27,47 @@ const OrdersByRegion: React.FC<{ supplierId: string }> = ({ supplierId }) => {
       );
     });
 
-    // Process the filtered orders to accumulate data by region and quarter
     filteredOrders.forEach((orderData) => {
       const order = orderData.order;
       const deliveryDate = order.deliveryDate
         ? new Date(order.deliveryDate * 1000)
         : null;
       const region = order.shippingAddress.region;
+      const customerId = order.customerId;
 
-      if (region && deliveryDate) {
+      if (region && deliveryDate && customerId) {
         if (!newRegions[region]) {
-          newRegions[region] = { Q1: 0, Q2: 0, Q3: 0, Q4: 0 };
+          newRegions[region] = {
+            Q1: new Set(),
+            Q2: new Set(),
+            Q3: new Set(),
+            Q4: new Set(),
+          };
         }
 
-        const month = deliveryDate.getMonth() + 1; // Get month (1-12)
-        if (month >= 1 && month <= 3) newRegions[region].Q1++;
-        else if (month >= 4 && month <= 6) newRegions[region].Q2++;
-        else if (month >= 7 && month <= 9) newRegions[region].Q3++;
-        else if (month >= 10 && month <= 12) newRegions[region].Q4++;
+        const month = deliveryDate.getMonth() + 1;
+        let quarter: keyof (typeof newRegions)[string] = "Q1";
+        if (month >= 4 && month <= 6) quarter = "Q2";
+        else if (month >= 7 && month <= 9) quarter = "Q3";
+        else if (month >= 10 && month <= 12) quarter = "Q4";
+
+        newRegions[region][quarter].add(customerId);
       }
     });
 
-    setRegions(newRegions); // Update regions state when orders are processed
-  }, [selectedYear, supplierId]); // Re-run the effect whenever selectedYear or supplierId changes
+    // Convert Sets to counts
+    const countRegions = Object.fromEntries(
+      Object.entries(newRegions).map(([region, quarters]) => [
+        region,
+        Object.fromEntries(
+          Object.entries(quarters).map(([q, set]) => [q, set.size]),
+        ),
+      ]),
+    );
 
-  // Transform data into series for grouped bars
+    setRegions(countRegions);
+  }, [selectedYear, supplierId]);
+
   const quarterSeries = quarters.map((quarter) => ({
     name: quarter,
     data: Object.keys(regions).map((region) => regions[region][quarter] || 0),
@@ -97,7 +110,7 @@ const OrdersByRegion: React.FC<{ supplierId: string }> = ({ supplierId }) => {
     },
     yaxis: {
       title: {
-        text: "Number of Orders",
+        text: "Number of Unique Customers",
       },
     },
     legend: {
@@ -105,18 +118,16 @@ const OrdersByRegion: React.FC<{ supplierId: string }> = ({ supplierId }) => {
       horizontalAlign: "center",
     },
     title: {
-      text: `Orders by Quarter for Each Region in ${selectedYear}`,
+      text: `Unique Customers for Each Region in ${selectedYear}`,
       align: "center",
     },
     colors: ["#FF5733", "#33FF57", "#3357FF", "#FF33A6"],
   };
 
-  // Handle year change
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedYear(Number(event.target.value));
   };
 
-  // Generate years dynamically (for example, from 2020 to current year)
   const years = Array.from(
     { length: currentYear - 2020 + 1 },
     (_, i) => 2020 + i,
@@ -124,7 +135,6 @@ const OrdersByRegion: React.FC<{ supplierId: string }> = ({ supplierId }) => {
 
   return (
     <div>
-      {/* Year Filter Dropdown */}
       <div className="mb-4 text-center">
         <label className="text-sm font-semibold">Year:</label>
         <select
@@ -140,7 +150,6 @@ const OrdersByRegion: React.FC<{ supplierId: string }> = ({ supplierId }) => {
         </select>
       </div>
 
-      {/* Chart */}
       <ApexCharts
         options={chartOptions}
         series={quarterSeries}
