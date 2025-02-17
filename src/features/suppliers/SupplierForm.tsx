@@ -35,8 +35,6 @@ const SupplierForm = ({
   const [comment, setComment] = useState("");
   const [message, setMessage] = useState("");
   const { data: session } = useSession();
-
-  // Payment states
   const [paymentTypes, setPaymentTypes] = useState<
     { type: string; percentage: string; amount: string }[]
   >([
@@ -109,24 +107,11 @@ const SupplierForm = ({
   const [remainingAmounts, setRemainingAmounts] = useState([totalAmount]);
 
   useEffect(() => {
-    if (paymentTypes.length) {
-      const totalPercentage = paymentTypes.reduce(
-        (acc, payment) => acc + (parseFloat(payment.percentage) || 0),
-        0,
-      );
-      const remaining = totalAmount * ((100 - totalPercentage) / 100);
-      setRemainingAmount(remaining);
-
-      if (
-        totalPercentage < 100 &&
-        paymentTypes[paymentTypes.length - 1].percentage !== ""
-      ) {
-        setPaymentTypes([
-          ...paymentTypes,
-          { type: "", percentage: "", amount: "" },
-        ]);
-      }
-    }
+    const totalAllocated = paymentTypes.reduce(
+      (acc, payment) => acc + (parseFloat(payment.amount || "0") || 0),
+      0,
+    );
+    setRemainingAmount(totalAmount - totalAllocated);
   }, [paymentTypes, totalAmount]);
 
   const handlePaymentTypeChange = (index: number, type: string) => {
@@ -136,48 +121,30 @@ const SupplierForm = ({
     setPaymentTypes(updatedPaymentTypes);
   };
   const handlePaymentPercentageChange = (index: number, value: string) => {
-    let newPercentage = parseFloat(value) || 0;
-    if (newPercentage > 100) newPercentage = 100;
-    let updatedPayments = [...paymentTypes];
+    const newPercentage = Math.min(parseFloat(value) || 0, 100);
+    const updatedPayments = [...paymentTypes];
     updatedPayments[index] = {
       ...updatedPayments[index],
       percentage: newPercentage.toString(),
+      amount: ((totalAmount * newPercentage) / 100).toString(),
     };
-    let totalPercentage = updatedPayments.reduce(
-      (acc, payment, idx) =>
-        idx <= index ? acc + (parseFloat(payment.percentage) || 0) : acc,
+    const totalAllocated = updatedPayments.reduce(
+      (acc, payment) => acc + (parseFloat(payment.amount || "0") || 0),
+      0,
+    );
+    const newTotalPercentage = updatedPayments.reduce(
+      (acc, payment) => acc + (parseFloat(payment.percentage) || 0),
       0,
     );
 
-    let remainingPercentage = 100 - totalPercentage;
-    if (remainingPercentage > 0) {
-      updatedPayments = updatedPayments.map((payment, idx) => {
-        if (idx > index) {
-          return { ...payment, percentage: remainingPercentage.toString() };
-        }
-        return payment;
-      });
-    } else {
-      newPercentage =
-        100 -
-        updatedPayments
-          .slice(0, index)
-          .reduce(
-            (acc, payment) => acc + (parseFloat(payment.percentage) || 0),
-            0,
-          );
-      updatedPayments[index] = {
-        ...updatedPayments[index],
-        percentage: newPercentage.toString(),
-      };
-    }
-    if (index === updatedPayments.length - 1 && remainingPercentage > 0) {
+    if (totalAllocated < totalAmount && index === updatedPayments.length - 1) {
       updatedPayments.push({
         type: "",
-        percentage: remainingPercentage.toString(),
+        percentage: "",
         amount: "",
       });
     }
+
     setPaymentTypes(updatedPayments);
   };
 
@@ -452,17 +419,15 @@ const SupplierForm = ({
   };
 
   const handlePaymentAmountChange = (index: number, value: string) => {
-    const newAmount = Math.min(
-      Math.max(parseFloat(value) || 0, 0),
-      totalAmount,
-    );
+    const newAmount = Math.min(parseFloat(value) || 0, totalAmount);
     const updatedPaymentTypes = [...paymentTypes];
+    const newPercentage =
+      totalAmount !== 0 ? (newAmount / totalAmount) * 100 : 0;
 
     updatedPaymentTypes[index] = {
       ...updatedPaymentTypes[index],
-      amount: String(newAmount),
-      percentage:
-        totalAmount > 0 ? ((newAmount / totalAmount) * 100).toFixed(2) : "0.00",
+      amount: newAmount.toString(),
+      percentage: newPercentage.toFixed(2),
     };
 
     const totalAllocated = updatedPaymentTypes.reduce(
@@ -470,12 +435,14 @@ const SupplierForm = ({
       0,
     );
 
-    if (index === paymentTypes.length - 1 && totalAllocated < totalAmount) {
-      const remaining = totalAmount - totalAllocated;
+    if (
+      totalAllocated < totalAmount &&
+      index === updatedPaymentTypes.length - 1
+    ) {
       updatedPaymentTypes.push({
         type: "",
-        percentage: ((remaining / totalAmount) * 100).toFixed(2),
-        amount: String(remaining),
+        percentage: "",
+        amount: "",
       });
     }
 
@@ -769,6 +736,17 @@ const SupplierForm = ({
                         <option value="cash">Cash</option>
                         <option value="traite">Traite</option>
                       </select>
+                      {payment.type && payment.type !== "cash" && (
+                        <input
+                          type="number"
+                          value={payment.percentage}
+                          onChange={(e) =>
+                            handlePaymentPercentageChange(index, e.target.value)
+                          }
+                          className="w-1/3 rounded-md border border-gray-300 p-3"
+                          placeholder="Percentage"
+                        />
+                      )}
                       {payment.type && (
                         <input
                           type="number"
@@ -781,24 +759,13 @@ const SupplierForm = ({
                         />
                       )}
 
-                      {payment.type && payment.type !== "cash" && (
-                        <input
-                          type="number"
-                          value={payment.percentage}
-                          onChange={(e) =>
-                            handlePaymentPercentageChange(index, e.target.value)
-                          }
-                          className="w-1/3 rounded-md border border-gray-300 p-3"
-                          placeholder="Percentage"
-                        />
-                      )}
                       <div className="flex w-full items-center space-x-2 sm:w-1/3 lg:w-1/4">
                         <label className="block w-1/3 text-sm font-medium text-gray-700">
                           R.Amount
                         </label>
                         <input
                           type="number"
-                          value={remainingAmounts[index]?.toFixed(2) || "0.00"}
+                          value={remainingAmount.toFixed(2) || "0.00"}
                           disabled
                           className="w-2/3 rounded-md border border-gray-300 bg-gray-100 p-3"
                         />
