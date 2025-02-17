@@ -15,8 +15,40 @@ const SupplierCategoryPieChart = ({ supplierId }: { supplierId: string }) => {
     options: {
       labels: [],
       colors: [],
-      legend: { position: "right" },
+      chart: {
+        height: 500,
+        type: "donut",
+      },
+      legend: {
+        position: "right",
+        fontSize: "14px",
+        itemMargin: {
+          horizontal: 10,
+          vertical: 5,
+        },
+      },
       tooltip: { y: { formatter: (val: number) => `${val} products` } },
+      plotOptions: {
+        pie: {
+          donut: {
+            size: "70%",
+            labels: {
+              show: true,
+              total: {
+                show: true,
+                label: "Total Products",
+                fontSize: "16px",
+              },
+            },
+          },
+        },
+      },
+      dataLabels: {
+        enabled: true,
+        style: {
+          fontSize: "14px",
+        },
+      },
     },
   });
 
@@ -91,11 +123,11 @@ const SupplierCategoryPieChart = ({ supplierId }: { supplierId: string }) => {
         plotOptions: {
           pie: {
             donut: {
+              ...chartState.options.plotOptions.pie.donut,
               labels: {
-                show: true,
+                ...chartState.options.plotOptions.pie.donut.labels,
                 total: {
-                  show: true,
-                  label: "Total Products",
+                  ...chartState.options.plotOptions.pie.donut.labels.total,
                   formatter: () => series.reduce((a, b) => a + b, 0).toString(),
                 },
               },
@@ -109,40 +141,43 @@ const SupplierCategoryPieChart = ({ supplierId }: { supplierId: string }) => {
   return (
     <div className="border-stroke rounded-lg border bg-white p-6 shadow-lg">
       {/* Date Filter */}
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <label className="text-sm font-medium">Date Range:</label>
-        <div className="flex space-x-2">
+        <div className="flex gap-3">
           <DatePicker
             selected={startDate}
             onChange={handleStartDateChange}
-            dateFormat="MMM dd, yyyy"
             placeholderText="Start Date"
-            className="w-32 rounded border p-1 text-sm"
+            className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            dateFormat="MMM d, yyyy"
             isClearable
           />
           <DatePicker
             selected={endDate}
             onChange={handleEndDateChange}
-            dateFormat="MMM dd, yyyy"
             placeholderText="End Date"
-            className="w-32 rounded border p-1 text-sm"
+            className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            dateFormat="MMM d, yyyy"
             isClearable
           />
         </div>
       </div>
 
-      {/* Chart Title */}
-      <h3 className="mb-4 text-xl font-semibold">
-        Market Distribution in Your Categories
-      </h3>
+      {/* Chart Container */}
+      <div className="min-h-[550px] rounded-lg border border-gray-100 bg-white p-4 shadow-inner">
+        <h3 className="mb-6 text-center text-2xl font-semibold">
+          Market Distribution in Your Categories
+        </h3>
 
-      {/* Chart */}
-      <ReactApexChart
-        options={chartState.options}
-        series={chartState.series}
-        type="donut"
-        height={400}
-      />
+        <div className="h-[440px] w-full">
+          <ReactApexChart
+            options={chartState.options}
+            series={chartState.series}
+            type="donut"
+            height={500}
+          />
+        </div>
+      </div>
     </div>
   );
 };

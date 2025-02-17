@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@as-integrations/next": "^3.0.0",
+    "@emailjs/browser": "^4.4.1",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@faker-js/faker": "^8.4.1",

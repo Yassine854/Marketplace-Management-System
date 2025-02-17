@@ -152,17 +152,17 @@ const InventoryTrendChart = ({ supplierId }: { supplierId: string }) => {
           <DatePicker
             selected={startDate}
             onChange={handleStartDateChange}
-            dateFormat="MMM dd, yyyy"
             placeholderText="Start Date"
-            className="w-32 rounded border p-1 text-sm"
+            className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            dateFormat="MMM d, yyyy"
             isClearable
           />
           <DatePicker
             selected={endDate}
             onChange={handleEndDateChange}
-            dateFormat="MMM dd, yyyy"
             placeholderText="End Date"
-            className="w-32 rounded border p-1 text-sm"
+            className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            dateFormat="MMM d, yyyy"
             isClearable
           />
         </div>

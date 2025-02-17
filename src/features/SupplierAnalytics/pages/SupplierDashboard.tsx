@@ -3,8 +3,6 @@ import CardDataStats from "../charts/CardDataStats";
 import {
   FaClipboardList,
   FaMoneyBillWave,
-  FaCheckCircle,
-  FaBox,
   FaUsers,
   FaUndo,
 } from "react-icons/fa";
@@ -20,32 +18,36 @@ import SupplierQuarterlyMetrics from "../charts/SupplierQuarterlyMetrics";
 import SupplierCategoryPieChart from "../charts/SupplierCategoryPieChart";
 import SupplierTopProductsChart from "../charts/SupplierTopProductsChart";
 import InventoryTrendChart from "../charts/InventoryTrendChart";
-
+import EmailFormPopup from "./email";
 import "react-datepicker/dist/react-datepicker.css";
 
 const supplierId = "9"; // Example supplier ID (e.g., Technofood)
 
 const SupplierDashboard = () => {
-  const [startDate, setStartDate] = useState(new Date()); // Default to current date
-  const [endDate, setEndDate] = useState(new Date()); // Default to current date
-  const [enableFilter, setEnableFilter] = useState(false); // New state for checkbox
+  const [startDate, setStartDate] = useState<Date | null>(null); // Default to null
+  const [endDate, setEndDate] = useState<Date | null>(null); // Default to null
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const supplierDetails = orderData.products.find(
+    (p) => p.product.supplier?.manufacturer_id === supplierId,
+  )?.product.supplier;
 
-  // Function to handle null date values
+  // Function to handle date changes
   const handleStartDateChange = (date: Date | null) => {
-    setStartDate(date || new Date()); // Default to current date if null
+    setStartDate(date);
   };
 
   const handleEndDateChange = (date: Date | null) => {
-    setEndDate(date || new Date()); // Default to current date if null
+    setEndDate(date);
   };
 
   // Filter orders based on the selected date range
-  const filteredOrders = enableFilter
-    ? orderData.orders.filter(({ order }) => {
-        const orderDate = new Date(order.createdAt * 1000);
-        return orderDate >= startDate && orderDate <= endDate;
-      })
-    : orderData.orders; // Show all orders when filter is disabled
+  const filteredOrders = orderData.orders.filter(({ order }) => {
+    const orderDate = new Date(order.createdAt * 1000);
+    return (
+      (!startDate || orderDate >= startDate) &&
+      (!endDate || orderDate <= endDate)
+    );
+  });
 
   const calculateTurnover = () => {
     const supplierProducts = orderData.products.filter(
@@ -69,18 +71,21 @@ const SupplierDashboard = () => {
       // 2. Get quantities OUTSIDE date range
       const excludedOrderedQty = orderData.orders
         .filter(({ order }) => {
-          if (!enableFilter) return false;
           const orderDate = new Date(order.createdAt * 1000);
-          return orderDate < startDate || orderDate > endDate;
+          return (
+            (startDate && orderDate < startDate) ||
+            (endDate && orderDate > endDate)
+          );
         })
         .flatMap(({ order }) => order.items)
         .filter((item) => item.productId === product.product.productId)
         .reduce((sum, item) => sum + parseFloat(item.quantity), 0);
 
       // 3. Calculate range-specific quantity
-      const rangeQty = enableFilter
-        ? currentQty + allOrderedQty - excludedOrderedQty
-        : currentQty + allOrderedQty;
+      const rangeQty =
+        startDate || endDate
+          ? currentQty + allOrderedQty - excludedOrderedQty
+          : currentQty + allOrderedQty;
 
       return total + costPrice * rangeQty;
     }, 0);
@@ -138,26 +143,9 @@ const SupplierDashboard = () => {
 
   return (
     <div className="mt-[4.8rem] w-full bg-n20 p-6">
-      {/* Checkbox Control */}
-      <div className="mb-4 flex items-center justify-between gap-2 md:justify-start">
-        <input
-          type="checkbox"
-          id="enableFilter"
-          checked={enableFilter}
-          onChange={(e) => setEnableFilter(e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-        />
-        <label
-          htmlFor="enableFilter"
-          className="text-sm font-medium text-gray-700"
-        >
-          Enable Date Filtering
-        </label>
-      </div>
-
       {/* Modified Date Pickers */}
-      <div className="mb-6 flex flex-col justify-between md:flex-row md:space-x-6">
-        <div className="flex flex-col">
+      <div className="mb-6 flex flex-col md:flex-row md:space-x-4">
+        <div className="flex flex-col md:mr-4">
           <label htmlFor="startDate" className="text-lg">
             Start Date:
           </label>
@@ -166,14 +154,12 @@ const SupplierDashboard = () => {
             selected={startDate}
             onChange={handleStartDateChange}
             dateFormat="yyyy/MM/dd"
-            className={`rounded border p-2 text-lg ${
-              !enableFilter ? "bg-gray-100" : ""
-            }`}
-            disabled={!enableFilter}
+            className="rounded border p-2 text-lg"
+            isClearable
           />
         </div>
 
-        <div className="mt-4 flex flex-col md:mt-0">
+        <div className="flex flex-col">
           <label htmlFor="endDate" className="text-lg">
             End Date:
           </label>
@@ -182,16 +168,14 @@ const SupplierDashboard = () => {
             selected={endDate}
             onChange={handleEndDateChange}
             dateFormat="yyyy/MM/dd"
-            className={`rounded border p-2 text-lg ${
-              !enableFilter ? "bg-gray-100" : ""
-            }`}
-            disabled={!enableFilter}
+            className="rounded border p-2 text-lg"
+            isClearable
           />
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <CardDataStats
           title="Turnover"
           total={`${supplierStats.totalTurnover.toFixed(2)} TND`}
@@ -240,16 +224,12 @@ const SupplierDashboard = () => {
         </div>
       </div>
 
-      {/* <div className="col-span-3 mt-12 w-full">
-    <ProductRevenueLossChart supplierId={supplierId} />
-  </div> */}
-
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
         <div>
           <TopArticlesOrdered supplierId={supplierId} />
         </div>
         <div>
-          <RegionsOrders supplierId={supplierId} />
+          <SupplierCategoryPieChart supplierId={supplierId} />
         </div>
         <div>
           <ClientSegment supplierId={supplierId} />
@@ -258,7 +238,7 @@ const SupplierDashboard = () => {
 
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
         <div>
-          <SupplierCategoryPieChart supplierId={supplierId} />
+          <RegionsOrders supplierId={supplierId} />
         </div>
         <div>
           <SupplierTopProductsChart supplierId={supplierId} />
@@ -267,6 +247,35 @@ const SupplierDashboard = () => {
           <InventoryTrendChart supplierId={supplierId} />
         </div>
       </div>
+
+      <button
+        onClick={() => setShowEmailForm(true)}
+        className="fixed bottom-10 right-10 flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg transition-all hover:bg-blue-600 hover:shadow-xl"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="h-6 w-6"
+        >
+          <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
+          <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
+        </svg>
+      </button>
+
+      {/* Email Form Popup */}
+      {showEmailForm && supplierDetails && (
+        <EmailFormPopup
+          onClose={() => setShowEmailForm(false)}
+          supplierDetails={{
+            company_name: supplierDetails.company_name,
+            contact_name: supplierDetails.contact_name,
+            phone_number: supplierDetails.phone_number,
+            email: supplierDetails.email,
+            address: `${supplierDetails.postal_code} ${supplierDetails.city}, ${supplierDetails.country}`,
+          }}
+        />
+      )}
     </div>
   );
 };
