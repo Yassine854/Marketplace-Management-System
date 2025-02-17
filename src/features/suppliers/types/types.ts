@@ -1,10 +1,10 @@
-// Type pour Warehouse
+// Type for Warehouse
 export type Warehouse = {
-  name: string; // Le nom de l'entrepôt
-  quantity: number; // La quantité de produits dans cet entrepôt
+  name: string; // The name of the warehouse
+  quantity: number; // The quantity of products in this warehouse
 };
 
-// Type pour Supplier
+// Type for Supplier
 export type Supplier = {
   manufacturer_id: string;
   company_name: string;
@@ -15,26 +15,37 @@ export type Supplier = {
   city?: string;
   country?: string;
   capital?: string;
-  payment_modes: string[];
+  payment_modes: string[]; // Payment modes available
 };
 
-// Type pour Product
+// Type for Product
 export type Product = {
   id: string;
   productName: string;
   productPrice: number;
   sku: string;
   manufacturer_id: string;
-  warehouses: Warehouse[]; // Référence au type Warehouse ici
+  warehouses: Warehouse[]; // References Warehouse type
 };
 
-// Type pour les paramètres de l'email
-export type EmailParams = {
-  to_name: string;
-  from_name: string;
-  to_email: string;
-  products: { name: string; quantity: number; price: number }[];
-  total_payment: number;
-  payment_mode: string;
-  delivery_date: string;
-};
+// Product Details to be included in the email
+export interface ProductDetails {
+  productName: string;
+  quantity: number;
+  priceExclTax: number;
+  total: number;
+}
+
+// Type for email parameters
+// Update the EmailParams type to include an index signature
+export interface EmailParams {
+  supplier: string;
+  warehouse: string;
+  state: string;
+  products: ProductDetails[];
+  totalAmount: string;
+  remainingAmount: string;
+  comment: string;
+
+  [key: string]: unknown; // This allows for any other dynamic key-value pairs
+}

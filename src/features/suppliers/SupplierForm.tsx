@@ -1,9 +1,10 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import toast from "react-hot-toast";
-import { sendOrderEmail } from "./services/emailService";
-import { Supplier, Product, EmailParams, Warehouse } from "./types/types";
+import { Supplier, Product, Warehouse } from "./types/types";
 import "./styles/NeonButton.css";
-import { generatePDF } from "./services/pdfService";
+import jsPDF from "jspdf";
+import { useSession } from "next-auth/react";
+import emailjs from "emailjs-com";
 
 const SupplierForm = ({
   onChange,
@@ -28,14 +29,20 @@ const SupplierForm = ({
   const [selectedState, setSelectedState] = useState<string>("");
   const [createdAt] = useState<Date>(new Date());
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
-  const [paymentType, setPaymentType] = useState<string>("");
   const [paymentPercentage, setPaymentPercentage] = useState<string>("");
+
   const [newPaymentType, setNewPaymentType] = useState<string>("");
-  const [remainingAmount, setRemainingAmount] = useState(0);
-  const [newPaymentPercentage, setNewPaymentPercentage] = useState<string>("");
   const [comment, setComment] = useState("");
   const [message, setMessage] = useState("");
-  const [storedComments, setStoredComments] = useState([]);
+  const { data: session } = useSession();
+
+  // Payment states
+  const [paymentTypes, setPaymentTypes] = useState<
+    { type: string; percentage: string; amount: string }[]
+  >([
+    { type: "", percentage: "100", amount: "" }, // Initial type with 100% as default
+  ]);
+  const [remainingAmount, setRemainingAmount] = useState(0);
   const [productsWithQuantities, setProductsWithQuantities] = useState<
     {
       product: Product;
@@ -46,40 +53,45 @@ const SupplierForm = ({
       total: number;
     }[]
   >([]);
+  const totalPercentage = paymentTypes.reduce(
+    (acc, payment) => acc + (parseFloat(payment.percentage) || 0),
+    0,
+  );
 
-  const [comments, setComments] = useState<
-    { text: string; createdAt: string }[]
-  >([]);
+  useEffect(() => {
+    const remaining = totalAmount * ((100 - totalPercentage) / 100);
+    setRemainingAmount(remaining);
+  }, [paymentTypes, totalPercentage]);
+
   const handleSubmitComments = async () => {
-    if (comment.trim() === "") {
-      setMessage("Veuillez entrer un commentaire valide.");
+    if (!comment.trim()) {
+      setMessage("Le commentaire ne peut pas être vide.");
       return;
     }
 
     try {
-      const response = await fetch("/api/comments", {
-        method: "POST", // Assurez-vous que c'est bien 'POST'
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await fetch("/api/saveComment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ comment }),
       });
 
-      console.log("Response:", response); // Ajoutez ce log pour vérifier la réponse
+      const text = await response.text();
+      console.log("Réponse brute du serveur:", text);
 
-      if (response.ok) {
-        const data = await response.json();
-        setMessage(data.message);
-        setComment("");
-      } else {
-        const errorData = await response.json();
-        setMessage(errorData.error || "Une erreur est survenue.");
-      }
+      const data = JSON.parse(text);
+      setMessage(data.message);
+      setComment("");
     } catch (error) {
-      setMessage("Erreur lors de l'ajout du commentaire.");
+      console.error("Erreur lors de l’enregistrement :", error);
+      setMessage("Erreur lors de l'enregistrement.");
     }
   };
-
+  useEffect(() => {
+    if (remainingAmount === 0 && paymentTypes.length > 1) {
+      setPaymentTypes((prevState) => prevState.slice(0, prevState.length - 1));
+    }
+  }, [remainingAmount]);
   useEffect(() => {
     if (
       newPaymentType &&
@@ -90,35 +102,116 @@ const SupplierForm = ({
       setPaymentPercentage(remainingPercentage.toString());
     }
   }, [newPaymentType]);
-  const isPaymentPercentageNot100 =
-    paymentPercentage && parseFloat(paymentPercentage) !== 100;
-
   const totalAmount = productsWithQuantities.reduce(
     (acc, item) => acc + item.total,
     0,
   );
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [remainingAmounts, setRemainingAmounts] = useState([totalAmount]);
 
-  const handleFileUpload = (event: any) => {
-    const file = event.target.files[0];
-    if (file) setUploadedFile(file);
-  };
-  const handlePaymentPercentageChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const value = e.target.value;
+  useEffect(() => {
+    if (paymentTypes.length) {
+      const totalPercentage = paymentTypes.reduce(
+        (acc, payment) => acc + (parseFloat(payment.percentage) || 0),
+        0,
+      );
+      const remaining = totalAmount * ((100 - totalPercentage) / 100);
+      setRemainingAmount(remaining);
 
-    if (value === "" || /^[0-9]+(\.[0-9]{0,2})?$/.test(value)) {
-      setPaymentPercentage(value);
-      if (parseFloat(value) < 100) {
-        const remainingPercentage = 100 - parseFloat(value);
-        setRemainingAmount((totalAmount * remainingPercentage) / 100); // Calculer le montant restant
-      } else {
-        setRemainingAmount(0); // Si le pourcentage est à 100, il ne reste rien à payer
+      if (
+        totalPercentage < 100 &&
+        paymentTypes[paymentTypes.length - 1].percentage !== ""
+      ) {
+        setPaymentTypes([
+          ...paymentTypes,
+          { type: "", percentage: "", amount: "" },
+        ]);
       }
     }
+  }, [paymentTypes, totalAmount]);
+
+  const handlePaymentTypeChange = (index: number, type: string) => {
+    const updatedPaymentTypes = [...paymentTypes];
+    updatedPaymentTypes[index].type = type;
+
+    setPaymentTypes(updatedPaymentTypes);
+  };
+  const handlePaymentPercentageChange = (index: number, value: string) => {
+    let newPercentage = parseFloat(value) || 0;
+    if (newPercentage > 100) newPercentage = 100;
+    let updatedPayments = [...paymentTypes];
+    updatedPayments[index] = {
+      ...updatedPayments[index],
+      percentage: newPercentage.toString(),
+    };
+    let totalPercentage = updatedPayments.reduce(
+      (acc, payment, idx) =>
+        idx <= index ? acc + (parseFloat(payment.percentage) || 0) : acc,
+      0,
+    );
+
+    let remainingPercentage = 100 - totalPercentage;
+    if (remainingPercentage > 0) {
+      updatedPayments = updatedPayments.map((payment, idx) => {
+        if (idx > index) {
+          return { ...payment, percentage: remainingPercentage.toString() };
+        }
+        return payment;
+      });
+    } else {
+      newPercentage =
+        100 -
+        updatedPayments
+          .slice(0, index)
+          .reduce(
+            (acc, payment) => acc + (parseFloat(payment.percentage) || 0),
+            0,
+          );
+      updatedPayments[index] = {
+        ...updatedPayments[index],
+        percentage: newPercentage.toString(),
+      };
+    }
+    if (index === updatedPayments.length - 1 && remainingPercentage > 0) {
+      updatedPayments.push({
+        type: "",
+        percentage: remainingPercentage.toString(),
+        amount: "",
+      });
+    }
+    setPaymentTypes(updatedPayments);
   };
 
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [fileList, setFileList] = useState([]);
+  const handleFileUpload = async (event: any) => {
+    const file = event.target.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("fileName", file.name);
+
+    try {
+      const response = await fetch("/api/uploadFile", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUploadedFile(file.name);
+        setFileList(data.files);
+      } else {
+        console.error("Failed to upload file");
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  };
   const handleSelectState = (state: string): void => setSelectedState(state);
 
   useEffect(() => {
@@ -150,17 +243,7 @@ const SupplierForm = ({
       )
       .catch((error: Error) => console.error("Error loading data:", error));
   }, []);
-  const handleNewPaymentPercentageChange = (
-    e: ChangeEvent<HTMLInputElement>,
-  ) => {
-    const value = e.target.value;
 
-    if (value === "" || /^[0-9]+(\.[0-9]{0,2})?$/.test(value)) {
-      setNewPaymentPercentage(value);
-      const remainingPercentage = 100 - parseFloat(value);
-      setRemainingAmount((totalAmount * remainingPercentage) / 100);
-    }
-  };
   const handleSelectSupplier = (supplier: Supplier): void => {
     setQuery(supplier.company_name);
     setSelectedSupplier(supplier);
@@ -169,19 +252,71 @@ const SupplierForm = ({
   };
 
   const handleDownloadPDF = () => {
-    if (selectedSupplier && selectedProducts.length > 0) {
-      generatePDF(
-        selectedSupplier,
-        selectedProducts,
-        quantities,
-        totalPayment,
-        selectedPaymentMode,
-      );
-    } else {
-      toast.error(
-        "Please select supplier and products before downloading the PDF.",
-      );
-    }
+    const doc = new jsPDF();
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Order Details", 20, 20);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text(`Supplier: ${selectedSupplier?.company_name}`, 20, 30);
+    doc.text(`Warehouse: ${selectedWarehouse?.name}`, 20, 40);
+    doc.text(`State: ${selectedState}`, 20, 50);
+
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(20, 55, 190, 55);
+
+    let currentY = 65;
+    const tableMargin = 20;
+    const tableWidth = 170;
+
+    doc.setFontSize(10);
+    doc.setFillColor(230, 230, 230);
+    doc.rect(tableMargin, currentY, tableWidth, 10, "F");
+
+    doc.setFont("helvetica", "bold");
+    doc.text("No.", tableMargin + 5, currentY + 7);
+    doc.text("Product", tableMargin + 25, currentY + 7);
+    doc.text("Quantity", tableMargin + 85, currentY + 7);
+    doc.text("Price", tableMargin + 125, currentY + 7);
+    doc.text("Total", tableMargin + 155, currentY + 7);
+
+    currentY += 12;
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(tableMargin, currentY, tableMargin + tableWidth, currentY);
+
+    currentY += 5;
+
+    doc.setFont("helvetica", "normal");
+    productsWithQuantities.forEach((item, index) => {
+      if (
+        item.product?.productName &&
+        item.quantity &&
+        item.priceExclTax &&
+        item.total
+      ) {
+        doc.text(`${index + 1}`, tableMargin + 5, currentY + 7);
+        doc.text(item.product.productName, tableMargin + 25, currentY + 7);
+        doc.text(item.quantity.toString(), tableMargin + 85, currentY + 7);
+        doc.text(item.priceExclTax.toFixed(2), tableMargin + 125, currentY + 7);
+        doc.text(item.total.toFixed(2), tableMargin + 155, currentY + 7);
+
+        currentY += 10;
+      }
+    });
+
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(tableMargin, currentY, tableMargin + tableWidth, currentY);
+
+    let totalAmountText = `Total Amount: ${totalAmount.toFixed(2)}`;
+    currentY += 15;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text(totalAmountText, tableMargin, currentY);
+    doc.save("order-details.pdf");
   };
 
   const handleSelectWarehouse = (warehouseName: string): void => {
@@ -271,46 +406,119 @@ const SupplierForm = ({
       return prevState;
     });
   };
-
-  const handleSubmitOrder = async () => {
-    if (!selectedSupplier || selectedProducts.length === 0) {
-      toast.error(
-        "Please select a supplier and products before submitting the order.",
+  const handleSendEmail = () => {
+    if (
+      !selectedSupplier ||
+      !selectedWarehouse ||
+      productsWithQuantities.length === 0
+    ) {
+      alert(
+        "Veuillez remplir tous les champs obligatoires avant d'envoyer l'email.",
       );
       return;
     }
 
-    const emailParams: EmailParams = {
-      to_name: selectedSupplier?.company_name || "",
-      from_name: "Your Company",
-      to_email: selectedSupplier?.email || "",
-      products: selectedProducts.map((product) => ({
-        name: product.productName,
-        quantity: quantities[product.id],
-        price: product.productPrice,
+    const templateParams = {
+      supplierName: selectedSupplier?.company_name || "Unknown Supplier",
+      warehouse: selectedWarehouse?.name || "Unknown Warehouse",
+      totalAmount: totalAmount?.toFixed(2) || "0.00",
+      remainingAmount: remainingAmount?.toFixed(2) || "0.00",
+      comment: comment || "No comment provided",
+
+      products: productsWithQuantities.map((item) => ({
+        productName: item.product.productName || "Unknown Product",
+        quantity: item.quantity || 0,
+        priceExclTax: item.priceExclTax?.toFixed(2) || "0.00",
+        total: item.total?.toFixed(2) || "0.00",
       })),
-      total_payment: totalPayment,
-      payment_mode: selectedPaymentMode,
-      delivery_date: "",
     };
 
-    const emailSuccess = await sendOrderEmail(emailParams);
-
-    if (emailSuccess) {
-      toast.success("Order submitted successfully and email sent.");
-    }
+    emailjs
+      .send(
+        "service_z1bkm7y",
+        "template_b63ikd2",
+        templateParams,
+        "1I-USeEEq-xcp9edT",
+      )
+      .then((response) => {
+        console.log("Email envoyé avec succès", response);
+        alert("Email envoyé avec succès !");
+      })
+      .catch((error) => {
+        console.error("Erreur lors de l'envoi de l'email", error);
+        alert("Échec de l'envoi de l'email. Veuillez réessayer.");
+      });
+    console.log(templateParams);
   };
+
+  const handlePaymentAmountChange = (index: number, value: string) => {
+    const newAmount = Math.min(
+      Math.max(parseFloat(value) || 0, 0),
+      totalAmount,
+    );
+    const updatedPaymentTypes = [...paymentTypes];
+
+    updatedPaymentTypes[index] = {
+      ...updatedPaymentTypes[index],
+      amount: String(newAmount),
+      percentage:
+        totalAmount > 0 ? ((newAmount / totalAmount) * 100).toFixed(2) : "0.00",
+    };
+
+    const totalAllocated = updatedPaymentTypes.reduce(
+      (acc, payment) => acc + (parseFloat(payment.amount || "0") || 0),
+      0,
+    );
+
+    if (index === paymentTypes.length - 1 && totalAllocated < totalAmount) {
+      const remaining = totalAmount - totalAllocated;
+      updatedPaymentTypes.push({
+        type: "",
+        percentage: ((remaining / totalAmount) * 100).toFixed(2),
+        amount: String(remaining),
+      });
+    }
+
+    setPaymentTypes(updatedPaymentTypes);
+    setRemainingAmount(totalAmount - totalAllocated);
+  };
+
+  const calculateRemainingAmount = (
+    totalAmount: number,
+    amount: number | null,
+    percentage: number | null,
+  ) => {
+    if (percentage !== null && percentage > 0) {
+      return totalAmount * (percentage / 100);
+    } else if (amount !== null && amount > 0) {
+      return totalAmount - amount;
+    }
+    return 0;
+  };
+  useEffect(() => {
+    const updatedRemainingAmounts = paymentTypes.map((payment) => {
+      const amount = parseFloat(payment.amount || "0");
+      const percentage = parseFloat(payment.percentage || "0");
+      return calculateRemainingAmount(totalAmount, amount, percentage);
+    });
+
+    setRemainingAmounts(updatedRemainingAmounts);
+  }, [paymentTypes, totalAmount]);
+
   return (
     <div className="flex h-full flex-grow">
       <div className="h-full w-full rounded-lg bg-[url(/images/login-bg.png)] bg-cover">
         <div className="relative grid h-full w-full items-center justify-center gap-4">
           <div className="box w-full min-w-[800px] xl:p-8">
-            <div className="bb-dashed mb-6 flex items-center pb-6">
-              <p className="ml-4 text-xl font-bold">Select Supplier</p>
+            <div className="bb-dashed mb-6 mt-9 flex items-center pb-6">
+              <p className="ml-4 mt-6 text-xl font-bold">Select Supplier</p>
+            </div>
+            <div className="box flex w-full justify-between rounded-lg ">
+              <p>Made by{session?.user?.name}</p>
             </div>
 
             {/* Supplier Search Section */}
-            <div className="box flex w-full justify-between rounded-lg bg-primary/5 p-4 dark:bg-bg3">
+            <div className="box mb-5 mt-5 flex w-full justify-between rounded-lg bg-primary/5 p-4 dark:bg-bg3">
               <div className="relative w-full">
                 <input
                   type="text"
@@ -414,7 +622,6 @@ const SupplierForm = ({
               </div>
             )}
 
-            {/* Product Selection Section */}
             {selectedWarehouse && selectedSupplier && (
               <div className="mt-8 max-h-[500px] overflow-y-auto rounded-lg border border-gray-300 bg-white p-6 shadow-lg">
                 <h4 className="mb-6 text-lg font-semibold text-gray-800">
@@ -443,7 +650,12 @@ const SupplierForm = ({
                             .filter(
                               (product) =>
                                 product.manufacturer_id ===
-                                selectedSupplier?.manufacturer_id,
+                                  selectedSupplier?.manufacturer_id &&
+                                !productsWithQuantities.some(
+                                  (selectedItem) =>
+                                    selectedItem.product.id === product.id &&
+                                    selectedItem.id !== item.id,
+                                ),
                             )
                             .map((product) => (
                               <option key={product.id} value={product.id}>
@@ -470,13 +682,40 @@ const SupplierForm = ({
                                 quantity: newQuantity,
                                 total:
                                   newQuantity *
-                                  updatedProducts[index].priceExclTax,
+                                  updatedProducts[index].priceExclTax, // Mise à jour du total
                               };
                               return updatedProducts;
                             });
                           }}
                           onBlur={() => addNewEmptyRow()}
                           className="w-full rounded-md border border-gray-300 p-3"
+                        />
+                      </div>
+
+                      {/* Prix Hors Taxe */}
+                      <div className="w-1/4">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Prix Hors Taxe
+                        </label>
+                        <input
+                          type="number"
+                          value={item.priceExclTax}
+                          onChange={(e) => {
+                            const newPriceExclTax = parseFloat(e.target.value);
+                            setProductsWithQuantities((prevState) => {
+                              const updatedProducts = [...prevState];
+                              updatedProducts[index] = {
+                                ...updatedProducts[index],
+                                priceExclTax: newPriceExclTax,
+                                total:
+                                  newPriceExclTax *
+                                  updatedProducts[index].quantity,
+                              };
+                              return updatedProducts;
+                            });
+                          }}
+                          className="w-full rounded-md border border-gray-300 p-3"
+                          placeholder="Price Excl. Tax"
                         />
                       </div>
 
@@ -509,124 +748,72 @@ const SupplierForm = ({
                   ))}
                 </div>
 
-                {/* Total Amount Section */}
                 <div className="mt-8 rounded-lg border border-gray-300 bg-white p-4 shadow-lg">
                   <h4 className="mb-6 text-lg font-semibold text-gray-800">
                     Total Amount
                   </h4>
+                  {paymentTypes.map((payment, index) => (
+                    <div
+                      key={index}
+                      className="mb-6 flex items-center space-x-4"
+                    >
+                      <select
+                        value={payment.type}
+                        onChange={(e) =>
+                          handlePaymentTypeChange(index, e.target.value)
+                        }
+                        className="w-1/3 rounded-md border border-gray-300 p-3"
+                      >
+                        <option value="">Select Payment Type</option>
+                        <option value="cheque">Cheque</option>
+                        <option value="cash">Cash</option>
+                        <option value="traite">Traite</option>
+                      </select>
+                      {payment.type && (
+                        <input
+                          type="number"
+                          value={payment.amount || ""}
+                          onChange={(e) =>
+                            handlePaymentAmountChange(index, e.target.value)
+                          }
+                          className="w-1/3 rounded-md border border-gray-300 p-3"
+                          placeholder="Amount"
+                        />
+                      )}
 
-                  <div className="flex items-center justify-between space-x-6">
-                    {/* Total Amount Display */}
-                    <div className="flex-1">
+                      {payment.type && payment.type !== "cash" && (
+                        <input
+                          type="number"
+                          value={payment.percentage}
+                          onChange={(e) =>
+                            handlePaymentPercentageChange(index, e.target.value)
+                          }
+                          className="w-1/3 rounded-md border border-gray-300 p-3"
+                          placeholder="Percentage"
+                        />
+                      )}
+                      <div className="flex w-full items-center space-x-2 sm:w-1/3 lg:w-1/4">
+                        <label className="block w-1/3 text-sm font-medium text-gray-700">
+                          R.Amount
+                        </label>
+                        <input
+                          type="number"
+                          value={remainingAmounts[index]?.toFixed(2) || "0.00"}
+                          disabled
+                          className="w-2/3 rounded-md border border-gray-300 bg-gray-100 p-3"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <div className="mt-6">
+                    <div className="flex justify-between">
                       <span className="text-lg font-medium text-gray-800">
-                        Total:
+                        Total Amount
                       </span>
                       <span className="text-lg font-semibold text-gray-800">
                         {totalAmount.toFixed(2)}
                       </span>
                     </div>
-
-                    {/* Payment Type Dropdown */}
-                    <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Payment Type
-                      </label>
-                      <select
-                        value={paymentType}
-                        onChange={(e) => setPaymentType(e.target.value)}
-                        className="w-full rounded-md border border-gray-300 p-3"
-                      >
-                        <option value="">Select a payment type</option>
-                        <option value="cheque">Cheque</option>
-                        <option value="cash">Cash</option>
-                        <option value="traite">Traite</option>
-                      </select>
-                    </div>
-
-                    {/* Payment Percentage Field */}
-                    {paymentType && (
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700">
-                          Payment Percentage
-                        </label>
-                        <input
-                          type="number"
-                          value={paymentPercentage}
-                          onChange={handlePaymentPercentageChange}
-                          placeholder="Enter percentage"
-                          className="w-full rounded-md border border-gray-300 p-3"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* New Payment Type Section */}
-                  {isPaymentPercentageNot100 && (
-                    <div className="mt-6 flex items-center justify-between space-x-6">
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700">
-                          New Payment Type
-                        </label>
-                        <select
-                          value={newPaymentType}
-                          onChange={(e) => setNewPaymentType(e.target.value)}
-                          className="w-full rounded-md border border-gray-300 p-3"
-                        >
-                          <option value="">Select a payment type</option>
-                          <option value="cheque">Cheque</option>
-                          <option value="cash">Cash</option>
-                          <option value="traite">Traite</option>
-                        </select>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Payment Percentage for New Payment Type */}
-                  {isPaymentPercentageNot100 && newPaymentType && (
-                    <div className="mt-4 flex-1">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Payment Percentage
-                      </label>
-                      <input
-                        type="number"
-                        value={
-                          newPaymentPercentage ||
-                          (
-                            100 - parseFloat(paymentPercentage || "100")
-                          ).toString()
-                        }
-                        onChange={handleNewPaymentPercentageChange}
-                        placeholder="Enter percentage"
-                        className="w-full rounded-md border border-gray-300 p-3"
-                      />
-                    </div>
-                  )}
-
-                  {/* Payment Details */}
-                  <div className="mt-6">
-                    <div className="flex justify-between">
-                      <span className="text-lg font-medium text-gray-800">
-                        First Payment ({paymentPercentage || 100}%)
-                      </span>
-                      <span className="text-lg font-semibold text-gray-800">
-                        {(
-                          totalAmount *
-                          (parseFloat(paymentPercentage || "100") / 100)
-                        ).toFixed(2)}
-                      </span>
-                    </div>
-
-                    {isPaymentPercentageNot100 && (
-                      <div className="mt-4 flex justify-between">
-                        <span className="text-lg font-medium text-gray-800">
-                          Remaining Payment (
-                          {100 - parseFloat(paymentPercentage)}%)
-                        </span>
-                        <span className="text-lg font-semibold text-gray-800">
-                          {remainingAmount.toFixed(2)}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -637,11 +824,22 @@ const SupplierForm = ({
               <label className="mb-2 block text-lg font-semibold text-gray-700">
                 Upload File
               </label>
-              <input
-                type="file"
-                onChange={handleFileUpload}
-                className="w-full cursor-pointer rounded-lg border border-gray-300 bg-white p-3 text-gray-700 focus:ring-2 focus:ring-blue-500"
-              />
+
+              <div className="relative w-full">
+                <input
+                  type="file"
+                  id="fileInput"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="fileInput"
+                  className="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white p-3 text-center text-gray-700 hover:bg-gray-200"
+                >
+                  📁 Choose File
+                </label>
+              </div>
+
               {uploadedFile && (
                 <div className="mt-3 font-medium text-green-600">
                   ✅ File uploaded successfully!
@@ -649,7 +847,8 @@ const SupplierForm = ({
               )}
             </div>
 
-            {/* Comment Section */}
+            {/*comment*/}
+
             <div className="mt-6 rounded-xl border border-gray-300 bg-gray-50 p-4 shadow-sm">
               <label className="mb-2 block text-lg font-semibold text-gray-700">
                 Comment
@@ -657,30 +856,34 @@ const SupplierForm = ({
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="Entrez votre commentaire"
+                placeholder="type your comment"
+                className="w-full rounded border p-2"
               />
-              <button onClick={handleSubmitComments}>
-                Sauvegarder le commentaire
+              <button
+                onClick={handleSubmitComments}
+                className="mt-2 rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white shadow-md 
+             transition-all duration-300 hover:bg-blue-700 focus:outline-none 
+             focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+              >
+                💾 Save Comment
               </button>
-              {message && <p>{message}</p>}
-            </div>
 
-            {/* Submit Order Section */}
-            <div className="mt-6 grid grid-cols-4 items-center gap-6">
-              <button onClick={handleDownloadPDF} className="neon-button">
-                Download PDF
-              </button>
-              <button onClick={handleSubmitOrder} className="neon-button">
-                Submit Order
-              </button>
-              <button onClick={handleSubmitOrder} className="neon-button">
-                Save
-              </button>
+              {message && (
+                <p className="mt-2 text-sm text-green-600">{message}</p>
+              )}
             </div>
+            <button onClick={handleDownloadPDF} className="neon-button">
+              📄 Download PDF
+            </button>
+            <button onClick={handleSendEmail} className="neon-button">
+              ✉️ Submit
+            </button>
+            <button className="neon-button">Save</button>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
 export default SupplierForm;
