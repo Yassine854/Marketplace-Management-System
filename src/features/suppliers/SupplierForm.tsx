@@ -63,7 +63,7 @@ const SupplierForm = ({
 
   const handleSubmitComments = async () => {
     if (!comment.trim()) {
-      setMessage("Le commentaire ne peut pas être vide.");
+      toast.error("Comment cannot be empty");
       return;
     }
 
@@ -75,14 +75,12 @@ const SupplierForm = ({
       });
 
       const text = await response.text();
-      console.log("Réponse brute du serveur:", text);
-
       const data = JSON.parse(text);
       setMessage(data.message);
       setComment("");
+      toast.success(data.message);
     } catch (error) {
-      console.error("Erreur lors de l’enregistrement :", error);
-      setMessage("Erreur lors de l'enregistrement.");
+      toast.error("Error saving comment");
     }
   };
   useEffect(() => {
@@ -172,8 +170,9 @@ const SupplierForm = ({
       if (response.ok) {
         setUploadedFile(file.name);
         setFileList(data.files);
+        toast.success("File uploaded successfully");
       } else {
-        console.error("Failed to upload file");
+        toast.error("File upload failed");
       }
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -379,9 +378,8 @@ const SupplierForm = ({
       !selectedWarehouse ||
       productsWithQuantities.length === 0
     ) {
-      alert(
-        "Veuillez remplir tous les champs obligatoires avant d'envoyer l'email.",
-      );
+      toast.error("Please complete all fields before sending an email");
+
       return;
     }
 
@@ -407,15 +405,12 @@ const SupplierForm = ({
         templateParams,
         "1I-USeEEq-xcp9edT",
       )
-      .then((response) => {
-        console.log("Email envoyé avec succès", response);
-        alert("Email envoyé avec succès !");
+      .then(() => {
+        toast.success("Email sent successfully!");
       })
-      .catch((error) => {
-        console.error("Erreur lors de l'envoi de l'email", error);
-        alert("Échec de l'envoi de l'email. Veuillez réessayer.");
+      .catch(() => {
+        toast.error("Failed to send email. Please try again.");
       });
-    console.log(templateParams);
   };
 
   const handlePaymentAmountChange = (index: number, value: string) => {
@@ -649,7 +644,7 @@ const SupplierForm = ({
                                 quantity: newQuantity,
                                 total:
                                   newQuantity *
-                                  updatedProducts[index].priceExclTax, // Mise à jour du total
+                                  updatedProducts[index].priceExclTax,
                               };
                               return updatedProducts;
                             });
@@ -806,12 +801,6 @@ const SupplierForm = ({
                   📁 Choose File
                 </label>
               </div>
-
-              {uploadedFile && (
-                <div className="mt-3 font-medium text-green-600">
-                  ✅ File uploaded successfully!
-                </div>
-              )}
             </div>
 
             {/*comment*/}
