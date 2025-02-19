@@ -2,9 +2,10 @@ import { useState, useEffect, ChangeEvent } from "react";
 import toast from "react-hot-toast";
 import { Supplier, Product, Warehouse } from "./types/types";
 import "./styles/NeonButton.css";
-import jsPDF from "jspdf";
+import { generateOrderPDF } from "./utils/pdfGenerator";
 import { useSession } from "next-auth/react";
 import emailjs from "emailjs-com";
+import jsPDF from "jspdf";
 
 const SupplierForm = ({
   onChange,
@@ -217,74 +218,6 @@ const SupplierForm = ({
     resetFormFields();
   };
 
-  const handleDownloadPDF = () => {
-    const doc = new jsPDF();
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-    doc.text("Order Details", 20, 20);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-    doc.text(`Supplier: ${selectedSupplier?.company_name}`, 20, 30);
-    doc.text(`Warehouse: ${selectedWarehouse?.name}`, 20, 40);
-    doc.text(`State: ${selectedState}`, 20, 50);
-
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.5);
-    doc.line(20, 55, 190, 55);
-
-    let currentY = 65;
-    const tableMargin = 20;
-    const tableWidth = 170;
-
-    doc.setFontSize(10);
-    doc.setFillColor(230, 230, 230);
-    doc.rect(tableMargin, currentY, tableWidth, 10, "F");
-
-    doc.setFont("helvetica", "bold");
-    doc.text("No.", tableMargin + 5, currentY + 7);
-    doc.text("Product", tableMargin + 25, currentY + 7);
-    doc.text("Quantity", tableMargin + 85, currentY + 7);
-    doc.text("Price", tableMargin + 125, currentY + 7);
-    doc.text("Total", tableMargin + 155, currentY + 7);
-
-    currentY += 12;
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.5);
-    doc.line(tableMargin, currentY, tableMargin + tableWidth, currentY);
-
-    currentY += 5;
-
-    doc.setFont("helvetica", "normal");
-    productsWithQuantities.forEach((item, index) => {
-      if (
-        item.product?.productName &&
-        item.quantity &&
-        item.priceExclTax &&
-        item.total
-      ) {
-        doc.text(`${index + 1}`, tableMargin + 5, currentY + 7);
-        doc.text(item.product.productName, tableMargin + 25, currentY + 7);
-        doc.text(item.quantity.toString(), tableMargin + 85, currentY + 7);
-        doc.text(item.priceExclTax.toFixed(2), tableMargin + 125, currentY + 7);
-        doc.text(item.total.toFixed(2), tableMargin + 155, currentY + 7);
-
-        currentY += 10;
-      }
-    });
-
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.5);
-    doc.line(tableMargin, currentY, tableMargin + tableWidth, currentY);
-
-    let totalAmountText = `Total Amount: ${totalAmount.toFixed(2)}`;
-    currentY += 15;
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text(totalAmountText, tableMargin, currentY);
-    doc.save("order-details.pdf");
-  };
-
   const handleSelectWarehouse = (warehouseName: string): void => {
     const warehouse = warehouses.find((w) => w.name === warehouseName);
     if (warehouse) {
@@ -444,6 +377,17 @@ const SupplierForm = ({
     setPaymentTypes(updatedPaymentTypes);
     setRemainingAmount(totalAmount - totalAllocated);
   };
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    generateOrderPDF(
+      doc,
+      selectedSupplier,
+      selectedWarehouse,
+      selectedState,
+      productsWithQuantities,
+      totalAmount,
+    );
+  };
 
   const calculateRemainingAmount = (
     totalAmount: number,
@@ -476,7 +420,7 @@ const SupplierForm = ({
               <p className="ml-4 mt-6 text-xl font-bold">Select Supplier</p>
             </div>
             <div className="box flex w-full justify-between rounded-lg ">
-              <p>Made by{session?.user?.name}</p>
+              <p>Made by Intern </p>
             </div>
 
             {/* Supplier Search Section */}
@@ -574,9 +518,9 @@ const SupplierForm = ({
                         className="w-full rounded-md border border-gray-300 p-2"
                       >
                         <option value="">Select State</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
+                        <option value="1"> In progress </option>
+                        <option value="2"> Ready</option>
+                        <option value="3"> Delivered </option>
                       </select>
                     </div>
                   </div>
