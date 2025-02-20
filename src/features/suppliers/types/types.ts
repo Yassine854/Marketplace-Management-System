@@ -2,6 +2,7 @@ export type Warehouse = {
   warehouse_id: any;
   name: string;
   quantity: number;
+  products: Product[];
 };
 
 export type Supplier = {

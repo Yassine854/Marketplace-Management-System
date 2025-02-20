@@ -63,6 +63,28 @@ const SupplierForm = ({
   );
 
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [suppliersRes, warehousesRes] = await Promise.all([
+          fetch("/api/manufacturers"),
+          fetch("/api/warehouse"),
+        ]);
+
+        const suppliers: Supplier[] = await suppliersRes.json();
+        //const products: Product[] = await productsRes.json();
+        const warehouses: Warehouse[] = await warehousesRes.json();
+
+        setSuppliers(suppliers);
+        //setProducts(products);
+        setWarehouses(warehouses);
+      } catch (error) {
+        console.error("Erreur de chargement des données:", error);
+      }
+    };
+    loadData();
+  }, []);
+
+  useEffect(() => {
     const remaining = totalAmount * ((100 - totalPercentage) / 100);
     setRemainingAmount(remaining);
   }, [paymentTypes, totalPercentage]);
@@ -199,29 +221,6 @@ const SupplierForm = ({
     }
   }, [paymentPercentage]);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [suppliersRes, productsRes, warehousesRes] = await Promise.all([
-          fetch("/api/manufacturers"),
-          fetch("/api/products"),
-          fetch("/api/warehouses"),
-        ]);
-
-        const suppliers: Supplier[] = await suppliersRes.json();
-        const products: Product[] = await productsRes.json();
-        const warehouses: Warehouse[] = await warehousesRes.json();
-
-        setSuppliers(suppliers);
-        setProducts(products);
-        setWarehouses(warehouses);
-      } catch (error) {
-        console.error("Erreur de chargement des données:", error);
-      }
-    };
-    loadData();
-  }, []);
-
   const handleSelectSupplier = (supplier: Supplier): void => {
     setQuery(supplier.company_name);
     setSelectedSupplier(supplier);
@@ -249,102 +248,82 @@ const SupplierForm = ({
     if (
       !selectedSupplier ||
       !selectedWarehouse ||
-      !selectedState ||
-      !productsWithQuantities.length
+      productsWithQuantities.length === 0
     ) {
-      toast.error("Veuillez remplir tous les champs obligatoires");
+      alert("Veuillez remplir tous les champs obligatoires.");
       return;
     }
 
-    try {
-      const manufacturerId = selectedSupplier.manufacturer_id;
-      const warehouseId = selectedWarehouse.warehouse_id;
+    const orderData = {
+      orderNumber: `PO-${Date.now()}`, // Génération unique d'un numéro de commande
+      manufacturerId: selectedSupplier.manufacturer_id,
+      warehouseId: selectedWarehouse.warehouse_id,
+      deliveryDate: deliveryDate.toISOString(),
+      totalAmount: totalAmount,
+      status: selectedState,
+      comments: comment ? [{ content: comment }] : [],
+      payments: paymentTypes.map((payment) => ({
+        amount: payment.amount,
+        paymentMethod: payment.type,
+      })),
+      products: productsWithQuantities.map((item) => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+        priceExclTax: item.priceExclTax,
+        total: item.total,
+      })),
+    };
 
-      const stateMapping: { [key: string]: OrderState } = {
-        "1": OrderState.IN_PROGRESS,
-        "2": OrderState.READY,
-        "3": OrderState.DELIVERED,
-      };
-      const order = await prisma.purchaseOrder.create({
-        data: {
-          orderNumber: `CMD-${Date.now()}-${Math.random()
-            .toString(36)
-            .slice(2, 7)}`,
-          deliveryDate: deliveryDate,
-          manufacturer: { connect: { manufacturerId } },
-          warehouse: { connect: { warehouseId } },
-          totalAmount: parseFloat(totalAmount.toFixed(2)),
-          status: stateMapping[selectedState],
-          comments: {
-            create: {
-              content: comment || "Aucun commentaire",
-            },
-          },
-          payments: {
-            create: paymentTypes
-              .filter((p) => p.type && p.amount)
-              .map((payment) => ({
-                amount: parseFloat(payment.amount),
-                paymentMethod: payment.type as PaymentMethod,
-                paymentDate: new Date(),
-                reference: `PAY-${Date.now()}-${Math.random()
-                  .toString(36)
-                  .slice(2, 5)}`,
-                manufacturer: { connect: { manufacturerId } },
-              })),
-          },
+    try {
+      const response = await fetch("/api/purchaseOrder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        include: {
-          payments: true,
-          comments: true,
-          manufacturer: true,
-          warehouse: true,
-        },
+        body: JSON.stringify(orderData),
       });
 
-      // Enregistrement des produits (nécessite une table de liaison)
-      await Promise.all(
-        productsWithQuantities.map(async (item) => {
-          await prisma.product.update({
-            where: { sku: item.product.sku },
-            data: {
-              purchaseOrders: {
-                connect: { id: order.id },
-              },
-            },
-          });
-        }),
-      );
+      if (!response.ok) throw new Error("Erreur lors de l'enregistrement");
 
-      toast.success("Commande enregistrée avec succès !");
-      resetFormFields();
+      const result = await response.json();
+      alert("Commande enregistrée avec succès !");
+      console.log("Purchase Order Saved:", result);
     } catch (error) {
-      console.error("Erreur d'enregistrement:", error);
-      toast.error("Échec de l'enregistrement: " + (error as Error).message);
+      console.error("Erreur:", error);
+      alert("Échec de l'enregistrement.");
     }
   };
+
   const handleSelectWarehouse = (warehouseName: string): void => {
     const warehouse = warehouses.find((w) => w.name === warehouseName);
+
     if (warehouse) {
       setSelectedWarehouse(warehouse);
-      setProductsWithQuantities((prevState) => [
-        ...prevState,
-        {
+
+      // Vérifier si l'entrepôt a des produits associés
+      if (warehouse.products && warehouse.products.length > 0) {
+        const updatedProducts = warehouse.products.map((product, index) => ({
           product: {
-            id: "",
-            productName: "",
-            productPrice: 0,
-            manufacturer_id: "",
-            sku: "",
-            warehouses: [],
+            id: product.id || "",
+            productName: product.productName || "",
+            productPrice: product.productPrice || 0,
+            manufacturerId: product.manufacturerId || "",
+            sku: product.sku || "",
+            warehouseIds: product.warehouseIds || [],
           },
           quantity: 0,
-          sku: "",
-          id: `new-product-${Date.now()}`,
-          priceExclTax: 0,
+          sku: product.sku || "",
+          id: `new-product-${Date.now()}-${index}`,
+          priceExclTax: product.productPrice || 0,
           total: 0,
-        },
-      ]);
+        }));
+
+        setProductsWithQuantities(updatedProducts);
+      } else {
+        console.warn("Cet entrepôt ne contient pas de produits.");
+      }
+    } else {
+      console.error("Entrepôt non trouvé !");
     }
   };
 
@@ -395,9 +374,9 @@ const SupplierForm = ({
               id: "",
               productName: "",
               productPrice: 0,
-              manufacturer_id: "",
+              manufacturerId: "",
               sku: "",
-              warehouses: [],
+              warehouseIds: [],
             },
             quantity: 0,
             sku: "",
@@ -410,6 +389,7 @@ const SupplierForm = ({
       return prevState;
     });
   };
+
   const handleSendEmail = () => {
     if (
       !selectedSupplier ||
@@ -541,7 +521,7 @@ const SupplierForm = ({
                   }}
                   className="w-full rounded-md border border-gray-300 p-2"
                 />
-                {query && !selectedSupplier && suppliers.length > 0 && (
+                {!selectedSupplier && suppliers.length > 0 && (
                   <ul className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg">
                     {suppliers
                       .filter((supplier) =>
