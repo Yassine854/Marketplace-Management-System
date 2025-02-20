@@ -1,12 +1,11 @@
-// Type for Warehouse
 export type Warehouse = {
+  warehouse_id: any;
   name: string;
   quantity: number;
 };
 
-// Type for Supplier
 export type Supplier = {
-  manufacturer_id: string;
+  manufacturer_id: number;
   company_name: string;
   contact_name: string;
   email: string;
@@ -15,7 +14,6 @@ export type Supplier = {
   city?: string;
   country?: string;
   capital?: string;
-  payment_modes: string[];
 };
 
 export type Product = {
@@ -23,8 +21,8 @@ export type Product = {
   productName: string;
   productPrice: number;
   sku: string;
-  manufacturer_id: string;
-  warehouses: Warehouse[];
+  manufacturerId: string;
+  warehouseIds: number[];
 };
 
 export interface ProductDetails {

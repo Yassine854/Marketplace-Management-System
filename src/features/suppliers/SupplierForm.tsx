@@ -6,6 +6,9 @@ import { generateOrderPDF } from "./utils/pdfGenerator";
 import { useSession } from "next-auth/react";
 import emailjs from "emailjs-com";
 import jsPDF from "jspdf";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 const SupplierForm = ({
   onChange,
@@ -18,6 +21,8 @@ const SupplierForm = ({
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
     null,
   );
+  const [deliveryDate, setDeliveryDate] = useState<Date>(new Date());
+
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [quantities, setQuantities] = useState<{ [productId: string]: number }>(
     {},
@@ -195,20 +200,26 @@ const SupplierForm = ({
   }, [paymentPercentage]);
 
   useEffect(() => {
-    fetch("/data/data.json")
-      .then((response) => response.json())
-      .then(
-        (data: {
-          suppliers: Supplier[];
-          products: Product[];
-          warehouses: Warehouse[];
-        }) => {
-          setSuppliers(data.suppliers);
-          setProducts(data.products);
-          setWarehouses(data.warehouses);
-        },
-      )
-      .catch((error: Error) => console.error("Error loading data:", error));
+    const loadData = async () => {
+      try {
+        const [suppliersRes, productsRes, warehousesRes] = await Promise.all([
+          fetch("/api/manufacturers"),
+          fetch("/api/products"),
+          fetch("/api/warehouses"),
+        ]);
+
+        const suppliers: Supplier[] = await suppliersRes.json();
+        const products: Product[] = await productsRes.json();
+        const warehouses: Warehouse[] = await warehousesRes.json();
+
+        setSuppliers(suppliers);
+        setProducts(products);
+        setWarehouses(warehouses);
+      } catch (error) {
+        console.error("Erreur de chargement des données:", error);
+      }
+    };
+    loadData();
   }, []);
 
   const handleSelectSupplier = (supplier: Supplier): void => {
@@ -217,7 +228,101 @@ const SupplierForm = ({
     onChange?.(supplier);
     resetFormFields();
   };
+  // Ajout des enums nécessaires
+  enum OrderState {
+    IN_PROGRESS = "IN_PROGRESS",
+    READY = "READY",
+    DELIVERED = "DELIVERED",
+    COMPLETED = "COMPLETED",
+  }
 
+  enum PaymentMethod {
+    CARTE_BANCAIRE = "CARTE_BANCAIRE",
+    CHEQUE = "CHEQUE",
+    CREDIT = "CREDIT",
+    TRAITE = "TRAITE",
+    ESPECES = "ESPECES",
+    VIREMENT_BANCAIRE = "VIREMENT_BANCAIRE",
+  }
+
+  const handleSaveOrder = async () => {
+    if (
+      !selectedSupplier ||
+      !selectedWarehouse ||
+      !selectedState ||
+      !productsWithQuantities.length
+    ) {
+      toast.error("Veuillez remplir tous les champs obligatoires");
+      return;
+    }
+
+    try {
+      const manufacturerId = selectedSupplier.manufacturer_id;
+      const warehouseId = selectedWarehouse.warehouse_id;
+
+      const stateMapping: { [key: string]: OrderState } = {
+        "1": OrderState.IN_PROGRESS,
+        "2": OrderState.READY,
+        "3": OrderState.DELIVERED,
+      };
+      const order = await prisma.purchaseOrder.create({
+        data: {
+          orderNumber: `CMD-${Date.now()}-${Math.random()
+            .toString(36)
+            .slice(2, 7)}`,
+          deliveryDate: deliveryDate,
+          manufacturer: { connect: { manufacturerId } },
+          warehouse: { connect: { warehouseId } },
+          totalAmount: parseFloat(totalAmount.toFixed(2)),
+          status: stateMapping[selectedState],
+          comments: {
+            create: {
+              content: comment || "Aucun commentaire",
+            },
+          },
+          payments: {
+            create: paymentTypes
+              .filter((p) => p.type && p.amount)
+              .map((payment) => ({
+                amount: parseFloat(payment.amount),
+                paymentMethod: payment.type as PaymentMethod,
+                paymentDate: new Date(),
+                reference: `PAY-${Date.now()}-${Math.random()
+                  .toString(36)
+                  .slice(2, 5)}`,
+                manufacturer: { connect: { manufacturerId } },
+              })),
+          },
+        },
+        include: {
+          payments: true,
+          comments: true,
+          manufacturer: true,
+          warehouse: true,
+        },
+      });
+
+      // Enregistrement des produits (nécessite une table de liaison)
+      await Promise.all(
+        productsWithQuantities.map(async (item) => {
+          await prisma.product.update({
+            where: { sku: item.product.sku },
+            data: {
+              purchaseOrders: {
+                connect: { id: order.id },
+              },
+            },
+          });
+        }),
+      );
+
+      toast.success("Commande enregistrée avec succès !");
+      resetFormFields();
+    } catch (error) {
+      console.error("Erreur d'enregistrement:", error);
+      toast.error("Échec de l'enregistrement: " + (error as Error).message);
+    }
+  };
   const handleSelectWarehouse = (warehouseName: string): void => {
     const warehouse = warehouses.find((w) => w.name === warehouseName);
     if (warehouse) {
@@ -555,8 +660,8 @@ const SupplierForm = ({
                           {products
                             .filter(
                               (product) =>
-                                product.manufacturer_id ===
-                                  selectedSupplier?.manufacturer_id &&
+                                product.manufacturerId ===
+                                  selectedSupplier?.company_name &&
                                 !productsWithQuantities.some(
                                   (selectedItem) =>
                                     selectedItem.product.id === product.id &&
@@ -670,10 +775,11 @@ const SupplierForm = ({
                         }
                         className="w-1/3 rounded-md border border-gray-300 p-3"
                       >
-                        <option value="">Select Payment Type</option>
-                        <option value="cheque">Cheque</option>
-                        <option value="cash">Cash</option>
-                        <option value="traite">Traite</option>
+                        <option value="CHEQUE">Cheque</option>
+
+                        <option value="ESPECES">Cash</option>
+
+                        <option value="TRAITE">Traite</option>
                       </select>
                       {payment.type && payment.type !== "cash" && (
                         <input
@@ -748,7 +854,11 @@ const SupplierForm = ({
             </div>
 
             {/*comment*/}
-
+            <input
+              type="date"
+              value={deliveryDate.toISOString().split("T")[0]}
+              onChange={(e) => setDeliveryDate(new Date(e.target.value))}
+            />
             <div className="mt-6 rounded-xl border border-gray-300 bg-gray-50 p-4 shadow-sm">
               <label className="mb-2 block text-lg font-semibold text-gray-700">
                 Comment
@@ -778,7 +888,9 @@ const SupplierForm = ({
             <button onClick={handleSendEmail} className="neon-button">
               ✉️ Submit
             </button>
-            <button className="neon-button">Save</button>
+            <button onClick={handleSaveOrder} className="neon-button">
+              Save
+            </button>
           </div>
         </div>
       </div>

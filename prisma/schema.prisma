@@ -42,19 +42,136 @@ model MilkRunAuditTrail {
   agentName    String
   deliveryDate String
 }
+
 model Category {
-  id            String @id @default(auto()) @map("_id") @db.ObjectId
-  categoryId    Int    @unique
-  nameCategory  String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  categoryId   Int      @unique // ID Magento
+  nameCategory String
 }
 
 model Warehouse {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  warehouseId Int    @unique
-  websiteId Int
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  warehouseId Int      @unique // ID Magento
+  websiteId   Int
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  purchaseOrders PurchaseOrder[] 
+}
+
+model Product {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  magento_id    Int      @unique // ID Magento
+  sku           String   @unique
+  productName   String
+  productPrice  Float
+  manufacturerId  String?
+  categoryIds   Int[]    @db.Int // IDs Magento des catégories
+  warehouseIds  Int[]    @db.Int // IDs Magento des entrepôts
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([categoryIds])
+  @@index([warehouseIds])
+}
+
+model Manufacturer {
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  manufacturerId       Int      @unique // Correspond à manufacturer_id dans le JSON
+  code                 String   @unique
+  companyName          String   @map("company_name")
+  contactName          String?  @map("contact_name")
+  phoneNumber          String?  @map("phone_number")
+  postalCode           String?  @map("postal_code")
+  city                 String?
+  country              String?
+  capital              String?
+  email                String?
+  payments             Payment[]     
+  purchaseOrders       PurchaseOrder[] 
+  address              String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@map("manufacturers")
+}
+model Payment {
+
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+
+  amount         Float
+
+  paymentDate    DateTime
+
+  paymentMethod  PaymentMethod
+
+  reference      String
+
+  manufacturer   Manufacturer   @relation(fields: [manufacturerId], references: [manufacturerId])
+
+  manufacturerId Int
+
+  purchaseOrder  PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id])
+
+  purchaseOrderId String?        @db.ObjectId
+
+  createdAt      DateTime       @default(now())
+
+  updatedAt      DateTime       @updatedAt
+
+  @@map("payments")
+
+}
+
+enum PaymentMethod {
+  CARTE_BANCAIRE
+  CHEQUE
+  CREDIT
+  TRAITE
+  ESPECES
+  VIREMENT_BANCAIRE
+
+}
+
+
+enum OrderState {
+
+  IN_PROGRESS
+
+  READY
+
+  DELIVERED
+
+  COMPLETED
+
+
+}
+model PurchaseOrder {
+
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber     String         @unique
+  manufacturer    Manufacturer   @relation(fields: [manufacturerId], references: [manufacturerId])
+  manufacturerId  Int
+  warehouse       Warehouse      @relation(fields: [warehouseId], references: [warehouseId])
+  warehouseId     Int
+  deliveryDate    DateTime
+  totalAmount     Float
+  status          OrderState
+  comments        Comment[]
+  payments        Payment[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  @@map("purchase_orders")
+
+}
+
+
+model Comment {
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  content         String
+  purchaseOrder   PurchaseOrder  @relation(fields: [purchaseOrderId], references: [id])
+  purchaseOrderId String         @db.ObjectId
+  createdAt       DateTime       @default(now()) 
+  updatedAt       DateTime       @updatedAt 
+  @@map("comments")
 }
