@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CardDataStats from "../charts/CardDataStats";
 import {
   FaClipboardList,
@@ -6,6 +6,7 @@ import {
   FaUsers,
   FaUndo,
 } from "react-icons/fa";
+import axios from "axios";
 import orderData from "../../../../data_test.json";
 import ProductRevenueLossChart from "../charts/ProductRevenueLossChart";
 import TopArticlesOrdered from "../charts/TopArticlesOrdered";
@@ -27,11 +28,117 @@ const SupplierDashboard = () => {
   const [startDate, setStartDate] = useState<Date | null>(null); // Default to null
   const [endDate, setEndDate] = useState<Date | null>(null); // Default to null
   const [showEmailForm, setShowEmailForm] = useState(false);
+
+  const [categories, setCategories] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/categories",
+        );
+        setCategories(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/orders");
+        setOrders(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/products");
+        setProducts(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+
+    fetchProducts();
+    fetchOrders();
+    fetchCategories();
+  }, []);
+
+  //Total orders
+  const supplierProducts = products.filter(
+    (p) => p.manufacturer === supplierId,
+  );
+  const supplierProductIds = new Set(supplierProducts.map((p) => p.id));
+
+  const totalValidOrders = orders.filter(
+    (order) =>
+      order.state != "canceled" &&
+      order.items.some((item: { product_id: number }) =>
+        supplierProductIds.has(item.product_id),
+      ),
+  ).length;
+
+  //Total unique customers
+  const uniqueCustomers = new Set<number>();
+  orders.forEach((order) => {
+    if (
+      order.state != "canceled" &&
+      order.items.some((item: { product_id: number }) =>
+        supplierProductIds.has(item.product_id),
+      )
+    ) {
+      if (order.customer_id) {
+        uniqueCustomers.add(order.customer_id);
+      }
+    }
+  });
+  const totalUniqueCustomers = uniqueCustomers.size;
+
+  //Total returned products
+  const totalReturns = orders
+    .filter((order) => order.state !== "canceled")
+    .flatMap((order) => order.items)
+    .filter(
+      (item) =>
+        supplierProductIds.has(item.product_id) && item.qty_refunded > 0,
+    )
+    .reduce((sum, item) => sum + item.qty_refunded, 0);
+
+  //Chiffre d'affaires
+
+  const currentInventoryValue = supplierProducts.reduce((total, product) => {
+    const cost = product.cost || 0;
+    const stockQty = product.stock_item?.qty || 0;
+    return total + cost * stockQty;
+  }, 0);
+
+  const soldProductsValue = orders
+    .filter((order) => order.state !== "canceled")
+    .flatMap((order) => order.items)
+    .filter(
+      (item) =>
+        supplierProductIds.has(item.product_id) && item.qty_invoiced > 0,
+    )
+    .reduce((total, item) => {
+      const product = supplierProducts.find((p) => p.id === item.product_id);
+      const cost = product?.cost || 0;
+      const netQty = (item.qty_invoiced || 0) - (item.qty_refunded || 0);
+      return total + cost * netQty;
+    }, 0);
+
+  const totalTurnover = currentInventoryValue + soldProductsValue;
+
   const supplierDetails = orderData.products.find(
     (p) => p.product.supplier?.manufacturer_id === supplierId,
   )?.product.supplier;
 
-  // Function to handle date changes
   const handleStartDateChange = (date: Date | null) => {
     setStartDate(date);
   };
@@ -41,13 +148,13 @@ const SupplierDashboard = () => {
   };
 
   // Filter orders based on the selected date range
-  const filteredOrders = orderData.orders.filter(({ order }) => {
-    const orderDate = new Date(order.createdAt * 1000);
-    return (
-      (!startDate || orderDate >= startDate) &&
-      (!endDate || orderDate <= endDate)
-    );
-  });
+  // const filteredOrders = orderData.orders.filter(({ order }) => {
+  //   const orderDate = new Date(order.createdAt * 1000);
+  //   return (
+  //     (!startDate || orderDate >= startDate) &&
+  //     (!endDate || orderDate <= endDate)
+  //   );
+  // });
 
   const calculateTurnover = () => {
     const supplierProducts = orderData.products.filter(
@@ -62,7 +169,7 @@ const SupplierDashboard = () => {
       const allOrderedQty = orderData.orders
         .filter(
           ({ order }) =>
-            order.state === "confirmed" && order.status === "valid",
+            order.state === "delivered" && order.status === "valid",
         )
         .flatMap(({ order }) => order.items)
         .filter((item) => item.productId === product.product.productId)
@@ -91,55 +198,55 @@ const SupplierDashboard = () => {
     }, 0);
   };
 
-  const supplierStats = filteredOrders.reduce(
-    (acc, { order }) => {
-      const uniqueOrders = new Set();
-      const uniqueCustomers = new Set(acc.uniqueCustomers);
-      let orderProcessed = false;
+  // const supplierStats = filteredOrders.reduce(
+  //   (acc, { order }) => {
+  //     const uniqueOrders = new Set();
+  //     const uniqueCustomers = new Set(acc.uniqueCustomers);
+  //     let orderProcessed = false;
 
-      if (order.items) {
-        order.items.forEach((item) => {
-          if (
-            "supplier" in item &&
-            item.supplier?.manufacturer_id === supplierId
-          ) {
-            if (!orderProcessed) {
-              if (order.state === "confirmed" && order.status === "valid") {
-                acc.deliveredOrders += 1;
-              }
-              orderProcessed = true;
-            }
+  //     if (order.items) {
+  //       order.items.forEach((item) => {
+  //         if (
+  //           "supplier" in item &&
+  //           item.supplier?.manufacturer_id === supplierId
+  //         ) {
+  //           if (!orderProcessed) {
+  //             if (order.state === "delivered" && order.status === "valid") {
+  //               acc.deliveredOrders += 1;
+  //             }
+  //             orderProcessed = true;
+  //           }
 
-            if (!uniqueOrders.has(order.orderId)) {
-              uniqueOrders.add(order.orderId);
-              acc.totalOrders += 1;
-            }
+  //           if (!uniqueOrders.has(order.orderId)) {
+  //             uniqueOrders.add(order.orderId);
+  //             acc.totalOrders += 1;
+  //           }
 
-            if (order.state === "confirmed" && order.status === "valid") {
-              uniqueCustomers.add(order.customerId);
-            }
+  //           if (order.state === "delivered" && order.status === "valid") {
+  //             uniqueCustomers.add(order.customerId);
+  //           }
 
-            if (order.state === "canceled" && order.status === "invalid") {
-              acc.totalReturns += parseInt(item.quantity);
-            }
-          }
-        });
-      }
+  //           if (order.state === "canceled" && order.status === "invalid") {
+  //             acc.totalReturns += parseInt(item.quantity);
+  //           }
+  //         }
+  //       });
+  //     }
 
-      acc.totalCustomers = uniqueCustomers.size;
-      acc.uniqueCustomers = uniqueCustomers;
+  //     acc.totalCustomers = uniqueCustomers.size;
+  //     acc.uniqueCustomers = uniqueCustomers;
 
-      return acc;
-    },
-    {
-      totalOrders: 0,
-      totalTurnover: calculateTurnover(),
-      deliveredOrders: 0,
-      totalCustomers: 0,
-      totalReturns: 0,
-      uniqueCustomers: new Set(),
-    },
-  );
+  //     return acc;
+  //   },
+  //   {
+  //     totalOrders: 0,
+  //     totalTurnover: calculateTurnover(),
+  //     deliveredOrders: 0,
+  //     totalCustomers: 0,
+  //     totalReturns: 0,
+  //     uniqueCustomers: new Set(),
+  //   },
+  // );
 
   return (
     <div className="mt-[4.8rem] w-full bg-n20 p-6">
@@ -177,18 +284,36 @@ const SupplierDashboard = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <CardDataStats
-          title="Turnover"
-          total={`${supplierStats.totalTurnover.toFixed(2)} TND`}
+          title="Chiffre d'affaires"
+          total={`${totalTurnover.toFixed(2)} TND`}
         >
           <FaMoneyBillWave className="text-green-500" />
         </CardDataStats>
 
         <CardDataStats
-          title="Total Orders"
-          total={supplierStats.totalOrders.toString()}
+          title="Totale des commandes"
+          total={totalValidOrders.toString()}
         >
           <FaClipboardList className="text-blue-500" />
         </CardDataStats>
+
+        <CardDataStats
+          title="Clients actifs payants"
+          total={totalUniqueCustomers.toString()}
+        >
+          <FaUsers className="text-orange-500" />
+        </CardDataStats>
+
+        <CardDataStats
+          title="Produits retournés"
+          total={totalReturns.toString()}
+        >
+          <FaUndo className="text-red-500" />
+        </CardDataStats>
+
+        {/*   
+
+        
 
         <CardDataStats
           title="Unique Paying Customers"
@@ -197,12 +322,7 @@ const SupplierDashboard = () => {
           <FaUsers className="text-orange-500" />
         </CardDataStats>
 
-        <CardDataStats
-          title="Returned Products"
-          total={supplierStats.totalReturns.toString()}
-        >
-          <FaUndo className="text-red-500" />
-        </CardDataStats>
+        */}
       </div>
 
       {/* Charts */}
@@ -226,13 +346,25 @@ const SupplierDashboard = () => {
 
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
         <div>
-          <TopArticlesOrdered supplierId={supplierId} />
+          <TopArticlesOrdered
+            supplierId={supplierId}
+            startDate={startDate}
+            endDate={endDate}
+          />
         </div>
         <div>
-          <SupplierCategoryPieChart supplierId={supplierId} />
+          <SupplierCategoryPieChart
+            supplierId={supplierId}
+            startDate={startDate}
+            endDate={endDate}
+          />
         </div>
         <div>
-          <ClientSegment supplierId={supplierId} />
+          <ClientSegment
+            supplierId={supplierId}
+            startDate={startDate}
+            endDate={endDate}
+          />
         </div>
       </div>
 
@@ -241,10 +373,18 @@ const SupplierDashboard = () => {
           <RegionsOrders supplierId={supplierId} />
         </div>
         <div>
-          <SupplierTopProductsChart supplierId={supplierId} />
+          <SupplierTopProductsChart
+            supplierId={supplierId}
+            startDate={startDate}
+            endDate={endDate}
+          />
         </div>
         <div>
-          <InventoryTrendChart supplierId={supplierId} />
+          <InventoryTrendChart
+            supplierId={supplierId}
+            startDate={startDate}
+            endDate={endDate}
+          />
         </div>
       </div>
 

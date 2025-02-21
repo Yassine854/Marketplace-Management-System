@@ -41,7 +41,7 @@ const SupplierAreaChart: React.FC<RevenueOverTimeChartProps> = ({
 
     // Second pass: Process orders and accumulate ordered quantities
     supplierData.orders.forEach(({ order }: any) => {
-      if (order.state !== "confirmed") return;
+      if (order.state !== "delivered") return;
 
       const orderDate = new Date(order.createdAt * 1000);
       const timeKey = getTimeKey(orderDate);

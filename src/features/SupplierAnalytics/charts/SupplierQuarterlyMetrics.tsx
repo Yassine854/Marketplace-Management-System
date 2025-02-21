@@ -24,7 +24,7 @@ const SupplierQuarterlyMetrics = ({ supplierId }: { supplierId: string }) => {
     // Filter valid confirmed orders containing supplier's products
     const orders = orderData.orders.filter(
       ({ order }) =>
-        order.state === "confirmed" &&
+        order.state === "delivered" &&
         order.status === "valid" &&
         order.items.some(
           (item) =>

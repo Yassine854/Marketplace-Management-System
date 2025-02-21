@@ -1,66 +1,77 @@
-import React, { useState } from "react";
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa"; // Import React Icons
-
-import supplierData from "../../../../data_test.json"; // Ensure the path is correct
+import React, { useState, useEffect } from "react";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import axios from "axios";
 
 const AvailableProducts: React.FC<{ supplierId: string }> = ({
   supplierId,
 }) => {
-  // Filter available products based on the supplier ID and stock status
-  const availableProducts = (supplierData as any).products.filter(
-    (product: any) =>
-      product.product.supplier.manufacturer_id === supplierId &&
-      product.product.is_in_stock === "1",
-  );
-
-  // Get the total count of available products
-  const totalAvailableProducts = availableProducts.length;
-
-  // Pagination state
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 6;
-  const totalPages = Math.ceil(totalAvailableProducts / productsPerPage);
 
-  // Get the current products to display based on the current page
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/products");
+        setProducts(response.data);
+        setIsLoading(false);
+      } catch (err) {
+        setError("Failed to fetch products");
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Filter available products based on supplier and stock status
+  const availableProducts = products.filter(
+    (product) =>
+      product.manufacturer === supplierId && product.stock_item?.is_in_stock,
+  );
+
+  const totalAvailableProducts = availableProducts.length;
+  const totalPages = Math.ceil(totalAvailableProducts / productsPerPage);
   const currentProducts = availableProducts.slice(
     (currentPage - 1) * productsPerPage,
     currentPage * productsPerPage,
   );
 
-  // Handlers for pagination
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
   const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
+
+  if (isLoading) return <div>Loading products...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="mt-6 rounded-lg bg-white p-6 shadow-md">
-      {" "}
-      {/* White background added here */}
-      <h2 className="mb-3 text-xl font-semibold">Name of Available Products</h2>
-      {/* Display the total count of available products */}
+      <h2 className="mb-3 text-xl font-semibold">Produits disponibles</h2>
       <p className="mb-4 text-sm font-medium text-gray-600">
-        Total Available Products: {totalAvailableProducts}
+        Total disponible: {totalAvailableProducts}
       </p>
-      {/* List of Products */}
+
       <div className="space-y-2">
         {totalAvailableProducts > 0 ? (
-          currentProducts.map((product: any) => (
+          currentProducts.map((product) => (
             <div
-              key={product.product.productId}
+              key={product.id}
               className="rounded-lg border bg-white p-3 shadow-md transition duration-300 hover:shadow-lg"
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">
-                  {product.product.productName}
-                </h3>
+                <h3 className="text-sm font-medium">{product.name}</h3>
+                <span className="text-sm text-gray-500">
+                  Qty: {product.stock_item?.qty || 0}
+                </span>
+              </div>
+              <div className="mt-2 text-sm text-gray-600">
+                <p>SKU: {product.sku}</p>
               </div>
             </div>
           ))
@@ -70,7 +81,7 @@ const AvailableProducts: React.FC<{ supplierId: string }> = ({
           </div>
         )}
       </div>
-      {/* Pagination controls */}
+
       {totalAvailableProducts > productsPerPage && (
         <div className="mt-4 flex items-center justify-between">
           <button

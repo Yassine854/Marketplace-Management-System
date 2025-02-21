@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import ApexCharts from "react-apexcharts";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import supplierData from "../../../../data_test.json";
 
-// Use the same color scheme as TopArticlesOrdered
 const newColors = [
   "#FF5733",
   "#33FF57",
@@ -18,123 +16,173 @@ const newColors = [
   "#F39C12",
 ];
 
-const ClientSegment: React.FC<{ supplierId: string }> = ({ supplierId }) => {
+interface Customer {
+  id: number;
+  retailer_profile: string;
+}
+
+interface Order {
+  entity_id: number;
+  customer_id?: number;
+  created_at: { $date: string };
+  state: string;
+  status: string;
+  items: Array<{ product_id: number }>;
+}
+
+interface Product {
+  id: number;
+  manufacturer: string;
+}
+
+const ClientSegment: React.FC<{
+  supplierId: string;
+  startDate?: Date | null;
+  endDate?: Date | null;
+}> = ({ supplierId, startDate: propStartDate, endDate: propEndDate }) => {
   const [chartData, setChartData] = useState<any>(null);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(
+    propStartDate || null,
+  );
+  const [endDate, setEndDate] = useState<Date | null>(propEndDate || null);
   const [totalCustomers, setTotalCustomers] = useState<number>(0);
   const [segmentDetails, setSegmentDetails] = useState<
     { label: string; count: number }[]
   >([]);
 
-  const handleStartDateChange = (date: Date | null) => setStartDate(date);
-  const handleEndDateChange = (date: Date | null) => setEndDate(date);
+  useEffect(() => {
+    setStartDate(propStartDate || null);
+    setEndDate(propEndDate || null);
+  }, [propStartDate, propEndDate]);
 
   useEffect(() => {
-    const filteredOrders = supplierData.orders.filter((order: any) => {
-      const orderDate = new Date(order.order.deliveryDate * 1000);
-      return (
-        order.order.state === "confirmed" &&
-        order.order.status === "valid" &&
-        order.order.items.some(
-          (item: any) => item.supplier.manufacturer_id === supplierId,
-        ) &&
-        (!startDate || orderDate >= startDate) &&
-        (!endDate || orderDate <= endDate)
-      );
-    });
+    const fetchData = async () => {
+      try {
+        // Fetch all necessary data
+        const [ordersResponse, customersResponse, productsResponse] =
+          await Promise.all([
+            fetch("http://localhost:3000/api/orders"),
+            fetch("http://localhost:3000/api/customers"),
+            fetch("http://localhost:3000/api/products"),
+          ]);
 
-    const segments: Record<string, { count: number; customers: Set<string> }> =
-      {};
-    const allCustomers = new Set<string>();
+        const orders: Order[] = await ordersResponse.json();
+        const customers: Customer[] = await customersResponse.json();
+        const products: Product[] = await productsResponse.json();
 
-    filteredOrders.forEach((order: any) => {
-      const segment = order.order.segment_type;
-      const customerId = order.order.customerId;
+        // Create mappings
+        const customerProfileMap = customers.reduce(
+          (acc: Record<number, string>, customer) => {
+            acc[customer.id] = customer.retailer_profile || "N/A";
+            return acc;
+          },
+          {},
+        );
 
-      if (segment) {
-        if (!segments[segment]) {
-          segments[segment] = { count: 0, customers: new Set() };
-        }
+        const productManufacturerMap = products.reduce(
+          (acc: Record<number, string>, product) => {
+            acc[product.id] = product.manufacturer;
+            return acc;
+          },
+          {},
+        );
 
-        if (!segments[segment].customers.has(customerId)) {
-          segments[segment].customers.add(customerId);
-          segments[segment].count++;
-          allCustomers.add(customerId);
-        }
-      }
-    });
+        // Filter orders
+        const filteredOrders = orders.filter((order) => {
+          const orderDate = new Date(order.created_at.$date);
+          const hasSupplierProducts = order.items.some(
+            (item) => productManufacturerMap[item.product_id] === supplierId,
+          );
 
-    setTotalCustomers(allCustomers.size);
+          return (
+            order.state != "canceled" &&
+            hasSupplierProducts &&
+            (!startDate || orderDate >= startDate) &&
+            (!endDate || orderDate <= endDate)
+          );
+        });
 
-    const segmentList = Object.entries(segments).map(([label, data]) => ({
-      label,
-      count: data.count,
-    }));
+        // Process customer profiles
+        const profileDistribution: Record<string, Set<number>> = {};
+        const allCustomers = new Set<number>();
 
-    setSegmentDetails(segmentList);
+        filteredOrders.forEach((order) => {
+          if (order.customer_id) {
+            const profile = customerProfileMap[order.customer_id] || "Unknown";
 
-    setChartData({
-      series: segmentList.map((item) => item.count),
-      options: {
-        chart: {
-          type: "pie",
-          height: 400,
-          fontFamily: "Satoshi, sans-serif",
-          events: {
-            dataPointSelection: (
-              event: any,
-              chartContext: any,
-              config: any,
-            ) => {
-              console.log(
-                "Selected segment:",
-                segmentList[config.dataPointIndex].label,
-              );
+            if (!profileDistribution[profile]) {
+              profileDistribution[profile] = new Set();
+            }
+
+            if (!profileDistribution[profile].has(order.customer_id)) {
+              profileDistribution[profile].add(order.customer_id);
+              allCustomers.add(order.customer_id);
+            }
+          }
+        });
+
+        // Prepare visualization data
+        const segments = Object.entries(profileDistribution).map(
+          ([label, customers]) => ({
+            label,
+            count: customers.size,
+          }),
+        );
+
+        setTotalCustomers(allCustomers.size);
+        setSegmentDetails(segments);
+
+        setChartData({
+          series: segments.map((item) => item.count),
+          options: {
+            chart: {
+              type: "pie",
+              height: 400,
+              events: {
+                dataPointSelection: (
+                  event: any,
+                  chartContext: any,
+                  config: any,
+                ) => {
+                  console.log(
+                    "Selected profile:",
+                    segments[config.dataPointIndex].label,
+                  );
+                },
+              },
+            },
+            colors: newColors,
+            labels: segments.map((item) => item.label),
+            dataLabels: {
+              enabled: true,
+              formatter: (val: number) => `${val.toFixed(1)}%`,
+            },
+            legend: { show: false },
+            tooltip: {
+              y: { formatter: (value: number) => `${value} customers` },
+            },
+            title: {
+              text: `Retailer Profiles - Unique Customers: ${allCustomers.size}`,
+              align: "center",
             },
           },
-        },
-        colors: newColors,
-        labels: segmentList.map((item) => item.label),
-        dataLabels: {
-          enabled: true,
-          formatter: (val: number) => `${val.toFixed(1)}%`,
-          style: {
-            fontSize: "14px",
-            fontWeight: "bold",
-          },
-        },
-        legend: {
-          position: "bottom",
-          horizontalAlign: "center",
-        },
-        tooltip: {
-          y: {
-            formatter: (value: number) => `${value} customers`,
-          },
-        },
-        title: {
-          text: `Client Segments - Total Unique Customers: ${allCustomers.size}`,
-          align: "center",
-          style: {
-            fontSize: "16px",
-            fontWeight: "bold",
-            color: "#333",
-          },
-        },
-      },
-    });
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
   }, [supplierId, startDate, endDate]);
 
   return (
     <div className="w-full rounded-xl border border-gray-100 bg-white p-6 shadow-lg">
-      {/* Header Section */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <label className="text-sm font-medium">Date Range:</label>
         <div className="flex gap-3">
           <DatePicker
             selected={startDate}
-            onChange={handleStartDateChange}
+            onChange={setStartDate}
             placeholderText="Start Date"
             className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             dateFormat="MMM d, yyyy"
@@ -142,7 +190,7 @@ const ClientSegment: React.FC<{ supplierId: string }> = ({ supplierId }) => {
           />
           <DatePicker
             selected={endDate}
-            onChange={handleEndDateChange}
+            onChange={setEndDate}
             placeholderText="End Date"
             className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             dateFormat="MMM d, yyyy"
@@ -151,7 +199,6 @@ const ClientSegment: React.FC<{ supplierId: string }> = ({ supplierId }) => {
         </div>
       </div>
 
-      {/* Chart Section */}
       <div className="rounded-lg border border-gray-100 bg-white p-4 shadow-inner">
         {chartData ? (
           <ApexCharts
@@ -162,12 +209,11 @@ const ClientSegment: React.FC<{ supplierId: string }> = ({ supplierId }) => {
           />
         ) : (
           <p className="text-center text-gray-500">
-            Loading customer segments...
+            Loading retailer profiles...
           </p>
         )}
       </div>
 
-      {/* Segment List Section */}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {segmentDetails.map((segment, index) => (
           <div
@@ -181,10 +227,10 @@ const ClientSegment: React.FC<{ supplierId: string }> = ({ supplierId }) => {
             <div className="flex-1">
               <div className="flex flex-col">
                 <span className="break-words font-medium text-gray-800">
-                  {segment.label}
+                  {segment.label || "No Profile"}
                 </span>
                 <span className="mt-1 text-sm text-gray-500">
-                  {segment.count} customers
+                  {segment.count} unique customers
                 </span>
               </div>
             </div>

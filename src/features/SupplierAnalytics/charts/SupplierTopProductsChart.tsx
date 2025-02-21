@@ -9,7 +9,15 @@ interface ChartState {
   options: any;
 }
 
-const SupplierTopProductsChart = ({ supplierId }: { supplierId: string }) => {
+const SupplierTopProductsChart = ({
+  supplierId,
+  startDate: propStartDate,
+  endDate: propEndDate,
+}: {
+  supplierId: string;
+  startDate?: Date | null;
+  endDate?: Date | null;
+}) => {
   const [chartState, setChartState] = useState<ChartState>({
     series: [{ name: "Loading...", data: [0] }],
     options: {
@@ -22,12 +30,18 @@ const SupplierTopProductsChart = ({ supplierId }: { supplierId: string }) => {
     },
   });
 
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  // Local date state with initial values from props
+  const [startDate, setStartDate] = useState<Date | null>(
+    propStartDate || null,
+  );
+  const [endDate, setEndDate] = useState<Date | null>(propEndDate || null);
   const [metric, setMetric] = useState<"volume" | "revenue">("volume");
 
-  const handleStartDateChange = (date: Date | null) => setStartDate(date);
-  const handleEndDateChange = (date: Date | null) => setEndDate(date);
+  // Sync with parent date changes
+  useEffect(() => {
+    setStartDate(propStartDate || null);
+    setEndDate(propEndDate || null);
+  }, [propStartDate, propEndDate]);
 
   useEffect(() => {
     try {
@@ -133,7 +147,7 @@ const SupplierTopProductsChart = ({ supplierId }: { supplierId: string }) => {
           <div className="relative">
             <DatePicker
               selected={startDate}
-              onChange={handleStartDateChange}
+              onChange={setStartDate}
               placeholderText="Start Date"
               className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               dateFormat="MMM d, yyyy"
@@ -143,7 +157,7 @@ const SupplierTopProductsChart = ({ supplierId }: { supplierId: string }) => {
               <button
                 type="button"
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                onClick={() => handleStartDateChange(null)}
+                onClick={() => setStartDate(null)}
               >
                 ×
               </button>
@@ -152,7 +166,7 @@ const SupplierTopProductsChart = ({ supplierId }: { supplierId: string }) => {
           <div className="relative">
             <DatePicker
               selected={endDate}
-              onChange={handleEndDateChange}
+              onChange={setEndDate}
               placeholderText="End Date"
               className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               dateFormat="MMM d, yyyy"
@@ -162,7 +176,7 @@ const SupplierTopProductsChart = ({ supplierId }: { supplierId: string }) => {
               <button
                 type="button"
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                onClick={() => handleEndDateChange(null)}
+                onClick={() => setEndDate(null)}
               >
                 ×
               </button>

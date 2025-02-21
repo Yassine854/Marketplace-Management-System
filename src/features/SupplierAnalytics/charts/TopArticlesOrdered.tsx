@@ -3,26 +3,52 @@ import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import supplierData from "../../../../data_test.json";
 
 const newColors = [
-  "#FF5733",
-  "#33FF57",
-  "#3357FF",
-  "#F1C40F",
-  "#8E44AD",
-  "#E74C3C",
-  "#3498DB",
-  "#2ECC71",
-  "#9B59B6",
-  "#F39C12",
+  "#FF6B6B",
+  "#FFD700",
+  "#4ECDC4",
+  "#A78BFA",
+  "#E84393",
+  "#6C5CE7",
+  "#839788",
+  "#D95D39",
+  "#00CEC9",
+  "#FF9F43",
 ];
 
-const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
+interface OrderItem {
+  product_id: number;
+  qty_invoiced: number;
+}
+
+interface Order {
+  created_at: string;
+  state: string;
+  items: OrderItem[];
+}
+
+interface Product {
+  id: number;
+  name: string;
+  manufacturer: string;
+}
+
+interface Props {
+  supplierId: string;
+  startDate?: Date | null;
+  endDate?: Date | null;
+}
+
+const TopArticlesOrdered: React.FC<Props> = ({
   supplierId,
+  startDate: propStartDate,
+  endDate: propEndDate,
 }) => {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(
+    propStartDate || null,
+  );
+  const [endDate, setEndDate] = useState<Date | null>(propEndDate || null);
   const [state, setState] = useState<{
     series: number[];
     labels: string[];
@@ -30,49 +56,63 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
   }>({ series: [], labels: [], ordersCount: [] });
 
   useEffect(() => {
-    const productOrders: Record<
-      string,
-      { quantity: number; orderCount: number }
-    > = {};
+    setStartDate(propStartDate || null);
+    setEndDate(propEndDate || null);
+  }, [propStartDate, propEndDate]);
 
-    supplierData.orders.forEach((order) => {
-      const orderDate = new Date(order.order.createdAt * 1000);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const productsRes = await fetch("http://localhost:3000/api/products");
+        const ordersRes = await fetch("http://localhost:3000/api/orders");
 
-      if (
-        (!startDate || orderDate >= startDate) &&
-        (!endDate || orderDate <= endDate)
-      ) {
-        order.order.items.forEach((item) => {
-          if (item.supplier.manufacturer_id === supplierId) {
-            const productName = item.productName;
-            const quantity = parseFloat(item.quantity);
+        const products = await productsRes.json();
+        const orders = await ordersRes.json();
 
-            if (!productOrders[productName]) {
-              productOrders[productName] = { quantity: 0, orderCount: 0 };
+        const filteredProducts = products.filter(
+          (product: Product) => product.manufacturer === supplierId,
+        );
+        const productOrders: Record<string, number> = {};
+
+        orders.forEach((order: Order) => {
+          if (order.state !== "canceled") {
+            const orderDate = new Date(order.created_at);
+            if (
+              (!startDate || orderDate >= startDate) &&
+              (!endDate || orderDate <= endDate)
+            ) {
+              order.items.forEach((item) => {
+                const product = filteredProducts.find(
+                  (p: Product) => p.id === item.product_id,
+                );
+                if (product) {
+                  if (!productOrders[product.name]) {
+                    productOrders[product.name] = 0;
+                  }
+                  productOrders[product.name]++;
+                }
+              });
             }
-
-            productOrders[productName].quantity += quantity;
-            productOrders[productName].orderCount++;
           }
         });
+
+        const totalOrders =
+          Object.values(productOrders).reduce((acc, count) => acc + count, 0) ||
+          1;
+        const labels = Object.keys(productOrders);
+        setState({
+          series: labels.map((name) =>
+            Number(((productOrders[name] / totalOrders) * 100).toFixed(2)),
+          ),
+          labels,
+          ordersCount: labels.map((name) => productOrders[name]),
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    });
+    };
 
-    const totalQuantity = Object.values(productOrders).reduce(
-      (acc, curr) => acc + curr.quantity,
-      0,
-    );
-    const labels = Object.keys(productOrders);
-
-    setState({
-      series: labels.map((name) =>
-        Number(
-          ((productOrders[name].quantity / totalQuantity) * 100).toFixed(2),
-        ),
-      ),
-      labels,
-      ordersCount: labels.map((name) => productOrders[name].orderCount),
-    });
+    fetchData();
   }, [supplierId, startDate, endDate]);
 
   const options: ApexOptions = {
@@ -85,13 +125,7 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
     labels: state.labels,
     colors: newColors.slice(0, state.labels.length),
     legend: { show: false },
-    plotOptions: {
-      pie: {
-        donut: {
-          size: "65%",
-        },
-      },
-    },
+    plotOptions: { pie: { donut: { size: "65%" } } },
     dataLabels: {
       enabled: true,
       formatter: (val: number) => `${val.toFixed(1)}%`,
@@ -100,22 +134,20 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
     tooltip: {
       y: {
         formatter: (_, { seriesIndex }) =>
-          `${state.ordersCount[seriesIndex]} Orders`,
+          `${state.ordersCount[seriesIndex]} commandes`,
       },
     },
   };
 
   return (
     <div className="w-full rounded-xl border border-gray-100 bg-white p-6 shadow-lg">
-      {/* Header Section */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <label className="text-sm font-medium">Date Range:</label>
-
+        <label className="text-sm font-medium">Période :</label>
         <div className="flex gap-3">
           <DatePicker
             selected={startDate}
             onChange={setStartDate}
-            placeholderText="Start Date"
+            placeholderText="Date début"
             className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             dateFormat="MMM d, yyyy"
             isClearable
@@ -123,7 +155,7 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
           <DatePicker
             selected={endDate}
             onChange={setEndDate}
-            placeholderText="End Date"
+            placeholderText="Date fin"
             className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             dateFormat="MMM d, yyyy"
             isClearable
@@ -131,10 +163,9 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
         </div>
       </div>
 
-      {/* Chart Section */}
       <div className="rounded-lg border border-gray-100 bg-white p-4 shadow-inner">
         <h3 className="mb-6 text-center text-2xl font-semibold">
-          Most Ordered Products
+          Produits les plus commandés
         </h3>
         <ReactApexChart
           options={options}
@@ -144,7 +175,8 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
         />
       </div>
 
-      {/* Product List Section with full names */}
+      <hr className="my-6 border-gray-300" />
+
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {state.labels.map((product, index) => (
           <div
@@ -161,7 +193,7 @@ const TopArticlesOrdered: React.FC<{ supplierId: string }> = ({
                   {product}
                 </span>
                 <span className="mt-1 text-sm text-gray-500">
-                  {state.ordersCount[index]} orders
+                  {state.ordersCount[index]} commandes
                 </span>
               </div>
             </div>

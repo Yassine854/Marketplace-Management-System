@@ -9,7 +9,15 @@ interface ChartState {
   options: any;
 }
 
-const InventoryTrendChart = ({ supplierId }: { supplierId: string }) => {
+const InventoryTrendChart = ({
+  supplierId,
+  startDate: propStartDate,
+  endDate: propEndDate,
+}: {
+  supplierId: string;
+  startDate?: Date | null;
+  endDate?: Date | null;
+}) => {
   const [chartState, setChartState] = useState<ChartState>({
     series: [],
     options: {
@@ -24,12 +32,18 @@ const InventoryTrendChart = ({ supplierId }: { supplierId: string }) => {
     },
   });
 
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  // Local date state with initial values from props
+  const [startDate, setStartDate] = useState<Date | null>(
+    propStartDate || null,
+  );
+  const [endDate, setEndDate] = useState<Date | null>(propEndDate || null);
   const [frequency, setFrequency] = useState<"daily" | "weekly">("daily");
 
-  const handleStartDateChange = (date: Date | null) => setStartDate(date);
-  const handleEndDateChange = (date: Date | null) => setEndDate(date);
+  // Sync with parent date changes
+  useEffect(() => {
+    setStartDate(propStartDate || null);
+    setEndDate(propEndDate || null);
+  }, [propStartDate, propEndDate]);
 
   useEffect(() => {
     // 1. Get supplier's products
@@ -151,7 +165,7 @@ const InventoryTrendChart = ({ supplierId }: { supplierId: string }) => {
         <div className="flex space-x-2">
           <DatePicker
             selected={startDate}
-            onChange={handleStartDateChange}
+            onChange={setStartDate}
             placeholderText="Start Date"
             className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             dateFormat="MMM d, yyyy"
@@ -159,7 +173,7 @@ const InventoryTrendChart = ({ supplierId }: { supplierId: string }) => {
           />
           <DatePicker
             selected={endDate}
-            onChange={handleEndDateChange}
+            onChange={setEndDate}
             placeholderText="End Date"
             className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             dateFormat="MMM d, yyyy"

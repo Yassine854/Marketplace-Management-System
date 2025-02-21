@@ -45,7 +45,7 @@ const SalesByCategory: React.FC<{ supplierId: string }> = ({ supplierId }) => {
     const categorySales: Record<string, number> = {};
 
     supplierData.orders.forEach((order) => {
-      if (order.order.state === "confirmed") {
+      if (order.order.state === "delivered") {
         // Only include confirmed orders
         order.order.items.forEach((item) => {
           if (item.supplier.manufacturer_id === supplierId) {

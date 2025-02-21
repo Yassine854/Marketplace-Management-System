@@ -6,7 +6,7 @@
         "orderId": "63453",
         "incrementId": "000052675",
         "kamiounId": "000052675",
-        "state": "confirmed",
+        "state": "delivered",
         "status": "valid",
         "total": 159.09,
         "createdAt": 1739525976,
@@ -136,6 +136,21 @@
             }
           }
         ],
+        "return": {
+          "returnId": "RNT-20240211-008",
+          "orderId": "6427153",
+          "returnStatus": "completed",
+          "refundAmount": 60.0,
+          "returnItems": [
+            {
+              "productId": "5648",
+              "productName": "La Goulette - Thon entier HV 2.1kg",
+              "quantity": "1",
+              "returnDate": 1742040000,
+              "totalPrice": "60.00"
+            }
+          ]
+        },
         "invoice": {
           "invoiceId": "INV-20240211-002",
           "orderId": "63453",
@@ -189,7 +204,7 @@
         "orderId": "63455",
         "incrementId": "000052677",
         "kamiounId": "000052677",
-        "state": "confirmed",
+        "state": "delivered",
         "status": "valid",
         "total": 210.5,
         "createdAt": 1722350694,
@@ -628,7 +643,7 @@
         "orderId": "63454",
         "incrementId": "000052676",
         "kamiounId": "000052676",
-        "state": "canceled",
+        "state": "failed",
         "status": "invalid",
         "total": 0.0,
         "createdAt": 1742040000,
