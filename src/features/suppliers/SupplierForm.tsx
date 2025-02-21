@@ -63,20 +63,53 @@ const SupplierForm = ({
   );
 
   useEffect(() => {
+    // Dans le useEffect de chargement initial :
     const loadData = async () => {
       try {
-        const [suppliersRes, warehousesRes] = await Promise.all([
+        const [suppliersRes, warehousesRes, productsRes] = await Promise.all([
           fetch("/api/manufacturers"),
           fetch("/api/warehouse"),
+          fetch("/api/products"),
         ]);
 
-        const suppliers: Supplier[] = await suppliersRes.json();
-        //const products: Product[] = await productsRes.json();
-        const warehouses: Warehouse[] = await warehousesRes.json();
+        // Traitement des entrepôts
+        const warehousesData = await warehousesRes.json();
+        const validatedWarehouses = warehousesData.map((w: any) => ({
+          warehouse_id: w.warehouseId ?? w.warehouse_id,
+          name: w.warehouseName || w.name,
+          location: w.location,
+          capacity: w.capacity,
+          manager: w.manager,
+        }));
+        setWarehouses(validatedWarehouses);
 
-        setSuppliers(suppliers);
-        //setProducts(products);
-        setWarehouses(warehouses);
+        // Traitement existant des produits
+        const productsData = await productsRes.json();
+        const validatedProducts = productsData.map((p: any) => ({
+          id: p._id,
+          product_id: p.product_id,
+          sku: p.sku,
+          name: p.name,
+          price: p.price,
+          website_ids: p.website_ids?.map(Number) || [],
+          manufacturer: p.manufacturer,
+        }));
+        setProducts(validatedProducts);
+
+        // Traitement existant des fournisseurs
+        const suppliersData = await suppliersRes.json();
+        const validatedSuppliers = suppliersData.map((s: any) => ({
+          manufacturer_id: s.manufacturerId ?? s.manufacturer_id,
+          company_name: s.companyName || s.company_name,
+          contact_name: s.contactName || s.contact_name,
+          email: s.email,
+          phone_number: s.phoneNumber ?? s.phone_number,
+          postal_code: s.postalCode ?? s.postal_code,
+          city: s.city,
+          country: s.country,
+          capital: s.capital,
+        }));
+        setSuppliers(validatedSuppliers);
       } catch (error) {
         console.error("Erreur de chargement des données:", error);
       }
@@ -174,7 +207,7 @@ const SupplierForm = ({
     setPaymentTypes(updatedPayments);
   };
 
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadedFiles, setUploadedFiles] = useState<{ id: string }[]>([]);
   const [fileList, setFileList] = useState([]);
   const handleFileUpload = async (event: any) => {
     const file = event.target.files[0];
@@ -196,7 +229,7 @@ const SupplierForm = ({
       const data = await response.json();
 
       if (response.ok) {
-        setUploadedFile(file.name);
+        setUploadedFiles((prev) => [...prev, ...data.uploadedFiles]);
         setFileList(data.files);
         toast.success("File uploaded successfully");
       } else {
@@ -272,6 +305,9 @@ const SupplierForm = ({
         priceExclTax: item.priceExclTax,
         total: item.total,
       })),
+      files: {
+        connect: uploadedFiles.map((file) => ({ id: file.id })),
+      },
     };
 
     try {
@@ -293,37 +329,37 @@ const SupplierForm = ({
       alert("Échec de l'enregistrement.");
     }
   };
-
   const handleSelectWarehouse = (warehouseName: string): void => {
     const warehouse = warehouses.find((w) => w.name === warehouseName);
 
     if (warehouse) {
       setSelectedWarehouse(warehouse);
 
-      // Vérifier si l'entrepôt a des produits associés
-      if (warehouse.products && warehouse.products.length > 0) {
-        const updatedProducts = warehouse.products.map((product, index) => ({
-          product: {
-            id: product.id || "",
-            productName: product.productName || "",
-            productPrice: product.productPrice || 0,
-            manufacturerId: product.manufacturerId || "",
-            sku: product.sku || "",
-            warehouseIds: product.warehouseIds || [],
-          },
-          quantity: 0,
-          sku: product.sku || "",
-          id: `new-product-${Date.now()}-${index}`,
-          priceExclTax: product.productPrice || 0,
-          total: 0,
-        }));
+      const filteredProducts = products.filter(
+        (product) =>
+          product.manufacturer ===
+            selectedSupplier?.manufacturer_id.toString() &&
+          product.website_ids.includes(warehouse.warehouse_id),
+      );
 
-        setProductsWithQuantities(updatedProducts);
-      } else {
-        console.warn("Cet entrepôt ne contient pas de produits.");
-      }
-    } else {
-      console.error("Entrepôt non trouvé !");
+      const updatedProducts = filteredProducts.map((product) => ({
+        product: {
+          id: product.id, // Utilisation de l'ID MongoDB (string)
+          product_id: product.product_id, // Conservation de l'ID Magento (number)
+          sku: product.sku,
+          name: product.name, // Utilisation de la clé 'name' du type Product
+          price: product.price, // Utilisation de la clé 'price' du type Product
+          website_ids: product.website_ids, // Nom de propriété corrigé
+          manufacturer: product.manufacturer,
+        },
+        quantity: 0,
+        sku: product.sku,
+        id: product.id, // ID string (MongoDB)
+        priceExclTax: product.price || 0,
+        total: 0,
+      }));
+
+      setProductsWithQuantities(updatedProducts);
     }
   };
 
@@ -341,55 +377,66 @@ const SupplierForm = ({
     selectedProductId: string,
     index: number,
   ) => {
-    const selectedProduct = products.find(
-      (product) => product.id === selectedProductId,
-    );
-    if (selectedProduct) {
-      setProductsWithQuantities((prevState) => {
-        const updatedProducts = [...prevState];
-        updatedProducts[index] = {
-          ...updatedProducts[index],
-          product: selectedProduct,
-          sku: selectedProduct.sku,
-          priceExclTax: selectedProduct.productPrice,
-          total: selectedProduct.productPrice * updatedProducts[index].quantity,
-          id: selectedProduct.id,
-        };
+    const selectedProduct = products.find((p) => p.id === selectedProductId);
 
-        return updatedProducts;
+    if (selectedProduct) {
+      setProductsWithQuantities((prev) => {
+        const newState = prev.map((item, i) =>
+          i === index
+            ? {
+                ...item,
+                product: selectedProduct,
+                sku: selectedProduct.sku,
+                priceExclTax: selectedProduct.price,
+                total: selectedProduct.price * item.quantity,
+              }
+            : item,
+        );
+
+        // Ajout automatique d'une nouvelle ligne si dernière ligne modifiée
+        if (index === newState.length - 1) {
+          return [...newState, createEmptyProductRow()];
+        }
+        return newState;
       });
     }
   };
-
   const addNewEmptyRow = () => {
-    setProductsWithQuantities((prevState) => {
-      if (
-        prevState.length === 0 ||
-        prevState[prevState.length - 1].product.id !== ""
-      ) {
-        return [
-          ...prevState,
-          {
-            product: {
-              id: "",
-              productName: "",
-              productPrice: 0,
-              manufacturerId: "",
-              sku: "",
-              warehouseIds: [],
-            },
-            quantity: 0,
-            sku: "",
-            id: `new-product-${Date.now()}`,
-            priceExclTax: 0,
-            total: 0,
-          },
-        ];
+    setProductsWithQuantities((prev) => {
+      if (prev.length === 0 || prev[prev.length - 1].product.id) {
+        return [...prev, createEmptyProductRow()];
       }
-      return prevState;
+
+      return prev;
     });
   };
+  const createEmptyProductRow = () => ({
+    product: {
+      id: "",
 
+      product_id: 0,
+
+      sku: "",
+
+      name: "",
+
+      price: 0,
+
+      website_ids: [],
+
+      manufacturer: "",
+    },
+
+    quantity: 0,
+
+    sku: "",
+
+    id: crypto.randomUUID(), // Génère un ID unique
+
+    priceExclTax: 0,
+
+    total: 0,
+  });
   const handleSendEmail = () => {
     if (
       !selectedSupplier ||
@@ -409,7 +456,7 @@ const SupplierForm = ({
       comment: comment || "No comment provided",
 
       products: productsWithQuantities.map((item) => ({
-        productName: item.product.productName || "Unknown Product",
+        productName: item.product.name || "Unknown Product",
         quantity: item.quantity || 0,
         priceExclTax: item.priceExclTax?.toFixed(2) || "0.00",
         total: item.total?.toFixed(2) || "0.00",
@@ -524,10 +571,11 @@ const SupplierForm = ({
                 {!selectedSupplier && suppliers.length > 0 && (
                   <ul className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg">
                     {suppliers
-                      .filter((supplier) =>
-                        supplier.company_name
-                          .toLowerCase()
-                          .includes(query.toLowerCase()),
+                      .filter(
+                        (supplier) =>
+                          supplier.company_name
+                            ?.toLowerCase()
+                            .includes(query.toLowerCase()),
                       )
                       .map((supplier) => (
                         <li
@@ -603,11 +651,23 @@ const SupplierForm = ({
                         className="w-full rounded-md border border-gray-300 p-2"
                       >
                         <option value="">Select State</option>
-                        <option value="1"> In progress </option>
-                        <option value="2"> Ready</option>
-                        <option value="3"> Delivered </option>
+                        <option value="IN_PROGRESS"> In progress </option>
+                        <option value="READY"> Ready</option>
+                        <option value="DELIVERED"> Delivered </option>
+                        <option value="COMPLETED">Completed</option>
                       </select>
                     </div>
+
+                    <label>
+                      Delivery Date:
+                      <input
+                        type="date"
+                        value={deliveryDate.toISOString().split("T")[0]}
+                        onChange={(e) =>
+                          setDeliveryDate(new Date(e.target.value))
+                        }
+                      />
+                    </label>
                   </div>
                 </form>
               </div>
@@ -624,36 +684,17 @@ const SupplierForm = ({
                       key={item.id}
                       className="mb-6 flex items-center justify-between gap-6"
                     >
-                      {/* Product Selection */}
-                      <div className="w-1/4">
+                      {/* Product Name */}
+                      <div className="w-1/3">
                         <label className="block text-sm font-medium text-gray-700">
-                          Product
+                          Produit
                         </label>
-                        <select
-                          value={item.product.id}
-                          onChange={(e) =>
-                            handleSelectProductInLine(e.target.value, index)
-                          }
-                          className="w-full rounded-md border border-gray-300 p-3"
-                        >
-                          <option value="">Select a product</option>
-                          {products
-                            .filter(
-                              (product) =>
-                                product.manufacturerId ===
-                                  selectedSupplier?.company_name &&
-                                !productsWithQuantities.some(
-                                  (selectedItem) =>
-                                    selectedItem.product.id === product.id &&
-                                    selectedItem.id !== item.id,
-                                ),
-                            )
-                            .map((product) => (
-                              <option key={product.id} value={product.id}>
-                                {product.productName}
-                              </option>
-                            ))}
-                        </select>
+                        <input
+                          type="text"
+                          value={item.product.name}
+                          readOnly
+                          className="w-full rounded-md border border-gray-300 bg-gray-100 p-3"
+                        />
                       </div>
 
                       {/* Quantity */}
@@ -678,7 +719,11 @@ const SupplierForm = ({
                               return updatedProducts;
                             });
                           }}
-                          onBlur={() => addNewEmptyRow()}
+                          onBlur={() => {
+                            if (item.quantity > 0 && item.product.id) {
+                              addNewEmptyRow();
+                            }
+                          }}
                           className="w-full rounded-md border border-gray-300 p-3"
                         />
                       </div>
@@ -755,10 +800,9 @@ const SupplierForm = ({
                         }
                         className="w-1/3 rounded-md border border-gray-300 p-3"
                       >
+                        <option value="0">Select a payment method</option>
                         <option value="CHEQUE">Cheque</option>
-
                         <option value="ESPECES">Cash</option>
-
                         <option value="TRAITE">Traite</option>
                       </select>
                       {payment.type && payment.type !== "cash" && (
@@ -833,12 +877,6 @@ const SupplierForm = ({
               </div>
             </div>
 
-            {/*comment*/}
-            <input
-              type="date"
-              value={deliveryDate.toISOString().split("T")[0]}
-              onChange={(e) => setDeliveryDate(new Date(e.target.value))}
-            />
             <div className="mt-6 rounded-xl border border-gray-300 bg-gray-50 p-4 shadow-sm">
               <label className="mb-2 block text-lg font-semibold text-gray-700">
                 Comment

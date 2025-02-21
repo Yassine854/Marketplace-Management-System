@@ -1,52 +1,53 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
-export const config = {
-  api: {
-    bodyParser: false, // Désactiver le bodyParser pour gérer le fichier manuellement
-  },
-};
+export const config = { api: { bodyParser: false } };
 
-// Fonction pour gérer l'upload de fichier via POST
 export async function POST(req: NextRequest) {
-  if (req.method !== "POST") {
-    return NextResponse.json(
-      { message: "Méthode non autorisée" },
-      { status: 405 },
-    );
+  try {
+    const formData = await req.formData();
+    const file = formData.get("file") as File;
+
+    if (!file) {
+      return NextResponse.json(
+        { message: "Aucun fichier fourni" },
+        { status: 400 },
+      );
+    }
+
+    // Sanitize filename
+    const originalFileName = file.name;
+    const sanitizedFileName = originalFileName
+      .replace(/[^a-zA-Z0-9_.-]/g, "")
+      .toLowerCase();
+    const finalFileName = `${Date.now()}-${sanitizedFileName}`;
+
+    // Setup directories
+    const uploadsDir = path.join(process.cwd(), "public/uploads");
+    if (!fs.existsSync(uploadsDir))
+      fs.mkdirSync(uploadsDir, { recursive: true });
+
+    // Write file
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const filePath = path.join(uploadsDir, finalFileName);
+    fs.writeFileSync(filePath, buffer);
+
+    // DB entry
+    const dbFile = await prisma.file.create({
+      data: { url: `/uploads/${finalFileName}` },
+    });
+
+    return NextResponse.json({
+      success: true,
+      fileId: dbFile.id,
+      fileName: finalFileName,
+      url: dbFile.url,
+    });
+  } catch (error) {
+    console.error("Erreur upload:", error);
+    return NextResponse.json({ message: "Échec de l'upload" }, { status: 500 });
   }
-
-  // Lire le FormData depuis la requête
-  const formData = await req.formData();
-  const file = formData.get("file") as Blob | null;
-
-  if (!file) {
-    return NextResponse.json(
-      { message: "Aucun fichier fourni" },
-      { status: 400 },
-    );
-  }
-
-  // Obtenir le nom original du fichier
-  const fileName = (formData.get("fileName") as string) || "uploaded-file";
-
-  // Définir le dossier où stocker les fichiers
-  const uploadsDir = path.join(process.cwd(), "public/uploads");
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-  }
-
-  // Convertir Blob en Buffer
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-
-  // Sauvegarder le fichier avec son nom et extension
-  const filePath = path.join(uploadsDir, fileName);
-  fs.writeFileSync(filePath, buffer);
-
-  return NextResponse.json({
-    message: "Fichier sauvegardé avec succès!",
-    filePath,
-  });
 }

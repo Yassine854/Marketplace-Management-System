@@ -58,22 +58,25 @@ model Warehouse {
   updatedAt   DateTime @updatedAt
   purchaseOrders PurchaseOrder[] 
 }
-
 model Product {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  magento_id    Int      @unique // ID Magento
-  sku           String   @unique
-  productName   String
-  productPrice  Float
-  manufacturerId  String?
-  categoryIds   Int[]    @db.Int // IDs Magento des catégories
-  warehouseIds  Int[]    @db.Int // IDs Magento des entrepôts
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@index([categoryIds])
-  @@index([warehouseIds])
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  product_id     Int      @unique // ID Magento
+  sku            String   @unique
+  name           String
+  price          Float
+  special_price  Float?
+  cost           Float?
+  manufacturer   String?  // ID du fabricant
+  category_ids   Int[]    @db.Int // IDs Magento des catégories
+  website_ids    Int[]    @db.Int // IDs Magento des entrepôts
+  image          String?
+  url_key        String?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  @@index([category_ids])
 }
+
+
 
 model Manufacturer {
   id                   String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -146,6 +149,17 @@ enum OrderState {
 
 
 }
+model File {
+
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  url       String
+
+  order     PurchaseOrder? @relation(fields: [orderId], references: [id])
+
+  orderId   String?        @db.ObjectId
+
+}
 model PurchaseOrder {
 
   id              String         @id @default(auto()) @map("_id") @db.ObjectId
@@ -159,6 +173,7 @@ model PurchaseOrder {
   status          OrderState
   comments        Comment[]
   payments        Payment[]
+  files           File[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   @@map("purchase_orders")

@@ -19,11 +19,18 @@ export type Supplier = {
 
 export type Product = {
   id: string;
-  productName: string;
-  productPrice: number;
+
+  product_id: number;
+
   sku: string;
-  manufacturerId: string;
-  warehouseIds: number[];
+
+  name: string;
+
+  price: number;
+
+  website_ids: number[];
+
+  manufacturer: string;
 };
 
 export interface ProductDetails {

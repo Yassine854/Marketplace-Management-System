@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export async function GET() {
   try {
     const manufacturers = await prisma.manufacturer.findMany();
-
+    console.log(manufacturers);
     return NextResponse.json(
       manufacturers.map(
         (m: {
