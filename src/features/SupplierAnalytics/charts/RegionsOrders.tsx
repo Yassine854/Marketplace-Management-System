@@ -18,7 +18,7 @@ interface Order {
 }
 
 interface Product {
-  id: number;
+  product_id: number;
   manufacturer: string;
 }
 
@@ -53,7 +53,7 @@ const OrdersByRegion: React.FC<{ supplierId: string }> = ({ supplierId }) => {
         const validProductIds = new Set(
           products
             .filter((p) => p.manufacturer === supplierId)
-            .map((p) => p.id),
+            .map((p) => p.product_id),
         );
 
         const filteredOrders = orders.filter((order: Order) => {

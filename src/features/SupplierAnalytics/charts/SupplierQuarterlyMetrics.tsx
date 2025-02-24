@@ -1,10 +1,25 @@
 import React, { useEffect, useState } from "react";
-import orderData from "../../../../data_test.json";
+
+interface Order {
+  created_at: string;
+  state: string;
+  customer_id: number;
+  items: Array<{
+    product_id: number;
+    qty_invoiced: number;
+  }>;
+}
+
+interface Product {
+  product_id: number;
+  manufacturer: string;
+  cost: number;
+}
 
 interface QuarterlyData {
   quarter: string;
   totalOrders: number;
-  uniqueCustomers: Set<string>;
+  uniqueCustomers: Set<number>;
   turnover: number;
 }
 
@@ -16,107 +31,89 @@ const SupplierQuarterlyMetrics = ({ supplierId }: { supplierId: string }) => {
   const [availableYears, setAvailableYears] = useState<number[]>([]);
 
   useEffect(() => {
-    // Get all products for this supplier
-    const supplierProducts = orderData.products.filter(
-      (p) => p.product.supplier?.manufacturer_id === supplierId,
-    );
-
-    // Filter valid confirmed orders containing supplier's products
-    const orders = orderData.orders.filter(
-      ({ order }) =>
-        order.state === "delivered" &&
-        order.status === "valid" &&
-        order.items.some(
-          (item) =>
-            "supplier" in item && item.supplier?.manufacturer_id === supplierId,
-        ),
-    );
-
-    // Extract unique years from orders
-    const years = Array.from(
-      new Set(
-        orders.map(({ order }) =>
-          new Date(order.createdAt * 1000).getFullYear(),
-        ),
+    Promise.all([
+      fetch("http://localhost:3000/api/orders").then(
+        (res) => res.json() as Promise<Order[]>,
       ),
-    ).sort((a, b) => b - a);
+      fetch("http://localhost:3000/api/products").then(
+        (res) => res.json() as Promise<Product[]>,
+      ),
+    ]).then(([orders, products]) => {
+      const supplierProducts = products.filter(
+        (p) => p.manufacturer === supplierId,
+      );
+      const supplierProductIds = new Set(
+        supplierProducts.map((p) => p.product_id),
+      );
+      const productMap = new Map(
+        supplierProducts.map((p) => [p.product_id, p]),
+      );
 
-    setAvailableYears(years);
-    if (years.length > 0 && !years.includes(selectedYear)) {
-      setSelectedYear(years[0]);
-    }
+      const validOrders = orders.filter(
+        (order) =>
+          order.state !== "canceled" &&
+          order.items.some((item) => supplierProductIds.has(item.product_id)),
+      );
 
-    // Data processing
-    const quarterlyMap = new Map<string, QuarterlyData>();
-    const productSalesMap = new Map<string, Map<string, number>>(); // productId -> quarter -> soldQty
+      const years = Array.from(
+        new Set(
+          validOrders.map((order) => new Date(order.created_at).getFullYear()),
+        ),
+      ).sort((a: number, b: number) => b - a);
 
-    // Initialize sales tracking structure
-    supplierProducts.forEach((product) => {
-      productSalesMap.set(product.product.productId, new Map<string, number>());
-    });
-
-    // First pass: Aggregate sales per product per quarter
-    orders.forEach(({ order }) => {
-      const orderDate = new Date(order.createdAt * 1000);
-      const year = orderDate.getFullYear();
-      const quarter = `Q${Math.floor(orderDate.getMonth() / 3) + 1}`;
-
-      if (year !== selectedYear) return;
-
-      // Initialize quarter data if not exists
-      const quarterKey = `${quarter} ${selectedYear}`;
-      if (!quarterlyMap.has(quarterKey)) {
-        quarterlyMap.set(quarterKey, {
-          quarter,
-          totalOrders: 0,
-          uniqueCustomers: new Set(),
-          turnover: 0,
-        });
+      setAvailableYears(years);
+      if (years.length > 0 && !years.includes(selectedYear)) {
+        setSelectedYear(years[0]);
       }
 
-      const quarterData = quarterlyMap.get(quarterKey)!;
-      quarterData.totalOrders++;
-      quarterData.uniqueCustomers.add(order.customerId);
+      const quarterlyMap = validOrders.reduce(
+        (acc: Map<string, QuarterlyData>, order) => {
+          const orderDate = new Date(order.created_at);
+          const year = orderDate.getFullYear();
+          if (year !== selectedYear) return acc;
 
-      // Process items
-      order.items.forEach((item) => {
-        if (
-          "supplier" in item &&
-          item.supplier?.manufacturer_id === supplierId
-        ) {
-          const productSales = productSalesMap.get(item.productId);
-          if (productSales) {
-            const currentQty = productSales.get(quarter) || 0;
-            productSales.set(quarter, currentQty + parseFloat(item.quantity));
+          const quarter = `Q${
+            Math.floor(orderDate.getMonth() / 3) + 1
+          } - ${year}`;
+
+          if (!acc.has(quarter)) {
+            acc.set(quarter, {
+              quarter,
+              totalOrders: 0,
+              uniqueCustomers: new Set<number>(),
+              turnover: 0,
+            });
           }
-        }
-      });
+
+          const quarterData = acc.get(quarter)!;
+          quarterData.totalOrders++;
+
+          if (order.customer_id) {
+            quarterData.uniqueCustomers.add(order.customer_id);
+          }
+
+          order.items.forEach((item) => {
+            if (supplierProductIds.has(item.product_id)) {
+              const product = productMap.get(item.product_id);
+              if (product) {
+                quarterData.turnover += item.qty_invoiced * product.cost;
+              }
+            }
+          });
+
+          return acc;
+        },
+        new Map<string, QuarterlyData>(),
+      );
+
+      setQuartersData(Array.from(quarterlyMap.values()));
     });
-
-    // Second pass: Calculate turnover for each quarter
-    quarterlyMap.forEach((quarterData, quarterKey) => {
-      let turnover = 0;
-
-      supplierProducts.forEach((product) => {
-        const productId = product.product.productId;
-        const costPrice = parseFloat(product.product.costPrice);
-        const currentQty = parseFloat(product.product.qty);
-        const soldInQuarter =
-          productSalesMap.get(productId)?.get(quarterData.quarter) || 0;
-
-        turnover += (currentQty + soldInQuarter) * costPrice;
-      });
-
-      quarterData.turnover = turnover;
-    });
-
-    setQuartersData(Array.from(quarterlyMap.values()));
   }, [supplierId, selectedYear]);
 
   return (
     <div className="border-stroke rounded-lg border bg-white p-6 shadow-lg">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xl font-semibold">Quarterly Performance</h3>
+        <h3 className="text-xl font-semibold">Performance Trimestrielle</h3>
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(Number(e.target.value))}
@@ -133,10 +130,10 @@ const SupplierQuarterlyMetrics = ({ supplierId }: { supplierId: string }) => {
       <table className="w-full">
         <thead>
           <tr className="bg-gray-100">
-            <th className="p-3 text-left">Quarter</th>
-            <th className="p-3 text-left">Total Orders</th>
-            <th className="p-3 text-left">Unique Customers</th>
-            <th className="p-3 text-left">Turnover</th>
+            <th className="p-3 text-left">Trimestre</th>
+            <th className="p-3 text-left">Total des Commandes</th>
+            <th className="p-3 text-left">Clients Uniques</th>
+            <th className="p-3 text-left">Chiffre d&apos;Affaires</th>
           </tr>
         </thead>
         <tbody>

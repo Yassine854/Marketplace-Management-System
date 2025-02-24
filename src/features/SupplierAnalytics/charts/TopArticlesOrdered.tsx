@@ -4,18 +4,12 @@ import ReactApexChart from "react-apexcharts";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const newColors = [
-  "#FF6B6B",
-  "#FFD700",
-  "#4ECDC4",
-  "#A78BFA",
-  "#E84393",
-  "#6C5CE7",
-  "#839788",
-  "#D95D39",
-  "#00CEC9",
-  "#FF9F43",
-];
+const generateUniqueColors = (count: number) => {
+  return Array.from(
+    { length: count },
+    (_, i) => `hsl(${(i * 137.508) % 360}, 70%, 50%)`,
+  );
+};
 
 interface OrderItem {
   product_id: number;
@@ -29,7 +23,7 @@ interface Order {
 }
 
 interface Product {
-  id: number;
+  product_id: number;
   name: string;
   manufacturer: string;
 }
@@ -49,6 +43,9 @@ const TopArticlesOrdered: React.FC<Props> = ({
     propStartDate || null,
   );
   const [endDate, setEndDate] = useState<Date | null>(propEndDate || null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 4;
+
   const [state, setState] = useState<{
     series: number[];
     labels: string[];
@@ -83,29 +80,32 @@ const TopArticlesOrdered: React.FC<Props> = ({
             ) {
               order.items.forEach((item) => {
                 const product = filteredProducts.find(
-                  (p: Product) => p.id === item.product_id,
+                  (p: Product) => p.product_id === item.product_id,
                 );
                 if (product) {
-                  if (!productOrders[product.name]) {
-                    productOrders[product.name] = 0;
-                  }
-                  productOrders[product.name]++;
+                  productOrders[product.name] =
+                    (productOrders[product.name] || 0) + item.qty_invoiced;
                 }
               });
             }
           }
         });
 
+        const sortedEntries = Object.entries(productOrders).sort(
+          (a, b) => b[1] - a[1],
+        );
+
+        const labels = sortedEntries.map(([name]) => name);
+        const ordersCount = sortedEntries.map(([, count]) => count);
         const totalOrders =
-          Object.values(productOrders).reduce((acc, count) => acc + count, 0) ||
-          1;
-        const labels = Object.keys(productOrders);
+          ordersCount.reduce((acc, count) => acc + count, 0) || 1;
+
         setState({
-          series: labels.map((name) =>
-            Number(((productOrders[name] / totalOrders) * 100).toFixed(2)),
+          series: ordersCount.map((count) =>
+            Number(((count / totalOrders) * 100).toFixed(2)),
           ),
           labels,
-          ordersCount: labels.map((name) => productOrders[name]),
+          ordersCount,
         });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -115,6 +115,14 @@ const TopArticlesOrdered: React.FC<Props> = ({
     fetchData();
   }, [supplierId, startDate, endDate]);
 
+  const totalPages = Math.ceil(state.labels.length / itemsPerPage);
+  const currentItems = state.labels.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage,
+  );
+
+  const colors = generateUniqueColors(state.labels.length);
+
   const options: ApexOptions = {
     chart: {
       type: "donut",
@@ -123,7 +131,7 @@ const TopArticlesOrdered: React.FC<Props> = ({
       background: "#FFFFFF",
     },
     labels: state.labels,
-    colors: newColors.slice(0, state.labels.length),
+    colors: colors,
     legend: { show: false },
     plotOptions: { pie: { donut: { size: "65%" } } },
     dataLabels: {
@@ -141,8 +149,11 @@ const TopArticlesOrdered: React.FC<Props> = ({
 
   return (
     <div className="w-full rounded-xl border border-gray-100 bg-white p-6 shadow-lg">
+      <h3 className="mb-6 text-center text-2xl font-semibold">
+        Produits les plus commandés
+      </h3>
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <label className="text-sm font-medium">Période :</label>
+        <label className="text-sm font-medium">Période:</label>
         <div className="flex gap-3">
           <DatePicker
             selected={startDate}
@@ -163,42 +174,63 @@ const TopArticlesOrdered: React.FC<Props> = ({
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-100 bg-white p-4 shadow-inner">
-        <h3 className="mb-6 text-center text-2xl font-semibold">
-          Produits les plus commandés
-        </h3>
-        <ReactApexChart
-          options={options}
-          series={state.series}
-          type="donut"
-          height={350}
-        />
-      </div>
-
-      <hr className="my-6 border-gray-300" />
-
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {state.labels.map((product, index) => (
-          <div
-            key={product}
-            className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
-          >
-            <div
-              className="mt-1 h-5 w-5 flex-shrink-0 rounded-full"
-              style={{ backgroundColor: newColors[index % newColors.length] }}
-            />
-            <div className="flex-1">
-              <div className="flex flex-col">
-                <span className="break-words font-medium text-gray-800">
-                  {product}
-                </span>
-                <span className="mt-1 text-sm text-gray-500">
-                  {state.ordersCount[index]} commandes
-                </span>
+      <div className="flex flex-col items-start sm:flex-row">
+        <div className="flex w-full justify-center sm:w-1/2">
+          <ReactApexChart
+            options={options}
+            series={state.series}
+            type="donut"
+            height={350}
+          />
+        </div>
+        <div className="w-full space-y-4 sm:w-1/2">
+          {currentItems.map((product, index) => {
+            const globalIndex = currentPage * itemsPerPage + index;
+            return (
+              <div
+                key={product}
+                className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm hover:shadow-md"
+              >
+                <div
+                  className="mt-1 h-5 w-5 flex-shrink-0 rounded-full"
+                  style={{ backgroundColor: colors[globalIndex] }}
+                />
+                <div className="flex-1">
+                  <span className="font-medium text-gray-800">{product}</span>
+                  <span className="mt-1 text-sm text-gray-500">
+                    {" "}
+                    : {state.ordersCount[globalIndex]} commandes
+                  </span>
+                </div>
               </div>
+            );
+          })}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="mt-4 flex justify-between">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
+                disabled={currentPage === 0}
+                className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Précédent
+              </button>
+              <span className="text-sm text-gray-700">
+                Page {currentPage + 1} sur {totalPages}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1))
+                }
+                disabled={currentPage >= totalPages - 1}
+                className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Suivant
+              </button>
             </div>
-          </div>
-        ))}
+          )}
+        </div>
       </div>
     </div>
   );

@@ -24,14 +24,14 @@ interface Customer {
 interface Order {
   entity_id: number;
   customer_id?: number;
-  created_at: { $date: string };
+  created_at: string; // Corrected interface
   state: string;
   status: string;
   items: Array<{ product_id: number }>;
 }
 
 interface Product {
-  id: number;
+  product_id: number;
   manufacturer: string;
 }
 
@@ -58,7 +58,6 @@ const ClientSegment: React.FC<{
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch all necessary data
         const [ordersResponse, customersResponse, productsResponse] =
           await Promise.all([
             fetch("http://localhost:3000/api/orders"),
@@ -70,7 +69,6 @@ const ClientSegment: React.FC<{
         const customers: Customer[] = await customersResponse.json();
         const products: Product[] = await productsResponse.json();
 
-        // Create mappings
         const customerProfileMap = customers.reduce(
           (acc: Record<number, string>, customer) => {
             acc[customer.id] = customer.retailer_profile || "N/A";
@@ -81,28 +79,44 @@ const ClientSegment: React.FC<{
 
         const productManufacturerMap = products.reduce(
           (acc: Record<number, string>, product) => {
-            acc[product.id] = product.manufacturer;
+            acc[product.product_id] = product.manufacturer;
             return acc;
           },
           {},
         );
 
-        // Filter orders
+        // UTC date boundary calculations
+        const startUTC = startDate
+          ? Date.UTC(
+              startDate.getFullYear(),
+              startDate.getMonth(),
+              startDate.getDate(),
+            )
+          : null;
+
+        const endUTC = endDate
+          ? Date.UTC(
+              endDate.getFullYear(),
+              endDate.getMonth(),
+              endDate.getDate() + 1,
+            ) - 1
+          : null;
+
+        // Filter orders with UTC comparison
         const filteredOrders = orders.filter((order) => {
-          const orderDate = new Date(order.created_at.$date);
+          const orderTimestamp = new Date(order.created_at).getTime();
           const hasSupplierProducts = order.items.some(
             (item) => productManufacturerMap[item.product_id] === supplierId,
           );
 
-          return (
-            order.state != "canceled" &&
-            hasSupplierProducts &&
-            (!startDate || orderDate >= startDate) &&
-            (!endDate || orderDate <= endDate)
-          );
+          const dateValid =
+            (!startUTC || orderTimestamp >= startUTC) &&
+            (!endUTC || orderTimestamp <= endUTC);
+
+          return order.state !== "canceled" && hasSupplierProducts && dateValid;
         });
 
-        // Process customer profiles
+        // Track unique customers
         const profileDistribution: Record<string, Set<number>> = {};
         const allCustomers = new Set<number>();
 
@@ -114,7 +128,7 @@ const ClientSegment: React.FC<{
               profileDistribution[profile] = new Set();
             }
 
-            if (!profileDistribution[profile].has(order.customer_id)) {
+            if (!allCustomers.has(order.customer_id)) {
               profileDistribution[profile].add(order.customer_id);
               allCustomers.add(order.customer_id);
             }
@@ -178,12 +192,12 @@ const ClientSegment: React.FC<{
   return (
     <div className="w-full rounded-xl border border-gray-100 bg-white p-6 shadow-lg">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <label className="text-sm font-medium">Date Range:</label>
+        <label className="text-sm font-medium">Période:</label>
         <div className="flex gap-3">
           <DatePicker
             selected={startDate}
             onChange={setStartDate}
-            placeholderText="Start Date"
+            placeholderText="Date Début"
             className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             dateFormat="MMM d, yyyy"
             isClearable
@@ -191,7 +205,7 @@ const ClientSegment: React.FC<{
           <DatePicker
             selected={endDate}
             onChange={setEndDate}
-            placeholderText="End Date"
+            placeholderText="Date Fin"
             className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             dateFormat="MMM d, yyyy"
             isClearable

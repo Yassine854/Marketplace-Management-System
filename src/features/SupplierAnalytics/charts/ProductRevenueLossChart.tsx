@@ -1,138 +1,163 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ApexCharts from "react-apexcharts";
-import supplierData from "../../../../data_test.json"; // Ensure the path is correct
 
 interface ProductRevenueLossChartProps {
   supplierId: string;
+}
+
+interface OrderItem {
+  product_id: number;
+  amount_refunded: number;
+}
+
+interface Order {
+  created_at: string;
+  items: OrderItem[];
+  state: string;
+}
+
+interface Product {
+  product_id: number;
+  manufacturer: string;
 }
 
 const ProductRevenueLossChart: React.FC<ProductRevenueLossChartProps> = ({
   supplierId,
 }) => {
   const [timeFilter, setTimeFilter] = useState("yearly");
-  const currentYear = new Date().getFullYear();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Filter orders based on the supplierId
-  const orders = supplierData.orders.filter((order) =>
-    order.order.items.some(
-      (item) => item.supplier.manufacturer_id === supplierId,
-    ),
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [ordersRes, productsRes] = await Promise.all([
+          fetch("http://localhost:3000/api/orders"),
+          fetch("http://localhost:3000/api/products"),
+        ]);
+
+        const ordersData = await ordersRes.json();
+        const productsData = await productsRes.json();
+
+        setOrders(ordersData);
+        setProducts(productsData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Get supplier's product IDs
+  const supplierProductIds = new Set(
+    products
+      .filter((product) => product.manufacturer === supplierId)
+      .map((product) => product.product_id),
   );
 
-  // Group returns revenue loss based on the selected time filter
-  const revenueLossByTime: { [key: string]: number } = {};
-
-  orders.forEach((order) => {
-    if (order.order.state === "canceled" && order.order.return) {
-      order.order.return.returnItems.forEach((returnItem) => {
-        const returnDate = new Date(returnItem.returnDate * 1000);
-        const returnYear = returnDate.getFullYear();
-
-        const totalCost = parseFloat(returnItem.totalPrice);
-
-        let key;
-        switch (timeFilter) {
-          case "monthly":
-            key = `${returnDate.getFullYear()}-${returnDate.getMonth() + 1}`;
-            break;
-          case "weekly":
-            key = `${returnDate.getFullYear()}-W${Math.ceil(
-              returnDate.getDate() / 7,
-            )}`;
-            break;
-          case "daily":
-            key = returnDate.toISOString().split("T")[0];
-            break;
-          case "semestrial":
-            key = `${returnDate.getFullYear()}-S${
-              returnDate.getMonth() < 6 ? 1 : 2
-            }`;
-            break;
-          default:
-            key = returnDate.getFullYear().toString();
-        }
-
-        if (!revenueLossByTime[key]) {
-          revenueLossByTime[key] = 0;
-        }
-        revenueLossByTime[key] += totalCost;
-      });
+  const getTimeKey = (date: Date, filter: string) => {
+    const pad = (n: number) => String(n).padStart(2, "0");
+    switch (filter) {
+      case "daily":
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+          date.getDate(),
+        )}`;
+      case "weekly":
+        return `${date.getFullYear()}-W${Math.ceil(date.getDate() / 7)}`;
+      case "monthly":
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}`;
+      case "semestrial":
+        return `${date.getFullYear()}-S${date.getMonth() < 6 ? 1 : 2}`;
+      default:
+        return `${date.getFullYear()}`;
     }
-  });
+  };
 
-  // Sort the time labels
-  const timeLabels = Object.keys(revenueLossByTime).sort();
-  const revenueValues = timeLabels.map((time) => revenueLossByTime[time] || 0);
+  const { labels, values } = orders.reduce(
+    (acc, order) => {
+      const orderDate = new Date(order.created_at);
+      const timeKey = getTimeKey(orderDate, timeFilter);
 
-  // Prepare the chart data for the bar chart
+      // Filter items for supplier's products and calculate refunds
+      const totalRefund = order.items
+        .filter((item) => supplierProductIds.has(item.product_id))
+        .reduce((sum, item) => sum + (item.amount_refunded || 0), 0);
+
+      if (totalRefund > 0) {
+        acc.labels.add(timeKey);
+        acc.values[timeKey] = (acc.values[timeKey] || 0) + totalRefund;
+      }
+
+      return acc;
+    },
+    {
+      labels: new Set<string>(),
+      values: {} as { [key: string]: number },
+    },
+  );
+
+  const sortedLabels = Array.from(labels).sort();
   const chartData = {
     series: [
       {
-        name: "Total Cost of Returns",
-        data: revenueValues,
+        name: "Montant du Remboursement",
+        data: sortedLabels.map((label) => values[label]),
       },
     ],
     options: {
       chart: {
-        type: "bar" as "bar",
-        height: 300,
-        background: "#ffffff",
-        responsive: [
-          {
-            breakpoint: 768,
-            options: {
-              chart: { height: 300 },
-              xaxis: { labels: { rotate: -45 } },
-            },
-          },
-          {
-            breakpoint: 480,
-            options: {
-              chart: { height: 250 },
-              xaxis: { labels: { show: false } },
-            },
-          },
-        ],
+        type: "bar" as const,
+        height: 350,
+        toolbar: { show: false },
       },
       xaxis: {
-        categories: timeLabels,
-        title: { text: "Time" },
+        categories: sortedLabels,
+        title: { text: "Temps" },
+        labels: { rotate: -45 },
       },
       yaxis: {
-        title: { text: "Revenue Loss (TND)" },
+        title: { text: "Montant du Remboursement (TND)" },
         labels: {
-          formatter: (val: number) => `${val.toFixed(2)} TND`,
+          formatter: (val: number) => `TND ${val.toFixed(2)}`,
         },
       },
       title: {
-        text: `Product Revenue Loss (${timeFilter})`,
-        align: "center" as "center",
+        text: `Remboursements de Produits (${timeFilter})`,
+        align: "center" as const,
+        style: { fontSize: "16px" },
       },
       tooltip: {
-        y: {
-          formatter: (val: number) => `${val.toFixed(2)} TND`,
-        },
+        y: { formatter: (val: number) => `TND ${val.toFixed(2)}` },
       },
     },
   };
 
   return (
-    <div className="mt-6 w-full rounded-lg bg-white p-4">
-      <div className="mb-4">
-        <label className="mr-2">Filter:</label>
+    <div className="mt-6 w-full rounded-lg bg-white p-4 shadow-sm">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Analyse des Remboursements</h3>
         <select
           value={timeFilter}
           onChange={(e) => setTimeFilter(e.target.value)}
-          className="border p-2"
+          className="rounded-md border p-2 text-sm focus:ring-2 focus:ring-blue-500"
         >
-          <option value="yearly">Yearly</option>
-          <option value="monthly">Monthly</option>
-          <option value="weekly">Weekly</option>
-          <option value="daily">Daily</option>
-          <option value="semestrial">Semestrial</option>
+          <option value="annuel">Annuel</option>
+          <option value="mensuel">Mensuel</option>
+          <option value="hebdomadaire">Hebdomadaire</option>
+          <option value="quotidien">Quotidien</option>
+          <option value="semestriel">Semestriel</option>
         </select>
       </div>
-      {revenueValues.length > 0 ? (
+
+      {loading ? (
+        <div className="py-8 text-center">
+          Chargement des données de remboursement...
+        </div>
+      ) : sortedLabels.length > 0 ? (
         <ApexCharts
           options={chartData.options}
           series={chartData.series}
@@ -140,7 +165,9 @@ const ProductRevenueLossChart: React.FC<ProductRevenueLossChartProps> = ({
           height={400}
         />
       ) : (
-        <p>No return data available for the selected time filter.</p>
+        <div className="py-8 text-center text-gray-500">
+          Aucune donnée de remboursement disponible pour la période sélectionnée
+        </div>
       )}
     </div>
   );

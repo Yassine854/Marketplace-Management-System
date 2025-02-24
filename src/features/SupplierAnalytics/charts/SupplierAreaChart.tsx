@@ -1,88 +1,100 @@
 import { ApexOptions } from "apexcharts";
 import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
-import supplierData from "../../../../data_test.json";
 
 interface RevenueOverTimeChartProps {
   supplierId: string;
+}
+
+interface Order {
+  created_at: string;
+  state: string;
+  items: Array<{
+    product_id: number;
+    qty_invoiced: number;
+  }>;
+}
+
+interface Product {
+  product_id: number;
+  manufacturer: string;
+  cost: number;
 }
 
 const SupplierAreaChart: React.FC<RevenueOverTimeChartProps> = ({
   supplierId,
 }) => {
   const [chartData, setChartData] = useState<any>(null);
-  const [timeFilter, setTimeFilter] = useState("yearly");
-
-  // Get supplier products and pre-cache costPrice/qty
-  const supplierProducts = supplierData.products.filter(
-    (p: any) => p.product.supplier?.manufacturer_id === supplierId,
-  );
-
-  // Pre-map products for quick lookup
-  const productMap = new Map(
-    supplierProducts.map((p: any) => [
-      p.product.productId,
-      {
-        costPrice: parseFloat(p.product.costPrice),
-        qty: parseFloat(p.product.qty),
-        orderedQty: 0,
-      },
-    ]),
-  );
+  const [timeFilter, setTimeFilter] = useState("annuel");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
+    Promise.all([
+      fetch("http://localhost:3000/api/orders").then(
+        (res) => res.json() as Promise<Order[]>,
+      ),
+      fetch("http://localhost:3000/api/products").then(
+        (res) => res.json() as Promise<Product[]>,
+      ),
+    ]).then(([ordersData, productsData]) => {
+      setOrders(ordersData);
+      setProducts(productsData);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (orders.length === 0 || products.length === 0) return;
+
+    // Get supplier products and create product map
+    const supplierProducts = products.filter(
+      (p) => p.manufacturer === supplierId,
+    );
+    const productMap = new Map(supplierProducts.map((p) => [p.product_id, p]));
     const timeSeries: { [key: string]: number } = {};
 
-    // First pass: Calculate base turnover from inventory
-    const baseTurnover = Array.from(productMap.values()).reduce(
-      (sum, product) => sum + product.costPrice * product.qty,
-      0,
-    );
+    // Process valid orders
+    orders.forEach((order) => {
+      if (order.state === "canceled") return;
 
-    // Second pass: Process orders and accumulate ordered quantities
-    supplierData.orders.forEach(({ order }: any) => {
-      if (order.state !== "delivered") return;
-
-      const orderDate = new Date(order.createdAt * 1000);
+      const orderDate = new Date(order.created_at);
       const timeKey = getTimeKey(orderDate);
 
-      order.items.forEach((item: any) => {
-        if (item.supplier.manufacturer_id !== supplierId) return;
-
-        const product = productMap.get(item.productId);
+      order.items.forEach((item) => {
+        const product = productMap.get(item.product_id);
         if (!product) return;
 
-        const orderedQty = parseFloat(item.quantity);
-        product.orderedQty += orderedQty;
-
-        const turnoverContribution = product.costPrice * orderedQty;
-        timeSeries[timeKey] = (timeSeries[timeKey] || 0) + turnoverContribution;
+        const turnover = item.qty_invoiced * product.cost;
+        timeSeries[timeKey] = (timeSeries[timeKey] || 0) + turnover;
       });
     });
 
-    // Combine base turnover with time-based contributions
+    // Sort and format data for chart
     const timeLabels = Object.keys(timeSeries).sort();
-    const turnoverData = timeLabels.map(
-      (time) => baseTurnover + timeSeries[time],
-    );
+    const turnoverData = timeLabels.map((time) => timeSeries[time]);
 
     setChartData({
       series: [{ name: "Turnover", data: turnoverData }],
       options: getChartOptions(timeLabels, timeFilter),
     });
-  }, [supplierId, timeFilter]);
+  }, [orders, products, supplierId, timeFilter]);
 
   // Helper function to generate time keys
   const getTimeKey = (date: Date) => {
     switch (timeFilter) {
-      case "monthly":
-        return `${date.getFullYear()}-${date.getMonth() + 1}`;
-      case "weekly":
-        return `${date.getFullYear()}-W${Math.ceil(date.getDate() / 7)}`;
-      case "daily":
+      case "mensuel":
+        return `${date.getFullYear()}-${(date.getMonth() + 1)
+          .toString()
+          .padStart(2, "0")}`;
+      case "hebdomadaire":
+        const weekNumber = Math.ceil(date.getDate() / 7);
+        return `${date.getFullYear()}-W${weekNumber
+          .toString()
+          .padStart(2, "0")}`;
+      case "quotidien":
         return date.toISOString().split("T")[0];
-      case "semestrial":
-        return `${date.getFullYear()}-S${date.getMonth() < 6 ? 1 : 2}`;
+      case "semestriel":
+        return `${date.getFullYear()}-S${date.getMonth() < 6 ? "01" : "02"}`;
       default:
         return date.getFullYear().toString();
     }
@@ -100,35 +112,39 @@ const SupplierAreaChart: React.FC<RevenueOverTimeChartProps> = ({
     },
     xaxis: {
       categories,
-      title: { text: "Time" },
+      title: { text: "Temps" }, // "Time" -> "Temps"
+      type: "category",
     },
     yaxis: {
-      title: { text: "Turnover (TND)" },
+      title: { text: "Chiffre d'affaires (TND)" }, // "Turnover (TND)" -> "Chiffre d'affaires (TND)"
       labels: { formatter: (val: number) => `${val.toFixed(0)} TND` },
     },
     title: {
-      text: `Turnover (${filter})`,
+      text: `Chiffre d'affaires (${filter})`, // "Turnover" -> "Chiffre d'affaires"
       align: "center",
     },
     tooltip: {
       y: { formatter: (val: number) => `${val.toFixed(2)} TND` },
     },
+    dataLabels: { enabled: false },
+    stroke: { curve: "smooth" },
   });
 
   return (
     <div className="mt-6 w-full bg-white p-4">
       <div className="mb-4">
-        <label className="mr-2">Filter:</label>
+        <label className="mr-2">Filtrer :</label>{" "}
+        {/* "Filter:" -> "Filtrer :" */}
         <select
           value={timeFilter}
           onChange={(e) => setTimeFilter(e.target.value)}
           className="border p-2"
         >
-          <option value="yearly">Yearly</option>
-          <option value="monthly">Monthly</option>
-          <option value="weekly">Weekly</option>
-          <option value="daily">Daily</option>
-          <option value="semestrial">Semestrial</option>
+          <option value="annuel">Annuel</option>
+          <option value="mensuel">Mensuel</option>
+          <option value="hebdomadaire">Hebdomadaire</option>
+          <option value="quotidien">Quotidien</option>
+          <option value="semestriel">Semestriel</option>
         </select>
       </div>
       {chartData ? (
@@ -139,7 +155,7 @@ const SupplierAreaChart: React.FC<RevenueOverTimeChartProps> = ({
           height={400}
         />
       ) : (
-        <p>Loading chart data...</p>
+        <p>Chargement des données du graphique...</p>
       )}
     </div>
   );

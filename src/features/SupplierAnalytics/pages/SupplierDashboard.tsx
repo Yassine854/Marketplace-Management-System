@@ -22,7 +22,7 @@ import InventoryTrendChart from "../charts/InventoryTrendChart";
 import EmailFormPopup from "./email";
 import "react-datepicker/dist/react-datepicker.css";
 
-const supplierId = "9"; // Example supplier ID (e.g., Technofood)
+const supplierId = "27"; // Example supplier ID (e.g., Technofood)
 
 const SupplierDashboard = () => {
   const [startDate, setStartDate] = useState<Date | null>(null); // Default to null
@@ -75,11 +75,13 @@ const SupplierDashboard = () => {
   const supplierProducts = products.filter(
     (p) => p.manufacturer === supplierId,
   );
-  const supplierProductIds = new Set(supplierProducts.map((p) => p.id));
+  const supplierProductIds = new Set(supplierProducts.map((p) => p.product_id));
 
   const totalValidOrders = orders.filter(
     (order) =>
       order.state != "canceled" &&
+      (!startDate || new Date(order.created_at) >= startDate) &&
+      (!endDate || new Date(order.created_at) <= endDate) &&
       order.items.some((item: { product_id: number }) =>
         supplierProductIds.has(item.product_id),
       ),
@@ -90,6 +92,8 @@ const SupplierDashboard = () => {
   orders.forEach((order) => {
     if (
       order.state != "canceled" &&
+      (!startDate || new Date(order.created_at) >= startDate) &&
+      (!endDate || new Date(order.created_at) <= endDate) &&
       order.items.some((item: { product_id: number }) =>
         supplierProductIds.has(item.product_id),
       )
@@ -103,7 +107,12 @@ const SupplierDashboard = () => {
 
   //Total returned products
   const totalReturns = orders
-    .filter((order) => order.state !== "canceled")
+    .filter(
+      (order) =>
+        order.state !== "canceled" &&
+        (!startDate || new Date(order.created_at) >= startDate) &&
+        (!endDate || new Date(order.created_at) <= endDate),
+    )
     .flatMap((order) => order.items)
     .filter(
       (item) =>
@@ -112,28 +121,19 @@ const SupplierDashboard = () => {
     .reduce((sum, item) => sum + item.qty_refunded, 0);
 
   //Chiffre d'affaires
-
-  const currentInventoryValue = supplierProducts.reduce((total, product) => {
-    const cost = product.cost || 0;
-    const stockQty = product.stock_item?.qty || 0;
-    return total + cost * stockQty;
-  }, 0);
-
-  const soldProductsValue = orders
-    .filter((order) => order.state !== "canceled")
-    .flatMap((order) => order.items)
+  const totalTurnover = orders
     .filter(
-      (item) =>
-        supplierProductIds.has(item.product_id) && item.qty_invoiced > 0,
+      (order) =>
+        order.state !== "canceled" &&
+        (!startDate || new Date(order.created_at) >= startDate) &&
+        (!endDate || new Date(order.created_at) <= endDate),
     )
-    .reduce((total, item) => {
-      const product = supplierProducts.find((p) => p.id === item.product_id);
-      const cost = product?.cost || 0;
-      const netQty = (item.qty_invoiced || 0) - (item.qty_refunded || 0);
-      return total + cost * netQty;
+    .flatMap((order) => order.items)
+    .filter((item) => supplierProductIds.has(item.product_id))
+    .reduce((sum, item) => {
+      const product = products.find((p) => p.product_id === item.product_id);
+      return sum + item.qty_invoiced * (product?.cost || 0);
     }, 0);
-
-  const totalTurnover = currentInventoryValue + soldProductsValue;
 
   const supplierDetails = orderData.products.find(
     (p) => p.product.supplier?.manufacturer_id === supplierId,
@@ -155,48 +155,6 @@ const SupplierDashboard = () => {
   //     (!endDate || orderDate <= endDate)
   //   );
   // });
-
-  const calculateTurnover = () => {
-    const supplierProducts = orderData.products.filter(
-      (p) => p.product.supplier?.manufacturer_id === supplierId,
-    );
-
-    return supplierProducts.reduce((total, product) => {
-      const costPrice = parseFloat(product.product.costPrice);
-      const currentQty = parseFloat(product.product.qty);
-
-      // 1. Get ALL historical ordered quantities
-      const allOrderedQty = orderData.orders
-        .filter(
-          ({ order }) =>
-            order.state === "delivered" && order.status === "valid",
-        )
-        .flatMap(({ order }) => order.items)
-        .filter((item) => item.productId === product.product.productId)
-        .reduce((sum, item) => sum + parseFloat(item.quantity), 0);
-
-      // 2. Get quantities OUTSIDE date range
-      const excludedOrderedQty = orderData.orders
-        .filter(({ order }) => {
-          const orderDate = new Date(order.createdAt * 1000);
-          return (
-            (startDate && orderDate < startDate) ||
-            (endDate && orderDate > endDate)
-          );
-        })
-        .flatMap(({ order }) => order.items)
-        .filter((item) => item.productId === product.product.productId)
-        .reduce((sum, item) => sum + parseFloat(item.quantity), 0);
-
-      // 3. Calculate range-specific quantity
-      const rangeQty =
-        startDate || endDate
-          ? currentQty + allOrderedQty - excludedOrderedQty
-          : currentQty + allOrderedQty;
-
-      return total + costPrice * rangeQty;
-    }, 0);
-  };
 
   // const supplierStats = filteredOrders.reduce(
   //   (acc, { order }) => {
@@ -254,7 +212,7 @@ const SupplierDashboard = () => {
       <div className="mb-6 flex flex-col md:flex-row md:space-x-4">
         <div className="flex flex-col md:mr-4">
           <label htmlFor="startDate" className="text-lg">
-            Start Date:
+            Date Début:
           </label>
           <DatePicker
             id="startDate"
@@ -268,7 +226,7 @@ const SupplierDashboard = () => {
 
         <div className="flex flex-col">
           <label htmlFor="endDate" className="text-lg">
-            End Date:
+            Date Fin:
           </label>
           <DatePicker
             id="endDate"
@@ -298,7 +256,7 @@ const SupplierDashboard = () => {
         </CardDataStats>
 
         <CardDataStats
-          title="Clients actifs payants"
+          title="Clients Uniques"
           total={totalUniqueCustomers.toString()}
         >
           <FaUsers className="text-orange-500" />
@@ -344,7 +302,7 @@ const SupplierDashboard = () => {
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-1">
         <div>
           <TopArticlesOrdered
             supplierId={supplierId}
@@ -352,6 +310,9 @@ const SupplierDashboard = () => {
             endDate={endDate}
           />
         </div>
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <SupplierCategoryPieChart
             supplierId={supplierId}
@@ -380,11 +341,7 @@ const SupplierDashboard = () => {
           />
         </div>
         <div>
-          <InventoryTrendChart
-            supplierId={supplierId}
-            startDate={startDate}
-            endDate={endDate}
-          />
+          <InventoryTrendChart supplierId={supplierId} />
         </div>
       </div>
 

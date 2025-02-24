@@ -2,193 +2,166 @@ import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import orderData from "../../../../data_test.json";
+
+interface Product {
+  product_id: number;
+  name: string;
+  manufacturer: string; // Added missing property
+  stock_item: {
+    qty: number;
+    is_in_stock: boolean;
+  };
+}
+
+interface OrderItem {
+  product_id: number;
+  qty_invoiced: number;
+  date: Date;
+}
 
 interface ChartState {
   series: { name: string; data: { x: Date; y: number }[] }[];
   options: any;
 }
 
-const InventoryTrendChart = ({
-  supplierId,
-  startDate: propStartDate,
-  endDate: propEndDate,
-}: {
-  supplierId: string;
-  startDate?: Date | null;
-  endDate?: Date | null;
-}) => {
+const InventoryTrendChart = ({ supplierId }: { supplierId: string }) => {
   const [chartState, setChartState] = useState<ChartState>({
     series: [],
     options: {
       chart: { type: "line" },
       xaxis: { type: "datetime" },
-      yaxis: { title: { text: "Stock Level" } },
-      stroke: { curve: "smooth" },
-      colors: ["#3B82F6", "#10B981"],
-      tooltip: {
-        x: { format: "dd MMM yyyy" },
-      },
+      yaxis: { title: { text: "Unités" } },
+      stroke: { curve: "stepline" },
+      tooltip: { x: { format: "dd MMM yyyy" } },
     },
   });
 
-  // Local date state with initial values from props
-  const [startDate, setStartDate] = useState<Date | null>(
-    propStartDate || null,
-  );
-  const [endDate, setEndDate] = useState<Date | null>(propEndDate || null);
-  const [frequency, setFrequency] = useState<"daily" | "weekly">("daily");
-
-  // Sync with parent date changes
-  useEffect(() => {
-    setStartDate(propStartDate || null);
-    setEndDate(propEndDate || null);
-  }, [propStartDate, propEndDate]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // 1. Get supplier's products
-    const supplierProducts = orderData.products.filter(
-      (p) => p.product.supplier?.manufacturer_id === supplierId,
-    );
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-    // 2. Filter orders and group by time
-    const filteredOrders = orderData.orders.filter(({ order }) => {
-      const orderDate = new Date(order.createdAt * 1000);
-      const start = startDate || new Date(0);
-      const end = endDate || new Date();
-      return orderDate >= start && orderDate <= end;
-    });
+        const [productsRes, ordersRes] = await Promise.all([
+          fetch("http://localhost:3000/api/products"),
+          fetch("http://localhost:3000/api/orders"),
+        ]);
 
-    // 3. Create timeline
-    const dateMap = new Map<string, { stock: number; sales: number }>();
+        if (!productsRes.ok || !ordersRes.ok)
+          throw new Error("Data loading failed");
 
-    filteredOrders.forEach(({ order }) => {
-      const orderDate = new Date(order.createdAt * 1000);
-      const timeKey =
-        frequency === "daily"
-          ? orderDate.toISOString().split("T")[0]
-          : `${orderDate.getFullYear()}-W${Math.ceil(
-              ((orderDate.getTime() -
-                new Date(orderDate.getFullYear(), 0, 1).getTime()) /
-                86400000 +
-                1) /
-                7,
-            )}`;
+        const products: Product[] = await productsRes.json();
+        const orders: any[] = await ordersRes.json();
 
-      order.items.forEach((item) => {
-        if (
-          "supplier" in item &&
-          item.supplier?.manufacturer_id === supplierId
-        ) {
-          const product = supplierProducts.find(
-            (p) => p.product.productId === item.productId,
+        const supplierProducts = products.filter(
+          (p) => p.manufacturer === supplierId && p.stock_item.is_in_stock,
+        );
+
+        // Process all sales data first
+        const allSales: OrderItem[] = [];
+        orders.forEach((order) => {
+          if (order.state !== "complete") return;
+          const orderDate = new Date(order.created_at);
+          order.items.forEach((item: any) => {
+            allSales.push({
+              product_id: item.product_id,
+              qty_invoiced: item.qty_invoiced,
+              date: orderDate,
+            });
+          });
+        });
+
+        // Create inventory series for each product
+        const inventorySeries = supplierProducts.map((product) => {
+          // Filter sales for this product
+          const productSales = allSales
+            .filter((s) => s.product_id === product.product_id)
+            .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+          // Calculate inventory timeline
+          let inventory = product.stock_item.qty;
+          const inventoryData: { x: Date; y: number }[] = [];
+          const salesData: { x: Date; y: number }[] = [];
+
+          // Rebuild inventory history backwards from current stock
+          const salesHistory = productSales.reduceRight(
+            (acc, sale) => {
+              inventory += sale.qty_invoiced; // Add back sold units
+              acc.push({ x: sale.date, y: inventory });
+              return acc;
+            },
+            [] as { x: Date; y: number }[],
           );
 
-          if (product) {
-            const currentStock = parseFloat(product.product.qty);
-            const current = dateMap.get(timeKey) || { stock: 0, sales: 0 };
-
-            dateMap.set(timeKey, {
-              stock: currentStock,
-              sales: current.sales + parseFloat(item.quantity),
-            });
+          // Add current inventory state
+          if (salesHistory.length > 0) {
+            inventoryData.push(...salesHistory.reverse());
           }
-        }
-      });
-    });
+          inventoryData.push({
+            x: new Date(),
+            y: product.stock_item.qty,
+          });
 
-    // 4. Prepare series data with proper Date objects
-    const stockSeries: { x: Date; y: number }[] = [];
-    const salesSeries: { x: Date; y: number }[] = [];
+          return {
+            name: product.name,
+            data: inventoryData,
+          };
+        });
 
-    dateMap.forEach((value, key) => {
-      if (frequency === "daily") {
-        const date = new Date(key);
-        stockSeries.push({ x: date, y: value.stock });
-        salesSeries.push({ x: date, y: value.sales });
-      } else {
-        const [year, week] = key.split("-W").map(Number);
-        const date = new Date(year, 0, 1 + (week - 1) * 7);
-        stockSeries.push({ x: date, y: value.stock });
-        salesSeries.push({ x: date, y: value.sales });
-      }
-    });
-
-    // Sort by date
-    const sortByDate = (a: { x: Date }, b: { x: Date }) =>
-      a.x.getTime() - b.x.getTime();
-    stockSeries.sort(sortByDate);
-    salesSeries.sort(sortByDate);
-
-    setChartState({
-      series: [
-        { name: "Stock Level", data: stockSeries },
-        { name: "Sales Volume", data: salesSeries },
-      ],
-      options: {
-        ...chartState.options,
-        xaxis: {
-          type: "datetime",
-          title: { text: frequency === "daily" ? "Date" : "Week" },
-          labels: {
-            format: frequency === "daily" ? "dd MMM" : "WW",
+        setChartState({
+          series: inventorySeries,
+          options: {
+            ...chartState.options,
+            chart: {
+              ...chartState.options.chart,
+              toolbar: { show: true },
+            },
+            stroke: { curve: "stepline" },
+            markers: { size: 5 },
           },
-        },
-        yaxis: {
-          title: { text: "Units" },
-          min: 0,
-        },
-      },
-    });
-  }, [supplierId, startDate, endDate, frequency]);
+        });
+      } catch (err) {
+        console.error("Error:", err);
+        setError("Failed to load inventory data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [supplierId]);
 
   return (
     <div className="border-stroke rounded-lg border bg-white p-6 shadow-lg">
-      {/* Chart Header */}
-      <div className="mb-4 flex flex-col justify-between gap-4 md:flex-row">
-        <h3 className="text-xl font-semibold">Inventory & Sales Trends</h3>
+      <h3 className="mb-4 text-xl font-semibold">
+        Tendances des stocks de produits
+      </h3>
 
-        {/* Frequency Selector */}
-        <select
-          value={frequency}
-          onChange={(e) => setFrequency(e.target.value as "daily" | "weekly")}
-          className="w-32 rounded border p-1 text-sm"
-        >
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-        </select>
-      </div>
-
-      {/* Date Filter */}
-      <div className="mb-4 flex items-center justify-between">
-        <label className="text-sm font-medium">Date Range:</label>
-        <div className="flex space-x-2">
-          <DatePicker
-            selected={startDate}
-            onChange={setStartDate}
-            placeholderText="Start Date"
-            className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            dateFormat="MMM d, yyyy"
-            isClearable
-          />
-          <DatePicker
-            selected={endDate}
-            onChange={setEndDate}
-            placeholderText="End Date"
-            className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            dateFormat="MMM d, yyyy"
-            isClearable
-          />
+      {error && (
+        <div className="mb-4 rounded-lg bg-red-100 p-3 text-red-700">
+          {error}
         </div>
-      </div>
+      )}
 
-      {/* Chart */}
-      <ReactApexChart
-        options={chartState.options}
-        series={chartState.series}
-        type="line"
-        height={400}
-      />
+      {loading ? (
+        <div className="flex h-96 items-center justify-center text-gray-500">
+          Loading inventory data...
+        </div>
+      ) : chartState.series.length > 0 ? (
+        <ReactApexChart
+          options={chartState.options}
+          series={chartState.series}
+          type="line"
+          height={400}
+        />
+      ) : (
+        <div className="flex h-96 items-center justify-center text-gray-500">
+          No inventory data available
+        </div>
+      )}
     </div>
   );
 };

@@ -61,7 +61,7 @@ const AvailableProducts: React.FC<{ supplierId: string }> = ({
         {totalAvailableProducts > 0 ? (
           currentProducts.map((product) => (
             <div
-              key={product.id}
+              key={product.product_id}
               className="rounded-lg border bg-white p-3 shadow-md transition duration-300 hover:shadow-lg"
             >
               <div className="flex items-center justify-between">

@@ -2,7 +2,26 @@ import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import orderData from "../../../../data_test.json";
+
+interface Product {
+  product_id: number;
+  name: string;
+  manufacturer: string;
+  price: number;
+  cost: number;
+}
+
+interface Order {
+  _id: string;
+  created_at: string;
+  state: string;
+  items: {
+    product_id: number;
+    qty_invoiced: number;
+    row_total_incl_tax: number;
+    name: string;
+  }[];
+}
 
 interface ChartState {
   series: { name: string; data: number[] }[];
@@ -19,175 +38,218 @@ const SupplierTopProductsChart = ({
   endDate?: Date | null;
 }) => {
   const [chartState, setChartState] = useState<ChartState>({
-    series: [{ name: "Loading...", data: [0] }],
+    series: [{ name: "Chargement...", data: [0] }],
     options: {
       chart: { type: "bar" },
       plotOptions: { bar: { horizontal: true } },
-      xaxis: { categories: ["Loading..."], title: { text: "Products" } },
-      yaxis: { title: { text: "Sales Volume" } },
+      xaxis: { categories: ["Chargement..."], title: { text: "Produits" } },
+      yaxis: { title: { text: "Volume des Ventes" } },
       colors: ["#3B82F6"],
       dataLabels: { enabled: false },
     },
   });
 
-  // Local date state with initial values from props
   const [startDate, setStartDate] = useState<Date | null>(
     propStartDate || null,
   );
   const [endDate, setEndDate] = useState<Date | null>(propEndDate || null);
-  const [metric, setMetric] = useState<"volume" | "revenue">("volume");
+  const [metric, setMetric] = useState<"volume" | "revenue" | "turnover">(
+    "volume",
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Sync with parent date changes
   useEffect(() => {
     setStartDate(propStartDate || null);
     setEndDate(propEndDate || null);
   }, [propStartDate, propEndDate]);
 
   useEffect(() => {
-    try {
-      // 1. Filter orders by date and supplier
-      const filteredOrders = orderData.orders.filter(({ order }) => {
-        const orderDate = new Date(order.createdAt * 1000);
-        const start = startDate || new Date(0);
-        const end = endDate || new Date();
-        return orderDate >= start && orderDate <= end;
-      });
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      // 2. Aggregate product data
-      const productMap = filteredOrders
-        .flatMap(({ order }) => order.items)
-        .filter(
-          (item) =>
-            "supplier" in item && item.supplier?.manufacturer_id === supplierId,
-        )
-        .reduce((acc, item) => {
-          const productId = item.productId;
-          const current = acc.get(productId) || {
-            name: item.productName,
-            volume: 0,
-            revenue: 0,
-          };
+        const [productsRes, ordersRes] = await Promise.all([
+          fetch("http://localhost:3000/api/products"),
+          fetch("http://localhost:3000/api/orders"),
+        ]);
 
-          return acc.set(productId, {
-            ...current,
-            volume: current.volume + parseFloat(item.quantity),
-            revenue: current.revenue + parseFloat(item.totalPrice),
-          });
-        }, new Map<string, { name: string; volume: number; revenue: number }>());
+        if (!productsRes.ok || !ordersRes.ok)
+          throw new Error("Échec de la récupération des données");
 
-      // 3. Sort and format data
-      const sortedProducts = Array.from(productMap.values())
-        .sort((a, b) =>
-          metric === "volume" ? b.volume - a.volume : b.revenue - a.revenue,
-        )
-        .slice(0, 10);
+        const products: Product[] = await productsRes.json();
+        const orders: Order[] = await ordersRes.json();
 
-      setChartState({
-        series: [
-          {
-            name: metric === "volume" ? "Units Sold" : "Revenue (TND)",
-            data:
-              sortedProducts.length > 0
-                ? sortedProducts.map((p) =>
-                    metric === "volume" ? p.volume : p.revenue,
-                  )
-                : [0],
+        // Create product cost map
+        const productCostMap = products.reduce(
+          (acc, product) => {
+            acc[product.product_id] = product.cost;
+            return acc;
           },
-        ],
-        options: {
-          ...chartState.options,
-          xaxis: {
-            categories:
-              sortedProducts.length > 0
-                ? sortedProducts.map((p) => p.name)
-                : ["No data"],
-            title: { text: "Products" },
-          },
-          yaxis: {
-            title: {
-              text: metric === "volume" ? "Sales Volume" : "Revenue (TND)",
+          {} as Record<number, number>,
+        );
+
+        // Get supplier's product IDs
+        const supplierProductIds = products
+          .filter((p) => p.manufacturer === supplierId)
+          .map((p) => p.product_id);
+
+        // Filter and aggregate orders
+        const productData = orders
+          .filter((order) => {
+            const orderDate = new Date(order.created_at);
+            return (
+              order.state === "complete" &&
+              (!startDate || orderDate >= startDate) &&
+              (!endDate || orderDate <= endDate)
+            );
+          })
+          .flatMap((order) => order.items)
+          .filter((item) => supplierProductIds.includes(item.product_id))
+          .reduce((acc, item) => {
+            const existing = acc.get(item.product_id) || {
+              name: item.name,
+              volume: 0,
+              revenue: 0,
+              turnover: 0,
+            };
+
+            const cost = productCostMap[item.product_id] || 0;
+
+            return acc.set(item.product_id, {
+              ...existing,
+              volume: existing.volume + item.qty_invoiced,
+              revenue: existing.revenue + item.row_total_incl_tax,
+              turnover: existing.turnover + item.qty_invoiced * cost,
+            });
+          }, new Map<number, { name: string; volume: number; revenue: number; turnover: number }>());
+
+        // Sort and format data
+        const sortedProducts = Array.from(productData.values())
+          .sort((a, b) => {
+            if (metric === "volume") return b.volume - a.volume;
+            if (metric === "revenue") return b.revenue - a.revenue;
+            return b.turnover - a.turnover;
+          })
+          .slice(0, 10);
+
+        setChartState({
+          series: [
+            {
+              name:
+                metric === "volume"
+                  ? "Unités Vendues"
+                  : metric === "revenue"
+                  ? "Chiffre d'Affaires (TND)"
+                  : "Chiffre d'Affaires (Coût)",
+              data:
+                sortedProducts.length > 0
+                  ? sortedProducts.map((p) => {
+                      if (metric === "volume") return p.volume;
+                      if (metric === "revenue") return p.revenue;
+                      return p.turnover;
+                    })
+                  : [0],
             },
+          ],
+          options: {
+            ...chartState.options,
+            xaxis: {
+              categories:
+                sortedProducts.length > 0
+                  ? sortedProducts.map((p) => p.name)
+                  : ["Aucune donnée"],
+              title: { text: "Produits" },
+            },
+            yaxis: {
+              title: {
+                text:
+                  metric === "volume"
+                    ? "Volume des Ventes"
+                    : metric === "revenue"
+                    ? "Chiffre d'Affaires (TND)"
+                    : "Chiffre d'Affaires (Coût)",
+              },
+            },
+            colors: [
+              metric === "volume"
+                ? "#3B82F6"
+                : metric === "revenue"
+                ? "#10B981"
+                : "#8B5CF6",
+            ],
           },
-          colors: [metric === "volume" ? "#3B82F6" : "#10B981"],
-        },
-      });
-    } catch (error) {
-      console.error("Error processing chart data:", error);
-      setChartState({
-        series: [{ name: "Error", data: [0] }],
-        options: {
-          ...chartState.options,
-          xaxis: { categories: ["Error loading data"] },
-        },
-      });
-    }
+        });
+      } catch (err) {
+        console.error("Erreur:", err);
+        setError("Échec du chargement des données. Veuillez réessayer.");
+        setChartState({
+          series: [{ name: "Erreur", data: [0] }],
+          options: {
+            ...chartState.options,
+            xaxis: { categories: ["Erreur lors du chargement des données"] },
+          },
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [supplierId, startDate, endDate, metric]);
 
   return (
     <div className="border-stroke rounded-lg border bg-white p-6 shadow-lg">
-      {/* Chart Header */}
       <div className="mb-4 flex flex-col justify-between gap-4 md:flex-row">
-        <h3 className="text-xl font-semibold">Top Performing Products</h3>
-
-        {/* Metric Selector */}
+        <h3 className="text-xl font-semibold">Produits les Plus Performants</h3>
         <select
           value={metric}
-          onChange={(e) => setMetric(e.target.value as "volume" | "revenue")}
-          className="w-32 rounded border p-1 text-sm"
+          onChange={(e) =>
+            setMetric(e.target.value as "volume" | "revenue" | "turnover")
+          }
+          className="w-48 rounded border p-1 text-sm"
         >
-          <option value="volume">By Volume</option>
-          <option value="revenue">By Revenue</option>
+          <option value="volume">Par Volume</option>
+          <option value="revenue">Par Chiffre d&apos;Affaires (Ventes)</option>
+          <option value="turnover">Par Chiffre d&apos;Affaires (Coût)</option>
         </select>
       </div>
 
-      {/* Date Filter */}
       <div className="mb-4 flex items-center justify-between">
-        <label className="text-sm font-medium">Date Range:</label>
+        <label className="text-sm font-medium">Période :</label>
         <div className="flex space-x-2">
-          <div className="relative">
-            <DatePicker
-              selected={startDate}
-              onChange={setStartDate}
-              placeholderText="Start Date"
-              className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              dateFormat="MMM d, yyyy"
-              isClearable
-            />
-            {startDate && (
-              <button
-                type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                onClick={() => setStartDate(null)}
-              >
-                ×
-              </button>
-            )}
-          </div>
-          <div className="relative">
-            <DatePicker
-              selected={endDate}
-              onChange={setEndDate}
-              placeholderText="End Date"
-              className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              dateFormat="MMM d, yyyy"
-              isClearable
-            />
-            {endDate && (
-              <button
-                type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                onClick={() => setEndDate(null)}
-              >
-                ×
-              </button>
-            )}
-          </div>
+          <DatePicker
+            selected={startDate}
+            onChange={setStartDate}
+            placeholderText="Date de Début"
+            className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            dateFormat="MMM d, yyyy"
+            isClearable
+          />
+          <DatePicker
+            selected={endDate}
+            onChange={setEndDate}
+            placeholderText="Date de Fin"
+            className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            dateFormat="MMM d, yyyy"
+            isClearable
+          />
         </div>
       </div>
 
-      {/* Chart */}
-      {chartState.series[0].data.length > 0 &&
-      chartState.series[0].data[0] !== 0 ? (
+      {error && (
+        <div className="mb-4 rounded-lg bg-red-100 p-3 text-red-700">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex h-96 items-center justify-center text-gray-500">
+          Chargement des données...
+        </div>
+      ) : chartState.series[0].data.length > 0 &&
+        chartState.series[0].data[0] !== 0 ? (
         <ReactApexChart
           options={chartState.options}
           series={chartState.series}
@@ -196,7 +258,7 @@ const SupplierTopProductsChart = ({
         />
       ) : (
         <div className="flex h-96 items-center justify-center text-gray-500">
-          No data available for the selected period
+          Aucune donnée de vente pour vos produits dans cette période
         </div>
       )}
     </div>
