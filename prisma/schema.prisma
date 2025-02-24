@@ -58,7 +58,7 @@ model Warehouse {
   updatedAt   DateTime @updatedAt
   purchaseOrders PurchaseOrder[] 
 }
-model Product {
+model products {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   product_id     Int      @unique // ID Magento
   sku            String   @unique
@@ -67,13 +67,29 @@ model Product {
   special_price  Float?
   cost           Float?
   manufacturer   String?  // ID du fabricant
-  category_ids   Int[]    @db.Int // IDs Magento des catégories
-  website_ids    Int[]    @db.Int // IDs Magento des entrepôts
+  category_ids   String[]   @db.String// IDs Magento des catégories
+  website_ids    Int[]    @db.Int// IDs Magento des entrepôts
   image          String?
   url_key        String?
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  created_at     String  @map("created_at")
+  updated_at     String
+  stock_item     StockItem?
+
   @@index([category_ids])
+}
+model StockItem {
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  item_id        Int?
+  product_id     Int    @unique
+  stock_id       Int?
+  qty            Float?
+  is_in_stock    Boolean?
+  min_qty        Float?
+  min_sale_qty   Float?
+  max_sale_qty   Float?
+  backorders     Int?
+  low_stock_date String?
+  product        products @relation(fields: [product_id], references: [product_id])
 }
 
 
@@ -104,11 +120,8 @@ model Payment {
 
   amount         Float
 
-  paymentDate    DateTime
-
   paymentMethod  PaymentMethod
-
-  reference      String
+  percentage     Float
 
   manufacturer   Manufacturer   @relation(fields: [manufacturerId], references: [manufacturerId])
 
@@ -127,13 +140,9 @@ model Payment {
 }
 
 enum PaymentMethod {
-  CARTE_BANCAIRE
   CHEQUE
-  CREDIT
   TRAITE
   ESPECES
-  VIREMENT_BANCAIRE
-
 }
 
 
@@ -152,14 +161,27 @@ enum OrderState {
 model File {
 
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-
+  name      String 
   url       String
-
   order     PurchaseOrder? @relation(fields: [orderId], references: [id])
 
   orderId   String?        @db.ObjectId
 
+  @@map("files")
+
 }
+model Comment {
+
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+
+  content         String
+
+  purchaseOrder   PurchaseOrder  @relation(fields: [purchaseOrderId], references: [id])
+
+  purchaseOrderId String         @db.ObjectId
+
+}
+
 model PurchaseOrder {
 
   id              String         @id @default(auto()) @map("_id") @db.ObjectId
@@ -181,12 +203,3 @@ model PurchaseOrder {
 }
 
 
-model Comment {
-  id              String         @id @default(auto()) @map("_id") @db.ObjectId
-  content         String
-  purchaseOrder   PurchaseOrder  @relation(fields: [purchaseOrderId], references: [id])
-  purchaseOrderId String         @db.ObjectId
-  createdAt       DateTime       @default(now()) 
-  updatedAt       DateTime       @updatedAt 
-  @@map("comments")
-}

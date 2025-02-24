@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const dirPath = path.join(process.cwd(), "public/data"); // Utilisation de 'public'
+    const dirPath = path.join(process.cwd(), "public/data");
     const filePath = path.join(dirPath, "comments.json");
 
     console.log("📂 Vérification du dossier:", dirPath);
@@ -37,12 +37,11 @@ export async function POST(req: Request) {
       const fileData = fs.readFileSync(filePath, "utf8");
       comments = JSON.parse(fileData);
 
-      // 🛑 Vérifier que c'est bien un tableau
       if (!Array.isArray(comments)) {
         console.warn(
           "⚠️ Le fichier JSON ne contient pas un tableau. Réinitialisation...",
         );
-        comments = []; // Réinitialiser s'il contient autre chose qu'un tableau
+        comments = [];
       }
     } catch (error) {
       console.error("❌ Erreur de lecture du fichier JSON:", error);
@@ -52,7 +51,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Ajouter le nouveau commentaire à la liste existante
     comments.push({ id: Date.now(), text: comment });
 
     try {

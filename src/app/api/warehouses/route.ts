@@ -31,8 +31,6 @@ export async function GET() {
     }
 
     const data = await response.json();
-    console.log("Réponse complète de l'API Magento:", data);
-
     const storeViews = data;
 
     if (!storeViews || storeViews.length === 0) {
@@ -41,11 +39,9 @@ export async function GET() {
         { status: 404 },
       );
     }
-
-    //inserer dans la db
     for (let storeView of storeViews) {
-      if (storeView.id === 0) {
-        console.log("Ignorer le warehouse avec id 0", storeView);
+      if (storeView.id === 0 || storeView.id === 1) {
+        console.log("Ignorer le warehouse avec id 0 et 1", storeView);
         continue;
       }
 

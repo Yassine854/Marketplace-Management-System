@@ -35,16 +35,17 @@ export async function POST(req: NextRequest) {
     const filePath = path.join(uploadsDir, finalFileName);
     fs.writeFileSync(filePath, buffer);
 
-    // DB entry
-    const dbFile = await prisma.file.create({
-      data: { url: `/uploads/${finalFileName}` },
+    // After saving the file to disk:
+    const dbfile = await prisma.file.create({
+      data: {
+        url: `/uploads/${finalFileName}`,
+        name: originalFileName,
+      },
     });
 
     return NextResponse.json({
-      success: true,
-      fileId: dbFile.id,
-      fileName: finalFileName,
-      url: dbFile.url,
+      fileId: dbfile.id,
+      fileName: dbfile.name,
     });
   } catch (error) {
     console.error("Erreur upload:", error);

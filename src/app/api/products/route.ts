@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const products = await prisma.product.findMany();
+    const products = await prisma.products.findMany();
     console.log(products);
     return NextResponse.json(
       products.map(
@@ -22,8 +22,8 @@ export async function GET() {
           website_ids: number[];
           image: string | null;
           url_key: string | null;
-          created_at: Date;
-          updated_at: Date;
+          created_at: string;
+          updated_at: string;
         }) => ({
           id: p.id,
           product_id: p.product_id,
@@ -37,8 +37,8 @@ export async function GET() {
           website_ids: p.website_ids,
           image: p.image || null,
           url_key: p.url_key || null,
-          created_at: p.created_at.toISOString(),
-          updated_at: p.updated_at.toISOString(),
+          created_at: p.created_at,
+          updated_at: p.updated_at,
         }),
       ),
     );

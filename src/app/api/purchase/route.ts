@@ -1,29 +1,93 @@
-import { NextApiRequest, NextApiResponse } from "next/types";
+import { OrderState, PaymentMethod } from "@prisma/client";
+import { NextResponse } from "next/server";
 const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method === "POST") {
-    try {
-      const order = await prisma.purchaseOrder.create({
-        data: {
-          ...req.body,
-          files: {
-            connect: req.body.filesIds?.map((id: string) => ({ id })),
-          },
-        },
-        include: {
-          files: true,
-        },
-      });
-      res.status(201).json(order);
-    } catch (error) {
-      console.error("Error creating order:", error);
-      res.status(500).json({ error: "Failed to create order" });
+export async function POST(req: Request) {
+  try {
+    const {
+      manufacturerId,
+      warehouseId,
+      deliveryDate,
+      totalAmount,
+      status,
+      comments,
+      payments,
+      files,
+    } = await req.json();
+
+    if (!manufacturerId || !warehouseId) {
+      return NextResponse.json(
+        { error: "Données manquantes" },
+        { status: 400 },
+      );
     }
+
+    const order = await prisma.purchaseOrder.create({
+      data: {
+        orderNumber: `PO-${Date.now()}`,
+        manufacturer: { connect: { manufacturerId: parseInt(manufacturerId) } },
+        warehouse: { connect: { warehouseId: parseInt(warehouseId) } },
+        deliveryDate: new Date(deliveryDate),
+        totalAmount: parseFloat(totalAmount),
+        status: status as OrderState,
+
+        comments:
+          comments?.length > 0
+            ? {
+                create: comments.map((comment: { content: string }) => ({
+                  content: comment.content,
+                })),
+              }
+            : undefined,
+        payments:
+          payments?.length > 0
+            ? {
+                create: payments
+                  .filter((payment: any) => {
+                    const amount = parseFloat(payment.amount);
+                    const percentage = parseFloat(payment.percentage);
+                    const validMethods = Object.values(PaymentMethod);
+                    return (
+                      !isNaN(amount) &&
+                      amount > 0 &&
+                      validMethods.includes(
+                        payment.paymentMethod.toUpperCase(),
+                      ) &&
+                      !isNaN(percentage) &&
+                      percentage >= 0 &&
+                      percentage <= 100
+                    ); // Validation du pourcentage
+                  })
+                  .map((payment: any) => ({
+                    amount: parseFloat(payment.amount),
+                    paymentMethod: payment.paymentMethod.toUpperCase(),
+                    percentage: parseFloat(payment.percentage) || 0,
+                    manufacturerId: Number(manufacturerId) || 0,
+                  })),
+              }
+            : undefined,
+
+        files: {
+          connect: (Array.isArray(files) ? files : []).map(
+            (file: { id: string }) => ({ id: file.id }),
+          ),
+        },
+      },
+      include: {
+        comments: true,
+        payments: true,
+        files: true,
+      },
+    });
+
+    return NextResponse.json(order, { status: 201 });
+  } catch (error) {
+    console.error("Erreur création commande:", error);
+    return NextResponse.json(
+      { error: "Échec de l'enregistrement" },
+      { status: 500 },
+    );
   }
 }
