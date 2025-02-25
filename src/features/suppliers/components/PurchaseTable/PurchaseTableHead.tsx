@@ -3,25 +3,28 @@ const PurchaseTableHead = () => {
     <thead className="border-b border-gray-100 bg-gray-50">
       <tr>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-          Commande
+          Order
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-          Fournisseur
+          Supplier
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-          Entrepôt
+          Warehouse
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-          Livraison
+          Delivery
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-          Statut
+          Status
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-          Montant
+          Amount
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-          Paiements
+          Payments
+        </th>
+        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+          Actions
         </th>
       </tr>
     </thead>

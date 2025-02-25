@@ -1,68 +1,144 @@
-"use client";
+import { useEffect, useState } from "react";
+import PurchaseTable from "./PurchaseTable";
+import usePurchaseStore from "../stores/purchaseStore";
+import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersPers";
+import Pagination from "../components/Pagination";
 
-export default function deliveredOrdersPage() {
+const InProgressPage = () => {
+  const { purchases, loading, error, fetchPurchases, total } =
+    usePurchaseStore();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
+    {},
+  );
+  const pageSize = 10;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await fetchPurchases(currentPage, pageSize, {
+          search: searchTerm,
+          ...activeFilters,
+        });
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    };
+
+    fetchData();
+  }, [currentPage, pageSize, searchTerm, activeFilters]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchPurchases(currentPage, pageSize, {
+        search: debouncedSearchTerm,
+        ...activeFilters,
+      });
+    };
+
+    fetchData();
+  }, [debouncedSearchTerm]);
+
+  const handleSearch = () => {
+    const normalizedSearch = searchTerm.toLowerCase();
+    fetchPurchases(1, pageSize, {
+      search: normalizedSearch,
+      ...activeFilters,
+    });
+  };
+
+  const totalPages = Math.ceil(total / pageSize);
+
+  if (error) {
+    return (
+      <div className="p-6 text-red-500">
+        <h1 className="mb-4 text-2xl font-bold">Error</h1>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-6xl p-6">
-      <h1 className="mb-6 text-2xl font-bold">Commandes en Cours</h1>
+    <div className="flex h-full flex-grow">
+      <div className="h-full w-full rounded-lg bg-[url(/images/login-bg.png)] bg-cover">
+        <div className="relative grid h-full w-full items-center justify-center gap-4">
+          <div className="box w-full min-w-[800px] xl:p-8">
+            <div className="bb-dashed mb-6 mt-9 flex items-center pb-6">
+              <p className="ml-4 mt-6 text-xl font-bold">Supplier Orders</p>
+            </div>
 
-      <div className="overflow-x-auto rounded-lg border">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
-                ID Commande
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
-                Client
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
-                Statut
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
-                Date Livraison
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
-                Montant
-              </th>
-            </tr>
-          </thead>
+            <div className="mb-5 space-y-4">
+              <div className="flex gap-2">
+                <input
+                  placeholder="Search (Order ID, Supplier, Warehouse)"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="flex-1 rounded border p-2"
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                />
+                <button
+                  onClick={handleSearch}
+                  className="rounded bg-blue-500 px-4 py-2 text-white"
+                >
+                  🔍
+                </button>
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="rounded bg-gray-200 px-4 py-2"
+                >
+                  {showFilters ? "Hide Filters" : "Filters"}
+                </button>
+              </div>
 
-          <tbody className="divide-y divide-gray-200 bg-white">
-            {/* Lignes du tableau */}
-            <tr className="hover:bg-gray-50">
-              <td className="whitespace-nowrap px-6 py-4 text-sm">#1001</td>
-              <td className="whitespace-nowrap px-6 py-4 text-sm">
-                Jean Dupont
-              </td>
-              <td className="whitespace-nowrap px-6 py-4 text-sm">
-                <span className="rounded-full bg-yellow-100 px-2 py-1 text-xs text-yellow-800">
-                  En traitement
-                </span>
-              </td>
-              <td className="whitespace-nowrap px-6 py-4 text-sm">
-                25 mars 2024
-              </td>
-              <td className="whitespace-nowrap px-6 py-4 text-sm">149,99 €</td>
-            </tr>
+              {showFilters && (
+                <AdvancedFilters
+                  onApply={(filters) => {
+                    setActiveFilters(filters);
+                    setCurrentPage(1);
+                  }}
+                />
+              )}
 
-            <tr className="hover:bg-gray-50">
-              <td className="whitespace-nowrap px-6 py-4 text-sm">#1002</td>
-              <td className="whitespace-nowrap px-6 py-4 text-sm">
-                Marie Curie
-              </td>
-              <td className="whitespace-nowrap px-6 py-4 text-sm">
-                <span className="rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800">
-                  Expédié
-                </span>
-              </td>
-              <td className="whitespace-nowrap px-6 py-4 text-sm">
-                28 mars 2024
-              </td>
-              <td className="whitespace-nowrap px-6 py-4 text-sm">299,95 €</td>
-            </tr>
-          </tbody>
-        </table>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(activeFilters).map(
+                  ([key, value]) =>
+                    value && (
+                      <span
+                        key={key}
+                        className="rounded-full bg-gray-100 px-2 py-1 text-sm"
+                      >
+                        {key}: {value}
+                      </span>
+                    ),
+                )}
+              </div>
+            </div>
+
+            <div className="box mb-5 mt-5 flex w-full justify-between rounded-lg bg-primary/5 p-4 dark:bg-bg3">
+              <PurchaseTable data={purchases} loading={loading} />
+            </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => setCurrentPage(page)}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default InProgressPage;

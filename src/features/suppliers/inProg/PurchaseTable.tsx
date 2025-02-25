@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import PurchaseTableHead from "./PurchaseTableHead";
-import PurchaseTableRow from "./PurchaseTableRow";
-import PurchaseTableSkeleton from "./PurchaseTableSkeleton";
-import { PurchaseOrder } from "../types/purchaseOrder";
+import PurchaseTableHead from "../components/PurchaseTable/PurchaseTableHead";
+import PurchaseTableRow from "../components/PurchaseTable/PurchaseTableRow";
+import PurchaseTableSkeleton from "../components/PurchaseTable/PurchaseTableSkeleton";
+import { PurchaseOrder } from "../components/types/purchaseOrder";
 
 const PurchaseTable = ({
   data,
@@ -14,7 +14,11 @@ const PurchaseTable = ({
   const [orders, setOrders] = useState<PurchaseOrder[]>(data);
 
   useEffect(() => {
-    setOrders(data);
+    const filteredOrders = data.filter(
+      (order) => order.status === "IN_PROGRESS",
+    );
+
+    setOrders(filteredOrders);
   }, [data]);
 
   const handleUpdateOrder = (updatedOrder: PurchaseOrder) => {

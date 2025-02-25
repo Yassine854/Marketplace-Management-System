@@ -1,5 +1,4 @@
-// stores/purchaseStore.ts
-import create from "zustand";
+import { create } from "zustand";
 
 type PurchaseOrderStatus = "IN_PROGRESS" | "READY" | "DELIVERED" | "COMPLETED";
 
@@ -7,7 +6,8 @@ interface PurchaseOrder {
   id: string;
   orderNumber: string;
   manufacturer: {
-    company_name: string;
+    id: string;
+    companyName: string;
   } | null;
   warehouse: {
     name: string;
@@ -69,11 +69,31 @@ const usePurchaseStore = create<PurchaseState>((set) => ({
 
       set({
         purchases: data.map((order: any) => ({
-          ...order,
+          id: order.id,
 
-          manufacturer: order.manufacturer || null,
+          orderNumber: order.orderNumber,
 
-          warehouse: order.warehouse || null,
+          manufacturer: order.manufacturer
+            ? {
+                id: order.manufacturer.id,
+
+                companyName: order.manufacturer.companyName,
+              }
+            : null,
+
+          warehouse: order.warehouse
+            ? {
+                name: order.warehouse.name,
+              }
+            : null,
+
+          deliveryDate: new Date(order.deliveryDate),
+
+          totalAmount: order.totalAmount,
+
+          status: order.status,
+
+          payments: order.payments,
         })),
 
         total,

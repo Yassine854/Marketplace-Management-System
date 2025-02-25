@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import PurchaseTable from "../components/PurchaseTable/PurchaseTable";
 import usePurchaseStore from "../stores/purchaseStore";
-import AdvancedFilters from "../components/AdvancedFilters/AdvancedFilters";
+import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersAll";
 import Pagination from "../components/Pagination";
+
 const SupplierPurchasesPage = () => {
   const { purchases, loading, error, fetchPurchases, total } =
     usePurchaseStore();
@@ -20,11 +21,10 @@ const SupplierPurchasesPage = () => {
       try {
         await fetchPurchases(currentPage, pageSize, {
           search: searchTerm,
-
           ...activeFilters,
         });
       } catch (error) {
-        console.error("Erreur lors du chargement:", error);
+        console.error("Error loading data:", error);
       }
     };
 
@@ -43,7 +43,6 @@ const SupplierPurchasesPage = () => {
     const fetchData = async () => {
       await fetchPurchases(currentPage, pageSize, {
         search: debouncedSearchTerm,
-
         ...activeFilters,
       });
     };
@@ -64,7 +63,7 @@ const SupplierPurchasesPage = () => {
   if (error) {
     return (
       <div className="p-6 text-red-500">
-        <h1 className="mb-4 text-2xl font-bold">Erreur</h1>
+        <h1 className="mb-4 text-2xl font-bold">Error</h1>
         <p>{error}</p>
       </div>
     );
@@ -76,15 +75,13 @@ const SupplierPurchasesPage = () => {
         <div className="relative grid h-full w-full items-center justify-center gap-4">
           <div className="box w-full min-w-[800px] xl:p-8">
             <div className="bb-dashed mb-6 mt-9 flex items-center pb-6">
-              <p className="ml-4 mt-6 text-xl font-bold">
-                Commandes Fournisseurs
-              </p>
+              <p className="ml-4 mt-6 text-xl font-bold">Supplier Orders</p>
             </div>
 
             <div className="mb-5 space-y-4">
               <div className="flex gap-2">
                 <input
-                  placeholder="Rechercher (ID Commande, Fournisseur, Entrepôt)"
+                  placeholder="Search (Order ID, Supplier, Warehouse)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="flex-1 rounded border p-2"
@@ -100,7 +97,7 @@ const SupplierPurchasesPage = () => {
                   onClick={() => setShowFilters(!showFilters)}
                   className="rounded bg-gray-200 px-4 py-2"
                 >
-                  {showFilters ? "Masquer" : "Filtres"}
+                  {showFilters ? "Hide Filters" : "Filters"}
                 </button>
               </div>
 

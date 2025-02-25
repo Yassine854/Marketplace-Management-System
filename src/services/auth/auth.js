@@ -7,7 +7,7 @@ let staticUser = {
   username: "intern",
   firstName: "intern",
   lastName: "intern",
-  password: "intern", // Remember to hash passwords in production
+  password: "intern",
   roleId: "1",
   isActive: true,
   createdAt: new Date(),
@@ -26,9 +26,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         // Simulate checking credentials against the static user
         if (credentials.password === staticUser.password) {
           // Return the static user if credentials match
-          staticUser.username=credentials.username;
-          staticUser.firstName=credentials.username;
-          staticUser.lastName="";
+          staticUser.username = credentials.username;
+          staticUser.firstName = credentials.username;
+          staticUser.lastName = "";
           return staticUser;
         } else {
           // Return null if credentials don't match (simulating invalid login)
@@ -41,7 +41,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   callbacks: {
     // Sign-in callback - Checks if the user is active before allowing sign-in
     async signIn({ user }) {
-    /*  if (!user?.isActive) {
+      /*  if (!user?.isActive) {
         return false; // Prevent sign-in if the user is not active
       }*/
       return true; // Allow sign-in if the user is active

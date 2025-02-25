@@ -1,4 +1,3 @@
-// components/Pagination.tsx
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 interface PaginationProps {
@@ -18,7 +17,6 @@ const Pagination = ({
     let start = Math.max(1, currentPage - 2);
     let end = Math.min(totalPages, start + maxVisiblePages - 1);
 
-    // Gestion des ellipsis
     if (end - start < maxVisiblePages - 1) {
       start = Math.max(1, end - maxVisiblePages + 1);
     }
@@ -42,7 +40,6 @@ const Pagination = ({
         <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
       </button>
 
-      {/* Numéros de page */}
       <div className="flex items-center gap-1">
         {getPageNumbers().map((page, index) =>
           typeof page === "number" ? (
@@ -66,7 +63,6 @@ const Pagination = ({
         )}
       </div>
 
-      {/* Bouton Suivant */}
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
@@ -76,7 +72,6 @@ const Pagination = ({
         <ChevronRightIcon className="h-5 w-5 text-gray-600" />
       </button>
 
-      {/* Affichage de la position */}
       <div className="ml-4 hidden text-sm text-gray-500 sm:block">
         Page <span className="font-semibold">{currentPage}</span> / {totalPages}
       </div>
