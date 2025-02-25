@@ -17,6 +17,7 @@ import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import SidebarButton from "@/features/shared/elements/SidebarElements/SidebarButton";
 import SidebarSubMenu from "@/features/shared/elements/SidebarElements/SidebarSubMenu";
 import SidebarOrdersSubMenu from "@/features/shared/elements/SidebarElements/SidebarOrdersSubMenu";
+import SidebarSuppliersSubMenu from "@/features/shared/elements/SidebarElements/SidebarSuppliersSubMenu";
 
 const Sidebar = ({
   isAdmin,
@@ -73,10 +74,7 @@ const Sidebar = ({
 
           {/* Suppliers Analytics */}
 
-          <SidebarButton
-            onClick={() => {
-              push("/supplierDashboard");
-            }}
+          <SidebarSuppliersSubMenu
             name={"Supplier Dashboard"}
             icon={<IconDeviceAnalytics />}
             isActive={pathname?.includes("supplierDashboard")}

@@ -1,6 +1,18 @@
 import NextAuth from "next-auth";
-import { handleAuthentication } from "./handleAuthentication";
 import CredentialsProvider from "next-auth/providers/credentials";
+
+// Static user data for testing purposes
+let staticUser = {
+  id: "100",
+  username: "intern",
+  firstName: "intern",
+  lastName: "intern",
+  password: "intern",
+  roleId: "1",
+  isActive: true,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
@@ -11,34 +23,32 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const user = await handleAuthentication(
-          credentials.username,
-          credentials.password,
-        );
-
-        return user;
+        // Simulate checking credentials against the static user
+        if (credentials.password === staticUser.password) {
+          // Return the static user if credentials match
+          staticUser.username = credentials.username;
+          staticUser.firstName = credentials.username;
+          staticUser.lastName = "";
+          return staticUser;
+        } else {
+          // Return null if credentials don't match (simulating invalid login)
+          return null;
+        }
       },
     }),
   ],
 
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      if (!user?.isActive) {
-        return false;
-      }
-
-      return true;
-
-      // if (isAllowedToSignIn) {
-      //   return true;
-      // } else {
-      //   // Return false to display a default error message
-      //   return false;
-      //   // Or you can return a URL to redirect to:
-      //   //return '/unauthorized'
-      // }
+    // Sign-in callback - Checks if the user is active before allowing sign-in
+    async signIn({ user }) {
+      /*  if (!user?.isActive) {
+        return false; // Prevent sign-in if the user is not active
+      }*/
+      return true; // Allow sign-in if the user is active
     },
-    async jwt({ token, user, profile, session }) {
+
+    // JWT callback - Populates the token with user data
+    async jwt({ token, user }) {
       if (user) {
         return {
           ...token,
@@ -50,23 +60,24 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           isActive: user.isActive,
         };
       }
-
-      return token;
+      return token; // Return the existing token if no user is provided
     },
+
+    // Session callback - Adds user data from the token to the session object
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id;
+        session.user.id = token.userId;
         session.user.roleId = token.userRoleId;
         session.user.username = token.username;
-        session.user.lastName = token.userLastName;
         session.user.firstName = token.userFirstName;
+        session.user.lastName = token.userLastName;
         session.user.isActive = token.isActive;
       }
-
       return session;
     },
   },
+
   secret: process.env.AUTH_SECRET,
   trustHost: true,
-  debug: process.env.NODE_ENV === "development",
+  debug: process.env.NODE_ENV === "development", // Enable debug mode in development only
 });

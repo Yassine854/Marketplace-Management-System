@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import CardDataStats from "../charts/CardDataStats";
+import { useRouter } from "next/navigation"; // Import useRouter
+import { useSearchParams } from "next/navigation";
+import CardDataStats from "../charts/suppliers/CardDataStats";
 import {
   FaClipboardList,
   FaMoneyBillWave,
@@ -8,23 +10,26 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import orderData from "../../../../data_test.json";
-import ProductRevenueLossChart from "../charts/ProductRevenueLossChart";
-import TopArticlesOrdered from "../charts/TopArticlesOrdered";
-import SupplierAreaChart from "../charts/SupplierAreaChart";
-import RegionsOrders from "../charts/RegionsOrders";
-import AvailableProducts from "../charts/AvailableProducts";
+import ProductRevenueLossChart from "../charts/suppliers/ProductRevenueLossChart";
+import TopArticlesOrdered from "../charts/suppliers/TopArticlesOrdered";
+import SupplierAreaChart from "../charts/suppliers/SupplierAreaChart";
+import RegionsOrders from "../charts/suppliers/RegionsOrders";
+import AvailableProducts from "../charts/suppliers/AvailableProducts";
 import DatePicker from "react-datepicker";
-import ClientSegment from "../charts/ClientSegment";
-import SupplierQuarterlyMetrics from "../charts/SupplierQuarterlyMetrics";
-import SupplierCategoryPieChart from "../charts/SupplierCategoryPieChart";
-import SupplierTopProductsChart from "../charts/SupplierTopProductsChart";
-import InventoryTrendChart from "../charts/InventoryTrendChart";
+import ClientSegment from "../charts/suppliers/ClientSegment";
+import SupplierQuarterlyMetrics from "../charts/suppliers/SupplierQuarterlyMetrics";
+import SupplierCategoryPieChart from "../charts/suppliers/SupplierCategoryPieChart";
+import SupplierTopProductsChart from "../charts/suppliers/SupplierTopProductsChart";
+import InventoryTrendChart from "../charts/suppliers/InventoryTrendChart";
 import EmailFormPopup from "./email";
 import "react-datepicker/dist/react-datepicker.css";
 
-const supplierId = "27"; // Example supplier ID (e.g., Technofood)
+// const supplierId = "27"; // Example supplier ID (e.g., Technofood)
 
 const SupplierDashboard = () => {
+  const router = useRouter(); // Initialize useRouter hook to access the query parameters
+  const searchParams = useSearchParams();
+  const supplierId: string = searchParams.get("supplierId") ?? "";
   const [startDate, setStartDate] = useState<Date | null>(null); // Default to null
   const [endDate, setEndDate] = useState<Date | null>(null); // Default to null
   const [showEmailForm, setShowEmailForm] = useState(false);
@@ -34,6 +39,7 @@ const SupplierDashboard = () => {
   const [orders, setOrders] = useState<any[]>([]);
 
   useEffect(() => {
+    console.log(supplierId);
     const fetchCategories = async () => {
       try {
         const response = await axios.get(

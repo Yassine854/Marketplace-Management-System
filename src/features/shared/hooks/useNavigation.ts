@@ -19,6 +19,10 @@ export const useNavigation = () => {
     push("/dashboard");
   };
 
+  const navigateToAllSuppliersDashboard = () => {
+    push("/suppliers");
+  };
+
   const navigateToSupplierDashboard = () => {
     push("/SupplierDashboard");
   };
@@ -48,6 +52,7 @@ export const useNavigation = () => {
     navigateToLogin,
     navigateToOrders,
     navigateToDashboard,
+    navigateToAllSuppliersDashboard,
     navigateToSupplierDashboard,
     navigateToUsersTable,
     navigateToOrderDetails,

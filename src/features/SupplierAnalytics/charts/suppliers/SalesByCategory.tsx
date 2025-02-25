@@ -1,7 +1,7 @@
 import { ApexOptions } from "apexcharts";
 import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
-import supplierData from "../../../../data_test.json"; // Ensure the path is correct
+import supplierData from "../../../../../data_test.json"; // Ensure the path is correct
 
 // Generate random colors for the chart
 const generateColors = (num: number): string[] => {
