@@ -15,12 +15,12 @@ interface EmailFormPopupProps {
 }
 
 const servicesList = [
-  "Ads Service",
-  "Inventory Management Support",
-  "Order Fulfillment Services",
-  "Marketing Collaboration",
-  "Technical Support",
-  "Account Management",
+  "Service Ads",
+  "Support de Gestion des Stocks",
+  "Services d'Exécution des Commandes",
+  "Collaboration Marketing",
+  "Support Technique",
+  "Gestion de Compte",
 ];
 
 const EmailFormPopup: React.FC<EmailFormPopupProps> = ({
@@ -41,7 +41,8 @@ const EmailFormPopup: React.FC<EmailFormPopupProps> = ({
     setError(null);
 
     const templateParams = {
-      to_email: "achat@kamioun.tn",
+      // to_email: "achat@kamioun.tn",
+      to_email: "medhioubyassine@gmail.com",
       from_name: supplierDetails.company_name,
       reply_to: supplierDetails.email,
       subject: `[${supplierDetails.company_name}] - Request for Services`,
@@ -53,6 +54,7 @@ ${selectedServices.map((service) => `- ${service}`).join("\n")}
 Here’s my contact information:
 - Contact Person: ${contactName}
 - Phone Number: ${contactPhone}
+- Email: ${supplierDetails.email}
 - Company Address: ${supplierDetails.address}
 
 Best,
@@ -79,7 +81,9 @@ ${supplierDetails.company_name}`,
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className="w-full max-w-[90vw] rounded-lg bg-white p-4 md:max-w-md md:p-6">
         <div className="mb-4 flex items-start justify-between">
-          <h2 className="text-lg font-bold md:text-xl">Service Request Form</h2>
+          <h2 className="text-lg font-bold md:text-xl">
+            Formulaire de demande de service
+          </h2>
           <button
             onClick={onClose}
             className="text-xl text-gray-500 hover:text-gray-700 md:text-base"
@@ -91,7 +95,7 @@ ${supplierDetails.company_name}`,
         <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
           {/* Subject Input */}
           <div>
-            <label className="mb-1 block text-sm font-medium">Subject</label>
+            <label className="mb-1 block text-sm font-medium">Sujet</label>
             <input
               type="text"
               disabled
@@ -103,7 +107,7 @@ ${supplierDetails.company_name}`,
           {/* Services Multi-select */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              Select Services
+              Sélectionnez service(s)
             </label>
 
             <div className="relative">
@@ -188,7 +192,7 @@ ${supplierDetails.company_name}`,
                 Sending...
               </div>
             ) : (
-              "Send Request"
+              "Envoyer demande"
             )}
           </button>
         </form>

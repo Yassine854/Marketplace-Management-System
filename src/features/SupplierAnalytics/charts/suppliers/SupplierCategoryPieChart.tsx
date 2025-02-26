@@ -85,6 +85,10 @@ const SupplierCategoryComparisonChart: React.FC<{
   );
   const [endDate, setEndDate] = useState<Date | null>(propEndDate || null);
   const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    setStartDate(propStartDate || null);
+    setEndDate(propEndDate || null);
+  }, [propStartDate, propEndDate]);
 
   const filterOrdersByDate = (
     orders: Order[],

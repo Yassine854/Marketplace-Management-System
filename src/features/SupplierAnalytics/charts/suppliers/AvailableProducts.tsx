@@ -51,7 +51,7 @@ const AvailableProducts: React.FC<{ supplierId: string }> = ({
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="mt-6 rounded-lg bg-white p-6 shadow-md">
+    <div className="w-full rounded-xl border border-gray-100 bg-white p-6 shadow-lg">
       <h2 className="mb-3 text-xl font-semibold">Produits disponibles</h2>
       <p className="mb-4 text-sm font-medium text-gray-600">
         Total disponible: {totalAvailableProducts}

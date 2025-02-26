@@ -137,7 +137,7 @@ const ProductRevenueLossChart: React.FC<ProductRevenueLossChartProps> = ({
   };
 
   return (
-    <div className="mt-6 w-full rounded-lg bg-white p-4 shadow-sm">
+    <div className="w-full rounded-xl border border-gray-100 bg-white p-6 shadow-lg">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-semibold">Analyse des Remboursements</h3>
         <select

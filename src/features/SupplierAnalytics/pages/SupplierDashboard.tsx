@@ -8,6 +8,7 @@ import {
   FaUsers,
   FaUndo,
 } from "react-icons/fa";
+import Image from "next/image";
 import axios from "axios";
 import orderData from "../../../../data_test.json";
 import ProductRevenueLossChart from "../charts/suppliers/ProductRevenueLossChart";
@@ -21,8 +22,8 @@ import SupplierQuarterlyMetrics from "../charts/suppliers/SupplierQuarterlyMetri
 import SupplierCategoryPieChart from "../charts/suppliers/SupplierCategoryPieChart";
 import SupplierTopProductsChart from "../charts/suppliers/SupplierTopProductsChart";
 import InventoryTrendChart from "../charts/suppliers/InventoryTrendChart";
-import EmailFormPopup from "./email";
 import "react-datepicker/dist/react-datepicker.css";
+import Footer from "./footer";
 
 // const supplierId = "27"; // Example supplier ID (e.g., Technofood)
 
@@ -32,11 +33,11 @@ const SupplierDashboard = () => {
   const supplierId: string = searchParams.get("supplierId") ?? "";
   const [startDate, setStartDate] = useState<Date | null>(null); // Default to null
   const [endDate, setEndDate] = useState<Date | null>(null); // Default to null
-  const [showEmailForm, setShowEmailForm] = useState(false);
 
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
+  const [supplier, setSupplier] = useState<any>(null);
 
   useEffect(() => {
     console.log(supplierId);
@@ -49,6 +50,24 @@ const SupplierDashboard = () => {
         console.log(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
+      }
+    };
+
+    const fetchSupplier = async () => {
+      try {
+        // Fetch all suppliers from the API
+        const response = await axios.get("http://localhost:3000/api/suppliers");
+        const foundSupplier = response.data.find(
+          (supplier: any) => supplier.manufacturer_id === Number(supplierId),
+        );
+
+        if (foundSupplier) {
+          setSupplier(foundSupplier);
+        } else {
+          console.error("Supplier not found");
+        }
+      } catch (error) {
+        console.error("Error fetching supplier:", error);
       }
     };
 
@@ -71,11 +90,11 @@ const SupplierDashboard = () => {
         console.error("Error fetching orders:", error);
       }
     };
-
+    fetchSupplier();
     fetchProducts();
     fetchOrders();
     fetchCategories();
-  }, []);
+  }, [supplierId]);
 
   //Total orders
   const supplierProducts = products.filter(
@@ -213,69 +232,81 @@ const SupplierDashboard = () => {
   // );
 
   return (
-    <div className="mt-[4.8rem] w-full bg-n20 p-6">
-      {/* Modified Date Pickers */}
-      <div className="mb-6 flex flex-col md:flex-row md:space-x-4">
-        <div className="flex flex-col md:mr-4">
-          <label htmlFor="startDate" className="text-lg">
-            Date Début:
-          </label>
-          <DatePicker
-            id="startDate"
-            selected={startDate}
-            onChange={handleStartDateChange}
-            dateFormat="yyyy/MM/dd"
-            className="rounded border p-2 text-lg"
-            isClearable
-          />
+    <div>
+      <div className="mt-[4.8rem] w-full bg-n20 p-6">
+        {supplier && (
+          <div className="mb-6 text-center">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              {supplier.company_name}
+            </h1>
+            {supplier.city && supplier.country && (
+              <p className="text-lg text-gray-600 dark:text-gray-400">
+                {supplier.city}, {supplier.country}
+              </p>
+            )}
+          </div>
+        )}
+        <div className="mb-6 flex flex-col md:flex-row md:space-x-4">
+          <div className="flex flex-col md:mr-4">
+            <label htmlFor="startDate" className="text-lg">
+              Date Début:
+            </label>
+            <DatePicker
+              id="startDate"
+              selected={startDate}
+              onChange={handleStartDateChange}
+              dateFormat="yyyy/MM/dd"
+              className="rounded border p-2 text-lg"
+              isClearable
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="endDate" className="text-lg">
+              Date Fin:
+            </label>
+            <DatePicker
+              id="endDate"
+              selected={endDate}
+              onChange={handleEndDateChange}
+              dateFormat="yyyy/MM/dd"
+              className="rounded border p-2 text-lg"
+              isClearable
+            />
+          </div>
         </div>
 
-        <div className="flex flex-col">
-          <label htmlFor="endDate" className="text-lg">
-            Date Fin:
-          </label>
-          <DatePicker
-            id="endDate"
-            selected={endDate}
-            onChange={handleEndDateChange}
-            dateFormat="yyyy/MM/dd"
-            className="rounded border p-2 text-lg"
-            isClearable
-          />
-        </div>
-      </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <CardDataStats
+            title="Chiffre d'affaires"
+            total={`${totalTurnover.toFixed(2)} TND`}
+          >
+            <FaMoneyBillWave className="text-green-500" />
+          </CardDataStats>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-        <CardDataStats
-          title="Chiffre d'affaires"
-          total={`${totalTurnover.toFixed(2)} TND`}
-        >
-          <FaMoneyBillWave className="text-green-500" />
-        </CardDataStats>
+          <CardDataStats
+            title="Totale des commandes"
+            total={totalValidOrders.toString()}
+          >
+            <FaClipboardList className="text-blue-500" />
+          </CardDataStats>
 
-        <CardDataStats
-          title="Totale des commandes"
-          total={totalValidOrders.toString()}
-        >
-          <FaClipboardList className="text-blue-500" />
-        </CardDataStats>
+          <CardDataStats
+            title="Clients Uniques"
+            total={totalUniqueCustomers.toString()}
+          >
+            <FaUsers className="text-orange-500" />
+          </CardDataStats>
 
-        <CardDataStats
-          title="Clients Uniques"
-          total={totalUniqueCustomers.toString()}
-        >
-          <FaUsers className="text-orange-500" />
-        </CardDataStats>
+          <CardDataStats
+            title="Produits retournés"
+            total={totalReturns.toString()}
+          >
+            <FaUndo className="text-red-500" />
+          </CardDataStats>
 
-        <CardDataStats
-          title="Produits retournés"
-          total={totalReturns.toString()}
-        >
-          <FaUndo className="text-red-500" />
-        </CardDataStats>
-
-        {/*   
+          {/*   
 
         
 
@@ -287,71 +318,72 @@ const SupplierDashboard = () => {
         </CardDataStats>
 
         */}
-      </div>
+        </div>
 
-      {/* Charts */}
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="md:col-span-2">
-          <SupplierAreaChart supplierId={supplierId} />
+        {/* Charts */}
+        <div className="mt-6 grid w-full grid-cols-1 justify-center gap-6 md:grid-cols-3">
+          <div className="md:col-span-2">
+            <SupplierAreaChart supplierId={supplierId} />
+          </div>
+          <div className="mt-6 flex w-full justify-center">
+            <SupplierQuarterlyMetrics supplierId={supplierId} />
+          </div>
         </div>
-        <div className="mt-6">
-          <SupplierQuarterlyMetrics supplierId={supplierId} />
-        </div>
-      </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="md:col-span-2">
-          <ProductRevenueLossChart supplierId={supplierId} />
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="md:col-span-2">
+            <ProductRevenueLossChart supplierId={supplierId} />
+          </div>
+          <div>
+            <AvailableProducts supplierId={supplierId} />
+          </div>
         </div>
-        <div>
-          <AvailableProducts supplierId={supplierId} />
-        </div>
-      </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-1">
-        <div>
-          <TopArticlesOrdered
-            supplierId={supplierId}
-            startDate={startDate}
-            endDate={endDate}
-          />
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-1">
+          <div>
+            <TopArticlesOrdered
+              supplierId={supplierId}
+              startDate={startDate}
+              endDate={endDate}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div>
-          <SupplierCategoryPieChart
-            supplierId={supplierId}
-            startDate={startDate}
-            endDate={endDate}
-          />
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="flex w-full justify-center">
+            <SupplierCategoryPieChart
+              supplierId={supplierId}
+              startDate={startDate}
+              endDate={endDate}
+            />
+          </div>
+          <div className="flex w-full justify-center">
+            <ClientSegment
+              supplierId={supplierId}
+              startDate={startDate}
+              endDate={endDate}
+            />
+          </div>
         </div>
-        <div>
-          <ClientSegment
-            supplierId={supplierId}
-            startDate={startDate}
-            endDate={endDate}
-          />
-        </div>
-      </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div>
-          <RegionsOrders supplierId={supplierId} />
-        </div>
-        <div>
-          <SupplierTopProductsChart
-            supplierId={supplierId}
-            startDate={startDate}
-            endDate={endDate}
-          />
-        </div>
-        <div>
-          <InventoryTrendChart supplierId={supplierId} />
-        </div>
-      </div>
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="flex w-full justify-center">
+            <RegionsOrders supplierId={supplierId} />
+          </div>
+          <div className="flex w-full justify-center">
+            <InventoryTrendChart supplierId={supplierId} />
+          </div>
 
-      <button
+          <div className="flex w-full justify-center">
+            <SupplierTopProductsChart
+              supplierId={supplierId}
+              startDate={startDate}
+              endDate={endDate}
+            />
+          </div>
+        </div>
+
+        {/* <button
         onClick={() => setShowEmailForm(true)}
         className="fixed bottom-10 right-10 flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg transition-all hover:bg-blue-600 hover:shadow-xl"
       >
@@ -364,21 +396,9 @@ const SupplierDashboard = () => {
           <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
           <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
         </svg>
-      </button>
-
-      {/* Email Form Popup */}
-      {showEmailForm && supplierDetails && (
-        <EmailFormPopup
-          onClose={() => setShowEmailForm(false)}
-          supplierDetails={{
-            company_name: supplierDetails.company_name,
-            contact_name: supplierDetails.contact_name,
-            phone_number: supplierDetails.phone_number,
-            email: supplierDetails.email,
-            address: `${supplierDetails.postal_code} ${supplierDetails.city}, ${supplierDetails.country}`,
-          }}
-        />
-      )}
+      </button> */}
+      </div>
+      <Footer supplier={supplier} />
     </div>
   );
 };

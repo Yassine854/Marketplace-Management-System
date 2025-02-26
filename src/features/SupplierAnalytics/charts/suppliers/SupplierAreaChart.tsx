@@ -131,7 +131,7 @@ const SupplierAreaChart: React.FC<RevenueOverTimeChartProps> = ({
   });
 
   return (
-    <div className="mt-6 w-full bg-white p-4">
+    <div className="border-stroke mt-6 w-full rounded-lg border bg-white p-6 shadow-lg">
       <div className="mb-4">
         <label className="mr-2">Filtrer :</label>{" "}
         {/* "Filter:" -> "Filtrer :" */}

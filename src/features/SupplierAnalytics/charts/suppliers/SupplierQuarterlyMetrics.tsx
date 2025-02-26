@@ -72,9 +72,7 @@ const SupplierQuarterlyMetrics = ({ supplierId }: { supplierId: string }) => {
           const year = orderDate.getFullYear();
           if (year !== selectedYear) return acc;
 
-          const quarter = `Q${
-            Math.floor(orderDate.getMonth() / 3) + 1
-          } - ${year}`;
+          const quarter = `Q${Math.floor(orderDate.getMonth() / 3) + 1}`;
 
           if (!acc.has(quarter)) {
             acc.set(quarter, {
@@ -111,13 +109,16 @@ const SupplierQuarterlyMetrics = ({ supplierId }: { supplierId: string }) => {
   }, [supplierId, selectedYear]);
 
   return (
-    <div className="border-stroke rounded-lg border bg-white p-6 shadow-lg">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xl font-semibold">Performance Trimestrielle</h3>
+    <div className="border-stroke rounded-lg border bg-white p-4 shadow-lg">
+      {/* Title & Year Selector */}
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <h3 className="text-lg font-semibold sm:text-xl">
+          Performance Trimestrielle
+        </h3>
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(Number(e.target.value))}
-          className="rounded border p-2"
+          className="w-full rounded border p-2 sm:w-auto"
         >
           {availableYears.map((year) => (
             <option key={year} value={year}>
@@ -127,22 +128,23 @@ const SupplierQuarterlyMetrics = ({ supplierId }: { supplierId: string }) => {
         </select>
       </div>
 
-      <table className="w-full">
+      {/* Optimized Table - No Scrolling */}
+      <table className="w-full text-sm sm:text-base">
         <thead>
           <tr className="bg-gray-100">
-            <th className="p-3 text-left">Trimestre</th>
-            <th className="p-3 text-left">Total des Commandes</th>
-            <th className="p-3 text-left">Clients Uniques</th>
-            <th className="p-3 text-left">Chiffre d&apos;Affaires</th>
+            <th className="p-2 text-left sm:p-3">Trim.</th>
+            <th className="p-2 text-left sm:p-3">Cmds Tot.</th>
+            <th className="p-2 text-left sm:p-3">Clients</th>
+            <th className="p-2 text-left sm:p-3">C.A. (TND)</th>
           </tr>
         </thead>
         <tbody>
           {quartersData.map((data, idx) => (
             <tr key={idx} className="border-b">
-              <td className="p-3">{data.quarter}</td>
-              <td className="p-3">{data.totalOrders}</td>
-              <td className="p-3">{data.uniqueCustomers.size}</td>
-              <td className="p-3">{(data.turnover || 0).toFixed(2)} TND</td>
+              <td className="p-2 sm:p-3">{data.quarter}</td>
+              <td className="p-2 sm:p-3">{data.totalOrders}</td>
+              <td className="p-2 sm:p-3">{data.uniqueCustomers.size}</td>
+              <td className="p-2 sm:p-3">{(data.turnover || 0).toFixed(2)}</td>
             </tr>
           ))}
         </tbody>

@@ -71,7 +71,11 @@ const ClientSegment: React.FC<{
 
         const customerProfileMap = customers.reduce(
           (acc: Record<number, string>, customer) => {
-            acc[customer.id] = customer.retailer_profile || "N/A";
+            // Check if retailer_profile is "0" or empty and categorize as "Inconnue"
+            acc[customer.id] =
+              customer.retailer_profile === "0" || !customer.retailer_profile
+                ? "Inconnue"
+                : customer.retailer_profile;
             return acc;
           },
           {},
@@ -122,7 +126,7 @@ const ClientSegment: React.FC<{
 
         filteredOrders.forEach((order) => {
           if (order.customer_id) {
-            const profile = customerProfileMap[order.customer_id] || "Unknown";
+            const profile = customerProfileMap[order.customer_id]; // Already handled "0" or empty profiles as "Inconnue"
 
             if (!profileDistribution[profile]) {
               profileDistribution[profile] = new Set();
@@ -176,7 +180,7 @@ const ClientSegment: React.FC<{
               y: { formatter: (value: number) => `${value} customers` },
             },
             title: {
-              text: `Retailer Profiles - Unique Customers: ${allCustomers.size}`,
+              text: `Profils des Clients – Clients uniques : ${allCustomers.size}`,
               align: "center",
             },
           },
