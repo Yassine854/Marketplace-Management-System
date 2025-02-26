@@ -30,7 +30,6 @@ const PurchaseTableSkeleton = () => {
           <td className="px-6 py-4">
             <div className="flex space-x-2">
               <div className="h-5 w-5 rounded-full bg-gray-200"></div>
-
               <div className="h-5 w-5 rounded-full bg-gray-200"></div>
             </div>
           </td>

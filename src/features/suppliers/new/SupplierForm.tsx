@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Supplier, Product, Warehouse } from "./types/types";
 import "./styles/NeonButton.css";
-import { useSession } from "next-auth/react";
 import emailjs from "emailjs-com";
 import jsPDF from "jspdf";
 import { PrismaClient } from "@prisma/client";
@@ -31,6 +30,10 @@ const SupplierForm = ({
   const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(
     null,
   );
+
+  const [productRows, setProductRows] = useState([
+    { productId: "", quantity: 0, sku: "", priceExclTax: 0, total: 0 },
+  ]);
   const [selectedState, setSelectedState] = useState<string>("");
   const [createdAt] = useState<Date>(new Date());
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
@@ -39,7 +42,6 @@ const SupplierForm = ({
   const [newPaymentType, setNewPaymentType] = useState<string>("");
   const [comment, setComment] = useState("");
   const [message, setMessage] = useState("");
-  const { data: session } = useSession();
   const [paymentTypes, setPaymentTypes] = useState<
     { type: string; percentage: string; amount: string }[]
   >([{ type: "", percentage: "100", amount: "" }]);
@@ -70,6 +72,7 @@ const SupplierForm = ({
       url: string;
     }[]
   >([]);
+  const [totalAmount, setTotalAmount] = useState<number>(0);
 
   useEffect(() => {
     const loadData = async () => {
@@ -92,8 +95,7 @@ const SupplierForm = ({
 
         const productsData = await productsRes.json();
         const validatedProducts = productsData.map((p: any) => ({
-          id: p._id,
-          product_id: p.product_id,
+          id: p.product_id,
           sku: p.sku,
           name: p.name,
           price: p.price,
@@ -142,10 +144,7 @@ const SupplierForm = ({
       setPaymentPercentage(remainingPercentage.toString());
     }
   }, [newPaymentType]);
-  const totalAmount = productsWithQuantities.reduce(
-    (acc, item) => acc + item.total,
-    0,
-  );
+
   const [remainingAmounts, setRemainingAmounts] = useState([totalAmount]);
 
   useEffect(() => {
@@ -284,9 +283,14 @@ const SupplierForm = ({
         percentage: parseFloat(payment.percentage) || 0,
       })),
       products: productsWithQuantities.map((item) => ({
-        productId: item.product.id,
+        id: item.id,
+
+        name: item.product.name,
+
         quantity: item.quantity,
+
         priceExclTax: item.priceExclTax,
+
         total: item.total,
       })),
       files: uploadedFiles.map((file) => ({ id: file.id })),
@@ -320,34 +324,48 @@ const SupplierForm = ({
     if (warehouse) {
       setSelectedWarehouse(warehouse);
 
+      console.log("Selected Warehouse:", warehouse);
+      console.log("All Products:", products);
+
       const filteredProducts = products.filter(
         (product) =>
-          product.manufacturer ===
-            selectedSupplier?.manufacturer_id.toString() &&
-          product.website_ids.includes(warehouse.warehouse_id),
+          product.website_ids.includes(warehouse.warehouse_id) &&
+          product.manufacturer === selectedSupplier?.manufacturer_id.toString(),
       );
 
-      const updatedProducts = filteredProducts.map((product) => ({
-        product: {
-          id: product.id,
-          product_id: product.product_id,
-          sku: product.sku,
-          name: product.name,
-          price: product.price,
-          website_ids: product.website_ids,
-          manufacturer: product.manufacturer,
-        },
-        quantity: 0,
-        sku: product.sku,
-        id: product.id,
-        priceExclTax: product.price || 0,
-        total: 0,
-      }));
+      console.log("Filtered Products:", filteredProducts);
 
+      const updatedProducts = filteredProducts
+        .map((product) => {
+          if (!product || !product.id) {
+            console.error("Product is undefined or missing id:", product);
+            return null;
+          }
+          return {
+            product: {
+              id: product.id.toString(),
+              product_id: product.product_id,
+              sku: product.sku,
+              name: product.name,
+              price: product.price,
+              website_ids: product.website_ids,
+              manufacturer: product.manufacturer,
+            },
+            quantity: 0,
+            sku: product.sku,
+            id: product.id.toString(),
+            priceExclTax: product.price || 0,
+            total: 0,
+          };
+        })
+        .filter(
+          (product): product is NonNullable<typeof product> => product !== null,
+        ); // Type guard to remove nulls
       setProductsWithQuantities(updatedProducts);
+    } else {
+      console.error("Warehouse not found:", warehouseName);
     }
   };
-
   const resetFormFields = (): void => {
     setQuantities({});
     setSelectedProducts([]);
@@ -655,7 +673,92 @@ const SupplierForm = ({
 
     setRemainingAmounts(updatedRemainingAmounts);
   }, [paymentTypes, totalAmount]);
+  const addProductRow = () => {
+    setProductRows([
+      ...productRows,
+      { productId: "", quantity: 0, sku: "", priceExclTax: 0, total: 0 },
+    ]);
+  };
+  useEffect(() => {
+    const newTotalAmount = productRows.reduce((acc, row) => {
+      const product = productsWithQuantities.find(
+        (p) => p.id === row.productId,
+      );
+      if (product) {
+        return acc + row.quantity * product.priceExclTax;
+      }
+      return acc;
+    }, 0);
 
+    setTotalAmount(newTotalAmount);
+  }, [productRows, productsWithQuantities]);
+  const handleProductChange = (index: number, productId: string) => {
+    const updatedRows = [...productRows];
+    const selectedProduct = productsWithQuantities.find(
+      (p) => p.id === productId,
+    );
+
+    if (selectedProduct) {
+      updatedRows[index] = {
+        ...updatedRows[index],
+        productId: selectedProduct.id,
+        sku: selectedProduct.sku,
+        priceExclTax: selectedProduct.priceExclTax,
+        total: updatedRows[index].quantity * selectedProduct.priceExclTax,
+      };
+
+      setProductRows(updatedRows);
+
+      // Recalculer le totalAmount
+      const newTotalAmount = updatedRows.reduce((acc, row) => {
+        const product = productsWithQuantities.find(
+          (p) => p.id === row.productId,
+        );
+        if (product) {
+          return acc + row.quantity * product.priceExclTax;
+        }
+        return acc;
+      }, 0);
+
+      setTotalAmount(newTotalAmount);
+    } else {
+      console.error("Product not found for ID:", productId);
+    }
+  };
+  const handleQuantityChange = (index: number, quantity: number) => {
+    const updatedRows = [...productRows];
+    updatedRows[index].quantity = quantity;
+
+    // Recalculer le total pour cette ligne
+    const product = productsWithQuantities.find(
+      (p) => p.id === updatedRows[index].productId,
+    );
+    if (product) {
+      updatedRows[index].total = quantity * product.priceExclTax;
+    }
+
+    setProductRows(updatedRows);
+
+    const newTotalAmount = updatedRows.reduce((acc, row) => {
+      const product = productsWithQuantities.find(
+        (p) => p.id === row.productId,
+      );
+      if (product) {
+        return acc + row.quantity * product.priceExclTax;
+      }
+      return acc;
+    }, 0);
+
+    setTotalAmount(newTotalAmount);
+  };
+  const getAvailableProducts = (currentIndex: number) => {
+    return productsWithQuantities.filter((product, index) => {
+      return (
+        index === currentIndex ||
+        !productRows.some((row) => row.productId === product.id)
+      );
+    });
+  };
   return (
     <div className="flex h-full flex-grow">
       <div className="h-full w-full rounded-lg bg-[url(/images/login-bg.png)] bg-cover">
@@ -785,52 +888,56 @@ const SupplierForm = ({
                 </form>
               </div>
             )}
-
             {selectedWarehouse && selectedSupplier && (
               <div className="mt-8 max-h-[500px] overflow-y-auto rounded-lg border border-gray-300 bg-white p-6 shadow-lg">
                 <h4 className="mb-6 text-lg font-semibold text-gray-800">
                   Select Product
                 </h4>
                 <div className="space-y-6">
-                  {productsWithQuantities.map((item, index) => (
+                  {productRows.map((row, index) => (
                     <div
-                      key={item.id}
+                      key={index}
                       className="mb-6 flex items-center justify-between gap-6"
                     >
-                      {/* Product Name */}
+                      {/* Dropdown pour le produit */}
                       <div className="w-1/3">
                         <label className="block text-sm font-medium text-gray-700">
                           Product
                         </label>
-                        <input
-                          type="text"
-                          value={item.product.name}
-                          readOnly
-                          className="w-full rounded-md border border-gray-300 bg-gray-100 p-3"
-                        />
+                        <select
+                          value={row.productId || ""}
+                          onChange={(e) =>
+                            handleProductChange(index, e.target.value)
+                          }
+                          className="w-full rounded-md border border-gray-300 p-3"
+                        >
+                          <option value="">Select a product</option>
+                          {getAvailableProducts(index).map((item) => (
+                            <option key={item.id} value={item.product.id}>
+                              {item.product.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
 
-                      {/* Quantity */}
+                      {/* Quantité */}
                       <div className="w-1/4">
                         <label className="block text-sm font-medium text-gray-700">
                           Quantity
                         </label>
                         <input
                           type="number"
-                          value={item.quantity}
-                          onChange={(e) => {
-                            const newQuantity = Number(e.target.value);
-                            setProductsWithQuantities((prevState) => {
-                              const updatedProducts = [...prevState];
-                              updatedProducts[index] = {
-                                ...updatedProducts[index],
-                                quantity: newQuantity,
-                                total:
-                                  newQuantity *
-                                  updatedProducts[index].priceExclTax,
-                              };
-                              return updatedProducts;
-                            });
+                          value={row.quantity}
+                          onChange={(e) =>
+                            handleQuantityChange(index, Number(e.target.value))
+                          }
+                          onBlur={() => {
+                            if (
+                              row.quantity > 0 &&
+                              index === productRows.length - 1
+                            ) {
+                              addProductRow();
+                            }
                           }}
                           className="w-full rounded-md border border-gray-300 p-3"
                         />
@@ -843,23 +950,13 @@ const SupplierForm = ({
                         </label>
                         <input
                           type="number"
-                          value={item.priceExclTax}
-                          onChange={(e) => {
-                            const newPriceExclTax = parseFloat(e.target.value);
-                            setProductsWithQuantities((prevState) => {
-                              const updatedProducts = [...prevState];
-                              updatedProducts[index] = {
-                                ...updatedProducts[index],
-                                priceExclTax: newPriceExclTax,
-                                total:
-                                  newPriceExclTax *
-                                  updatedProducts[index].quantity,
-                              };
-                              return updatedProducts;
-                            });
-                          }}
-                          className="w-full rounded-md border border-gray-300 p-3"
-                          placeholder="Price Excl. Tax"
+                          value={
+                            productsWithQuantities.find(
+                              (p) => p.id === row.productId,
+                            )?.priceExclTax
+                          }
+                          disabled
+                          className="w-full rounded-md border border-gray-300 bg-gray-100 p-3"
                         />
                       </div>
 
@@ -870,7 +967,12 @@ const SupplierForm = ({
                         </label>
                         <input
                           type="text"
-                          value={item.total.toFixed(2)}
+                          value={(
+                            row.quantity *
+                            (productsWithQuantities.find(
+                              (p) => p.id === row.productId,
+                            )?.priceExclTax || 0)
+                          ).toFixed(2)}
                           disabled
                           className="w-full rounded-md border border-gray-300 bg-gray-100 p-3"
                         />
@@ -883,7 +985,11 @@ const SupplierForm = ({
                         </label>
                         <input
                           type="text"
-                          value={item.sku}
+                          value={
+                            productsWithQuantities.find(
+                              (p) => p.id === row.productId,
+                            )?.sku || ""
+                          }
                           disabled
                           className="w-full rounded-md border border-gray-300 bg-gray-100 p-3"
                         />

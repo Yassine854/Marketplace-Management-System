@@ -15,6 +15,7 @@ export async function POST(req: Request) {
       comments,
       payments,
       files,
+      products,
     } = await req.json();
 
     if (!manufacturerId || !warehouseId) {
@@ -41,6 +42,7 @@ export async function POST(req: Request) {
                 })),
               }
             : undefined,
+
         payments:
           payments?.length > 0
             ? {
@@ -74,11 +76,23 @@ export async function POST(req: Request) {
             (file: { id: string }) => ({ id: file.id }),
           ),
         },
+
+        products: {
+          create: (Array.isArray(products) ? products : []).map(
+            (product: any) => ({
+              name: product.name,
+              quantity: product.quantity,
+              priceExclTax: product.priceExclTax,
+              total: product.total,
+            }),
+          ),
+        },
       },
       include: {
         comments: true,
         payments: true,
         files: true,
+        products: true,
       },
     });
 

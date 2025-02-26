@@ -4,7 +4,16 @@ export type PurchaseOrderStatus =
   | "DELIVERED"
   | "COMPLETED";
 
+export interface Product {
+  id: string;
+  name: string;
+  quantity: number;
+  priceExclTax: number;
+  total: number;
+}
+
 export interface PurchaseOrder {
+  products: Product[]; // Use the Product interface here
   id: string;
   orderNumber: string;
   manufacturer: {
@@ -28,4 +37,5 @@ export type PurchaseOrderUpdate = Partial<{
   status: PurchaseOrderStatus;
   warehouseId: string;
   manufacturerId: string;
+  products: Product[]; // Add products to the update type
 }>;

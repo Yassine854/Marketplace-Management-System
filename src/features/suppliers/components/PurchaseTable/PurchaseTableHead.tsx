@@ -30,4 +30,5 @@ const PurchaseTableHead = () => {
     </thead>
   );
 };
+
 export default PurchaseTableHead;

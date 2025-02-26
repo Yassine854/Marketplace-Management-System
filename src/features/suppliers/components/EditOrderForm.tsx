@@ -1,12 +1,12 @@
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { X, Calendar, ClipboardCheck } from "lucide-react";
 import {
   PurchaseOrder,
   PurchaseOrderUpdate,
   PurchaseOrderStatus,
 } from "./types/purchaseOrder";
 import { updatePurchaseOrder } from "./services/puchaseService";
-import { useState } from "react";
-import { toast } from "react-toastify";
-import { X, Calendar, ClipboardCheck } from "lucide-react";
 
 export default function EditOrderForm({
   order,
@@ -30,6 +30,7 @@ export default function EditOrderForm({
       onUpdate(updatedOrder);
       toast.success("Order successfully updated!");
       onClose();
+      window.location.reload();
     } catch (error) {
       console.error("Error updating order:", error);
       toast.error("Error updating the order.");
@@ -54,6 +55,7 @@ export default function EditOrderForm({
         </h2>
 
         <div className="space-y-5">
+          {/* Delivery Date */}
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
               Delivery Date
@@ -74,6 +76,7 @@ export default function EditOrderForm({
             </div>
           </div>
 
+          {/* Total Amount */}
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
               Total Amount (DT)
@@ -91,31 +94,26 @@ export default function EditOrderForm({
             />
           </div>
 
+          {/* Status */}
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
               Status
             </label>
-            <div className="relative flex items-center">
-              <ClipboardCheck
-                className="absolute left-3 text-gray-400"
-                size={20}
-              />
-              <select
-                value={formData.status}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    status: e.target.value as PurchaseOrderStatus,
-                  })
-                }
-                className="mt-1 block w-full rounded-lg border-gray-300 p-3 pl-12 shadow-md focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="READY">Ready</option>
-                <option value="DELIVERED">Delivered</option>
-                <option value="COMPLETED">Completed</option>
-              </select>
-            </div>
+            <select
+              value={formData.status}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  status: e.target.value as PurchaseOrderStatus,
+                })
+              }
+              className="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
+            >
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="READY">Ready</option>
+              <option value="DELIVERED">Delivered</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
           </div>
         </div>
 

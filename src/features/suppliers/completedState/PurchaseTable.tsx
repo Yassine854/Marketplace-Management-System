@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PurchaseTableHead from "../components/PurchaseTable/PurchaseTableHead";
-import PurchaseTableRow from "../components/PurchaseTable/PurchaseTableRow";
+import PurchaseTableRow from "./PurchaseTableRow";
 import PurchaseTableSkeleton from "../components/PurchaseTable/PurchaseTableSkeleton";
 import { PurchaseOrder } from "../components/types/purchaseOrder";
 
@@ -14,18 +14,10 @@ const PurchaseTable = ({
   const [orders, setOrders] = useState<PurchaseOrder[]>(data);
 
   useEffect(() => {
-    const filteredOrders = data.filter((order) => order.status === "COMPLETED");
+    const filteredOrders = data.filter((order) => order.status === "DELIVERED");
 
     setOrders(filteredOrders);
   }, [data]);
-
-  const handleUpdateOrder = (updatedOrder: PurchaseOrder) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === updatedOrder.id ? updatedOrder : order,
-      ),
-    );
-  };
 
   return (
     <div className="overflow-x-auto">
@@ -36,11 +28,7 @@ const PurchaseTable = ({
             <PurchaseTableSkeleton />
           ) : (
             orders.map((order) => (
-              <PurchaseTableRow
-                key={order.id}
-                order={order}
-                onUpdate={handleUpdateOrder}
-              />
+              <PurchaseTableRow key={order.id} order={order} />
             ))
           )}
         </tbody>
