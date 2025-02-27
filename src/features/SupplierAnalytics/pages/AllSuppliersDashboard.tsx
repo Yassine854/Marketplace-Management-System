@@ -9,6 +9,16 @@ import {
 } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import SupplierAreaChart from "../charts/super_admin/SupplierAreaChart";
+import SupplierQuarterlyMetrics from "../charts/super_admin/SupplierQuarterlyMetrics";
+import ProductRevenueLossChart from "../charts/super_admin/ProductRevenueLossChart";
+import AvailableProducts from "../charts/super_admin/AvailableProducts";
+import SupplierCategoryPieChart from "../charts/super_admin/SupplierCategoryPieChart";
+import ClientSegment from "../charts/super_admin/ClientSegment";
+import RegionsOrders from "../charts/super_admin/RegionsOrders";
+import InventoryTrendChart from "../charts/super_admin/InventoryTrendChart";
+
+import TopArticlesOrdered from "../charts/super_admin/TopArticlesOrdered";
 
 const AllSuppliersDashboard = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -53,15 +63,21 @@ const AllSuppliersDashboard = () => {
       (!selectedWarehouse || order.store_id === Number(selectedWarehouse)),
   ).length;
 
+  const validCustomerIds = new Set(customers.map((c) => c.id));
+
   const uniqueCustomers = new Set(
     orders
-      .filter(
-        (order) =>
+      .filter((order) => {
+        const orderTime = new Date(order.created_at).getTime();
+        return (
           order.state !== "canceled" &&
-          (!startDate || new Date(order.created_at) >= startDate) &&
-          (!endDate || new Date(order.created_at) <= endDate) &&
-          (!selectedWarehouse || order.store_id === Number(selectedWarehouse)),
-      )
+          order.customer_id &&
+          validCustomerIds.has(order.customer_id) &&
+          (!startDate || orderTime >= startDate.setHours(0, 0, 0, 0)) &&
+          (!endDate || orderTime <= endDate.setHours(23, 59, 59, 999)) &&
+          (!selectedWarehouse || order.store_id === Number(selectedWarehouse))
+        );
+      })
       .map((order) => order.customer_id),
   ).size;
 
@@ -91,69 +107,121 @@ const AllSuppliersDashboard = () => {
     }, 0);
 
   return (
-    <div className="mt-[4.8rem] w-full bg-n20 p-6">
-      <div className="mb-6 flex flex-col md:flex-row md:space-x-4">
-        {/* Warehouse Filter */}
-        <div className="flex flex-col md:mr-4">
-          <label className="text-lg">Warehouse:</label>
-          <select
-            value={selectedWarehouse || ""}
-            onChange={(e) => setSelectedWarehouse(e.target.value || null)}
-            className="rounded border p-2 text-lg"
+    <div>
+      <div className="mt-[4.8rem] w-full bg-n20 p-6">
+        <div className="mb-6 flex flex-col md:flex-row md:space-x-4">
+          {/* Warehouse Filter */}
+          <div className="flex flex-col md:mr-4">
+            <label className="text-lg">Warehouse:</label>
+            <select
+              value={selectedWarehouse || ""}
+              onChange={(e) => setSelectedWarehouse(e.target.value || null)}
+              className="rounded border p-2 text-lg"
+            >
+              {warehouses.map((warehouse) => (
+                <option key={warehouse.id} value={warehouse.id}>
+                  {warehouse.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Date Filters */}
+          <div className="flex flex-col md:mr-4">
+            <label className="text-lg">Start Date:</label>
+            <DatePicker
+              selected={startDate}
+              onChange={setStartDate}
+              dateFormat="yyyy/MM/dd"
+              className="rounded border p-2 text-lg"
+              isClearable
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-lg">End Date:</label>
+            <DatePicker
+              selected={endDate}
+              onChange={setEndDate}
+              dateFormat="yyyy/MM/dd"
+              className="rounded border p-2 text-lg"
+              isClearable
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <CardDataStats
+            title="Total Revenue"
+            total={`${totalTurnover.toFixed(2)} TND`}
           >
-            {warehouses.map((warehouse) => (
-              <option key={warehouse.id} value={warehouse.id}>
-                {warehouse.name}
-              </option>
-            ))}
-          </select>
+            <FaMoneyBillWave className="text-green-500" />
+          </CardDataStats>
+          <CardDataStats
+            title="Total Orders"
+            total={totalValidOrders.toString()}
+          >
+            <FaClipboardList className="text-blue-500" />
+          </CardDataStats>
+          <CardDataStats
+            title="Unique Customers"
+            total={uniqueCustomers.toString()}
+          >
+            <FaUsers className="text-orange-500" />
+          </CardDataStats>
+          <CardDataStats title="Total Returns" total={totalReturns.toString()}>
+            <FaUndo className="text-red-500" />
+          </CardDataStats>
         </div>
 
-        {/* Date Filters */}
-        <div className="flex flex-col md:mr-4">
-          <label className="text-lg">Start Date:</label>
-          <DatePicker
-            selected={startDate}
-            onChange={setStartDate}
-            dateFormat="yyyy/MM/dd"
-            className="rounded border p-2 text-lg"
-            isClearable
-          />
+        <div className="mt-6 grid w-full grid-cols-1 justify-center gap-6 md:grid-cols-3">
+          <div className="md:col-span-2">
+            <SupplierAreaChart />
+          </div>
+          <div className="mt-6 flex w-full justify-center">
+            <SupplierQuarterlyMetrics />
+          </div>
         </div>
-        <div className="flex flex-col">
-          <label className="text-lg">End Date:</label>
-          <DatePicker
-            selected={endDate}
-            onChange={setEndDate}
-            dateFormat="yyyy/MM/dd"
-            className="rounded border p-2 text-lg"
-            isClearable
-          />
+
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="md:col-span-2">
+            <ProductRevenueLossChart />
+          </div>
+          <div>
+            <AvailableProducts />
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-        <CardDataStats
-          title="Total Revenue"
-          total={`${totalTurnover.toFixed(2)} TND`}
-        >
-          <FaMoneyBillWave className="text-green-500" />
-        </CardDataStats>
-        <CardDataStats title="Total Orders" total={totalValidOrders.toString()}>
-          <FaClipboardList className="text-blue-500" />
-        </CardDataStats>
-        <CardDataStats
-          title="Unique Customers"
-          total={uniqueCustomers.toString()}
-        >
-          <FaUsers className="text-orange-500" />
-        </CardDataStats>
-        <CardDataStats title="Total Returns" total={totalReturns.toString()}>
-          <FaUndo className="text-red-500" />
-        </CardDataStats>
-      </div>
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-1">
+          <div>{/* <TopArticlesOrdered/> */}</div>
+        </div>
 
-      {/* <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="flex w-full justify-center">
+            <SupplierCategoryPieChart />
+          </div>
+          <div className="flex w-full justify-center">
+            <ClientSegment startDate={startDate} endDate={endDate} />
+          </div>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="flex w-full justify-center">
+            <RegionsOrders />
+          </div>
+          <div className="flex w-full justify-center">
+            <InventoryTrendChart />
+          </div>
+
+          {/*  <div className="flex w-full justify-center">
+            <SupplierTopProductsChart
+              supplierId={supplierId}
+              startDate={startDate}
+              endDate={endDate}
+            />
+          </div> */}
+        </div>
+
+        {/* <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="md:col-span-2">
           <RevenueTrendChart orders={orders} products={products} />
         </div>
@@ -197,6 +265,7 @@ const AllSuppliersDashboard = () => {
           products={products}
         />
       </div> */}
+      </div>
     </div>
   );
 };
