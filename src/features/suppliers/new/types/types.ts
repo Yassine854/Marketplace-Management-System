@@ -7,7 +7,7 @@ export type Warehouse = {
 
 export type Supplier = {
   manufacturer_id: number;
-  company_name: string;
+  companyName: string;
   contact_name: string;
   email: string;
   phone_number?: string;

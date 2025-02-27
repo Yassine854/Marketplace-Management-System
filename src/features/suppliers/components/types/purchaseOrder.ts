@@ -12,23 +12,36 @@ export interface Product {
   total: number;
 }
 
+export interface Payment {
+  paymentMethod: string;
+  amount: number;
+}
+
+export interface Supplier {
+  id: string;
+  companyName: string;
+}
+
+export interface Warehouse {
+  id: string;
+  name: string;
+}
+
 export interface PurchaseOrder {
-  products: Product[]; // Use the Product interface here
+  products: Product[];
   id: string;
   orderNumber: string;
-  manufacturer: {
-    companyName: string;
-  } | null;
-  warehouse: {
-    name: string;
-  } | null;
+  supplier: Supplier | null;
+  supplierId: string;
+  warehouse: Warehouse | null;
+  warehouseId: string;
   deliveryDate: Date;
   totalAmount: number;
   status: PurchaseOrderStatus;
-  payments: {
-    paymentMethod: string;
-    amount: number;
-  }[];
+  payments: Payment[];
+  paymentTypes: { type: string; percentage: number; amount: number }[];
+  comment: string;
+  files: { name: string; url: string }[];
 }
 
 export type PurchaseOrderUpdate = Partial<{
@@ -36,6 +49,9 @@ export type PurchaseOrderUpdate = Partial<{
   totalAmount: number;
   status: PurchaseOrderStatus;
   warehouseId: string;
-  manufacturerId: string;
-  products: Product[]; // Add products to the update type
+  supplierId: string;
+  products: Product[];
+  paymentTypes: { type: string; percentage: number; amount: number }[];
+  comment: string;
+  files: { name: string; url: string }[];
 }>;

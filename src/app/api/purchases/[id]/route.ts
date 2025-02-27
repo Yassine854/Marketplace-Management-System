@@ -18,26 +18,22 @@ export async function PUT(
       );
     }
 
-    // Prepare the update data for the purchase order
     const updateData: any = {
       deliveryDate: body.deliveryDate,
       totalAmount: body.totalAmount,
       status: body.status,
     };
 
-    // Connect warehouse if provided
     if (body.warehouseId) {
       updateData.warehouse = { connect: { warehouseId: body.warehouseId } };
     }
 
-    // Connect manufacturer if provided
     if (body.manufacturerId) {
       updateData.manufacturer = {
         connect: { manufacturerId: body.manufacturerId },
       };
     }
 
-    // Update the purchase order
     const updatedOrder = await prisma.purchaseOrder.update({
       where: { id: orderId },
       data: updateData,
@@ -48,23 +44,22 @@ export async function PUT(
       },
     });
 
-    // Update products if provided
     if (body.products) {
       await Promise.all(
         body.products.map(async (product: any) => {
           await prisma.productOrdered.upsert({
-            where: { id: product.id }, // Assuming each product has a unique ID
+            where: { id: product.id },
             create: {
               name: product.name,
               quantity: product.quantity,
               priceExclTax: product.priceExclTax,
-              total: product.total, // Ensure total is included if needed
-              purchaseOrderId: orderId, // Link to the purchase order
+              total: product.total,
+              purchaseOrderId: orderId,
             },
             update: {
               quantity: product.quantity,
               priceExclTax: product.priceExclTax,
-              total: product.total, // Update total if needed
+              total: product.total,
             },
           });
         }),

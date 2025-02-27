@@ -60,7 +60,7 @@ export async function POST(req: Request) {
                       !isNaN(percentage) &&
                       percentage >= 0 &&
                       percentage <= 100
-                    ); // Validation du pourcentage
+                    );
                   })
                   .map((payment: any) => ({
                     amount: parseFloat(payment.amount),

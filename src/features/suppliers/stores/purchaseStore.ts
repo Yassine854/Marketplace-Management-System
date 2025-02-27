@@ -84,7 +84,7 @@ const usePurchaseStore = create<PurchaseState>((set) => ({
           totalAmount: order.totalAmount,
           status: order.status,
           payments: order.payments,
-          products: order.products || [], // Ensure products are included
+          products: order.products || [],
         })),
         total,
       });

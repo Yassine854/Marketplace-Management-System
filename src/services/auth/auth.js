@@ -50,6 +50,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         id: token.userId,
         roleId: token.userRoleId,
         username: token.username,
+        name: `${token.userFirstName} ${token.userLastName}`,
         firstName: token.userFirstName,
         lastName: token.userLastName,
         isActive: token.isActive,

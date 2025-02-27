@@ -6,6 +6,7 @@ import emailjs from "emailjs-com";
 import jsPDF from "jspdf";
 import { PrismaClient } from "@prisma/client";
 
+import { useSession } from "next-auth/react";
 const prisma = new PrismaClient();
 
 const SupplierForm = ({
@@ -44,7 +45,7 @@ const SupplierForm = ({
   const [message, setMessage] = useState("");
   const [paymentTypes, setPaymentTypes] = useState<
     { type: string; percentage: string; amount: string }[]
-  >([{ type: "", percentage: "100", amount: "" }]);
+  >([{ type: "", percentage: "", amount: "" }]);
   const [remainingAmount, setRemainingAmount] = useState(0);
   const [productsWithQuantities, setProductsWithQuantities] = useState<
     {
@@ -107,7 +108,7 @@ const SupplierForm = ({
         const suppliersData = await suppliersRes.json();
         const validatedSuppliers = suppliersData.map((s: any) => ({
           manufacturer_id: s.manufacturerId ?? s.manufacturer_id,
-          company_name: s.companyName || s.company_name,
+          companyName: s.companyName || s.companyName,
           contact_name: s.contactName || s.contact_name,
           email: s.email,
           phone_number: s.phoneNumber ?? s.phone_number,
@@ -164,27 +165,33 @@ const SupplierForm = ({
   const handlePaymentPercentageChange = (index: number, value: string) => {
     const newPercentage = Math.min(parseFloat(value) || 0, 100);
     const updatedPayments = [...paymentTypes];
+
     updatedPayments[index] = {
       ...updatedPayments[index],
       percentage: newPercentage.toString(),
       amount: ((totalAmount * newPercentage) / 100).toString(),
     };
+
     const totalAllocated = updatedPayments.reduce(
-      (acc, payment) => acc + (parseFloat(payment.amount || "0") || 0),
-      0,
-    );
-    const newTotalPercentage = updatedPayments.reduce(
-      (acc, payment) => acc + (parseFloat(payment.percentage) || 0),
+      (acc, payment) => acc + (parseFloat(payment.percentage || "0") || 0),
       0,
     );
 
-    if (totalAllocated < totalAmount && index === updatedPayments.length - 1) {
+    const remainingPercentage = 100 - totalAllocated;
+
+    if (remainingPercentage > 0 && index === updatedPayments.length - 1) {
       updatedPayments.push({
         type: "",
-        percentage: "",
+        percentage: remainingPercentage.toFixed(2),
         amount: "",
       });
     }
+
+    updatedPayments.forEach((payment, i) => {
+      if (i !== index && i !== updatedPayments.length - 1) {
+        payment.percentage = payment.percentage;
+      }
+    });
 
     setPaymentTypes(updatedPayments);
   };
@@ -245,7 +252,7 @@ const SupplierForm = ({
   }, [paymentPercentage]);
 
   const handleSelectSupplier = (supplier: Supplier): void => {
-    setQuery(supplier.company_name);
+    setQuery(supplier.companyName);
     setSelectedSupplier(supplier);
     onChange?.(supplier);
     resetFormFields();
@@ -271,31 +278,35 @@ const SupplierForm = ({
     const orderData = {
       orderNumber: `PO-${Date.now()}`,
       manufacturerId: Number(selectedSupplier.manufacturer_id) || 0,
-
       warehouseId: Number(selectedWarehouse.warehouse_id) || 0,
       deliveryDate: new Date(deliveryDate).toISOString(),
       totalAmount: totalAmount,
       status: selectedState,
       comments: comment ? [{ content: comment }] : [],
-      payments: paymentTypes.map((payment) => ({
-        paymentMethod: payment.type.toUpperCase() as PaymentMethod,
-        amount: parseFloat(payment.amount) || 0,
-        percentage: parseFloat(payment.percentage) || 0,
-      })),
-      products: productsWithQuantities.map((item) => ({
-        id: item.id,
+      payments: paymentTypes
 
-        name: item.product.name,
+        .filter((payment) => payment.type && payment.amount) // Filtrer les paiements valides
 
-        quantity: item.quantity,
+        .map((payment) => ({
+          paymentMethod: payment.type.toUpperCase() as PaymentMethod,
 
-        priceExclTax: item.priceExclTax,
+          amount: parseFloat(payment.amount) || 0,
 
-        total: item.total,
-      })),
+          percentage: parseFloat(payment.percentage) || 0,
+        })),
+      products: productsWithQuantities
+        .filter((item) => item.quantity > 0)
+        .map((item) => ({
+          id: item.id,
+          name: item.product.name,
+          quantity: item.quantity,
+          priceExclTax: item.priceExclTax,
+          total: item.total,
+        })),
       files: uploadedFiles.map((file) => ({ id: file.id })),
     };
 
+    console.log("Données de la commande avant envoi:", orderData);
     try {
       const response = await fetch("/api/purchase", {
         method: "POST",
@@ -314,7 +325,6 @@ const SupplierForm = ({
       console.log("Purchase Order Saved:", result);
     } catch (error) {
       console.error("Erreur:", error);
-
       toast.error("Registration failed.");
     }
   };
@@ -387,7 +397,7 @@ const SupplierForm = ({
     }
 
     const templateParams = {
-      supplierName: selectedSupplier?.company_name || "Unknown Supplier",
+      supplierName: selectedSupplier?.companyName || "Unknown Supplier",
       warehouse: selectedWarehouse?.name || "Unknown Warehouse",
       totalAmount: totalAmount?.toFixed(2) || "0.00",
       remainingAmount: remainingAmount?.toFixed(2) || "0.00",
@@ -439,7 +449,7 @@ const SupplierForm = ({
     ) {
       updatedPaymentTypes.push({
         type: "",
-        percentage: "",
+        percentage: newPercentage.toFixed(2),
         amount: "",
       });
     }
@@ -465,6 +475,7 @@ const SupplierForm = ({
     remainingAmount: number,
 
     deliveryDate: Date,
+    userName: string,
   ) => {
     const lineHeight = 7;
 
@@ -473,6 +484,9 @@ const SupplierForm = ({
     const pageWidth = doc.internal.pageSize.getWidth();
 
     let yOffset = margin;
+    doc.setFontSize(12);
+
+    yOffset += lineHeight;
     const headerStyle = {
       fontSize: 18,
 
@@ -508,7 +522,7 @@ const SupplierForm = ({
     doc.setFont("helvetica", "normal");
 
     const details = [
-      `Supplier: ${supplier?.company_name || "Not specified"}`,
+      `Supplier: ${supplier?.companyName || "Not specified"}`,
 
       `Warehouse: ${warehouse?.name || "Not specified"}`,
 
@@ -627,6 +641,8 @@ const SupplierForm = ({
     doc.setLineWidth(0.1);
 
     doc.line(margin, yOffset, pageWidth - margin, yOffset);
+    yOffset += lineHeight;
+    doc.text(`Made by ${userName}`, margin, yOffset);
   };
   const handleDownloadPDF = () => {
     if (productsWithQuantities.length === 0) {
@@ -647,6 +663,7 @@ const SupplierForm = ({
       paymentTypes,
       remainingAmount,
       deliveryDate,
+      userName,
     );
 
     doc.save("order.pdf");
@@ -673,12 +690,7 @@ const SupplierForm = ({
 
     setRemainingAmounts(updatedRemainingAmounts);
   }, [paymentTypes, totalAmount]);
-  const addProductRow = () => {
-    setProductRows([
-      ...productRows,
-      { productId: "", quantity: 0, sku: "", priceExclTax: 0, total: 0 },
-    ]);
-  };
+
   useEffect(() => {
     const newTotalAmount = productRows.reduce((acc, row) => {
       const product = productsWithQuantities.find(
@@ -707,9 +719,18 @@ const SupplierForm = ({
         total: updatedRows[index].quantity * selectedProduct.priceExclTax,
       };
 
+      if (index === updatedRows.length - 1) {
+        updatedRows.push({
+          productId: "",
+          quantity: 0,
+          sku: "",
+          priceExclTax: 0,
+          total: 0,
+        });
+      }
+
       setProductRows(updatedRows);
 
-      // Recalculer le totalAmount
       const newTotalAmount = updatedRows.reduce((acc, row) => {
         const product = productsWithQuantities.find(
           (p) => p.id === row.productId,
@@ -722,23 +743,53 @@ const SupplierForm = ({
 
       setTotalAmount(newTotalAmount);
     } else {
-      console.error("Product not found for ID:", productId);
+      console.error("Produit non trouvé pour l'ID:", productId);
     }
   };
   const handleQuantityChange = (index: number, quantity: number) => {
     const updatedRows = [...productRows];
     updatedRows[index].quantity = quantity;
 
-    // Recalculer le total pour cette ligne
+    // Trouver le produit correspondant dans productsWithQuantities
     const product = productsWithQuantities.find(
       (p) => p.id === updatedRows[index].productId,
     );
+
     if (product) {
+      // Mettre à jour le total pour cette ligne
       updatedRows[index].total = quantity * product.priceExclTax;
+
+      // Mettre à jour productsWithQuantities
+      const updatedProductsWithQuantities = productsWithQuantities.map(
+        (item) => {
+          if (item.id === product.id) {
+            return {
+              ...item,
+              quantity: quantity, // Mettre à jour la quantité
+              total: quantity * item.priceExclTax, // Mettre à jour le total
+            };
+          }
+          return item;
+        },
+      );
+
+      setProductsWithQuantities(updatedProductsWithQuantities);
+    }
+
+    // Ajouter une nouvelle ligne si la quantité est > 0 et que c'est la dernière ligne
+    if (quantity > 0 && index === updatedRows.length - 1) {
+      updatedRows.push({
+        productId: "",
+        quantity: 0,
+        sku: "",
+        priceExclTax: 0,
+        total: 0,
+      });
     }
 
     setProductRows(updatedRows);
 
+    // Recalculer le totalAmount
     const newTotalAmount = updatedRows.reduce((acc, row) => {
       const product = productsWithQuantities.find(
         (p) => p.id === row.productId,
@@ -752,13 +803,19 @@ const SupplierForm = ({
     setTotalAmount(newTotalAmount);
   };
   const getAvailableProducts = (currentIndex: number) => {
-    return productsWithQuantities.filter((product, index) => {
-      return (
-        index === currentIndex ||
-        !productRows.some((row) => row.productId === product.id)
+    return productsWithQuantities.filter((product) => {
+      return !productRows.some(
+        (row, rowIndex) =>
+          rowIndex !== currentIndex && row.productId === product.id,
       );
     });
   };
+  const { data: session } = useSession();
+
+  if (!session?.user) {
+    return <p>Unauthorized</p>;
+  }
+  const userName = session.user?.name || "Guest";
   return (
     <div className="flex h-full flex-grow">
       <div className="h-full w-full rounded-lg bg-[url(/images/login-bg.png)] bg-cover">
@@ -768,7 +825,7 @@ const SupplierForm = ({
               <p className="ml-4 mt-6 text-xl font-bold">Select Supplier</p>
             </div>
             <div className="box flex w-full justify-between rounded-lg ">
-              <p>Made by Intern </p>
+              <p>Made by {userName} </p>
             </div>
 
             {/* Supplier Search Section */}
@@ -789,7 +846,7 @@ const SupplierForm = ({
                     {suppliers
                       .filter(
                         (supplier) =>
-                          supplier.company_name
+                          supplier.companyName
                             ?.toLowerCase()
                             .includes(query.toLowerCase()),
                       )
@@ -799,7 +856,7 @@ const SupplierForm = ({
                           onClick={() => handleSelectSupplier(supplier)}
                           className="cursor-pointer px-4 py-2 hover:bg-gray-100"
                         >
-                          {supplier.company_name}
+                          {supplier.companyName}
                         </li>
                       ))}
                   </ul>
@@ -831,7 +888,7 @@ const SupplierForm = ({
                       </label>
                       <input
                         type="text"
-                        value={selectedSupplier.company_name}
+                        value={selectedSupplier.companyName}
                         disabled
                         className="w-full rounded-md border border-gray-300 bg-gray-100 p-2"
                       />
@@ -913,7 +970,7 @@ const SupplierForm = ({
                         >
                           <option value="">Select a product</option>
                           {getAvailableProducts(index).map((item) => (
-                            <option key={item.id} value={item.product.id}>
+                            <option key={item.id} value={item.id}>
                               {item.product.name}
                             </option>
                           ))}
@@ -931,14 +988,6 @@ const SupplierForm = ({
                           onChange={(e) =>
                             handleQuantityChange(index, Number(e.target.value))
                           }
-                          onBlur={() => {
-                            if (
-                              row.quantity > 0 &&
-                              index === productRows.length - 1
-                            ) {
-                              addProductRow();
-                            }
-                          }}
                           className="w-full rounded-md border border-gray-300 p-3"
                         />
                       </div>
@@ -1023,9 +1072,22 @@ const SupplierForm = ({
                         <input
                           type="number"
                           value={payment.percentage}
-                          onChange={(e) =>
-                            handlePaymentPercentageChange(index, e.target.value)
-                          }
+                          onBlur={() => {
+                            handlePaymentPercentageChange(
+                              index,
+                              payment.percentage,
+                            );
+                          }}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setPaymentTypes((prev) => {
+                              const updatedPayments = [...prev];
+
+                              updatedPayments[index].percentage = value;
+
+                              return updatedPayments;
+                            });
+                          }}
                           className="w-1/3 rounded-md border border-gray-300 p-3"
                           placeholder="Percentage"
                         />
