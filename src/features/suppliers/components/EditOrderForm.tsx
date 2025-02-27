@@ -8,7 +8,6 @@ import {
 } from "./types/purchaseOrder";
 import { updatePurchaseOrder } from "./services/puchaseService";
 import { Supplier, Product, Warehouse } from "../new/types/types";
-
 export default function EditOrderForm({
   order,
   onClose,
@@ -38,11 +37,56 @@ export default function EditOrderForm({
   const [quantities, setQuantities] = useState<{ [productId: string]: number }>(
     {},
   );
-  const [paymentTypes, setPaymentTypes] = useState(order.paymentTypes);
   const [comment, setComment] = useState(order.comment || "");
   const [fileList, setFileList] = useState<{ name: string; url: string }[]>(
     order.files || [],
   );
+  const [paymentTypes, setPaymentTypes] = useState(order.paymentTypes || []);
+  const handlePaymentTypeChange = (index: number, type: string) => {
+    const updatedPaymentTypes = [...paymentTypes];
+
+    updatedPaymentTypes[index].type = type;
+
+    setPaymentTypes(updatedPaymentTypes);
+  };
+
+  const totalAmount = formData.totalAmount || 0;
+
+  const handlePaymentPercentageChange = (index: number, value: string) => {
+    const newPercentage = Math.min(parseFloat(value) || 0, 100);
+
+    const updatedPayments = [...paymentTypes];
+    const totalAmount = formData.totalAmount || 0;
+
+    updatedPayments[index] = {
+      ...updatedPayments[index],
+
+      percentage: newPercentage,
+
+      amount: (totalAmount * newPercentage) / 100, // Calculate as a number
+    };
+
+    setPaymentTypes(updatedPayments);
+  };
+
+  const handlePaymentAmountChange = (index: number, value: string) => {
+    const newAmount = Math.min(
+      parseFloat(value) || 0,
+      formData.totalAmount || 0,
+    );
+    const updatedPayments = [...paymentTypes];
+
+    updatedPayments[index] = {
+      ...updatedPayments[index],
+
+      amount: newAmount,
+
+      percentage: totalAmount !== 0 ? (newAmount / totalAmount) * 100 : 0,
+    };
+
+    setPaymentTypes(updatedPayments);
+  };
+
   useEffect(() => {
     const fetchPurchaseOrder = async () => {
       try {
@@ -74,7 +118,7 @@ export default function EditOrderForm({
           setQuantities(initialQuantities);
           setSelectedSupplier(data.manufacturer);
           setSelectedWarehouse(data.warehouse);
-          setPaymentTypes(data.payments || []);
+          setPaymentTypes(data.paymentTypes || []);
           setComment(data.comment || "");
           setFileList(data.files || []);
         } else {
@@ -170,6 +214,7 @@ export default function EditOrderForm({
             <input
               type="number"
               value={formData.totalAmount}
+              readOnly
               onChange={(e) =>
                 setFormData({
                   ...formData,
@@ -253,16 +298,38 @@ export default function EditOrderForm({
             ))}
           </div>
 
-          {/* Payment Types */}
           <div className="relative col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-gray-700">
               Payment Methods
             </label>
-            {(paymentTypes || []).map((payment, index) => (
+            {paymentTypes.map((payment, index) => (
               <div key={index} className="flex items-center space-x-4">
-                <span>{payment.type}</span>
-                <span>{payment.percentage}%</span>
-                <span>{payment.amount.toFixed(2)} DT</span>
+                <input
+                  value={payment.type}
+                  readOnly
+                  className="mt-1 block w-1/3 rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Type"
+                />
+
+                <input
+                  type="number"
+                  value={payment.percentage}
+                  onChange={(e) =>
+                    handlePaymentPercentageChange(index, e.target.value)
+                  }
+                  className="mt-1 block w-1/3 rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Percentage"
+                />
+
+                <input
+                  type="number"
+                  value={payment.amount}
+                  onChange={(e) =>
+                    handlePaymentAmountChange(index, e.target.value)
+                  }
+                  className="mt-1 block w-1/3 rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Amount"
+                />
               </div>
             ))}
           </div>

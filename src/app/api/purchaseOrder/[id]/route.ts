@@ -34,6 +34,11 @@ export async function GET(
         .map((comment) => comment.content)
         .join(", "),
       files: purchaseOrder.files,
+      paymentTypes: purchaseOrder.payments.map((payment) => ({
+        type: payment.paymentMethod,
+        percentage: payment.percentage,
+        amount: payment.amount,
+      })),
     };
 
     return NextResponse.json(mappedData);
