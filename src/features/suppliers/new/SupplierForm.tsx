@@ -108,7 +108,7 @@ const SupplierForm = ({
         const suppliersData = await suppliersRes.json();
         const validatedSuppliers = suppliersData.map((s: any) => ({
           manufacturer_id: s.manufacturerId ?? s.manufacturer_id,
-          companyName: s.companyName || s.companyName,
+          companyName: s.companyName || s.company_name,
           contact_name: s.contactName || s.contact_name,
           email: s.email,
           phone_number: s.phoneNumber ?? s.phone_number,
@@ -339,7 +339,6 @@ const SupplierForm = ({
 
       const filteredProducts = products.filter(
         (product) =>
-          product.website_ids.includes(warehouse.warehouse_id) &&
           product.manufacturer === selectedSupplier?.manufacturer_id.toString(),
       );
 
@@ -370,7 +369,7 @@ const SupplierForm = ({
         })
         .filter(
           (product): product is NonNullable<typeof product> => product !== null,
-        ); // Type guard to remove nulls
+        );
       setProductsWithQuantities(updatedProducts);
     } else {
       console.error("Warehouse not found:", warehouseName);
@@ -410,6 +409,7 @@ const SupplierForm = ({
         total: item.total?.toFixed(2) || "0.00",
       })),
     };
+    console.log("Template Params:", templateParams);
 
     emailjs
       .send(
@@ -897,7 +897,7 @@ const SupplierForm = ({
                     {/* Select Warehouse */}
                     <div className="mb-4">
                       <label className="block text-sm font-medium text-gray-700">
-                        Select Warehouse
+                        Warehouse
                       </label>
                       <select
                         value={selectedWarehouse?.name || ""}

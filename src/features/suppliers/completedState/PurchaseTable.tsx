@@ -14,7 +14,7 @@ const PurchaseTable = ({
   const [orders, setOrders] = useState<PurchaseOrder[]>(data);
 
   useEffect(() => {
-    const filteredOrders = data.filter((order) => order.status === "DELIVERED");
+    const filteredOrders = data.filter((order) => order.status === "COMPLETED");
 
     setOrders(filteredOrders);
   }, [data]);

@@ -14,8 +14,8 @@ const InProgressPage = () => {
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
     {},
   );
-  const pageSize = 10;
 
+  const pageSize = 10;
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -128,12 +128,6 @@ const InProgressPage = () => {
             <div className="box mb-5 mt-5 flex w-full justify-between rounded-lg bg-primary/5 p-4 dark:bg-bg3">
               <PurchaseTable data={purchases} loading={loading} />
             </div>
-
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(page) => setCurrentPage(page)}
-            />
           </div>
         </div>
       </div>

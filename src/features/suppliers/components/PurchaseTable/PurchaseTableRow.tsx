@@ -86,6 +86,7 @@ const PurchaseTableRow = ({
   order: PurchaseOrder;
   onUpdate: (updatedOrder: PurchaseOrder) => void;
 }) => {
+  console.log("Order data in PurchaseTableRow:", order);
   const [isEditing, setIsEditing] = useState(false);
   const StatusIcon = statusStyles[order.status].icon;
 

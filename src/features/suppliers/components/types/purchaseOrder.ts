@@ -31,8 +31,8 @@ export interface PurchaseOrder {
   products: Product[];
   id: string;
   orderNumber: string;
-  supplier: Supplier | null;
-  supplierId: string;
+  manufacturer: Supplier | null;
+  manufacturerId: string;
   warehouse: Warehouse | null;
   warehouseId: string;
   deliveryDate: Date;

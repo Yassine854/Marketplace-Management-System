@@ -22,18 +22,44 @@ export async function PUT(
       deliveryDate: body.deliveryDate,
       totalAmount: body.totalAmount,
       status: body.status,
+      comments: body.comment
+        ? {
+            create: { content: body.comment },
+          }
+        : undefined,
     };
 
     if (body.warehouseId) {
       updateData.warehouse = { connect: { warehouseId: body.warehouseId } };
     }
 
-    if (body.manufacturerId) {
+    if (body.supplierId) {
+      const manufacturerId = body.supplierId;
+
       updateData.manufacturer = {
-        connect: { manufacturerId: body.manufacturerId },
+        connect: { manufacturerId: manufacturerId },
       };
     }
 
+    // Handle files update
+    if (body.files) {
+      updateData.files = {
+        upsert: body.files.map((file: any) => ({
+          where: { id: file.id }, // Assuming each file has a unique id
+          create: {
+            name: file.name,
+            url: file.url,
+            orderId: orderId,
+          },
+          update: {
+            name: file.name,
+            url: file.url,
+          },
+        })),
+      };
+    }
+
+    // Update the purchase order
     const updatedOrder = await prisma.purchaseOrder.update({
       where: { id: orderId },
       data: updateData,
@@ -41,9 +67,12 @@ export async function PUT(
         manufacturer: true,
         warehouse: true,
         payments: true,
+        comments: true,
+        files: true,
       },
     });
 
+    // Handle products update
     if (body.products) {
       await Promise.all(
         body.products.map(async (product: any) => {
@@ -60,6 +89,30 @@ export async function PUT(
               quantity: product.quantity,
               priceExclTax: product.priceExclTax,
               total: product.total,
+            },
+          });
+        }),
+      );
+    }
+
+    // Handle payment types update
+    if (body.paymentTypes) {
+      await Promise.all(
+        body.paymentTypes.map(async (payment: any) => {
+          await prisma.payment.upsert({
+            where: { id: payment.id },
+            create: {
+              paymentMethod: payment.type,
+              percentage: payment.percentage,
+              amount: payment.amount,
+              manufacturerId: body.manufacturerId,
+              purchaseOrderId: orderId,
+            },
+            update: {
+              paymentMethod: payment.type,
+              percentage: payment.percentage,
+              amount: payment.amount,
+              manufacturerId: body.manufacturerId,
             },
           });
         }),

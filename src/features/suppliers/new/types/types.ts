@@ -48,6 +48,5 @@ export interface EmailParams {
   totalAmount: string;
   remainingAmount: string;
   comment: string;
-
   [key: string]: unknown;
 }

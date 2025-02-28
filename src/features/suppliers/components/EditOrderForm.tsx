@@ -19,13 +19,17 @@ export default function EditOrderForm({
 }) {
   const [formData, setFormData] = useState<PurchaseOrderUpdate>({
     deliveryDate: new Date(order.deliveryDate),
-    totalAmount: order.totalAmount,
+    totalAmount: order.totalAmount || 0,
     status: order.status,
-    supplierId: order.supplierId,
+    supplierId: order.manufacturerId,
     warehouseId: order.warehouseId,
     products: order.products,
   });
-
+  const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [productRows, setProductRows] = useState([
+    { productId: "", quantity: 0, sku: "", priceExclTax: 0, total: 0 },
+  ]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
@@ -86,6 +90,19 @@ export default function EditOrderForm({
 
     setPaymentTypes(updatedPayments);
   };
+  useEffect(() => {
+    // Calculer le total amount en fonction des quantités et des prix des produits
+    const newTotal = (formData.products || []).reduce((sum, product) => {
+      const quantity = quantities[product.id] || 0;
+      return sum + quantity * product.priceExclTax;
+    }, 0);
+
+    // Mettre à jour le totalAmount dans formData
+    setFormData((prev) => ({
+      ...prev,
+      totalAmount: newTotal,
+    }));
+  }, [quantities, formData.products]); // Déclencher ce useEffect lorsque quantities ou formData.products change
 
   useEffect(() => {
     const fetchPurchaseOrder = async () => {
@@ -99,10 +116,21 @@ export default function EditOrderForm({
             deliveryDate: new Date(data.deliveryDate),
             totalAmount: data.totalAmount,
             status: data.status,
-            supplierId: data.supplierId,
-            warehouseId: data.warehouseId,
+            supplierId: data.manufacturer.manufacturer_id,
+            warehouseId: data.warehouse.warehouse_id,
             products: data.products,
           });
+          const initialProductRows = data.products.map((product: any) => ({
+            productId: product.id,
+
+            quantity: product.quantity,
+
+            sku: product.sku,
+
+            priceExclTax: product.priceExclTax,
+
+            total: product.quantity * product.priceExclTax,
+          }));
           const initialQuantities = data.products.reduce(
             (
               acc: { [x: string]: any },
@@ -114,6 +142,19 @@ export default function EditOrderForm({
             },
             {},
           );
+          initialProductRows.push({
+            productId: "",
+
+            quantity: 0,
+
+            sku: "",
+
+            priceExclTax: 0,
+
+            total: 0,
+          });
+
+          setProductRows(initialProductRows);
 
           setQuantities(initialQuantities);
           setSelectedSupplier(data.manufacturer);
@@ -142,18 +183,20 @@ export default function EditOrderForm({
           ? String(selectedSupplier.manufacturer_id)
           : "",
         warehouseId: selectedWarehouse?.warehouse_id || "",
-        products: Object.keys(quantities).map((productId) => {
-          const product = (formData.products || []).find(
-            (p) => p.id === productId,
-          );
-          return {
-            id: productId,
-            quantity: quantities[productId],
-            name: product?.name || "",
-            priceExclTax: product?.priceExclTax || 0,
-            total: (quantities[productId] || 0) * (product?.priceExclTax || 0),
-          };
-        }),
+        products: productRows
+          .filter((row) => row.productId && row.quantity > 0)
+          .map((row) => {
+            const product = availableProducts.find(
+              (p) => p.id === row.productId,
+            );
+            return {
+              id: row.productId,
+              quantity: row.quantity,
+              name: product?.name || "",
+              priceExclTax: product?.price || 0,
+              total: row.total,
+            };
+          }),
         paymentTypes,
         comment,
         files: fileList,
@@ -264,7 +307,6 @@ export default function EditOrderForm({
             />
           </div>
 
-          {/* Products Selection */}
           <div className="relative col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-gray-700">
               Products
@@ -282,20 +324,38 @@ export default function EditOrderForm({
                   }
                   className="mt-1 block w-1/4 rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
                 />
-                <span>{product.name}</span>
-                <span>
-                  {quantities[product.id] || 0} x{" "}
-                  {product.priceExclTax.toFixed(2)} DT
-                </span>
+                <input
+                  type="text"
+                  value={product.name}
+                  className="mt-1 block w-1/4 rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
+                />
 
-                <span>
-                  {(
+                <input
+                  type="number"
+                  value={product.priceExclTax.toFixed(2)}
+                  className="mt-1 block w-1/4 rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
+                />
+                <input
+                  type="number"
+                  value={(
                     (quantities[product.id] || 0) * product.priceExclTax
-                  ).toFixed(2)}{" "}
-                  DT
-                </span>
+                  ).toFixed(2)}
+                  readOnly
+                  className="mt-1 block w-1/4 rounded-lg border-gray-300 bg-gray-100 p-3 shadow-md"
+                />
               </div>
             ))}
+          </div>
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700">
+              Total Amount (DT)
+            </label>
+            <input
+              type="number"
+              value={(formData.totalAmount || 0).toFixed(2)}
+              readOnly
+              className="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
+            />
           </div>
 
           <div className="relative col-span-1 md:col-span-2">

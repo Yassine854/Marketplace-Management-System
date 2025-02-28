@@ -10,24 +10,37 @@ interface Product {
   total: number;
 }
 
+interface Payment {
+  paymentMethod: string;
+  amount: number;
+}
+
+interface Supplier {
+  id: string;
+  companyName: string;
+}
+
+interface Warehouse {
+  id: string;
+  name: string;
+}
+
 interface PurchaseOrder {
   id: string;
   orderNumber: string;
-  manufacturer: {
-    id: string;
-    companyName: string;
-  } | null;
-  warehouse: {
-    name: string;
-  } | null;
+  manufacturer: Supplier | null;
+  manufacturerId: string;
+  supplierId: string;
+  warehouse: Warehouse | null;
+  warehouseId: string;
   deliveryDate: Date;
   totalAmount: number;
   status: PurchaseOrderStatus;
-  payments: {
-    paymentMethod: string;
-    amount: number;
-  }[];
+  payments: Payment[];
+  paymentTypes: { type: string; percentage: number; amount: number }[];
   products: Product[];
+  comment: string;
+  files: { name: string; url: string }[];
 }
 
 interface PurchaseState {
@@ -72,19 +85,27 @@ const usePurchaseStore = create<PurchaseState>((set) => ({
           manufacturer: order.manufacturer
             ? {
                 id: order.manufacturer.id,
+
                 companyName: order.manufacturer.companyName,
               }
             : null,
+
+          manufacturerId: order.manufacturerId,
           warehouse: order.warehouse
             ? {
+                id: order.warehouse.id,
                 name: order.warehouse.name,
               }
             : null,
+          warehouseId: order.warehouseId,
           deliveryDate: new Date(order.deliveryDate),
           totalAmount: order.totalAmount,
           status: order.status,
-          payments: order.payments,
+          payments: order.payments || [],
+          paymentTypes: order.paymentTypes || [],
           products: order.products || [],
+          comment: order.comment || "",
+          files: order.files || [],
         })),
         total,
       });

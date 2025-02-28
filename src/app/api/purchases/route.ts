@@ -6,8 +6,6 @@ const prisma = new PrismaClient();
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const pageSize = parseInt(searchParams.get("pageSize") || "10");
     const searchTerm = (searchParams.get("search") || "").toLowerCase();
     const status = (searchParams.get("status") as OrderState) || undefined;
 
@@ -56,10 +54,8 @@ export async function GET(request: Request) {
     const [data, total] = await prisma.$transaction([
       prisma.purchaseOrder.findMany({
         where,
-        skip: (page - 1) * pageSize,
-        take: pageSize,
         include: {
-          manufacturer: { select: { companyName: true } },
+          manufacturer: true,
           warehouse: { select: { name: true } },
           payments: true,
         },
@@ -71,8 +67,6 @@ export async function GET(request: Request) {
     return NextResponse.json({
       data,
       total,
-      page,
-      pageSize,
     });
   } catch (error) {
     console.error("Error fetching purchases:", error);

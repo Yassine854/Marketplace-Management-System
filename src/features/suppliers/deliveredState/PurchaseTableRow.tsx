@@ -28,7 +28,7 @@ const generatePDF = (order: PurchaseOrder) => {
   autoTable(doc, {
     head: [["Field", "Value"]],
     body: [
-      ["Supplier", order.supplier?.companyName || "N/A"],
+      ["Supplier", order.manufacturer?.companyName || "N/A"],
       ["Warehouse", order.warehouse?.name || "N/A"],
       ["Delivery Date", format(order.deliveryDate, "dd/MM/yyyy")],
       ["Total Amount", `${order.totalAmount.toFixed(2)} DT`],
@@ -88,7 +88,7 @@ const PurchaseTableRow = ({ order }: { order: PurchaseOrder }) => {
 
         <td className="px-6 py-4">
           <div className="text-sm font-medium text-gray-900">
-            {order.supplier?.companyName || "N/A"}
+            {order.manufacturer?.companyName || "N/A"}
           </div>
         </td>
 
