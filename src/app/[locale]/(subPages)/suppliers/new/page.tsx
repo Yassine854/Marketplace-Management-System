@@ -1,2 +1,2 @@
 "use client";
-export { default } from "@/features/suppliers/new/SupplierForm";
+export { default } from "@/features/suppliers/new/page";

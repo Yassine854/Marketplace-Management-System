@@ -100,12 +100,11 @@ const Sidebar = ({
           <Divider />
           <SidebarSubMenu
             icon={<IconShoppingCart />}
-            name="Suppliers"
-            onClick={() => push("/suppliers/new")}
+            name="Purchase order"
+            onClick={() => push("/suppliers/all")}
             isActive={pathname?.includes("suppliers")}
             items={[
               { name: "All", path: "/suppliers/all" },
-              { name: "New", path: "/suppliers/new" },
               { name: "In Progress", path: "/suppliers/inProg" },
               { name: "Ready", path: "/suppliers/readyState" },
               { name: "Delivered", path: "/suppliers/deliveredState" },

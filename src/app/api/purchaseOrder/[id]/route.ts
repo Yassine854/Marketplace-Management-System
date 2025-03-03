@@ -11,8 +11,8 @@ export async function GET(
     const purchaseOrder = await prisma.purchaseOrder.findUnique({
       where: { id: params.id },
       include: {
-        manufacturer: { select: { companyName: true } },
-        warehouse: { select: { name: true } },
+        manufacturer: { select: { companyName: true, manufacturerId: true } },
+        warehouse: { select: { name: true, warehouseId: true } },
         payments: true,
         products: true,
         comments: { select: { content: true } },
@@ -27,9 +27,19 @@ export async function GET(
       );
     }
 
+    // Formatage des produits
+    const formattedProducts = purchaseOrder.products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      quantity: product.quantity,
+      priceExclTax: product.priceExclTax,
+      total: product.total,
+    }));
+
     const mappedData = {
       ...purchaseOrder,
       supplier: purchaseOrder.manufacturer,
+      warehouse: purchaseOrder.warehouse,
       comment: purchaseOrder.comments
         .map((comment) => comment.content)
         .join(", "),
@@ -39,6 +49,7 @@ export async function GET(
         percentage: payment.percentage,
         amount: payment.amount,
       })),
+      products: formattedProducts,
     };
 
     return NextResponse.json(mappedData);
@@ -51,5 +62,7 @@ export async function GET(
       },
       { status: 500 },
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }

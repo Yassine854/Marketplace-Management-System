@@ -5,9 +5,11 @@ import {
   PurchaseOrder,
   PurchaseOrderUpdate,
   PurchaseOrderStatus,
+  Product,
+  Supplier,
+  Warehouse,
 } from "./types/purchaseOrder";
 import { updatePurchaseOrder } from "./services/puchaseService";
-import { Supplier, Product, Warehouse } from "../new/types/types";
 export default function EditOrderForm({
   order,
   onClose,
@@ -27,9 +29,7 @@ export default function EditOrderForm({
   });
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-  const [productRows, setProductRows] = useState([
-    { productId: "", quantity: 0, sku: "", priceExclTax: 0, total: 0 },
-  ]);
+
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
@@ -41,6 +41,24 @@ export default function EditOrderForm({
   const [quantities, setQuantities] = useState<{ [productId: string]: number }>(
     {},
   );
+  const [productRows, setProductRows] = useState([
+    {
+      productId: "",
+
+      name: "",
+
+      quantity: 0,
+
+      sku: "",
+
+      priceExclTax: 0,
+
+      total: 0,
+    },
+  ]);
+
+  const [supplierProducts, setSupplierProducts] = useState<Product[]>([]);
+
   const [comment, setComment] = useState(order.comment || "");
   const [fileList, setFileList] = useState<{ name: string; url: string }[]>(
     order.files || [],
@@ -67,7 +85,7 @@ export default function EditOrderForm({
 
       percentage: newPercentage,
 
-      amount: (totalAmount * newPercentage) / 100, // Calculate as a number
+      amount: (totalAmount * newPercentage) / 100,
     };
 
     setPaymentTypes(updatedPayments);
@@ -91,18 +109,12 @@ export default function EditOrderForm({
     setPaymentTypes(updatedPayments);
   };
   useEffect(() => {
-    // Calculer le total amount en fonction des quantités et des prix des produits
-    const newTotal = (formData.products || []).reduce((sum, product) => {
-      const quantity = quantities[product.id] || 0;
-      return sum + quantity * product.priceExclTax;
-    }, 0);
-
-    // Mettre à jour le totalAmount dans formData
+    const newTotal = productRows.reduce((sum, row) => sum + row.total, 0);
     setFormData((prev) => ({
       ...prev,
       totalAmount: newTotal,
     }));
-  }, [quantities, formData.products]); // Déclencher ce useEffect lorsque quantities ou formData.products change
+  }, [productRows]);
 
   useEffect(() => {
     const fetchPurchaseOrder = async () => {
@@ -110,6 +122,7 @@ export default function EditOrderForm({
         const response = await fetch(`/api/purchaseOrder/${order.id}`);
         const data = await response.json();
         console.log("Fetched data:", data);
+        console.log("hedha:", data);
 
         if (response.ok) {
           setFormData({
@@ -120,44 +133,62 @@ export default function EditOrderForm({
             warehouseId: data.warehouse.warehouse_id,
             products: data.products,
           });
+          setSelectedSupplier(data.manufacturer);
+          console.log("id", data.manufacturer.manufacturerId);
+
+          if (data.manufacturer.manufacturerId) {
+            const supplierId = data.manufacturer.manufacturerId.toString();
+
+            console.log("[Front] Supplier ID converti:", supplierId);
+
+            const apiUrl = `/api/prod?supplierId=${encodeURIComponent(
+              supplierId,
+            )}`;
+
+            console.log("[Front] Appel API:", apiUrl);
+
+            const productsResponse = await fetch(apiUrl);
+
+            if (!productsResponse.ok) {
+              const errorData = await productsResponse.json();
+
+              throw new Error(errorData.error || "Erreur API");
+            }
+
+            const productsData = await productsResponse.json();
+
+            const mappedProducts = productsData.map((product: any) => ({
+              ...product,
+              priceExclTax: product.price,
+            }));
+
+            console.log("[Front] Produits reçus et mappés:", mappedProducts);
+
+            setAvailableProducts(mappedProducts);
+          }
+
           const initialProductRows = data.products.map((product: any) => ({
             productId: product.id,
-
+            name: product.name,
             quantity: product.quantity,
-
             sku: product.sku,
-
             priceExclTax: product.priceExclTax,
-
             total: product.quantity * product.priceExclTax,
           }));
+          setProductRows(initialProductRows);
+
           const initialQuantities = data.products.reduce(
             (
               acc: { [x: string]: any },
               product: { id: string | number; quantity: any },
             ) => {
               acc[product.id] = product.quantity;
-
               return acc;
             },
             {},
           );
-          initialProductRows.push({
-            productId: "",
-
-            quantity: 0,
-
-            sku: "",
-
-            priceExclTax: 0,
-
-            total: 0,
-          });
-
-          setProductRows(initialProductRows);
-
           setQuantities(initialQuantities);
-          setSelectedSupplier(data.manufacturer);
+
           setSelectedWarehouse(data.warehouse);
           setPaymentTypes(data.paymentTypes || []);
           setComment(data.comment || "");
@@ -173,16 +204,45 @@ export default function EditOrderForm({
 
     fetchPurchaseOrder();
   }, [order.id]);
-
+  const removeProduct = (productId: string) => {
+    setProductRows((rows) => rows.filter((row) => row.productId !== productId));
+  };
+  const handleProductToggle = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    product: Product,
+  ) => {
+    if (e.target.checked) {
+      setProductRows([
+        ...productRows,
+        {
+          productId: product.id,
+          name: product.name,
+          quantity: 1,
+          sku: product.sku,
+          priceExclTax: product.priceExclTax,
+          total: product.priceExclTax,
+        },
+      ]);
+    } else {
+      setProductRows(productRows.filter((row) => row.productId !== product.id));
+    }
+  };
+  const updateQuantity = (index: number, quantity: number) => {
+    const newRows = [...productRows];
+    newRows[index] = {
+      ...newRows[index],
+      quantity,
+      total: quantity * newRows[index].priceExclTax,
+    };
+    setProductRows(newRows);
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const updatedOrder = await updatePurchaseOrder(order.id, {
         ...formData,
-        supplierId: selectedSupplier
-          ? String(selectedSupplier.manufacturer_id)
-          : "",
-        warehouseId: selectedWarehouse?.warehouse_id || "",
+        supplierId: selectedSupplier?.manufacturer_id || 0,
+        warehouseId: selectedWarehouse?.warehouse_id || 0,
         products: productRows
           .filter((row) => row.productId && row.quantity > 0)
           .map((row) => {
@@ -192,8 +252,9 @@ export default function EditOrderForm({
             return {
               id: row.productId,
               quantity: row.quantity,
+              sku: row.sku,
               name: product?.name || "",
-              priceExclTax: product?.price || 0,
+              priceExclTax: product?.priceExclTax || 0,
               total: row.total,
             };
           }),
@@ -214,7 +275,7 @@ export default function EditOrderForm({
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 p-6 backdrop-blur-md">
       <form
         onSubmit={handleSubmit}
-        className="relative max-h-[80vh] w-full max-w-4xl space-y-5 overflow-y-auto rounded-xl bg-white p-8 shadow-2xl" // Ajoutez max-h-[90vh] et overflow-y-auto
+        className="relative max-h-[80vh] w-full max-w-4xl space-y-5 overflow-y-auto rounded-xl bg-white p-8 shadow-2xl"
       >
         <button
           type="button"
@@ -308,43 +369,127 @@ export default function EditOrderForm({
           </div>
 
           <div className="relative col-span-1 md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Products
+            <label className="mb-4 block text-sm font-medium text-gray-700">
+              Gestion des Produits
             </label>
-            {(formData.products || []).map((product) => (
-              <div key={product.id} className="flex items-center space-x-4">
-                <input
-                  type="number"
-                  value={quantities[product.id] || 0}
-                  onChange={(e) =>
-                    setQuantities({
-                      ...quantities,
-                      [product.id]: Number(e.target.value),
-                    })
-                  }
-                  className="mt-1 block w-1/4 rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  value={product.name}
-                  className="mt-1 block w-1/4 rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
-                />
 
-                <input
-                  type="number"
-                  value={product.priceExclTax.toFixed(2)}
-                  className="mt-1 block w-1/4 rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
-                />
-                <input
-                  type="number"
-                  value={(
-                    (quantities[product.id] || 0) * product.priceExclTax
-                  ).toFixed(2)}
-                  readOnly
-                  className="mt-1 block w-1/4 rounded-lg border-gray-300 bg-gray-100 p-3 shadow-md"
-                />
+            {/* Produits Disponibles */}
+            <div className="mb-8">
+              <h3 className="mb-3 text-lg font-semibold">
+                Produits du Fournisseur
+              </h3>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                {availableProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className={`rounded-lg border p-4 transition-colors ${
+                      productRows.some((r) => r.productId === product.id)
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-blue-200"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="checkbox"
+                          checked={productRows.some(
+                            (r) => r.productId === product.id,
+                          )}
+                          onChange={(e) => handleProductToggle(e, product)}
+                          className="h-5 w-5 rounded text-blue-600 focus:ring-blue-500"
+                        />
+                        <div>
+                          <div className="font-medium">{product.name}</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-medium text-blue-600">
+                          {product.priceExclTax.toFixed(2)} DT
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+
+            {/* Produits Sélectionnés */}
+            <div className="mt-6">
+              <h3 className="mb-3 text-lg font-semibold">Produits Commandés</h3>
+              <div className="space-y-4">
+                {productRows.map((row, index) => {
+                  const product = availableProducts.find(
+                    (p) => p.id === row.productId,
+                  );
+                  return (
+                    <div
+                      key={index}
+                      className="rounded-lg border bg-white p-4 shadow-sm"
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <div>
+                          <span className="font-medium">
+                            {row.name || "Produit inconnu"}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeProduct(row.productId)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                        <div>
+                          <label className="mb-1 block text-sm text-gray-600">
+                            Quantité
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={row.quantity}
+                            onChange={(e) =>
+                              updateQuantity(index, Number(e.target.value))
+                            }
+                            className="w-full rounded-md border p-2"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="mb-1 block text-sm text-gray-600">
+                            Prix Unitaire
+                          </label>
+                          <div className="rounded-md bg-gray-100 p-2">
+                            {row.priceExclTax.toFixed(2)} DT
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="mb-1 block text-sm text-gray-600">
+                            Total
+                          </label>
+                          <div className="rounded-md bg-blue-50 p-2 font-medium text-blue-600">
+                            {row.total.toFixed(2)} DT
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Total Général */}
+            <div className="mt-6 rounded-lg bg-gray-50 p-4">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold">Total de la Commande:</span>
+                <span className="text-2xl font-bold text-blue-600">
+                  {formData.totalAmount?.toFixed(2) || "0.00"} DT
+                </span>
+              </div>
+            </div>
           </div>
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700">

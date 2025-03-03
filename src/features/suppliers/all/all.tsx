@@ -1,9 +1,10 @@
+"use client";
 import { useEffect, useState } from "react";
 import PurchaseTable from "../components/PurchaseTable/PurchaseTable";
 import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersAll";
 import Pagination from "../components/Pagination";
-
+import { useRouter } from "next/navigation";
 const SupplierPurchasesPage = () => {
   const { purchases, loading, error, fetchPurchases, total } =
     usePurchaseStore();
@@ -15,7 +16,7 @@ const SupplierPurchasesPage = () => {
     {},
   );
   const pageSize = 10;
-
+  const router = useRouter();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -58,8 +59,6 @@ const SupplierPurchasesPage = () => {
     });
   };
 
-  const totalPages = Math.ceil(total / pageSize);
-
   if (error) {
     return (
       <div className="p-6 text-red-500">
@@ -74,8 +73,32 @@ const SupplierPurchasesPage = () => {
       <div className="h-full w-full rounded-lg bg-[url(/images/login-bg.png)] bg-cover">
         <div className="relative grid h-full w-full items-center justify-center gap-4">
           <div className="box w-full min-w-[800px] xl:p-8">
-            <div className="bb-dashed mb-6 mt-9 flex items-center pb-6">
+            <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
               <p className="ml-4 mt-6 text-xl font-bold">Supplier Orders</p>
+
+              <div className="mt-6 flex items-center gap-4">
+                <button
+                  onClick={() => router.push("/suppliers/new")}
+                  className="mr-4 flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"
+                  title="New Order"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M12 5l0 14" />
+                    <path d="M5 12l14 0" />
+                  </svg>
+                  <span className="hidden md:inline">New Order</span>
+                </button>
+              </div>
             </div>
 
             <div className="mb-5 space-y-4">

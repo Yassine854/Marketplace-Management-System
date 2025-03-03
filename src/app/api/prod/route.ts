@@ -1,4 +1,3 @@
-// app/api/products/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
@@ -7,37 +6,35 @@ const prisma = new PrismaClient();
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const supplierId = searchParams.get("supplierId");
-  const warehouseId = searchParams.get("warehouseId");
 
-  if (!supplierId || !warehouseId) {
+  console.log("[API] Requête pour le fournisseur ID:", supplierId);
+
+  if (!supplierId) {
     return NextResponse.json(
-      { error: "Missing required parameters: supplierId and warehouseId" },
+      { error: "Paramètre supplierId manquant" },
       { status: 400 },
     );
   }
 
   try {
+    // Conversion explicite en string
+    const supplierIdString = supplierId.toString();
+
     const products = await prisma.products.findMany({
       where: {
-        manufacturer: String(supplierId),
-        website_ids: {
-          has: Number(warehouseId),
-        },
+        manufacturer: supplierIdString,
       },
       include: {
         stock_item: true,
       },
     });
-    console.log("products", products);
 
+    console.log("[API] Produits trouvés:", products);
     return NextResponse.json(products);
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("[API] Erreur:", error);
     return NextResponse.json(
-      {
-        error: "Failed to fetch products",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
+      { error: "Échec de la récupération", details: String(error) },
       { status: 500 },
     );
   } finally {

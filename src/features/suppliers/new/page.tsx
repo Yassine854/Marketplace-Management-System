@@ -5,7 +5,7 @@ import "./styles/NeonButton.css";
 import emailjs from "emailjs-com";
 import jsPDF from "jspdf";
 import { PrismaClient } from "@prisma/client";
-
+import { FaFileDownload } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 const prisma = new PrismaClient();
 
@@ -319,9 +319,6 @@ const SupplierForm = ({
       if (!response.ok) throw new Error("Error saving");
 
       const result = await response.json();
-
-      toast.success("Order successfully registered!");
-
       console.log("Purchase Order Saved:", result);
     } catch (error) {
       console.error("Erreur:", error);
@@ -418,9 +415,6 @@ const SupplierForm = ({
         templateParams,
         "1I-USeEEq-xcp9edT",
       )
-      .then(() => {
-        toast.success("Email sent successfully!");
-      })
       .catch(() => {
         toast.error("Failed to send email. Please try again.");
       });
@@ -750,23 +744,20 @@ const SupplierForm = ({
     const updatedRows = [...productRows];
     updatedRows[index].quantity = quantity;
 
-    // Trouver le produit correspondant dans productsWithQuantities
     const product = productsWithQuantities.find(
       (p) => p.id === updatedRows[index].productId,
     );
 
     if (product) {
-      // Mettre à jour le total pour cette ligne
       updatedRows[index].total = quantity * product.priceExclTax;
 
-      // Mettre à jour productsWithQuantities
       const updatedProductsWithQuantities = productsWithQuantities.map(
         (item) => {
           if (item.id === product.id) {
             return {
               ...item,
-              quantity: quantity, // Mettre à jour la quantité
-              total: quantity * item.priceExclTax, // Mettre à jour le total
+              quantity: quantity,
+              total: quantity * item.priceExclTax,
             };
           }
           return item;
@@ -776,7 +767,6 @@ const SupplierForm = ({
       setProductsWithQuantities(updatedProductsWithQuantities);
     }
 
-    // Ajouter une nouvelle ligne si la quantité est > 0 et que c'est la dernière ligne
     if (quantity > 0 && index === updatedRows.length - 1) {
       updatedRows.push({
         productId: "",
@@ -810,6 +800,53 @@ const SupplierForm = ({
       );
     });
   };
+  const handleSaveAndSendEmail = async () => {
+    try {
+      await handleSaveOrder();
+      if (
+        selectedSupplier &&
+        selectedWarehouse &&
+        productsWithQuantities.length > 0
+      ) {
+        await handleSendEmail();
+        toast.success("Order saved and email sent successfully!");
+      } else {
+        toast.error("Failed to send email. Please check the form data.");
+      }
+    } catch (error) {
+      console.error("Error saving order or sending email:", error);
+      toast.error("Failed to save order or send email.");
+    }
+  };
+  const handleCancel = () => {
+    setQuery("");
+
+    setSelectedSupplier(null);
+
+    setSelectedWarehouse(null);
+
+    setProductRows([
+      { productId: "", quantity: 0, sku: "", priceExclTax: 0, total: 0 },
+    ]);
+
+    setProductsWithQuantities([]);
+
+    setPaymentTypes([{ type: "", percentage: "", amount: "" }]);
+
+    setComment("");
+
+    setSelectedState("");
+
+    setDeliveryDate(new Date());
+
+    setUploadedFiles([]);
+
+    setFileList([]);
+
+    setTotalAmount(0);
+
+    setRemainingAmount(0);
+  };
   const { data: session } = useSession();
 
   if (!session?.user) {
@@ -821,362 +858,378 @@ const SupplierForm = ({
       <div className="h-full w-full rounded-lg bg-[url(/images/login-bg.png)] bg-cover">
         <div className="relative grid h-full w-full items-center justify-center gap-4">
           <div className="box w-full min-w-[800px] xl:p-8">
-            <div className="bb-dashed mb-6 mt-9 flex items-center pb-6">
-              <p className="ml-4 mt-6 text-xl font-bold">Select Supplier</p>
-            </div>
-            <div className="box flex w-full justify-between rounded-lg ">
-              <p>Made by {userName} </p>
-            </div>
-
-            {/* Supplier Search Section */}
-            <div className="box mb-5 mt-5 flex w-full justify-between rounded-lg bg-primary/5 p-4 dark:bg-bg3">
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  placeholder="Search and select supplier..."
-                  value={query}
-                  onChange={(e) => {
-                    setQuery(e.target.value);
-                    setSelectedSupplier(null);
-                  }}
-                  className="w-full rounded-md border border-gray-300 p-2"
-                />
-                {!selectedSupplier && suppliers.length > 0 && (
-                  <ul className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg">
-                    {suppliers
-                      .filter(
-                        (supplier) =>
-                          supplier.companyName
-                            ?.toLowerCase()
-                            .includes(query.toLowerCase()),
-                      )
-                      .map((supplier) => (
-                        <li
-                          key={supplier.manufacturer_id}
-                          onClick={() => handleSelectSupplier(supplier)}
-                          className="cursor-pointer px-4 py-2 hover:bg-gray-100"
-                        >
-                          {supplier.companyName}
-                        </li>
-                      ))}
-                  </ul>
-                )}
+            <div className="rounded-lg border-2 border-gray-300 bg-white p-8 shadow-lg">
+              <div className="bb-dashed mb-6 mt-9 flex items-center pb-6">
+                <p className="ml-4 mt-6 text-xl font-bold">Select Supplier</p>
+                <div
+                  onClick={handleDownloadPDF}
+                  className="ml-auto cursor-pointer text-2xl text-gray-700 hover:text-primary"
+                  title="Download PDF"
+                >
+                  <FaFileDownload />
+                </div>
               </div>
-            </div>
 
-            {/* Supplier Details Section */}
-            {selectedSupplier && (
-              <div className="mt-8 rounded-lg border border-gray-300 bg-white p-4 shadow-lg">
-                <h3 className="mb-4 text-xl font-semibold">Supplier Details</h3>
-                <form>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Created At
-                      </label>
-                      <input
-                        type="text"
-                        value={createdAt.toLocaleDateString()}
-                        disabled
-                        className="w-full rounded-md border border-gray-300 bg-gray-100 p-2"
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        From
-                      </label>
-                      <input
-                        type="text"
-                        value={selectedSupplier.companyName}
-                        disabled
-                        className="w-full rounded-md border border-gray-300 bg-gray-100 p-2"
-                      />
-                    </div>
-
-                    {/* Select Warehouse */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Warehouse
-                      </label>
-                      <select
-                        value={selectedWarehouse?.name || ""}
-                        onChange={(e) => handleSelectWarehouse(e.target.value)}
-                        className="w-full rounded-md border border-gray-300 p-2"
-                      >
-                        <option value="">Select Warehouse</option>
-                        {warehouses.map((warehouse) => (
-                          <option key={warehouse.name} value={warehouse.name}>
-                            {warehouse.name}
-                          </option>
+              {/* Supplier Search Section */}
+              <div className="box mb-5 mt-5 flex w-full justify-between rounded-lg bg-primary/5 p-4 dark:bg-bg3">
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    placeholder="Search and select supplier..."
+                    value={query}
+                    onChange={(e) => {
+                      setQuery(e.target.value);
+                      setSelectedSupplier(null);
+                    }}
+                    className="w-full rounded-md border border-gray-300 p-2"
+                  />
+                  {!selectedSupplier && suppliers.length > 0 && (
+                    <ul className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg">
+                      {suppliers
+                        .filter(
+                          (supplier) =>
+                            supplier.companyName
+                              ?.toLowerCase()
+                              .includes(query.toLowerCase()),
+                        )
+                        .map((supplier) => (
+                          <li
+                            key={supplier.manufacturer_id}
+                            onClick={() => handleSelectSupplier(supplier)}
+                            className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                          >
+                            {supplier.companyName}
+                          </li>
                         ))}
-                      </select>
-                    </div>
-
-                    {/* Select State */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        State
-                      </label>
-                      <select
-                        value={selectedState}
-                        onChange={(e) => handleSelectState(e.target.value)}
-                        className="w-full rounded-md border border-gray-300 p-2"
-                      >
-                        <option value="">Select State</option>
-                        <option value="IN_PROGRESS"> In progress </option>
-                        <option value="READY"> Ready</option>
-                        <option value="DELIVERED"> Delivered </option>
-                        <option value="COMPLETED">Completed</option>
-                      </select>
-                    </div>
-
-                    <label>
-                      Delivery Date:
-                      <input
-                        type="date"
-                        value={deliveryDate.toISOString().split("T")[0]}
-                        onChange={(e) =>
-                          setDeliveryDate(new Date(e.target.value))
-                        }
-                      />
-                    </label>
-                  </div>
-                </form>
+                    </ul>
+                  )}
+                </div>
               </div>
-            )}
-            {selectedWarehouse && selectedSupplier && (
-              <div className="mt-8 max-h-[500px] overflow-y-auto rounded-lg border border-gray-300 bg-white p-6 shadow-lg">
-                <h4 className="mb-6 text-lg font-semibold text-gray-800">
-                  Select Product
-                </h4>
-                <div className="space-y-6">
-                  {productRows.map((row, index) => (
-                    <div
-                      key={index}
-                      className="mb-6 flex items-center justify-between gap-6"
-                    >
-                      {/* Dropdown pour le produit */}
-                      <div className="w-1/3">
+
+              {/* Supplier Details Section */}
+              {selectedSupplier && (
+                <div className="mt-8 rounded-lg border border-gray-300 bg-white p-4 shadow-lg">
+                  <h3 className="mb-4 text-xl font-semibold">
+                    Supplier Details
+                  </h3>
+                  <form>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">
-                          Product
+                          Created At
+                        </label>
+                        <input
+                          type="text"
+                          value={createdAt.toLocaleDateString()}
+                          disabled
+                          className="w-full rounded-md border border-gray-300 bg-gray-100 p-2"
+                        />
+                      </div>
+
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">
+                          From
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedSupplier.companyName}
+                          disabled
+                          className="w-full rounded-md border border-gray-300 bg-gray-100 p-2"
+                        />
+                      </div>
+
+                      {/* Select Warehouse */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Warehouse
                         </label>
                         <select
-                          value={row.productId || ""}
+                          value={selectedWarehouse?.name || ""}
                           onChange={(e) =>
-                            handleProductChange(index, e.target.value)
+                            handleSelectWarehouse(e.target.value)
                           }
-                          className="w-full rounded-md border border-gray-300 p-3"
+                          className="w-full rounded-md border border-gray-300 p-2"
                         >
-                          <option value="">Select a product</option>
-                          {getAvailableProducts(index).map((item) => (
-                            <option key={item.id} value={item.id}>
-                              {item.product.name}
+                          <option value="">Select Warehouse</option>
+                          {warehouses.map((warehouse) => (
+                            <option key={warehouse.name} value={warehouse.name}>
+                              {warehouse.name}
                             </option>
                           ))}
                         </select>
                       </div>
 
-                      {/* Quantité */}
-                      <div className="w-1/4">
+                      <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">
-                          Quantity
+                          State
+                        </label>
+                        <select
+                          value={selectedState}
+                          onChange={(e) => handleSelectState(e.target.value)}
+                          className="w-full rounded-md border border-gray-300 p-2"
+                        >
+                          <option value="">Select State</option>
+                          <option value="IN_PROGRESS"> In progress </option>
+                          <option value="READY"> Ready</option>
+                          <option value="DELIVERED"> Delivered </option>
+                          <option value="COMPLETED">Completed</option>
+                        </select>
+                      </div>
+
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Delivery Date
                         </label>
                         <input
-                          type="number"
-                          value={row.quantity}
+                          type="date"
+                          value={deliveryDate.toISOString().split("T")[0]}
                           onChange={(e) =>
-                            handleQuantityChange(index, Number(e.target.value))
+                            setDeliveryDate(new Date(e.target.value))
                           }
-                          className="w-full rounded-md border border-gray-300 p-3"
-                        />
-                      </div>
-
-                      {/* Prix Hors Taxe */}
-                      <div className="w-1/4">
-                        <label className="block text-sm font-medium text-gray-700">
-                          Price exc.tax
-                        </label>
-                        <input
-                          type="number"
-                          value={
-                            productsWithQuantities.find(
-                              (p) => p.id === row.productId,
-                            )?.priceExclTax
-                          }
-                          disabled
-                          className="w-full rounded-md border border-gray-300 bg-gray-100 p-3"
-                        />
-                      </div>
-
-                      {/* Total */}
-                      <div className="w-1/4">
-                        <label className="block text-sm font-medium text-gray-700">
-                          Total
-                        </label>
-                        <input
-                          type="text"
-                          value={(
-                            row.quantity *
-                            (productsWithQuantities.find(
-                              (p) => p.id === row.productId,
-                            )?.priceExclTax || 0)
-                          ).toFixed(2)}
-                          disabled
-                          className="w-full rounded-md border border-gray-300 bg-gray-100 p-3"
-                        />
-                      </div>
-
-                      {/* SKU */}
-                      <div className="w-1/4">
-                        <label className="block text-sm font-medium text-gray-700">
-                          SKU
-                        </label>
-                        <input
-                          type="text"
-                          value={
-                            productsWithQuantities.find(
-                              (p) => p.id === row.productId,
-                            )?.sku || ""
-                          }
-                          disabled
-                          className="w-full rounded-md border border-gray-300 bg-gray-100 p-3"
+                          className="w-full rounded-md border border-gray-300 p-2"
                         />
                       </div>
                     </div>
-                  ))}
+                  </form>
                 </div>
-
-                <div className="mt-8 rounded-lg border border-gray-300 bg-white p-4 shadow-lg">
+              )}
+              {selectedWarehouse && selectedSupplier && (
+                <div className="mt-8 max-h-[500px] overflow-y-auto rounded-lg border border-gray-300 bg-white p-6 shadow-lg">
                   <h4 className="mb-6 text-lg font-semibold text-gray-800">
-                    Total Amount
+                    Select Product
                   </h4>
-                  {paymentTypes.map((payment, index) => (
-                    <div
-                      key={index}
-                      className="mb-6 flex items-center space-x-4"
-                    >
-                      <select
-                        value={payment.type}
-                        onChange={(e) =>
-                          handlePaymentTypeChange(index, e.target.value)
-                        }
-                        className="w-1/3 rounded-md border border-gray-300 p-3"
+                  <div className="space-y-6">
+                    {productRows.map((row, index) => (
+                      <div
+                        key={index}
+                        className="mb-6 flex items-center justify-between gap-6"
                       >
-                        <option value="0">Select a payment method</option>
-                        <option value="CHEQUE">Cheque</option>
-                        <option value="ESPECES">Cash</option>
-                        <option value="TRAITE">Traite</option>
-                      </select>
-                      {payment.type && payment.type !== "cash" && (
-                        <input
-                          type="number"
-                          value={payment.percentage}
-                          onBlur={() => {
-                            handlePaymentPercentageChange(
-                              index,
-                              payment.percentage,
-                            );
-                          }}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            setPaymentTypes((prev) => {
-                              const updatedPayments = [...prev];
+                        <div className="w-1/3">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Product
+                          </label>
+                          <select
+                            value={row.productId || ""}
+                            onChange={(e) =>
+                              handleProductChange(index, e.target.value)
+                            }
+                            className="w-full rounded-md border border-gray-300 p-3"
+                          >
+                            <option value="">Select a product</option>
+                            {getAvailableProducts(index).map((item) => (
+                              <option key={item.id} value={item.id}>
+                                {item.product.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
 
-                              updatedPayments[index].percentage = value;
+                        {/* Quantité */}
+                        <div className="w-1/4">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Quantity
+                          </label>
+                          <input
+                            type="number"
+                            value={row.quantity}
+                            onChange={(e) =>
+                              handleQuantityChange(
+                                index,
+                                Number(e.target.value),
+                              )
+                            }
+                            className="w-full rounded-md border border-gray-300 p-3"
+                          />
+                        </div>
 
-                              return updatedPayments;
-                            });
-                          }}
-                          className="w-1/3 rounded-md border border-gray-300 p-3"
-                          placeholder="Percentage"
-                        />
-                      )}
-                      {payment.type && (
-                        <input
-                          type="number"
-                          value={payment.amount || ""}
+                        {/* Prix Hors Taxe */}
+                        <div className="w-1/4">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Price exc.tax
+                          </label>
+                          <input
+                            type="number"
+                            value={
+                              productsWithQuantities.find(
+                                (p) => p.id === row.productId,
+                              )?.priceExclTax
+                            }
+                            disabled
+                            className="w-full rounded-md border border-gray-300 bg-gray-100 p-3"
+                          />
+                        </div>
+
+                        {/* Total */}
+                        <div className="w-1/4">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Total
+                          </label>
+                          <input
+                            type="text"
+                            value={(
+                              row.quantity *
+                              (productsWithQuantities.find(
+                                (p) => p.id === row.productId,
+                              )?.priceExclTax || 0)
+                            ).toFixed(2)}
+                            disabled
+                            className="w-full rounded-md border border-gray-300 bg-gray-100 p-3"
+                          />
+                        </div>
+
+                        {/* SKU */}
+                        <div className="w-1/4">
+                          <label className="block text-sm font-medium text-gray-700">
+                            SKU
+                          </label>
+                          <input
+                            type="text"
+                            value={
+                              productsWithQuantities.find(
+                                (p) => p.id === row.productId,
+                              )?.sku || ""
+                            }
+                            disabled
+                            className="w-full rounded-md border border-gray-300 bg-gray-100 p-3"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-8 rounded-lg border border-gray-300 bg-white p-4 shadow-lg">
+                    <h4 className="mb-6 text-lg font-semibold text-gray-800">
+                      Total Amount
+                    </h4>
+                    {paymentTypes.map((payment, index) => (
+                      <div
+                        key={index}
+                        className="mb-6 flex items-center space-x-4"
+                      >
+                        <select
+                          value={payment.type}
                           onChange={(e) =>
-                            handlePaymentAmountChange(index, e.target.value)
+                            handlePaymentTypeChange(index, e.target.value)
                           }
                           className="w-1/3 rounded-md border border-gray-300 p-3"
-                          placeholder="Amount"
-                        />
-                      )}
+                        >
+                          <option value="0">Select a payment method</option>
+                          <option value="CHEQUE">Cheque</option>
+                          <option value="ESPECES">Cash</option>
+                          <option value="TRAITE">Traite</option>
+                        </select>
+                        {payment.type && payment.type !== "cash" && (
+                          <input
+                            type="number"
+                            value={payment.percentage}
+                            onBlur={() => {
+                              handlePaymentPercentageChange(
+                                index,
+                                payment.percentage,
+                              );
+                            }}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setPaymentTypes((prev) => {
+                                const updatedPayments = [...prev];
 
-                      <div className="flex w-full items-center space-x-2 sm:w-1/3 lg:w-1/4">
-                        <label className="block w-1/3 text-sm font-medium text-gray-700">
-                          R.Amount
-                        </label>
-                        <input
-                          type="number"
-                          value={remainingAmount.toFixed(2) || "0.00"}
-                          disabled
-                          className="w-2/3 rounded-md border border-gray-300 bg-gray-100 p-3"
-                        />
+                                updatedPayments[index].percentage = value;
+
+                                return updatedPayments;
+                              });
+                            }}
+                            className="w-1/3 rounded-md border border-gray-300 p-3"
+                            placeholder="Percentage"
+                          />
+                        )}
+                        {payment.type && (
+                          <input
+                            type="number"
+                            value={payment.amount || ""}
+                            onChange={(e) =>
+                              handlePaymentAmountChange(index, e.target.value)
+                            }
+                            className="w-1/3 rounded-md border border-gray-300 p-3"
+                            placeholder="Amount"
+                          />
+                        )}
+
+                        <div className="flex w-full items-center space-x-2 sm:w-1/3 lg:w-1/4">
+                          <label className="block w-1/3 text-sm font-medium text-gray-700">
+                            R.Amount
+                          </label>
+                          <input
+                            type="number"
+                            value={remainingAmount.toFixed(2) || "0.00"}
+                            disabled
+                            className="w-2/3 rounded-md border border-gray-300 bg-gray-100 p-3"
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                  <div className="mt-6">
-                    <div className="flex justify-between">
-                      <span className="text-lg font-medium text-gray-800">
-                        Total Amount
-                      </span>
-                      <span className="text-lg font-semibold text-gray-800">
-                        {totalAmount.toFixed(2)}
-                      </span>
+                    ))}
+                    <div className="mt-6">
+                      <div className="flex justify-between">
+                        <span className="text-lg font-medium text-gray-800">
+                          Total Amount
+                        </span>
+                        <span className="text-lg font-semibold text-gray-800">
+                          {totalAmount.toFixed(2)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Upload File Section */}
-            <div className="rounded-xl border border-gray-300 bg-gray-50 p-4 shadow-sm">
-              <label className="mb-2 block text-lg font-semibold text-gray-700">
-                Upload File
-              </label>
-
-              <div className="relative w-full">
-                <input
-                  type="file"
-                  id="fileInput"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                <label
-                  htmlFor="fileInput"
-                  className="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white p-3 text-center text-gray-700 hover:bg-gray-200"
-                >
-                  📁 Choose File
-                </label>
-              </div>
-            </div>
-
-            <div className="mt-6 rounded-xl border border-gray-300 bg-gray-50 p-4 shadow-sm">
-              <label className="mb-2 block text-lg font-semibold text-gray-700">
-                Comment
-              </label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="type your comment"
-                className="w-full rounded border p-2"
-              />
-
-              {message && (
-                <p className="mt-2 text-sm text-green-600">{message}</p>
               )}
+
+              {/* Upload File Section */}
+              <div className="mt-6 rounded-xl border border-gray-300 bg-gray-50 p-4 shadow-sm">
+                <label className="mb-2 block text-lg font-semibold text-gray-700">
+                  Upload File
+                </label>
+
+                <div className="relative w-full">
+                  <input
+                    type="file"
+                    id="fileInput"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="fileInput"
+                    className="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white p-3 text-center text-gray-700 hover:bg-gray-200"
+                  >
+                    📁 Choose File
+                  </label>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-xl border border-gray-300 bg-gray-50 p-4 shadow-sm">
+                <label className="mb-2 block text-lg font-semibold text-gray-700">
+                  Comment
+                </label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="type your comment"
+                  className="w-full rounded border p-2"
+                />
+
+                {message && (
+                  <p className="mt-2 text-sm text-green-600">{message}</p>
+                )}
+              </div>
+              <div className="mt-6 flex justify-end space-x-4">
+                <button onClick={handleCancel} className="neon-button">
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveAndSendEmail}
+                  className="neon-button"
+                >
+                  Save
+                </button>
+              </div>
             </div>
-            <button onClick={handleDownloadPDF} className="neon-button">
-              📄 Download PDF
-            </button>
-            <button onClick={handleSendEmail} className="neon-button">
-              ✉️ Submit
-            </button>
-            <button onClick={handleSaveOrder} className="neon-button">
-              Save
-            </button>
           </div>
         </div>
       </div>

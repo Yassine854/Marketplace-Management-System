@@ -1,1 +1,1 @@
-export { default } from "./SupplierForm";
+export { default } from "./page";

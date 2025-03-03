@@ -6,24 +6,31 @@ export type PurchaseOrderStatus =
 
 export interface Product {
   id: string;
-  name: string;
-  quantity: number;
-  priceExclTax: number;
-  total: number;
-}
 
+  name: string;
+
+  quantity: number;
+
+  priceExclTax: number;
+
+  sku: string;
+
+  total: number;
+
+  manufacturer?: string;
+}
 export interface Payment {
   paymentMethod: string;
   amount: number;
 }
 
 export interface Supplier {
-  id: string;
+  manufacturer_id: number;
   companyName: string;
 }
 
 export interface Warehouse {
-  id: string;
+  warehouse_id: number;
   name: string;
 }
 
@@ -32,9 +39,9 @@ export interface PurchaseOrder {
   id: string;
   orderNumber: string;
   manufacturer: Supplier | null;
-  manufacturerId: string;
+  manufacturerId: number;
   warehouse: Warehouse | null;
-  warehouseId: string;
+  warehouseId: number;
   deliveryDate: Date;
   totalAmount: number;
   status: PurchaseOrderStatus;
@@ -48,8 +55,8 @@ export type PurchaseOrderUpdate = Partial<{
   deliveryDate: Date;
   totalAmount: number;
   status: PurchaseOrderStatus;
-  warehouseId: string;
-  supplierId: string;
+  warehouseId: number;
+  supplierId: number;
   products: Product[];
   paymentTypes: { type: string; percentage: number; amount: number }[];
   comment: string;

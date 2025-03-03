@@ -41,11 +41,10 @@ export async function PUT(
       };
     }
 
-    // Handle files update
     if (body.files) {
       updateData.files = {
         upsert: body.files.map((file: any) => ({
-          where: { id: file.id }, // Assuming each file has a unique id
+          where: { id: file.id },
           create: {
             name: file.name,
             url: file.url,
@@ -59,7 +58,6 @@ export async function PUT(
       };
     }
 
-    // Update the purchase order
     const updatedOrder = await prisma.purchaseOrder.update({
       where: { id: orderId },
       data: updateData,
@@ -72,7 +70,6 @@ export async function PUT(
       },
     });
 
-    // Handle products update
     if (body.products) {
       await Promise.all(
         body.products.map(async (product: any) => {
@@ -95,7 +92,6 @@ export async function PUT(
       );
     }
 
-    // Handle payment types update
     if (body.paymentTypes) {
       await Promise.all(
         body.paymentTypes.map(async (payment: any) => {
