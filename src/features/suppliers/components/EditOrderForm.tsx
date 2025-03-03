@@ -28,8 +28,7 @@ export default function EditOrderForm({
     products: order.products,
   });
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-
+  const [selectedProductId, setSelectedProductId] = useState("");
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
@@ -57,54 +56,79 @@ export default function EditOrderForm({
     },
   ]);
 
-  const [supplierProducts, setSupplierProducts] = useState<Product[]>([]);
-
   const [comment, setComment] = useState(order.comment || "");
   const [fileList, setFileList] = useState<{ name: string; url: string }[]>(
     order.files || [],
   );
-  const [paymentTypes, setPaymentTypes] = useState(order.paymentTypes || []);
-  const handlePaymentTypeChange = (index: number, type: string) => {
-    const updatedPaymentTypes = [...paymentTypes];
-
-    updatedPaymentTypes[index].type = type;
-
-    setPaymentTypes(updatedPaymentTypes);
-  };
 
   const totalAmount = formData.totalAmount || 0;
 
-  const handlePaymentPercentageChange = (index: number, value: string) => {
-    const newPercentage = Math.min(parseFloat(value) || 0, 100);
+  const [paymentTypes, setPaymentTypes] = useState<
+    { type: string; percentage: string; amount: string }[]
+  >(
+    order.paymentTypes?.map((p) => ({
+      type: p.type,
 
-    const updatedPayments = [...paymentTypes];
-    const totalAmount = formData.totalAmount || 0;
+      percentage: p.percentage?.toString() || "",
 
-    updatedPayments[index] = {
-      ...updatedPayments[index],
+      amount: p.amount?.toString() || "",
+    })) || [{ type: "", percentage: "", amount: "" }],
+  );
 
-      percentage: newPercentage,
+  const [remainingAmount, setRemainingAmount] = useState(0);
+  useEffect(() => {
+    const updatedPayments = paymentTypes.map((payment) => {
+      if (payment.percentage) {
+        const newAmount = (totalAmount * parseFloat(payment.percentage)) / 100;
 
-      amount: (totalAmount * newPercentage) / 100,
-    };
+        return {
+          ...payment,
+
+          amount: newAmount.toFixed(2),
+        };
+      }
+
+      return payment;
+    });
 
     setPaymentTypes(updatedPayments);
-  };
+  }, [totalAmount]);
+
+  useEffect(() => {
+    const totalAllocated = paymentTypes.reduce(
+      (acc, payment) => acc + (parseFloat(payment.amount || "0") || 0),
+
+      0,
+    );
+
+    setRemainingAmount(totalAmount - totalAllocated);
+  }, [paymentTypes, totalAmount]);
 
   const handlePaymentAmountChange = (index: number, value: string) => {
-    const newAmount = Math.min(
-      parseFloat(value) || 0,
-      formData.totalAmount || 0,
-    );
+    const newAmount = Math.min(parseFloat(value) || 0, totalAmount);
+
     const updatedPayments = [...paymentTypes];
+
+    const newPercentage =
+      totalAmount !== 0 ? (newAmount / totalAmount) * 100 : 0;
 
     updatedPayments[index] = {
       ...updatedPayments[index],
 
-      amount: newAmount,
+      amount: newAmount.toString(),
 
-      percentage: totalAmount !== 0 ? (newAmount / totalAmount) * 100 : 0,
+      percentage: newPercentage.toFixed(2),
     };
+
+    const totalAllocated = updatedPayments.reduce(
+      (acc, payment) => acc + (parseFloat(payment.amount || "0") || 0),
+
+      0,
+    );
+
+    if (totalAllocated < totalAmount && index === updatedPayments.length - 1) {
+      updatedPayments.push({ type: "", percentage: "", amount: "" });
+    }
 
     setPaymentTypes(updatedPayments);
   };
@@ -138,15 +162,9 @@ export default function EditOrderForm({
 
           if (data.manufacturer.manufacturerId) {
             const supplierId = data.manufacturer.manufacturerId.toString();
-
-            console.log("[Front] Supplier ID converti:", supplierId);
-
             const apiUrl = `/api/prod?supplierId=${encodeURIComponent(
               supplierId,
             )}`;
-
-            console.log("[Front] Appel API:", apiUrl);
-
             const productsResponse = await fetch(apiUrl);
 
             if (!productsResponse.ok) {
@@ -162,11 +180,22 @@ export default function EditOrderForm({
               priceExclTax: product.price,
             }));
 
-            console.log("[Front] Produits reçus et mappés:", mappedProducts);
-
             setAvailableProducts(mappedProducts);
           }
+          const initialPayments =
+            data.paymentTypes?.length > 0
+              ? [...data.paymentTypes, { type: "", percentage: "", amount: "" }]
+              : [{ type: "", percentage: "", amount: "" }];
 
+          setPaymentTypes(
+            initialPayments.map((p) => ({
+              type: p.type,
+
+              percentage: p.percentage?.toString() || "",
+
+              amount: p.amount?.toString() || "",
+            })),
+          );
           const initialProductRows = data.products.map((product: any) => ({
             productId: product.id,
             name: product.name,
@@ -190,7 +219,6 @@ export default function EditOrderForm({
           setQuantities(initialQuantities);
 
           setSelectedWarehouse(data.warehouse);
-          setPaymentTypes(data.paymentTypes || []);
           setComment(data.comment || "");
           setFileList(data.files || []);
         } else {
@@ -207,26 +235,7 @@ export default function EditOrderForm({
   const removeProduct = (productId: string) => {
     setProductRows((rows) => rows.filter((row) => row.productId !== productId));
   };
-  const handleProductToggle = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    product: Product,
-  ) => {
-    if (e.target.checked) {
-      setProductRows([
-        ...productRows,
-        {
-          productId: product.id,
-          name: product.name,
-          quantity: 1,
-          sku: product.sku,
-          priceExclTax: product.priceExclTax,
-          total: product.priceExclTax,
-        },
-      ]);
-    } else {
-      setProductRows(productRows.filter((row) => row.productId !== product.id));
-    }
-  };
+
   const updateQuantity = (index: number, quantity: number) => {
     const newRows = [...productRows];
     newRows[index] = {
@@ -239,36 +248,70 @@ export default function EditOrderForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const convertedPaymentTypes = paymentTypes
+
+        .filter((p) => p.type && p.amount)
+
+        .map((p) => ({
+          type: p.type,
+
+          percentage: parseFloat(p.percentage),
+
+          amount: parseFloat(p.amount),
+        }));
       const updatedOrder = await updatePurchaseOrder(order.id, {
         ...formData,
         supplierId: selectedSupplier?.manufacturer_id || 0,
         warehouseId: selectedWarehouse?.warehouse_id || 0,
+
         products: productRows
           .filter((row) => row.productId && row.quantity > 0)
-          .map((row) => {
-            const product = availableProducts.find(
-              (p) => p.id === row.productId,
-            );
-            return {
-              id: row.productId,
-              quantity: row.quantity,
-              sku: row.sku,
-              name: product?.name || "",
-              priceExclTax: product?.priceExclTax || 0,
-              total: row.total,
-            };
-          }),
-        paymentTypes,
+
+          .map((row) => ({
+            id: row.productId,
+            quantity: row.quantity,
+            sku: row.sku,
+            name: row?.name || "",
+            priceExclTax: row?.priceExclTax || 0,
+            total: row.total,
+          })),
+        paymentTypes: convertedPaymentTypes,
         comment,
         files: fileList,
       });
       onUpdate(updatedOrder);
       toast.success("Order successfully updated!");
+      window.location.reload();
       onClose();
     } catch (error) {
       console.error("Error updating order:", error);
       toast.error("Error updating the order.");
     }
+  };
+  const handlePaymentPercentageChange = (index: number, value: string) => {
+    const newPercentage = Math.min(parseFloat(value) || 0, 100);
+
+    const updatedPayments = [...paymentTypes];
+
+    updatedPayments[index] = {
+      ...updatedPayments[index],
+
+      percentage: newPercentage.toString(),
+
+      amount: ((totalAmount * newPercentage) / 100).toString(),
+    };
+
+    const totalAllocated = updatedPayments.reduce(
+      (acc, payment) => acc + (parseFloat(payment.percentage || "0") || 0),
+
+      0,
+    );
+
+    if (totalAllocated < 100 && index === updatedPayments.length - 1) {
+      updatedPayments.push({ type: "", percentage: "", amount: "" });
+    }
+
+    setPaymentTypes(updatedPayments);
   };
 
   return (
@@ -310,36 +353,26 @@ export default function EditOrderForm({
             </div>
           </div>
 
-          {/* Total Amount */}
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700">
-              Total Amount (DT)
-            </label>
-            <input
-              type="number"
-              value={formData.totalAmount}
-              readOnly
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  totalAmount: Number(e.target.value),
-                })
-              }
-              className="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-
           {/* Status */}
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
               Status
             </label>
-            <input
-              type="text"
+            <select
               value={formData.status}
-              readOnly
-              className="mt-1 block w-full rounded-lg border-gray-300 bg-gray-100 p-3 shadow-md"
-            />
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  status: e.target.value as PurchaseOrderStatus,
+                })
+              }
+              className="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
+            >
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="READY">Ready</option>
+              <option value="DELIVERED">Delivered</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
           </div>
 
           {/* Supplier Information */}
@@ -369,53 +402,54 @@ export default function EditOrderForm({
           </div>
 
           <div className="relative col-span-1 md:col-span-2">
-            <label className="mb-4 block text-sm font-medium text-gray-700">
-              Gestion des Produits
-            </label>
+            <div className="relative col-span-1 md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Supplier products
+              </label>
+              <select
+                value={selectedProductId}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  setSelectedProductId(selectedId);
 
-            {/* Produits Disponibles */}
-            <div className="mb-8">
-              <h3 className="mb-3 text-lg font-semibold">
-                Produits du Fournisseur
-              </h3>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                {availableProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className={`rounded-lg border p-4 transition-colors ${
-                      productRows.some((r) => r.productId === product.id)
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-blue-200"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <input
-                          type="checkbox"
-                          checked={productRows.some(
-                            (r) => r.productId === product.id,
-                          )}
-                          onChange={(e) => handleProductToggle(e, product)}
-                          className="h-5 w-5 rounded text-blue-600 focus:ring-blue-500"
-                        />
-                        <div>
-                          <div className="font-medium">{product.name}</div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-medium text-blue-600">
-                          {product.priceExclTax.toFixed(2)} DT
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  const selectedProduct = availableProducts.find(
+                    (product) => product.id === selectedId,
+                  );
+
+                  if (selectedProduct) {
+                    setProductRows((prevRows) => [
+                      ...prevRows,
+                      {
+                        productId: selectedProduct.id,
+                        name: selectedProduct.name,
+                        quantity: 1,
+                        sku: selectedProduct.sku,
+                        priceExclTax: selectedProduct.priceExclTax,
+                        total: selectedProduct.priceExclTax,
+                      },
+                    ]);
+                    setSelectedProductId("");
+                  }
+                }}
+                className="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="">select product</option>
+                {availableProducts
+                  .filter(
+                    (product) =>
+                      !productRows.some((row) => row.productId === product.id),
+                  )
+                  .map((product) => (
+                    <option key={product.id} value={product.id}>
+                      {product.name} - {product.priceExclTax.toFixed(2)} DT
+                    </option>
+                  ))}
+              </select>
             </div>
 
             {/* Produits Sélectionnés */}
             <div className="mt-6">
-              <h3 className="mb-3 text-lg font-semibold">Produits Commandés</h3>
+              <h3 className="mb-3 text-lg font-semibold">Products Ordered</h3>
               <div className="space-y-4">
                 {productRows.map((row, index) => {
                   const product = availableProducts.find(
@@ -444,7 +478,7 @@ export default function EditOrderForm({
                       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <div>
                           <label className="mb-1 block text-sm text-gray-600">
-                            Quantité
+                            Quantity
                           </label>
                           <input
                             type="number"
@@ -459,7 +493,7 @@ export default function EditOrderForm({
 
                         <div>
                           <label className="mb-1 block text-sm text-gray-600">
-                            Prix Unitaire
+                            Unit Price
                           </label>
                           <div className="rounded-md bg-gray-100 p-2">
                             {row.priceExclTax.toFixed(2)} DT
@@ -480,16 +514,6 @@ export default function EditOrderForm({
                 })}
               </div>
             </div>
-
-            {/* Total Général */}
-            <div className="mt-6 rounded-lg bg-gray-50 p-4">
-              <div className="flex items-center justify-between">
-                <span className="font-semibold">Total de la Commande:</span>
-                <span className="text-2xl font-bold text-blue-600">
-                  {formData.totalAmount?.toFixed(2) || "0.00"} DT
-                </span>
-              </div>
-            </div>
           </div>
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
@@ -504,39 +528,106 @@ export default function EditOrderForm({
           </div>
 
           <div className="relative col-span-1 md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="mb-4 block text-sm font-medium text-gray-700">
               Payment Methods
             </label>
-            {paymentTypes.map((payment, index) => (
-              <div key={index} className="flex items-center space-x-4">
-                <input
-                  value={payment.type}
-                  readOnly
-                  className="mt-1 block w-1/3 rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Type"
-                />
 
+            {/* En-têtes des colonnes */}
+            <div className="mb-2 grid grid-cols-12 gap-4">
+              <div className="col-span-3 text-sm font-medium text-gray-700">
+                Type
+              </div>
+              <div className="col-span-2 text-sm font-medium text-gray-700">
+                Percentage
+              </div>
+              <div className="col-span-3 text-sm font-medium text-gray-700">
+                Amount
+              </div>
+              <div className="col-span-3 text-sm font-medium text-gray-700">
+                Remaining
+              </div>
+              <div className="col-span-1"></div>
+            </div>
+
+            {paymentTypes.map((payment, index) => (
+              <div
+                key={index}
+                className="mb-4 grid grid-cols-12 items-center gap-4"
+              >
+                {/* Sélecteur de type */}
+                <select
+                  className="col-span-3 rounded-lg border-gray-300 p-3 shadow-md"
+                  value={payment.type}
+                  onChange={(e) => {
+                    const updated = [...paymentTypes];
+                    updated[index].type = e.target.value;
+                    setPaymentTypes(updated);
+                  }}
+                >
+                  <option value="">Select method</option>
+                  <option value="CHEQUE">Cheque</option>
+                  <option value="CASH">Cash</option>
+                  <option value="TRAITE">Traite</option>
+                </select>
+
+                {/* Pourcentage */}
                 <input
                   type="number"
                   value={payment.percentage}
                   onChange={(e) =>
                     handlePaymentPercentageChange(index, e.target.value)
                   }
-                  className="mt-1 block w-1/3 rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Percentage"
+                  className="col-span-2 rounded-lg border-gray-300 p-3 shadow-md"
+                  placeholder="%"
+                  step="0.01"
                 />
 
+                {/* Montant */}
                 <input
                   type="number"
                   value={payment.amount}
                   onChange={(e) =>
                     handlePaymentAmountChange(index, e.target.value)
                   }
-                  className="mt-1 block w-1/3 rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
+                  className="col-span-3 rounded-lg border-gray-300 p-3 shadow-md"
                   placeholder="Amount"
+                  step="0.01"
                 />
+
+                {/* Montant restant */}
+                <div className="col-span-3">
+                  <input
+                    type="number"
+                    value={remainingAmount.toFixed(2)}
+                    disabled
+                    className="w-full rounded-lg bg-gray-100 p-3"
+                  />
+                </div>
+
+                {/* Bouton de suppression */}
+                {index < paymentTypes.length - 1 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPaymentTypes((p) => p.filter((_, i) => i !== index))
+                    }
+                    className="col-span-1 text-red-500 hover:text-red-700"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
               </div>
             ))}
+
+            {/* Totaux */}
+            <div className="mt-4 flex justify-between border-t pt-4">
+              <span className="font-medium">Total Allocated:</span>
+              <span>{(totalAmount - remainingAmount).toFixed(2)} DT</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-medium">Remaining Amount:</span>
+              <span>{remainingAmount.toFixed(2)} DT</span>
+            </div>
           </div>
 
           <div className="relative col-span-1 md:col-span-2">
@@ -550,41 +641,55 @@ export default function EditOrderForm({
             />
           </div>
 
-          <input
-            type="file"
-            onChange={(e) => {
-              if (e.target.files) {
-                const file = e.target.files[0];
-                setFileList([
-                  ...fileList,
-                  { name: file.name, url: URL.createObjectURL(file) },
-                ]);
-              }
-            }}
-            className="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-md focus:border-blue-500 focus:ring-blue-500"
-          />
-          {fileList.map((file, index) => (
-            <div key={index} className="mt-2 flex items-center justify-between">
-              <a
-                href={file.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
+          <div className="relative w-full">
+            <input
+              type="file"
+              id="fileInput"
+              onChange={(e) => {
+                if (e.target.files) {
+                  const file = e.target.files[0];
+                  setFileList([
+                    ...fileList,
+                    { name: file.name, url: URL.createObjectURL(file) },
+                  ]);
+                }
+              }}
+              className="hidden"
+            />
+
+            <label
+              htmlFor="fileInput"
+              className="mt-1 block w-full flex-grow cursor-pointer rounded-lg border-gray-300 bg-blue-600 p-3 text-center text-white shadow-md transition hover:bg-blue-700 focus:border-blue-500 focus:ring-blue-500"
+            >
+              Choose File
+            </label>
+
+            {fileList.map((file, index) => (
+              <div
+                key={index}
+                className="mt-2 flex items-center justify-between"
               >
-                {file.name}
-              </a>
-              <button
-                type="button"
-                onClick={() => {
-                  const newFileList = fileList.filter((_, i) => i !== index);
-                  setFileList(newFileList);
-                }}
-                className="text-red-500 hover:text-red-700"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          ))}
+                <a
+                  href={file.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  {file.name}
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newFileList = fileList.filter((_, i) => i !== index);
+                    setFileList(newFileList);
+                  }}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="mt-8 flex justify-end space-x-3">

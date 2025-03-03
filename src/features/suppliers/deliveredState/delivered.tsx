@@ -125,7 +125,10 @@ const InProgressPage = () => {
               </div>
             </div>
 
-            <div className="box mb-5 mt-5 flex w-full justify-between rounded-lg bg-primary/5 p-4 dark:bg-bg3">
+            <div
+              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+              style={{ maxHeight: "400px" }}
+            >
               <PurchaseTable data={purchases} loading={loading} />
             </div>
           </div>

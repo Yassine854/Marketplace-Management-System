@@ -285,7 +285,7 @@ const SupplierForm = ({
       comments: comment ? [{ content: comment }] : [],
       payments: paymentTypes
 
-        .filter((payment) => payment.type && payment.amount) // Filtrer les paiements valides
+        .filter((payment) => payment.type && payment.amount)
 
         .map((payment) => ({
           paymentMethod: payment.type.toUpperCase() as PaymentMethod,
@@ -302,6 +302,7 @@ const SupplierForm = ({
           quantity: item.quantity,
           priceExclTax: item.priceExclTax,
           total: item.total,
+          sku: item.sku,
         })),
       files: uploadedFiles.map((file) => ({ id: file.id })),
     };
@@ -330,9 +331,6 @@ const SupplierForm = ({
 
     if (warehouse) {
       setSelectedWarehouse(warehouse);
-
-      console.log("Selected Warehouse:", warehouse);
-      console.log("All Products:", products);
 
       const filteredProducts = products.filter(
         (product) =>

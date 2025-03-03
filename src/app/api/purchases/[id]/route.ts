@@ -24,6 +24,8 @@ export async function PUT(
       status: body.status,
       comments: body.comment
         ? {
+            deleteMany: {},
+
             create: { content: body.comment },
           }
         : undefined,
@@ -42,20 +44,19 @@ export async function PUT(
     }
 
     if (body.files) {
-      updateData.files = {
-        upsert: body.files.map((file: any) => ({
-          where: { id: file.id },
-          create: {
-            name: file.name,
-            url: file.url,
-            orderId: orderId,
-          },
-          update: {
-            name: file.name,
-            url: file.url,
-          },
+      await prisma.file.deleteMany({
+        where: { orderId: orderId },
+      });
+
+      await prisma.file.createMany({
+        data: body.files.map((file: any) => ({
+          name: file.name,
+
+          url: file.url,
+
+          orderId: orderId,
         })),
-      };
+      });
     }
 
     const updatedOrder = await prisma.purchaseOrder.update({
@@ -71,48 +72,45 @@ export async function PUT(
     });
 
     if (body.products) {
-      await Promise.all(
-        body.products.map(async (product: any) => {
-          await prisma.productOrdered.upsert({
-            where: { id: product.id },
-            create: {
-              name: product.name,
-              quantity: product.quantity,
-              priceExclTax: product.priceExclTax,
-              total: product.total,
-              purchaseOrderId: orderId,
-            },
-            update: {
-              quantity: product.quantity,
-              priceExclTax: product.priceExclTax,
-              total: product.total,
-            },
-          });
-        }),
-      );
+      await prisma.productOrdered.deleteMany({
+        where: { purchaseOrderId: orderId },
+      });
+
+      await prisma.productOrdered.createMany({
+        data: body.products.map((product: any) => ({
+          name: product.name,
+
+          quantity: product.quantity,
+
+          priceExclTax: product.priceExclTax,
+
+          total: product.total,
+
+          purchaseOrderId: orderId,
+
+          sku: product.sku,
+        })),
+      });
     }
 
     if (body.paymentTypes) {
-      await Promise.all(
-        body.paymentTypes.map(async (payment: any) => {
-          await prisma.payment.upsert({
-            where: { id: payment.id },
-            create: {
-              paymentMethod: payment.type,
-              percentage: payment.percentage,
-              amount: payment.amount,
-              manufacturerId: body.manufacturerId,
-              purchaseOrderId: orderId,
-            },
-            update: {
-              paymentMethod: payment.type,
-              percentage: payment.percentage,
-              amount: payment.amount,
-              manufacturerId: body.manufacturerId,
-            },
-          });
-        }),
-      );
+      await prisma.payment.deleteMany({
+        where: { purchaseOrderId: orderId },
+      });
+
+      await prisma.payment.createMany({
+        data: body.paymentTypes.map((payment: any) => ({
+          paymentMethod: payment.type,
+
+          percentage: payment.percentage,
+
+          amount: payment.amount,
+
+          purchaseOrderId: orderId,
+
+          manufacturerId: body.supplierId,
+        })),
+      });
     }
 
     return NextResponse.json(updatedOrder);

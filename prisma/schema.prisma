@@ -209,6 +209,7 @@ model ProductOrdered {
   quantity       Int
   priceExclTax   Float
   total          Float 
+  sku            String?
   purchaseOrder  PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id])
   purchaseOrderId String?
   @@map("productOrdered")

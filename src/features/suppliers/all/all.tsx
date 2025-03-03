@@ -1,10 +1,10 @@
-"use client";
 import { useEffect, useState } from "react";
 import PurchaseTable from "../components/PurchaseTable/PurchaseTable";
 import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersAll";
 import Pagination from "../components/Pagination";
 import { useRouter } from "next/navigation";
+
 const SupplierPurchasesPage = () => {
   const { purchases, loading, error, fetchPurchases, total } =
     usePurchaseStore();
@@ -17,11 +17,12 @@ const SupplierPurchasesPage = () => {
   );
   const pageSize = 10;
   const router = useRouter();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         await fetchPurchases(currentPage, pageSize, {
-          search: searchTerm,
+          search: debouncedSearchTerm,
           ...activeFilters,
         });
       } catch (error) {
@@ -30,7 +31,7 @@ const SupplierPurchasesPage = () => {
     };
 
     fetchData();
-  }, [currentPage, pageSize, searchTerm, activeFilters]);
+  }, [currentPage, debouncedSearchTerm, activeFilters]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -40,23 +41,9 @@ const SupplierPurchasesPage = () => {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetchPurchases(currentPage, pageSize, {
-        search: debouncedSearchTerm,
-        ...activeFilters,
-      });
-    };
-
-    fetchData();
-  }, [debouncedSearchTerm]);
-
   const handleSearch = () => {
-    const normalizedSearch = searchTerm.toLowerCase();
-    fetchPurchases(1, pageSize, {
-      search: normalizedSearch,
-      ...activeFilters,
-    });
+    setCurrentPage(1);
+    setDebouncedSearchTerm(searchTerm.toLowerCase());
   };
 
   if (error) {
@@ -75,7 +62,6 @@ const SupplierPurchasesPage = () => {
           <div className="box w-full min-w-[800px] xl:p-8">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
               <p className="ml-4 mt-6 text-xl font-bold">Supplier Orders</p>
-
               <div className="mt-6 flex items-center gap-4">
                 <button
                   onClick={() => router.push("/suppliers/new")}
@@ -128,7 +114,7 @@ const SupplierPurchasesPage = () => {
                 <AdvancedFilters
                   onApply={(filters) => {
                     setActiveFilters(filters);
-                    setCurrentPage(1);
+                    setCurrentPage(1); // Reset to the first page on filter apply
                   }}
                 />
               )}
@@ -148,7 +134,11 @@ const SupplierPurchasesPage = () => {
               </div>
             </div>
 
-            <div className="box mb-5 mt-5 flex w-full justify-between rounded-lg bg-primary/5 p-4 dark:bg-bg3">
+            {/* Conteneur avec défilement pour le tableau */}
+            <div
+              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+              style={{ maxHeight: "400px" }}
+            >
               <PurchaseTable data={purchases} loading={loading} />
             </div>
           </div>

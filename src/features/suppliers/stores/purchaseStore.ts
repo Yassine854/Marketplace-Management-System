@@ -1,47 +1,64 @@
 import { create } from "zustand";
 
-type PurchaseOrderStatus = "IN_PROGRESS" | "READY" | "DELIVERED" | "COMPLETED";
+export type PurchaseOrderStatus =
+  | "IN_PROGRESS"
+  | "READY"
+  | "DELIVERED"
+  | "COMPLETED";
 
-interface Product {
+export interface Product {
   id: string;
   name: string;
   quantity: number;
   priceExclTax: number;
+  sku: string;
   total: number;
+  manufacturer?: string;
 }
 
-interface Payment {
+export interface Payment {
   paymentMethod: string;
   amount: number;
 }
 
-interface Supplier {
-  id: string;
+export interface Supplier {
+  manufacturer_id: number;
   companyName: string;
 }
 
-interface Warehouse {
-  id: string;
+export interface Warehouse {
+  warehouse_id: number;
   name: string;
 }
 
-interface PurchaseOrder {
+export interface PurchaseOrder {
+  products: Product[];
   id: string;
   orderNumber: string;
   manufacturer: Supplier | null;
-  manufacturerId: string;
-  supplierId: string;
+  manufacturerId: number;
   warehouse: Warehouse | null;
-  warehouseId: string;
+  warehouseId: number;
   deliveryDate: Date;
   totalAmount: number;
   status: PurchaseOrderStatus;
   payments: Payment[];
   paymentTypes: { type: string; percentage: number; amount: number }[];
-  products: Product[];
   comment: string;
   files: { name: string; url: string }[];
 }
+
+export type PurchaseOrderUpdate = Partial<{
+  deliveryDate: Date;
+  totalAmount: number;
+  status: PurchaseOrderStatus;
+  warehouseId: number;
+  supplierId: number;
+  products: Product[];
+  paymentTypes: { type: string; percentage: number; amount: number }[];
+  comment: string;
+  files: { name: string; url: string }[];
+}>;
 
 interface PurchaseState {
   purchases: PurchaseOrder[];
@@ -84,16 +101,14 @@ const usePurchaseStore = create<PurchaseState>((set) => ({
           orderNumber: order.orderNumber,
           manufacturer: order.manufacturer
             ? {
-                id: order.manufacturer.id,
-
+                manufacturer_id: order.manufacturer.manufacturer_id,
                 companyName: order.manufacturer.companyName,
               }
             : null,
-
           manufacturerId: order.manufacturerId,
           warehouse: order.warehouse
             ? {
-                id: order.warehouse.id,
+                warehouse_id: order.warehouse.warehouse_id,
                 name: order.warehouse.name,
               }
             : null,

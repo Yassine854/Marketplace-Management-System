@@ -17,7 +17,6 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Conversion explicite en string
     const supplierIdString = supplierId.toString();
 
     const products = await prisma.products.findMany({

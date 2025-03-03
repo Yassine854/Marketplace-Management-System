@@ -50,7 +50,6 @@ export async function GET(request: Request) {
     if (searchParams.get("deliveryDateEnd")) {
       where.deliveryDate.lte = new Date(searchParams.get("deliveryDateEnd")!);
     }
-
     const [data, total] = await prisma.$transaction([
       prisma.purchaseOrder.findMany({
         where,

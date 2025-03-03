@@ -14,13 +14,13 @@ const InProgressPage = () => {
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
     {},
   );
-
   const pageSize = 10;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         await fetchPurchases(currentPage, pageSize, {
-          search: searchTerm,
+          search: debouncedSearchTerm,
           ...activeFilters,
         });
       } catch (error) {
@@ -29,7 +29,7 @@ const InProgressPage = () => {
     };
 
     fetchData();
-  }, [currentPage, pageSize, searchTerm, activeFilters]);
+  }, [currentPage, debouncedSearchTerm, activeFilters]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -39,26 +39,10 @@ const InProgressPage = () => {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetchPurchases(currentPage, pageSize, {
-        search: debouncedSearchTerm,
-        ...activeFilters,
-      });
-    };
-
-    fetchData();
-  }, [debouncedSearchTerm]);
-
   const handleSearch = () => {
-    const normalizedSearch = searchTerm.toLowerCase();
-    fetchPurchases(1, pageSize, {
-      search: normalizedSearch,
-      ...activeFilters,
-    });
+    setCurrentPage(1); // Reset to the first page on new search
+    setDebouncedSearchTerm(searchTerm.toLowerCase());
   };
-
-  const totalPages = Math.ceil(total / pageSize);
 
   if (error) {
     return (
@@ -68,6 +52,8 @@ const InProgressPage = () => {
       </div>
     );
   }
+
+  const totalPages = Math.ceil(total / pageSize); // Calculate total pages
 
   return (
     <div className="flex h-full flex-grow">
@@ -105,7 +91,7 @@ const InProgressPage = () => {
                 <AdvancedFilters
                   onApply={(filters) => {
                     setActiveFilters(filters);
-                    setCurrentPage(1);
+                    setCurrentPage(1); // Reset to the first page on filter apply
                   }}
                 />
               )}
@@ -125,7 +111,10 @@ const InProgressPage = () => {
               </div>
             </div>
 
-            <div className="box mb-5 mt-5 flex w-full justify-between rounded-lg bg-primary/5 p-4 dark:bg-bg3">
+            <div
+              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+              style={{ maxHeight: "400px" }}
+            >
               <PurchaseTable data={purchases} loading={loading} />
             </div>
           </div>

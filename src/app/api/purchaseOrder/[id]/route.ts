@@ -27,7 +27,6 @@ export async function GET(
       );
     }
 
-    // Formatage des produits
     const formattedProducts = purchaseOrder.products.map((product) => ({
       id: product.id,
       name: product.name,
