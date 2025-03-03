@@ -152,7 +152,7 @@ const TopArticlesOrdered: React.FC<Props> = ({
       <h3 className="mb-6 text-center text-2xl font-semibold">
         Produits les plus commandés
       </h3>
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      {/* <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <label className="text-sm font-medium">Période:</label>
         <div className="flex gap-3">
           <DatePicker
@@ -172,7 +172,7 @@ const TopArticlesOrdered: React.FC<Props> = ({
             isClearable
           />
         </div>
-      </div>
+      </div> */}
 
       <div className="flex flex-col items-start sm:flex-row">
         <div className="flex w-full justify-center sm:w-1/2">

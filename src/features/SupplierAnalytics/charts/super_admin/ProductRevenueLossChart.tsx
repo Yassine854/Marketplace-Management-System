@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import ApexCharts from "react-apexcharts";
 
 interface OrderItem {
@@ -10,28 +10,38 @@ interface Order {
   created_at: string;
   items: OrderItem[];
   state: string;
+  store_id: number;
 }
 
-const ProductReturnsAnalysisChart: React.FC = () => {
-  const [timeFilter, setTimeFilter] = useState("yearly");
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+interface Props {
+  orders: Order[];
+  warehouseId?: number | null;
+  startDate?: Date | null;
+  endDate?: Date | null;
+}
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const ordersRes = await fetch("http://localhost:3000/api/orders");
-        const ordersData = await ordersRes.json();
-        setOrders(ordersData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+const ProductReturnsAnalysisChart: React.FC<Props> = ({
+  orders: allOrders,
+  warehouseId = null,
+  startDate,
+  endDate,
+}) => {
+  const [timeFilter, setTimeFilter] = React.useState("yearly");
+  const loading = allOrders.length === 0;
 
-    fetchData();
-  }, []);
+  // Apply all filters
+  const filteredOrders = allOrders.filter((order) => {
+    const orderDate = new Date(order.created_at);
+    const isValid = order.state !== "canceled";
+    const matchesWarehouse = warehouseId
+      ? order.store_id === warehouseId
+      : true;
+    const withinDateRange =
+      (!startDate || orderDate >= startDate) &&
+      (!endDate || orderDate <= endDate);
+
+    return isValid && matchesWarehouse && withinDateRange;
+  });
 
   const getTimeKey = (date: Date, filter: string) => {
     const pad = (n: number) => String(n).padStart(2, "0");
@@ -51,7 +61,7 @@ const ProductReturnsAnalysisChart: React.FC = () => {
     }
   };
 
-  const { labels, values } = orders.reduce(
+  const { labels, values } = filteredOrders.reduce(
     (acc, order) => {
       const orderDate = new Date(order.created_at);
       const timeKey = getTimeKey(orderDate, timeFilter);

@@ -34,6 +34,9 @@ const SupplierDashboard = () => {
   const [startDate, setStartDate] = useState<Date | null>(null); // Default to null
   const [endDate, setEndDate] = useState<Date | null>(null); // Default to null
 
+  const [appliedStartDate, setAppliedStartDate] = useState<Date | null>(null);
+  const [appliedEndDate, setAppliedEndDate] = useState<Date | null>(null);
+
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
@@ -96,6 +99,12 @@ const SupplierDashboard = () => {
     fetchCategories();
   }, [supplierId]);
 
+  const handleApplyFilters = () => {
+    // Only apply the current dates if they are not null
+    setAppliedStartDate(startDate);
+    setAppliedEndDate(endDate);
+  };
+
   //Total orders
   const supplierProducts = products.filter(
     (p) => p.manufacturer === supplierId,
@@ -105,8 +114,8 @@ const SupplierDashboard = () => {
   const totalValidOrders = orders.filter(
     (order) =>
       order.state != "canceled" &&
-      (!startDate || new Date(order.created_at) >= startDate) &&
-      (!endDate || new Date(order.created_at) <= endDate) &&
+      (!appliedStartDate || new Date(order.created_at) >= appliedStartDate) &&
+      (!appliedEndDate || new Date(order.created_at) <= appliedEndDate) &&
       order.items.some((item: { product_id: number }) =>
         supplierProductIds.has(item.product_id),
       ),
@@ -117,8 +126,8 @@ const SupplierDashboard = () => {
   orders.forEach((order) => {
     if (
       order.state != "canceled" &&
-      (!startDate || new Date(order.created_at) >= startDate) &&
-      (!endDate || new Date(order.created_at) <= endDate) &&
+      (!appliedStartDate || new Date(order.created_at) >= appliedStartDate) &&
+      (!appliedEndDate || new Date(order.created_at) <= appliedEndDate) &&
       order.items.some((item: { product_id: number }) =>
         supplierProductIds.has(item.product_id),
       )
@@ -135,8 +144,8 @@ const SupplierDashboard = () => {
     .filter(
       (order) =>
         order.state !== "canceled" &&
-        (!startDate || new Date(order.created_at) >= startDate) &&
-        (!endDate || new Date(order.created_at) <= endDate),
+        (!appliedStartDate || new Date(order.created_at) >= appliedStartDate) &&
+        (!appliedEndDate || new Date(order.created_at) <= appliedEndDate),
     )
     .flatMap((order) => order.items)
     .filter(
@@ -150,8 +159,8 @@ const SupplierDashboard = () => {
     .filter(
       (order) =>
         order.state !== "canceled" &&
-        (!startDate || new Date(order.created_at) >= startDate) &&
-        (!endDate || new Date(order.created_at) <= endDate),
+        (!appliedStartDate || new Date(order.created_at) >= appliedStartDate) &&
+        (!appliedEndDate || new Date(order.created_at) <= appliedEndDate),
     )
     .flatMap((order) => order.items)
     .filter((item) => supplierProductIds.has(item.product_id))
@@ -166,70 +175,19 @@ const SupplierDashboard = () => {
 
   const handleStartDateChange = (date: Date | null) => {
     setStartDate(date);
+    // Automatically clear the applied start date if input is cleared
+    if (date === null) {
+      setAppliedStartDate(null);
+    }
   };
 
   const handleEndDateChange = (date: Date | null) => {
     setEndDate(date);
+    // Automatically clear the applied end date if input is cleared
+    if (date === null) {
+      setAppliedEndDate(null);
+    }
   };
-
-  // Filter orders based on the selected date range
-  // const filteredOrders = orderData.orders.filter(({ order }) => {
-  //   const orderDate = new Date(order.createdAt * 1000);
-  //   return (
-  //     (!startDate || orderDate >= startDate) &&
-  //     (!endDate || orderDate <= endDate)
-  //   );
-  // });
-
-  // const supplierStats = filteredOrders.reduce(
-  //   (acc, { order }) => {
-  //     const uniqueOrders = new Set();
-  //     const uniqueCustomers = new Set(acc.uniqueCustomers);
-  //     let orderProcessed = false;
-
-  //     if (order.items) {
-  //       order.items.forEach((item) => {
-  //         if (
-  //           "supplier" in item &&
-  //           item.supplier?.manufacturer_id === supplierId
-  //         ) {
-  //           if (!orderProcessed) {
-  //             if (order.state === "delivered" && order.status === "valid") {
-  //               acc.deliveredOrders += 1;
-  //             }
-  //             orderProcessed = true;
-  //           }
-
-  //           if (!uniqueOrders.has(order.orderId)) {
-  //             uniqueOrders.add(order.orderId);
-  //             acc.totalOrders += 1;
-  //           }
-
-  //           if (order.state === "delivered" && order.status === "valid") {
-  //             uniqueCustomers.add(order.customerId);
-  //           }
-
-  //           if (order.state === "canceled" && order.status === "invalid") {
-  //             acc.totalReturns += parseInt(item.quantity);
-  //           }
-  //         }
-  //       });
-  //     }
-
-  //     acc.totalCustomers = uniqueCustomers.size;
-  //     acc.uniqueCustomers = uniqueCustomers;
-
-  //     return acc;
-  //   },
-  //   {
-  //     totalOrders: 0,
-  //     totalTurnover: calculateTurnover(),
-  //     deliveredOrders: 0,
-  //     totalCustomers: 0,
-  //     totalReturns: 0,
-  //     uniqueCustomers: new Set(),
-  //   },
-  // );
 
   return (
     <div>
@@ -274,6 +232,15 @@ const SupplierDashboard = () => {
               isClearable
             />
           </div>
+
+          <div className="flex items-end">
+            <button
+              onClick={handleApplyFilters}
+              className="h-[42px] rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            >
+              Appliquer Filtre
+            </button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -305,19 +272,6 @@ const SupplierDashboard = () => {
           >
             <FaUndo className="text-red-500" />
           </CardDataStats>
-
-          {/*   
-
-        
-
-        <CardDataStats
-          title="Unique Paying Customers"
-          total={supplierStats.totalCustomers.toString()}
-        >
-          <FaUsers className="text-orange-500" />
-        </CardDataStats>
-
-        */}
         </div>
 
         {/* Charts */}
@@ -331,10 +285,10 @@ const SupplierDashboard = () => {
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="md:col-span-2">
+          <div className="flex w-full justify-center md:col-span-2">
             <ProductRevenueLossChart supplierId={supplierId} />
           </div>
-          <div>
+          <div className="mt-6 flex w-full justify-center">
             <AvailableProducts supplierId={supplierId} />
           </div>
         </div>
@@ -367,14 +321,16 @@ const SupplierDashboard = () => {
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="flex w-full justify-center">
+          <div className="flex w-full justify-center md:col-span-2">
             <RegionsOrders supplierId={supplierId} />
           </div>
-          <div className="flex w-full justify-center">
+          <div className="flex w-full justify-center md:col-span-1">
             <InventoryTrendChart supplierId={supplierId} />
           </div>
+        </div>
 
-          <div className="flex w-full justify-center">
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-1">
+          <div>
             <SupplierTopProductsChart
               supplierId={supplierId}
               startDate={startDate}
@@ -382,21 +338,6 @@ const SupplierDashboard = () => {
             />
           </div>
         </div>
-
-        {/* <button
-        onClick={() => setShowEmailForm(true)}
-        className="fixed bottom-10 right-10 flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg transition-all hover:bg-blue-600 hover:shadow-xl"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="h-6 w-6"
-        >
-          <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
-          <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
-        </svg>
-      </button> */}
       </div>
       <Footer supplier={supplier} />
     </div>

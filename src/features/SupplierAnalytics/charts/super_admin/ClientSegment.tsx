@@ -1,19 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ApexCharts from "react-apexcharts";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 const newColors = [
-  "#3B82F6",
-  "#10B981",
-  "#F59E0B",
-  "#EF4444",
-  "#8B5CF6",
-  "#EC4899",
-  "#6EE7B7",
-  "#FDE68A",
-  "#FCA5A5",
-  "#94A3B8",
+  "#3B82F6", // Blue
+  "#10B981", // Emerald
+  "#F59E0B", // Amber
+  "#EF4444", // Red
+  "#8B5CF6", // Violet
+  "#EC4899", // Pink
+  "#6EE7B7", // Teal
+  "#FDE68A", // Yellow
+  "#FCA5A5", // Rose
+  "#94A3B8", // Slate
 ];
 
 interface Customer {
@@ -26,40 +24,38 @@ interface Order {
   customer_id?: number;
   created_at: string;
   state: string;
+  store_id: number;
 }
 
-const GeneralClientSegment: React.FC<{
+interface ClientSegmentProps {
   startDate?: Date | null;
   endDate?: Date | null;
-}> = ({ startDate: propStartDate, endDate: propEndDate }) => {
-  const [chartData, setChartData] = useState<any>(null);
-  const [startDate, setStartDate] = useState<Date | null>(
-    propStartDate || null,
-  );
-  const [endDate, setEndDate] = useState<Date | null>(propEndDate || null);
-  const [totalCustomers, setTotalCustomers] = useState<number>(0);
+  warehouseId?: number | null;
+  orders: Order[];
+  customers: Customer[];
+}
+
+const ClientSegment: React.FC<ClientSegmentProps> = ({
+  startDate,
+  endDate,
+  warehouseId,
+  orders,
+  customers,
+}) => {
+  const [chartData, setChartData] = useState<{
+    series: number[];
+    options: ApexCharts.ApexOptions;
+  } | null>(null);
+  const [totalCustomers, setTotalCustomers] = useState(0);
   const [segmentDetails, setSegmentDetails] = useState<
-    { label: string; count: number }[]
+    Array<{ label: string; count: number }>
   >([]);
 
   useEffect(() => {
-    setStartDate(propStartDate || null);
-    setEndDate(propEndDate || null);
-  }, [propStartDate, propEndDate]);
-
-  useEffect(() => {
-    const fetchData = async () => {
+    const processClientSegments = () => {
       try {
-        const [ordersResponse, customersResponse] = await Promise.all([
-          fetch("http://localhost:3000/api/orders"),
-          fetch("http://localhost:3000/api/customers"),
-        ]);
-
-        const orders: Order[] = await ordersResponse.json();
-        const customers: Customer[] = await customersResponse.json();
-
-        // Create customer profile map
-        const customerProfileMap = customers.reduce(
+        // 1. Create customer profile mapping with "0" handling
+        const profileMap = customers.reduce(
           (acc: Record<number, string>, customer) => {
             acc[customer.id] =
               customer.retailer_profile === "0" || !customer.retailer_profile
@@ -70,40 +66,43 @@ const GeneralClientSegment: React.FC<{
           {},
         );
 
-        // Date filtering
-        const startUTC = startDate ? startDate.getTime() : null;
-        const endUTC = endDate ? endDate.getTime() : null;
-
-        // Filter valid orders
+        // 2. Apply all filters to orders
         const filteredOrders = orders.filter((order) => {
-          const orderTime = new Date(order.created_at).getTime();
+          const orderDate = new Date(order.created_at);
+          const start = startDate ? new Date(startDate) : null;
+          const end = endDate ? new Date(endDate) : null;
+
+          // Normalize dates
+          if (start) start.setHours(0, 0, 0, 0);
+          if (end) end.setHours(23, 59, 59, 999);
+
           return (
             order.state !== "canceled" &&
-            (!startUTC || orderTime >= startUTC) &&
-            (!endUTC || orderTime <= endUTC)
+            (!warehouseId || order.store_id === warehouseId) &&
+            (!start || orderDate >= start) &&
+            (!end || orderDate <= end)
           );
         });
 
-        // Track unique customers per profile
+        // 3. Track unique customers per profile
         const profileDistribution: Record<string, Set<number>> = {};
-        const allCustomers = new Set<number>();
+        const uniqueCustomers = new Set<number>();
 
         filteredOrders.forEach((order) => {
-          if (order.customer_id && customerProfileMap[order.customer_id]) {
-            const profile = customerProfileMap[order.customer_id];
+          if (!order.customer_id) return;
 
-            if (!profileDistribution[profile]) {
-              profileDistribution[profile] = new Set();
-            }
+          const customerId = order.customer_id;
+          const profile = profileMap[customerId];
 
-            if (!allCustomers.has(order.customer_id)) {
-              profileDistribution[profile].add(order.customer_id);
-              allCustomers.add(order.customer_id);
-            }
+          if (!uniqueCustomers.has(customerId)) {
+            profileDistribution[profile] =
+              profileDistribution[profile] || new Set();
+            profileDistribution[profile].add(customerId);
+            uniqueCustomers.add(customerId);
           }
         });
 
-        // Prepare visualization data
+        // 4. Prepare visualization data
         const segments = Object.entries(profileDistribution)
           .map(([label, customers]) => ({
             label,
@@ -111,81 +110,86 @@ const GeneralClientSegment: React.FC<{
           }))
           .sort((a, b) => b.count - a.count);
 
-        setTotalCustomers(allCustomers.size);
+        // 5. Update state
+        setTotalCustomers(uniqueCustomers.size);
         setSegmentDetails(segments);
 
         setChartData({
-          series: segments.map((item) => item.count),
+          series: segments.map((s) => s.count),
           options: {
             chart: {
               type: "pie",
               height: 400,
               events: {
-                dataPointSelection: (
-                  event: any,
-                  chartContext: any,
-                  config: any,
-                ) => {
+                dataPointSelection: (event, chartContext, config) => {
                   console.log(
-                    "Selected profile:",
-                    segments[config.dataPointIndex].label,
+                    "Selected segment:",
+                    segments[config.dataPointIndex],
                   );
                 },
               },
             },
             colors: newColors,
-            labels: segments.map((item) => item.label),
+            labels: segments.map((s) => s.label),
             dataLabels: {
               enabled: true,
               formatter: (val: number) => `${val.toFixed(1)}%`,
+              style: {
+                fontSize: "12px",
+                fontFamily: "Inter, sans-serif",
+              },
             },
             legend: { show: false },
             tooltip: {
-              y: { formatter: (value: number) => `${value} customers` },
+              y: {
+                formatter: (value: number) =>
+                  `${value} client${value > 1 ? "s" : ""}`,
+                title: {
+                  formatter: (seriesName: string) => seriesName,
+                },
+              },
             },
             title: {
-              text: `Répartition des Clients – Clients uniques : ${allCustomers.size}`,
+              text: `Répartition des Clients – Clients uniques : ${uniqueCustomers.size}`,
               align: "center",
               style: {
                 fontSize: "16px",
-                fontWeight: "bold",
+                fontWeight: 600,
+                fontFamily: "Inter, sans-serif",
+                color: "#1F2937",
               },
             },
+            responsive: [
+              {
+                breakpoint: 640,
+                options: {
+                  chart: {
+                    height: 300,
+                  },
+                  title: {
+                    style: {
+                      fontSize: "14px",
+                    },
+                  },
+                },
+              },
+            ],
           },
         });
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error processing client segments:", error);
+        setChartData(null);
+        setSegmentDetails([]);
+        setTotalCustomers(0);
       }
     };
 
-    fetchData();
-  }, [startDate, endDate]);
+    processClientSegments();
+  }, [startDate, endDate, warehouseId, orders, customers]);
 
   return (
-    <div className="w-full rounded-xl border border-gray-100 bg-white p-6 shadow-lg">
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <label className="text-sm font-medium">Période:</label>
-        <div className="flex gap-3">
-          <DatePicker
-            selected={startDate}
-            onChange={setStartDate}
-            placeholderText="Date Début"
-            className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            dateFormat="MMM d, yyyy"
-            isClearable
-          />
-          <DatePicker
-            selected={endDate}
-            onChange={setEndDate}
-            placeholderText="Date Fin"
-            className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            dateFormat="MMM d, yyyy"
-            isClearable
-          />
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-gray-100 bg-white p-4 shadow-inner">
+    <div className="w-full rounded-xl border border-gray-200 bg-white p-6 shadow-lg">
+      <div className="mb-6 rounded-lg border border-gray-100 bg-white p-4 shadow-inner">
         {chartData ? (
           <ApexCharts
             options={chartData.options}
@@ -194,41 +198,48 @@ const GeneralClientSegment: React.FC<{
             height={350}
           />
         ) : (
-          <p className="text-center text-gray-500">
-            Chargement des profils clients...
-          </p>
+          <div className="flex h-[350px] items-center justify-center">
+            <p className="text-gray-500">Chargement des données clients...</p>
+          </div>
         )}
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {segmentDetails.map((segment, index) => (
           <div
             key={segment.label}
-            className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+            className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
           >
             <div
               className="mt-1 h-5 w-5 flex-shrink-0 rounded-full"
               style={{ backgroundColor: newColors[index % newColors.length] }}
+              aria-hidden="true"
             />
             <div className="flex-1">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-800">
+              <div className="space-y-1">
+                <h3 className="text-sm font-medium text-gray-800">
                   {segment.label}
-                </span>
-                <span className="mt-1 text-lg font-semibold text-gray-900">
+                </h3>
+                <p className="text-2xl font-semibold text-gray-900">
                   {segment.count}
-                </span>
-                <span className="text-sm text-gray-500">
+                </p>
+                <p className="text-sm text-gray-500">
                   {((segment.count / totalCustomers) * 100).toFixed(1)}% du
                   total
-                </span>
+                </p>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      {segmentDetails.length === 0 && !chartData && (
+        <div className="mt-6 text-center text-sm text-gray-500">
+          Aucune donnée disponible pour les filtres sélectionnés
+        </div>
+      )}
     </div>
   );
 };
 
-export default GeneralClientSegment;
+export default ClientSegment;

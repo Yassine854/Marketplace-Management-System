@@ -1,20 +1,26 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import Select from "react-select";
 
 interface Product {
-  stock_item: {
-    qty: number;
-    is_in_stock: boolean;
-    [key: string]: any;
-  };
   product_id: number;
   name: string;
   category_ids?: string[];
-  manufacturer: string;
-  created_at: string;
   [key: string]: any;
+}
+
+interface ProductStock {
+  _id: string;
+  product_id: number;
+  stock: {
+    store_id: number;
+    quantity: number;
+    price: number;
+    _id: string;
+  }[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface Category {
@@ -23,172 +29,174 @@ interface Category {
   nameCategory: string;
 }
 
+interface Warehouse {
+  id: number;
+  name: string;
+  [key: string]: any;
+}
+
+interface InventoryTrendChartProps {
+  warehouseId: number | null;
+  warehouses: Warehouse[];
+  products: Product[];
+  orders: any[];
+  productsStock: ProductStock[];
+  categories: Category[];
+}
+
 interface OrderItem {
   product_id: number;
   qty_invoiced: number;
   date: Date;
 }
 
-interface ChartState {
-  series: { name: string; data: { x: Date; y: number }[] }[];
-  options: ApexOptions;
-}
-
-const InventoryTrendChart = () => {
-  const [chartState, setChartState] = useState<ChartState>({
-    series: [],
-    options: {
-      chart: {
-        type: "line",
-        height: 500,
-        zoom: { enabled: true },
-        animations: { enabled: false },
-        toolbar: { show: true },
-      },
-      xaxis: { type: "datetime" },
-      yaxis: { title: { text: "Unités" } },
-      stroke: { curve: "straight", width: 1 },
-      tooltip: {
-        x: { format: "dd MMM yyyy" },
-        shared: true,
-        intersect: false,
-      },
-      dataLabels: { enabled: false },
-    },
-  });
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [salesMap, setSalesMap] = useState<Map<number, OrderItem[]>>(new Map());
+const InventoryTrendChart: React.FC<InventoryTrendChartProps> = ({
+  warehouseId,
+  warehouses,
+  products,
+  orders,
+  productsStock,
+  categories,
+}) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
+
+  // Get warehouse details from props
+  const selectedWarehouse = useMemo(() => {
+    return warehouses.find((wh) => wh.id === warehouseId);
+  }, [warehouseId, warehouses]);
+
+  const salesMap = useMemo(() => {
+    const map = new Map<number, OrderItem[]>();
+
+    orders
+      .filter(
+        (order) =>
+          order.state === "complete" &&
+          (warehouseId ? order.store_id === warehouseId : true),
+      )
+      .forEach((order) => {
+        const orderDate = new Date(order.created_at);
+        order.items.forEach((item: any) => {
+          const entries = map.get(item.product_id) || [];
+          entries.push({
+            product_id: item.product_id,
+            qty_invoiced: item.qty_invoiced,
+            date: orderDate,
+          });
+          map.set(item.product_id, entries);
+        });
+      });
+
+    return map;
+  }, [orders, warehouseId]);
 
   const processedSeries = useMemo(() => {
-    return allProducts
-      .filter(
-        (p) =>
-          p.stock_item.is_in_stock &&
-          (selectedCategory
-            ? p.category_ids?.includes(selectedCategory)
-            : true),
-      )
-      .map((product) => {
-        const sales = salesMap.get(product.product_id) || [];
-        const inventoryMap = new Map<number, number>();
-        let currentInventory = product.stock_item.qty;
+    if (!warehouseId) return [];
 
-        // Reconstruct inventory timeline
-        [...sales]
-          .sort((a, b) => b.date.getTime() - a.date.getTime())
-          .forEach((sale) => {
-            currentInventory += sale.qty_invoiced;
-            inventoryMap.set(sale.date.getTime(), currentInventory);
+    return productsStock
+      .filter((productStock) => {
+        const product = products.find(
+          (p) => p.product_id === productStock.product_id,
+        );
+        const warehouseStock = productStock.stock.find(
+          (s) => s.store_id === warehouseId,
+        );
+
+        return (
+          warehouseStock &&
+          warehouseStock.quantity > 0 &&
+          (!selectedCategory ||
+            product?.category_ids?.includes(selectedCategory))
+        );
+      })
+      .map((productStock) => {
+        const product = products.find(
+          (p) => p.product_id === productStock.product_id,
+        )!;
+        const warehouseStock = productStock.stock.find(
+          (s) => s.store_id === warehouseId,
+        )!;
+        const sales = salesMap.get(productStock.product_id) || [];
+
+        let currentInventory = warehouseStock.quantity;
+        const inventoryData = sales
+          .sort((a, b) => a.date.getTime() - b.date.getTime())
+          .map((sale) => {
+            currentInventory -= sale.qty_invoiced;
+            return {
+              x: sale.date,
+              y: Math.max(currentInventory, 0),
+            };
           });
 
-        // Add current stock
-        inventoryMap.set(new Date().getTime(), product.stock_item.qty);
+        inventoryData.push({
+          x: new Date(),
+          y: Math.max(warehouseStock.quantity, 0),
+        });
 
         return {
           name: product.name,
-          data: Array.from(inventoryMap.entries())
-            .sort(([a], [b]) => a - b)
-            .map(([timestamp, qty]) => ({
-              x: new Date(timestamp),
-              y: qty,
-            })),
+          data: inventoryData.sort((a, b) => a.x.getTime() - b.x.getTime()),
         };
       });
-  }, [allProducts, salesMap, selectedCategory]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const [productsRes, ordersRes, categoriesRes] = await Promise.all([
-          fetch("http://localhost:3000/api/products"),
-          fetch("http://localhost:3000/api/orders"),
-          fetch("http://localhost:3000/api/categories"),
-        ]);
-
-        if (!productsRes.ok || !ordersRes.ok || !categoriesRes.ok) {
-          throw new Error("Data loading failed");
-        }
-
-        const products: Product[] = await productsRes.json();
-        const orders: any[] = await ordersRes.json();
-        const categoriesData: Category[] = await categoriesRes.json();
-
-        // Create sales map
-        const newSalesMap = new Map<number, OrderItem[]>();
-        orders.forEach((order) => {
-          if (order.state !== "complete") return;
-          const orderDate = new Date(order.created_at);
-          order.items.forEach((item: any) => {
-            const entries = newSalesMap.get(item.product_id) || [];
-            entries.push({
-              product_id: item.product_id,
-              qty_invoiced: item.qty_invoiced,
-              date: orderDate,
-            });
-            newSalesMap.set(item.product_id, entries);
-          });
-        });
-
-        setAllProducts(products.filter((p) => p.stock_item.is_in_stock));
-        setSalesMap(newSalesMap);
-        setCategories(categoriesData);
-      } catch (err) {
-        console.error("Error:", err);
-        setError("Failed to load inventory data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  }, [productsStock, warehouseId, salesMap, products, selectedCategory]);
 
   const categoryOptions = useMemo(() => {
     return categories.map((category) => ({
-      value: category.categoryId.toString(), // Match product category_ids format
+      value: category.categoryId.toString(),
       label: category.nameCategory,
     }));
   }, [categories]);
 
+  const chartOptions: ApexOptions = {
+    chart: {
+      type: "line",
+      height: 500,
+      zoom: { enabled: true },
+      animations: { enabled: false },
+      toolbar: { show: true },
+    },
+    xaxis: { type: "datetime" },
+    yaxis: { title: { text: "Unités" } },
+    stroke: { curve: "straight", width: 1 },
+    tooltip: {
+      x: { format: "dd MMM yyyy" },
+      shared: true,
+      intersect: false,
+    },
+    dataLabels: { enabled: false },
+  };
+
   return (
     <div className="rounded-lg border bg-white p-6 shadow-lg">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Inventory Trends by Category</h2>
-        <div className="min-w-[300px]">
-          <Select
-            options={categoryOptions}
-            onChange={(selected) =>
-              setSelectedCategory(selected?.value || null)
-            }
-            placeholder="Select a category..."
-            isClearable
-            className="react-select-container"
-            classNamePrefix="react-select"
-          />
+        <h2 className="text-xl font-semibold">
+          {selectedWarehouse
+            ? `Tendances des stocks de produits - ${selectedWarehouse.name}`
+            : "Tendances des stocks de produits"}
+        </h2>
+        <div className="flex gap-4">
+          <div className="min-w-[200px]">
+            <Select
+              options={categoryOptions}
+              onChange={(selected) =>
+                setSelectedCategory(selected?.value || null)
+              }
+              placeholder="Filter by Category..."
+              isClearable
+            />
+          </div>
         </div>
       </div>
 
-      {error && (
-        <div className="mb-4 rounded-lg bg-red-100 p-3 text-red-700">
-          {error}
-        </div>
-      )}
-
-      {loading ? (
+      {!warehouseId ? (
         <div className="flex h-96 items-center justify-center text-gray-500">
-          Loading inventory data...
+          Veuillez sélectionner un entrepôt dans le tableau de bord pour
+          afficher les tendances des stocks
         </div>
       ) : processedSeries.length > 0 ? (
         <ReactApexChart
-          options={chartState.options}
+          options={chartOptions}
           series={processedSeries}
           type="line"
           height={500}
@@ -197,7 +205,7 @@ const InventoryTrendChart = () => {
         <div className="flex h-96 items-center justify-center text-gray-500">
           {selectedCategory
             ? "No products found in this category"
-            : "Select a category to view inventory trends"}
+            : "No inventory data available for selected warehouse"}
         </div>
       )}
     </div>

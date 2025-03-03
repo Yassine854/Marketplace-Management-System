@@ -1,20 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { FaArrowLeft, FaArrowRight, FaSearch } from "react-icons/fa";
-import axios from "axios";
 
-interface Product {
+interface ProductStock {
   product_id: number;
-  name: string;
-  sku: string;
-  manufacturer: string;
-  stock_item?: {
-    qty: number;
-    is_in_stock: boolean;
-  };
+  stock: {
+    store_id: number;
+    quantity: number;
+  }[];
 }
 
-const AvailableProducts: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+interface Warehouse {
+  id: number;
+  name: string;
+}
+
+interface AvailableProductsProps {
+  products: {
+    product_id: number;
+    name: string;
+    sku: string;
+    manufacturer: string;
+  }[];
+  products_stock: ProductStock[];
+  warehouses: Warehouse[];
+  warehouseId?: number | null;
+}
+
+const AvailableProducts: React.FC<AvailableProductsProps> = ({
+  products,
+  products_stock,
+  warehouses,
+  warehouseId,
+}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,30 +39,37 @@ const AvailableProducts: React.FC = () => {
   const [searchBy, setSearchBy] = useState<"name" | "sku" | "id">("name");
   const productsPerPage = 6;
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/api/products");
-        setProducts(response.data);
-        setIsLoading(false);
-      } catch (err) {
-        setError("Échec du chargement des produits");
-        setIsLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
+  // Merge product data with stock information
+  const mergedProducts = products.map((product) => {
+    const stockEntry = products_stock.find(
+      (ps) => ps.product_id === product.product_id,
+    );
+    const stock = stockEntry?.stock || [];
 
-  // Reset to first page when search criteria changes
+    return {
+      ...product,
+      stock,
+    };
+  });
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [products, products_stock]);
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, searchBy]);
+  }, [searchTerm, searchBy, warehouseId]);
 
-  const filteredProducts = products.filter((product) => {
-    // First filter out products not in stock
-    if (!product.stock_item?.is_in_stock) return false;
+  const filteredProducts = mergedProducts.filter((product) => {
+    // Calculate stock based on warehouse filter
+    const totalStock = warehouseId
+      ? product.stock.find((s) => s.store_id === warehouseId)?.quantity || 0
+      : product.stock.reduce((sum, s) => sum + s.quantity, 0);
 
-    // Then apply search filters
+    // Filter out products with 0 stock
+    if (totalStock <= 0) return false;
+
+    // Apply search filters
     if (!searchTerm) return true;
 
     const searchValue = searchTerm.toLowerCase();
@@ -79,7 +103,13 @@ const AvailableProducts: React.FC = () => {
   return (
     <div className="w-full rounded-xl border border-gray-100 bg-white p-6 shadow-lg">
       <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-semibold">Produits disponibles</h2>
+        <h2 className="text-xl font-semibold">
+          {warehouseId
+            ? `Produits disponibles (${
+                warehouses.find((w) => w.id === warehouseId)?.name || "Entrepôt"
+              })`
+            : "Produits disponibles (Tous les entrepôts)"}
+        </h2>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <select
             value={searchBy}
@@ -111,29 +141,41 @@ const AvailableProducts: React.FC = () => {
 
       <div className="space-y-2">
         {currentProducts.length > 0 ? (
-          currentProducts.map((product) => (
-            <div
-              key={product.product_id}
-              className="rounded-lg border bg-white p-3 shadow-md transition duration-300 hover:shadow-lg"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-medium">{product.name}</h3>
-                  <p className="text-xs text-gray-500">
-                    ID: {product.product_id}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="block text-sm text-gray-500">
-                    SKU: {product.sku}
-                  </span>
-                  <span className="block text-sm text-gray-500">
-                    Stock: {product.stock_item?.qty || 0}
-                  </span>
+          currentProducts.map((product) => {
+            const stock = warehouseId
+              ? product.stock.find((s) => s.store_id === warehouseId)
+                  ?.quantity || 0
+              : product.stock.reduce((sum, s) => sum + s.quantity, 0);
+
+            return (
+              <div
+                key={product.product_id}
+                className="rounded-lg border bg-white p-3 shadow-md transition duration-300 hover:shadow-lg"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-medium">{product.name}</h3>
+                    <p className="text-xs text-gray-500">
+                      ID: {product.product_id}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="block text-sm text-gray-500">
+                      SKU: {product.sku}
+                    </span>
+                    <span className="block text-sm text-gray-500">
+                      Stock: {stock}
+                      {warehouseId && (
+                        <span className="ml-2 text-xs text-gray-400">
+                          (Entrepôt {warehouseId})
+                        </span>
+                      )}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="text-center text-gray-500">
             {searchTerm ? "Aucun résultat trouvé" : "Aucun produit en stock"}

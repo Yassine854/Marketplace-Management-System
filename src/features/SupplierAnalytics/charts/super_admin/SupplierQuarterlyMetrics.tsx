@@ -4,6 +4,7 @@ interface Order {
   created_at: string;
   state: string;
   customer_id: number;
+  store_id: number;
   items: Array<{
     product_id: number;
     qty_invoiced: number;
@@ -22,7 +23,17 @@ interface QuarterlyData {
   revenue: number;
 }
 
-const AllSuppliersQuarterlyMetrics = () => {
+interface SupplierQuarterlyMetrics {
+  warehouseId?: number | null;
+  orders: Order[];
+  products: Product[];
+}
+
+const AllSuppliersQuarterlyMetrics = ({
+  warehouseId = null,
+  orders,
+  products,
+}: SupplierQuarterlyMetrics) => {
   const [selectedYear, setSelectedYear] = useState<number>(
     new Date().getFullYear(),
   );
@@ -30,76 +41,74 @@ const AllSuppliersQuarterlyMetrics = () => {
   const [availableYears, setAvailableYears] = useState<number[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      fetch("http://localhost:3000/api/orders").then(
-        (res) => res.json() as Promise<Order[]>,
+    if (!orders.length || !products.length) return;
+
+    const productMap = new Map(products.map((p) => [p.product_id, p]));
+
+    // Apply warehouse filter
+    const validOrders = orders
+      .filter(
+        (order) =>
+          order.state !== "canceled" &&
+          (warehouseId === null || order.store_id === warehouseId),
+      )
+      .sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      );
+
+    // Extract available years from filtered orders
+    const years = Array.from(
+      new Set(
+        validOrders.map((order) => new Date(order.created_at).getFullYear()),
       ),
-      fetch("http://localhost:3000/api/products").then(
-        (res) => res.json() as Promise<Product[]>,
-      ),
-    ]).then(([orders, products]) => {
-      const productMap = new Map(products.map((p) => [p.product_id, p]));
+    ).sort((a, b) => b - a);
 
-      // Sort orders chronologically
-      const validOrders = orders
-        .filter((order) => order.state !== "canceled")
-        .sort(
-          (a, b) =>
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-        );
+    setAvailableYears(years);
+    if (years.length > 0 && !years.includes(selectedYear)) {
+      setSelectedYear(years[0]);
+    }
 
-      const years = Array.from(
-        new Set(
-          validOrders.map((order) => new Date(order.created_at).getFullYear()),
-        ),
-      ).sort((a, b) => b - a);
+    const globalCustomerSet = new Set<number>();
+    const quarterlyMap = new Map<string, QuarterlyData>();
 
-      setAvailableYears(years);
-      if (years.length > 0 && !years.includes(selectedYear)) {
-        setSelectedYear(years[0]);
+    validOrders.forEach((order) => {
+      const orderDate = new Date(order.created_at);
+      const year = orderDate.getFullYear();
+      if (year !== selectedYear) return;
+
+      const quarter = `Q${Math.floor(orderDate.getMonth() / 3) + 1}`;
+
+      if (!quarterlyMap.has(quarter)) {
+        quarterlyMap.set(quarter, {
+          quarter,
+          totalOrders: 0,
+          uniqueCustomers: new Set<number>(),
+          revenue: 0,
+        });
       }
 
-      const globalCustomerSet = new Set<number>();
-      const quarterlyMap = new Map<string, QuarterlyData>();
+      const quarterData = quarterlyMap.get(quarter)!;
+      quarterData.totalOrders++;
 
-      validOrders.forEach((order) => {
-        const orderDate = new Date(order.created_at);
-        const year = orderDate.getFullYear();
-        if (year !== selectedYear) return;
+      // Track unique customers globally for the year
+      const isNewCustomer = !globalCustomerSet.has(order.customer_id);
+      if (order.customer_id && isNewCustomer) {
+        quarterData.uniqueCustomers.add(order.customer_id);
+        globalCustomerSet.add(order.customer_id);
+      }
 
-        const quarter = `Q${Math.floor(orderDate.getMonth() / 3) + 1}`;
-
-        if (!quarterlyMap.has(quarter)) {
-          quarterlyMap.set(quarter, {
-            quarter,
-            totalOrders: 0,
-            uniqueCustomers: new Set<number>(),
-            revenue: 0,
-          });
+      // Calculate revenue using product prices
+      order.items.forEach((item) => {
+        const product = productMap.get(item.product_id);
+        if (product) {
+          quarterData.revenue += item.qty_invoiced * product.price;
         }
-
-        const quarterData = quarterlyMap.get(quarter)!;
-        quarterData.totalOrders++;
-
-        // Check if customer is new for the year
-        const isNewCustomer = !globalCustomerSet.has(order.customer_id);
-
-        if (order.customer_id && isNewCustomer) {
-          quarterData.uniqueCustomers.add(order.customer_id);
-          globalCustomerSet.add(order.customer_id);
-        }
-
-        order.items.forEach((item) => {
-          const product = productMap.get(item.product_id);
-          if (product) {
-            quarterData.revenue += item.qty_invoiced * product.price;
-          }
-        });
       });
-
-      setQuartersData(Array.from(quarterlyMap.values()));
     });
-  }, [selectedYear]);
+
+    setQuartersData(Array.from(quarterlyMap.values()));
+  }, [selectedYear, warehouseId, orders, products]);
 
   // Calculate yearly totals
   const totalOrders = quartersData.reduce((sum, q) => sum + q.totalOrders, 0);

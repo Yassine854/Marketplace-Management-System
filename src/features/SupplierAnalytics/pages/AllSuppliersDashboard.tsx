@@ -17,6 +17,7 @@ import SupplierCategoryPieChart from "../charts/super_admin/SupplierCategoryPieC
 import ClientSegment from "../charts/super_admin/ClientSegment";
 import RegionsOrders from "../charts/super_admin/RegionsOrders";
 import InventoryTrendChart from "../charts/super_admin/InventoryTrendChart";
+import SupplierTopProductsChart from "../charts/super_admin/SupplierTopProductsChart";
 
 import TopArticlesOrdered from "../charts/super_admin/TopArticlesOrdered";
 
@@ -26,24 +27,42 @@ const AllSuppliersDashboard = () => {
   const [selectedWarehouse, setSelectedWarehouse] = useState<string | null>(
     null,
   );
+
+  const [appliedStartDate, setAppliedStartDate] = useState<Date | null>(null);
+  const [appliedEndDate, setAppliedEndDate] = useState<Date | null>(null);
+  const [appliedWarehouse, setAppliedWarehouse] = useState<string | null>(null);
+
+  const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
+  const [products_stock, setProductsStock] = useState<any[]>([]);
+
   const [customers, setCustomers] = useState<any[]>([]);
   const [warehouses, setWarehouses] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes, ordersRes, customersRes, warehousesRes] =
-          await Promise.all([
-            axios.get("http://localhost:3000/api/products"),
-            axios.get("http://localhost:3000/api/orders"),
-            axios.get("http://localhost:3000/api/customers"),
-            axios.get("http://localhost:3000/api/warehouses"),
-          ]);
+        const [
+          categoriesRes,
+          productsRes,
+          ordersRes,
+          productsStockRes,
+          customersRes,
+          warehousesRes,
+        ] = await Promise.all([
+          axios.get("http://localhost:3000/api/categories"),
+          axios.get("http://localhost:3000/api/products"),
+          axios.get("http://localhost:3000/api/orders"),
+          axios.get("http://localhost:3000/api/products_stock"),
+          axios.get("http://localhost:3000/api/customers"),
+          axios.get("http://localhost:3000/api/warehouses"),
+        ]);
 
+        setCategories(categoriesRes.data);
         setProducts(productsRes.data);
         setOrders(ordersRes.data);
+        setProductsStock(productsStockRes.data);
         setCustomers(customersRes.data);
         setWarehouses(warehousesRes.data);
       } catch (error) {
@@ -54,13 +73,33 @@ const AllSuppliersDashboard = () => {
     fetchData();
   }, []);
 
+  const handleStartDateChange = (date: Date | null) => {
+    setStartDate(date);
+    if (date === null) {
+      setAppliedStartDate(null);
+    }
+  };
+
+  const handleEndDateChange = (date: Date | null) => {
+    setEndDate(date);
+    if (date === null) {
+      setAppliedEndDate(null);
+    }
+  };
+
+  const handleApplyFilters = () => {
+    setAppliedStartDate(startDate);
+    setAppliedEndDate(endDate);
+    setAppliedWarehouse(selectedWarehouse);
+  };
+
   // Calculate global metrics with warehouse filter
   const totalValidOrders = orders.filter(
     (order) =>
       order.state !== "canceled" &&
-      (!startDate || new Date(order.created_at) >= startDate) &&
-      (!endDate || new Date(order.created_at) <= endDate) &&
-      (!selectedWarehouse || order.store_id === Number(selectedWarehouse)),
+      (!appliedStartDate || new Date(order.created_at) >= appliedStartDate) &&
+      (!appliedEndDate || new Date(order.created_at) <= appliedEndDate) &&
+      (!appliedWarehouse || order.store_id === Number(appliedWarehouse)),
   ).length;
 
   const validCustomerIds = new Set(customers.map((c) => c.id));
@@ -73,9 +112,11 @@ const AllSuppliersDashboard = () => {
           order.state !== "canceled" &&
           order.customer_id &&
           validCustomerIds.has(order.customer_id) &&
-          (!startDate || orderTime >= startDate.setHours(0, 0, 0, 0)) &&
-          (!endDate || orderTime <= endDate.setHours(23, 59, 59, 999)) &&
-          (!selectedWarehouse || order.store_id === Number(selectedWarehouse))
+          (!appliedStartDate ||
+            orderTime >= appliedStartDate.setHours(0, 0, 0, 0)) &&
+          (!appliedEndDate ||
+            orderTime <= appliedEndDate.setHours(23, 59, 59, 999)) &&
+          (!appliedWarehouse || order.store_id === Number(appliedWarehouse))
         );
       })
       .map((order) => order.customer_id),
@@ -85,9 +126,9 @@ const AllSuppliersDashboard = () => {
     .filter(
       (order) =>
         order.state !== "canceled" &&
-        (!startDate || new Date(order.created_at) >= startDate) &&
-        (!endDate || new Date(order.created_at) <= endDate) &&
-        (!selectedWarehouse || order.store_id === Number(selectedWarehouse)),
+        (!appliedStartDate || new Date(order.created_at) >= appliedStartDate) &&
+        (!appliedEndDate || new Date(order.created_at) <= appliedEndDate) &&
+        (!appliedWarehouse || order.store_id === Number(appliedWarehouse)),
     )
     .flatMap((order) => order.items)
     .reduce((sum, item) => sum + item.qty_refunded, 0);
@@ -96,9 +137,9 @@ const AllSuppliersDashboard = () => {
     .filter(
       (order) =>
         order.state !== "canceled" &&
-        (!startDate || new Date(order.created_at) >= startDate) &&
-        (!endDate || new Date(order.created_at) <= endDate) &&
-        (!selectedWarehouse || order.store_id === Number(selectedWarehouse)),
+        (!appliedStartDate || new Date(order.created_at) >= appliedStartDate) &&
+        (!appliedEndDate || new Date(order.created_at) <= appliedEndDate) &&
+        (!appliedWarehouse || order.store_id === Number(appliedWarehouse)),
     )
     .flatMap((order) => order.items)
     .reduce((sum, item) => {
@@ -128,66 +169,93 @@ const AllSuppliersDashboard = () => {
 
           {/* Date Filters */}
           <div className="flex flex-col md:mr-4">
-            <label className="text-lg">Start Date:</label>
+            <label className="text-lg">Date Début:</label>
             <DatePicker
               selected={startDate}
-              onChange={setStartDate}
+              onChange={handleStartDateChange}
               dateFormat="yyyy/MM/dd"
               className="rounded border p-2 text-lg"
               isClearable
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-lg">End Date:</label>
+            <label className="text-lg">Date Fin:</label>
             <DatePicker
               selected={endDate}
-              onChange={setEndDate}
+              onChange={handleEndDateChange}
               dateFormat="yyyy/MM/dd"
               className="rounded border p-2 text-lg"
               isClearable
             />
           </div>
+          <div className="flex items-end">
+            <button
+              onClick={handleApplyFilters}
+              className="h-[42px] rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            >
+              Appliquer Filtres
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <CardDataStats
-            title="Total Revenue"
+            title="Chiffre d'affaires"
             total={`${totalTurnover.toFixed(2)} TND`}
           >
             <FaMoneyBillWave className="text-green-500" />
           </CardDataStats>
           <CardDataStats
-            title="Total Orders"
+            title="Totale des commandes"
             total={totalValidOrders.toString()}
           >
             <FaClipboardList className="text-blue-500" />
           </CardDataStats>
           <CardDataStats
-            title="Unique Customers"
+            title="Clients Uniques"
             total={uniqueCustomers.toString()}
           >
             <FaUsers className="text-orange-500" />
           </CardDataStats>
-          <CardDataStats title="Total Returns" total={totalReturns.toString()}>
+          <CardDataStats
+            title="Produits retournés"
+            total={totalReturns.toString()}
+          >
             <FaUndo className="text-red-500" />
           </CardDataStats>
         </div>
 
         <div className="mt-6 grid w-full grid-cols-1 justify-center gap-6 md:grid-cols-3">
           <div className="md:col-span-2">
-            <SupplierAreaChart />
+            <SupplierAreaChart
+              warehouseId={appliedWarehouse ? Number(appliedWarehouse) : null} // ➕ Change default to null
+              orders={orders}
+              products={products}
+            />
           </div>
           <div className="mt-6 flex w-full justify-center">
-            <SupplierQuarterlyMetrics />
+            <SupplierQuarterlyMetrics
+              warehouseId={appliedWarehouse ? Number(appliedWarehouse) : null}
+              orders={orders}
+              products={products}
+            />
           </div>
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="md:col-span-2">
-            <ProductRevenueLossChart />
+          <div className="flex w-full justify-center md:col-span-2">
+            <ProductRevenueLossChart
+              warehouseId={appliedWarehouse ? Number(appliedWarehouse) : null}
+              orders={orders}
+            />
           </div>
-          <div>
-            <AvailableProducts />
+          <div className="flex w-full justify-center">
+            <AvailableProducts
+              products={products}
+              products_stock={products_stock}
+              warehouses={warehouses}
+              warehouseId={appliedWarehouse ? Number(appliedWarehouse) : null}
+            />
           </div>
         </div>
 
@@ -195,30 +263,56 @@ const AllSuppliersDashboard = () => {
           <div>{/* <TopArticlesOrdered/> */}</div>
         </div>
 
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-1">
+          <SupplierCategoryPieChart
+            orders={orders}
+            products={products}
+            categories={categories}
+            warehouseId={appliedWarehouse ? Number(appliedWarehouse) : null}
+            startDate={appliedStartDate}
+            endDate={appliedEndDate}
+          />
+        </div>
+
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="flex w-full justify-center">
-            <SupplierCategoryPieChart />
+            <ClientSegment
+              orders={orders}
+              customers={customers}
+              warehouseId={appliedWarehouse ? Number(appliedWarehouse) : null}
+              startDate={appliedStartDate}
+              endDate={appliedEndDate}
+            />
           </div>
+
           <div className="flex w-full justify-center">
-            <ClientSegment startDate={startDate} endDate={endDate} />
+            <InventoryTrendChart
+              warehouseId={appliedWarehouse ? Number(appliedWarehouse) : null}
+              warehouses={warehouses}
+              products={products}
+              orders={orders}
+              productsStock={products_stock}
+              categories={categories}
+            />
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="flex w-full justify-center">
-            <RegionsOrders />
-          </div>
-          <div className="flex w-full justify-center">
-            <InventoryTrendChart />
-          </div>
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-1">
+          <RegionsOrders
+            orders={orders}
+            customers={customers}
+            warehouseId={appliedWarehouse ? Number(appliedWarehouse) : null}
+          />
+        </div>
 
-          {/*  <div className="flex w-full justify-center">
-            <SupplierTopProductsChart
-              supplierId={supplierId}
-              startDate={startDate}
-              endDate={endDate}
-            />
-          </div> */}
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-1">
+          <SupplierTopProductsChart
+            orders={orders}
+            products={products}
+            warehouseId={appliedWarehouse ? Number(appliedWarehouse) : null}
+            startDate={appliedStartDate}
+            endDate={appliedEndDate}
+          />
         </div>
 
         {/* <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">

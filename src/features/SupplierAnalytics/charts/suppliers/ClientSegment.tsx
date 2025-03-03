@@ -195,7 +195,7 @@ const ClientSegment: React.FC<{
 
   return (
     <div className="w-full rounded-xl border border-gray-100 bg-white p-6 shadow-lg">
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      {/* <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <label className="text-sm font-medium">Période:</label>
         <div className="flex gap-3">
           <DatePicker
@@ -215,7 +215,7 @@ const ClientSegment: React.FC<{
             isClearable
           />
         </div>
-      </div>
+      </div> */}
 
       <div className="rounded-lg border border-gray-100 bg-white p-4 shadow-inner">
         {chartData ? (

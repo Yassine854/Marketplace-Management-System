@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ApexCharts from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
-import axios from "axios";
 
 const newColors = ["#FF5733", "#33FF57", "#3357FF", "#F1C40F"];
 const quarters = ["Q1", "Q2", "Q3", "Q4"];
@@ -10,6 +9,7 @@ interface Order {
   created_at: string;
   status: string;
   customer_id: number;
+  store_id: number;
 }
 
 interface Customer {
@@ -17,7 +17,17 @@ interface Customer {
   addresses: { region: { region: string } }[];
 }
 
-const OrdersByRegion = () => {
+interface OrdersByRegionProps {
+  orders: Order[];
+  customers: Customer[];
+  warehouseId?: number | null;
+}
+
+const OrdersByRegion: React.FC<OrdersByRegionProps> = ({
+  orders,
+  customers,
+  warehouseId,
+}) => {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [regions, setRegions] = useState<
@@ -26,22 +36,16 @@ const OrdersByRegion = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const processData = () => {
       try {
         setLoading(true);
-        const [ordersRes, customersRes] = await Promise.all([
-          axios.get("http://localhost:3000/api/orders"),
-          axios.get("http://localhost:3000/api/customers"),
-        ]);
-
-        const orders: Order[] = ordersRes.data;
-        const customers: Customer[] = customersRes.data;
 
         const filteredOrders = orders.filter((order: Order) => {
           const orderDate = new Date(order.created_at);
           return (
             orderDate.getFullYear() === selectedYear &&
-            order.status !== "canceled"
+            order.status !== "canceled" &&
+            (!warehouseId || order.store_id === warehouseId)
           );
         });
 
@@ -55,14 +59,12 @@ const OrdersByRegion = () => {
           const month = new Date(order.created_at).getMonth() + 1;
           const quarter = quarters[Math.floor((month - 1) / 3)];
 
-          if (!regionData[region]) {
-            regionData[region] = {
-              Q1: new Set(),
-              Q2: new Set(),
-              Q3: new Set(),
-              Q4: new Set(),
-            };
-          }
+          regionData[region] = regionData[region] || {
+            Q1: new Set(),
+            Q2: new Set(),
+            Q3: new Set(),
+            Q4: new Set(),
+          };
           regionData[region][quarter].add(order.customer_id.toString());
         });
 
@@ -77,14 +79,14 @@ const OrdersByRegion = () => {
 
         setRegions(formattedData);
       } catch (error) {
-        console.error("Error fetching data", error);
+        console.error("Error processing data", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [selectedYear]);
+    processData();
+  }, [selectedYear, warehouseId, orders, customers]);
 
   const quarterSeries = quarters.map((quarter) => ({
     name: quarter,
@@ -103,7 +105,7 @@ const OrdersByRegion = () => {
   return (
     <div className="w-full rounded-xl border bg-white p-6 shadow-lg">
       <div className="mb-6 flex items-center">
-        <span className="text-sm font-medium">Year:</span>
+        <span className="text-sm font-medium">Année:</span>
         <select
           className="ml-2 rounded border p-2"
           value={selectedYear}
@@ -120,7 +122,7 @@ const OrdersByRegion = () => {
         </select>
       </div>
       {loading ? (
-        <p>Loading...</p>
+        <p>Chargement...</p>
       ) : (
         <ApexCharts
           options={chartOptions}

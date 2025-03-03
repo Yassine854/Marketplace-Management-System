@@ -29,7 +29,9 @@ const AvailableProducts: React.FC<{ supplierId: string }> = ({
   // Filter available products based on supplier and stock status
   const availableProducts = products.filter(
     (product) =>
-      product.manufacturer === supplierId && product.stock_item?.is_in_stock,
+      product.manufacturer === supplierId &&
+      product.stock_item?.is_in_stock &&
+      product.stock_item?.qty != 0,
   );
 
   const totalAvailableProducts = availableProducts.length;

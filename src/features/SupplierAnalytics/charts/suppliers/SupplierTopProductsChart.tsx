@@ -216,7 +216,7 @@ const SupplierTopProductsChart = ({
         </select>
       </div>
 
-      <div className="mb-4 flex items-center justify-between">
+      {/* <div className="mb-4 flex items-center justify-between">
         <label className="text-sm font-medium">Période :</label>
         <div className="flex space-x-2">
           <DatePicker
@@ -236,7 +236,7 @@ const SupplierTopProductsChart = ({
             isClearable
           />
         </div>
-      </div>
+      </div> */}
 
       {error && (
         <div className="mb-4 rounded-lg bg-red-100 p-3 text-red-700">
