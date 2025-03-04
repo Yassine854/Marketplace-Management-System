@@ -2,11 +2,9 @@ import { useEffect, useState } from "react";
 import PurchaseTable from "./PurchaseTable";
 import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersPers";
-import Pagination from "../components/Pagination";
 
 const ReadyPage = () => {
-  const { purchases, loading, error, fetchPurchases, total } =
-    usePurchaseStore();
+  const { purchases, loading, error, fetchPurchases } = usePurchaseStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -14,7 +12,7 @@ const ReadyPage = () => {
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
     {},
   );
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,9 +50,6 @@ const ReadyPage = () => {
       </div>
     );
   }
-
-  const totalPages = Math.ceil(total / pageSize);
-
   return (
     <div className="flex h-full flex-grow">
       <div className="h-full w-full rounded-lg bg-[url(/images/login-bg.png)] bg-cover">
@@ -113,7 +108,7 @@ const ReadyPage = () => {
 
             <div
               className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
-              style={{ maxHeight: "400px" }}
+              style={{ maxHeight: "600px" }}
             >
               <PurchaseTable data={purchases} loading={loading} />
             </div>

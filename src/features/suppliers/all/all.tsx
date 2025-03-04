@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import PurchaseTable from "../components/PurchaseTable/PurchaseTable";
 import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersAll";
-import Pagination from "../components/Pagination";
 import { useRouter } from "next/navigation";
 
 const SupplierPurchasesPage = () => {
-  const { purchases, loading, error, fetchPurchases, total } =
-    usePurchaseStore();
+  const { purchases, loading, error, fetchPurchases } = usePurchaseStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -15,6 +13,7 @@ const SupplierPurchasesPage = () => {
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
     {},
   );
+
   const pageSize = 10;
   const router = useRouter();
 
@@ -114,7 +113,7 @@ const SupplierPurchasesPage = () => {
                 <AdvancedFilters
                   onApply={(filters) => {
                     setActiveFilters(filters);
-                    setCurrentPage(1); // Reset to the first page on filter apply
+                    setCurrentPage(1);
                   }}
                 />
               )}
@@ -134,10 +133,9 @@ const SupplierPurchasesPage = () => {
               </div>
             </div>
 
-            {/* Conteneur avec défilement pour le tableau */}
             <div
               className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
-              style={{ maxHeight: "400px" }}
+              style={{ maxHeight: "600px" }}
             >
               <PurchaseTable data={purchases} loading={loading} />
             </div>

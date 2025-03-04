@@ -2,11 +2,9 @@ import { useEffect, useState } from "react";
 import PurchaseTable from "./PurchaseTable";
 import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersPers";
-import Pagination from "../components/Pagination";
 
-const InProgressPage = () => {
-  const { purchases, loading, error, fetchPurchases, total } =
-    usePurchaseStore();
+const DeliveredPage = () => {
+  const { purchases, loading, error, fetchPurchases } = usePurchaseStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -57,8 +55,6 @@ const InProgressPage = () => {
       ...activeFilters,
     });
   };
-
-  const totalPages = Math.ceil(total / pageSize);
 
   if (error) {
     return (
@@ -127,7 +123,7 @@ const InProgressPage = () => {
 
             <div
               className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
-              style={{ maxHeight: "400px" }}
+              style={{ maxHeight: "600px" }}
             >
               <PurchaseTable data={purchases} loading={loading} />
             </div>
@@ -138,4 +134,4 @@ const InProgressPage = () => {
   );
 };
 
-export default InProgressPage;
+export default DeliveredPage;

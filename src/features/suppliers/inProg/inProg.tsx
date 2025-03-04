@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import PurchaseTable from "./PurchaseTable";
 import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersPers";
-import Pagination from "../components/Pagination";
 
 const InProgressPage = () => {
   const { purchases, loading, error, fetchPurchases, total } =
@@ -113,7 +112,7 @@ const InProgressPage = () => {
 
             <div
               className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
-              style={{ maxHeight: "400px" }}
+              style={{ maxHeight: "600px" }}
             >
               <PurchaseTable data={purchases} loading={loading} />
             </div>
