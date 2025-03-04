@@ -1,0 +1,215 @@
+import { useEffect, useState } from "react";
+import DraggableForm from "../../widgets/DraggableForm/DraggableForm";
+import axios from "axios";
+import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
+
+const UpdatePage = () => {
+  const pathname = usePathname();
+  const router = useRouter();
+  const id = pathname.split("/").pop();
+
+  const [elements, setElements] = useState([
+    { id: "1", title: "image" },
+    { id: "2", title: "carousel" },
+    { id: "3", title: "ProductShowcase" },
+  ]);
+
+  const [formElements, setFormElements] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState();
+  const [title, setTitle] = useState("");
+
+  const fetchForms = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/screen/${id}`,
+      );
+      if (response && response.data) {
+        setData(response.data);
+        setFormElements(response.data.ad);
+        setTitle(response.data.title);
+      } else {
+        console.error("Failed to fetch data");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchForms();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      const newData = { ...data, ad: formElements, title: title };
+
+      const response = await axios.put(
+        `http://localhost:3000/api/screen/${id}`,
+        newData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
+  };
+
+  const handlePublish = async () => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/api/screen/${id}/activate`,
+      );
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
+  };
+
+  const renderStatusIcon = (status) => {
+    switch (status) {
+      case "draft":
+        return (
+          <svg
+            className="h-6 w-6 text-yellow-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        );
+      case "active":
+        return (
+          <svg
+            className="h-6 w-6 text-green-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        );
+      case "inactive":
+        return (
+          <svg
+            className="h-6 w-6 text-red-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="mt-[4.8rem] h-full w-full bg-n20">
+      <div className="flex h-[60px] w-full flex-row items-center justify-between border-b-1 border-b-gray-500 bg-white px-4">
+        <div className="flex items-center gap-x-4">
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center rounded p-2 hover:bg-gray-100"
+          >
+            <svg
+              className="h-6 w-6 text-gray-700"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+          </button>
+
+          <h2 className="text-xl font-bold">
+            Screen :
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="rounded px-2 py-1 text-xl font-bold"
+            />
+          </h2>
+
+          {data?.status && (
+            <div className="flex items-center gap-x-2">
+              {renderStatusIcon(data.status)}
+              <span className="text-sm font-semibold capitalize">
+                {data.status}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-x-4">
+          <button
+            className="inline-flex items-center rounded border border-gray-500 bg-white px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50"
+            onClick={handleSave}
+          >
+            <svg
+              className="mr-2 h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+              />
+            </svg>
+            Save
+          </button>
+          <button
+            onClick={handlePublish}
+            className="inline-flex items-center rounded border border-gray-500 bg-blue-300 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50"
+          >
+            Publish
+          </button>
+        </div>
+      </div>
+      <DraggableForm
+        elements={elements}
+        setElements={setElements}
+        formElements={formElements}
+        setFormElements={setFormElements}
+      />
+    </div>
+  );
+};
+
+export default UpdatePage;
