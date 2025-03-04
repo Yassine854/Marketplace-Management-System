@@ -37,16 +37,14 @@ export const PUT = async (request: NextRequest) => {
     }
 
     const { total, orderId, items, deliveryDate } = order;
-    const sorder: any = await typesense.orders.getOne(orderId);
+
     const res = await magento.mutations.editOrderDetails({
       total,
       items,
       orderId,
       deliveryDate,
-      status:sorder?.status,
-      state:sorder?.state, 
     });
-//console.log(res);
+
     await typesense.orders.updateOne({
       total,
       items,
