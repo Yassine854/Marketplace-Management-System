@@ -1,18 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+// pages/api/logs.ts
+import { prismaClient } from "../../../clients/prisma/prismaClient"; // Assuming prisma is set up in lib/prisma.ts
 
-const prisma = new PrismaClient();
+import { NextApiRequest, NextApiResponse } from "next";
 
-// Handler pour une requête GET
-export async function GET(req: NextRequest) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   try {
-    const logs = await prisma.log.findMany();
-    return NextResponse.json({ logs });
+    const logs = await prismaClient.log.findMany();
+    res.status(200).json(logs);
   } catch (error) {
-    console.error("Erreur lors de la récupération des logs:", error);
-    return NextResponse.json(
-      { message: "Erreur lors de la récupération des logs" },
-      { status: 500 },
-    );
+    res.status(500).json({ error: "Error fetching logs" });
   }
 }
