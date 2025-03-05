@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import PurchaseTable from "./PurchaseTable";
 import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersPers";
-
+import Pagination from "@mui/material/Pagination";
+import styles from "../styles/pagination.module.css";
 const CompletedPage = () => {
   const { purchases, loading, error, fetchPurchases, total } =
     usePurchaseStore();
@@ -118,39 +119,17 @@ const CompletedPage = () => {
               <PurchaseTable data={purchases} loading={loading} />
             </div>
 
-            {/* Pagination Controls */}
-            <div className="mt-4 flex justify-center gap-2">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="rounded bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300"
-              >
-                Previous
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`rounded px-4 py-2 ${
-                      currentPage === page
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ),
-              )}
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-                className="rounded bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300"
-              >
-                Next
-              </button>
+            <div className={styles.pagination}>
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={(event, value) => setCurrentPage(value)}
+                color="primary"
+                shape="rounded"
+                siblingCount={1}
+                boundaryCount={1}
+                className="pagination"
+              />
             </div>
           </div>
         </div>

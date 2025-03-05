@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Supplier, Product, Warehouse } from "./types/types";
-import "./styles/NeonButton.css";
+import "../styles/NeonButton.css";
 import emailjs from "emailjs-com";
 import jsPDF from "jspdf";
-import { PrismaClient } from "@prisma/client";
 import { FaFileDownload } from "react-icons/fa";
 import { useSession } from "next-auth/react";
-const prisma = new PrismaClient();
-
 const SupplierForm = ({
   onChange,
 }: {
@@ -44,8 +41,8 @@ const SupplierForm = ({
   const [comment, setComment] = useState("");
   const [message, setMessage] = useState("");
   const [paymentTypes, setPaymentTypes] = useState<
-    { type: string; percentage: string; amount: string }[]
-  >([{ type: "", percentage: "", amount: "" }]);
+    { type: string; percentage: string; amount: string; date: Date }[]
+  >([{ type: "", percentage: "", amount: "", date: new Date() }]);
   const [remainingAmount, setRemainingAmount] = useState(0);
   const [productsWithQuantities, setProductsWithQuantities] = useState<
     {
@@ -184,6 +181,7 @@ const SupplierForm = ({
         type: "",
         percentage: remainingPercentage.toFixed(2),
         amount: "",
+        date: new Date(),
       });
     }
 
@@ -260,55 +258,68 @@ const SupplierForm = ({
 
   enum PaymentMethod {
     CHEQUE = "CHEQUE",
-    CREDIT = "CREDIT",
     TRAITE = "TRAITE",
     CASH = "CASH",
   }
 
   const handleSaveOrder = async () => {
-    if (
-      !selectedSupplier ||
-      !selectedWarehouse ||
-      productsWithQuantities.length === 0
-    ) {
-      alert("Veuillez remplir tous les champs obligatoires.");
-      return;
-    }
-
-    const orderData = {
-      orderNumber: `PO-${Date.now()}`,
-      manufacturerId: Number(selectedSupplier.manufacturer_id) || 0,
-      warehouseId: Number(selectedWarehouse.warehouse_id) || 0,
-      deliveryDate: new Date(deliveryDate).toISOString(),
-      totalAmount: totalAmount,
-      status: selectedState,
-      comments: comment ? [{ content: comment }] : [],
-      payments: paymentTypes
-
-        .filter((payment) => payment.type && payment.amount)
-
-        .map((payment) => ({
-          paymentMethod: payment.type.toUpperCase() as PaymentMethod,
-
-          amount: parseFloat(payment.amount) || 0,
-
-          percentage: parseFloat(payment.percentage) || 0,
-        })),
-      products: productsWithQuantities
-        .filter((item) => item.quantity > 0)
-        .map((item) => ({
-          id: item.id,
-          name: item.product.name,
-          quantity: item.quantity,
-          priceExclTax: item.priceExclTax,
-          total: item.total,
-          sku: item.sku,
-        })),
-      files: uploadedFiles.map((file) => ({ id: file.id })),
-    };
-
-    console.log("Données de la commande avant envoi:", orderData);
     try {
+      if (!selectedSupplier) {
+        toast.error("Supplier is required.");
+        throw new Error("Supplier is required.");
+      }
+      if (!selectedWarehouse) {
+        toast.error("Warehouse is required.");
+        throw new Error("Warehouse is required");
+      }
+      if (!selectedState) {
+        toast.error("Order state is required.");
+        throw new Error("Order state is required");
+      }
+      if (productsWithQuantities.length === 0) {
+        toast.error("At least one product must be added.");
+        throw new Error("At least one product must be added");
+      }
+      if (
+        paymentTypes.some(
+          (p) => p.type && (!p.amount || parseFloat(p.amount) <= 0),
+        )
+      ) {
+        toast.error("Each payment must have a valid amount.");
+        throw new Error("Each payment must have a valid amount");
+      }
+
+      const orderData = {
+        orderNumber: `PO-${Date.now()}`,
+        manufacturerId: Number(selectedSupplier.manufacturer_id) || 0,
+        warehouseId: Number(selectedWarehouse.warehouse_id) || 0,
+        deliveryDate: new Date(deliveryDate).toISOString(),
+        totalAmount: totalAmount,
+        status: selectedState,
+        comments: comment ? [{ content: comment }] : [],
+        payments: paymentTypes
+          .filter((payment) => payment.type && payment.amount)
+          .map((payment) => ({
+            paymentMethod: payment.type.toUpperCase(),
+            amount: parseFloat(payment.amount) || 0,
+            percentage: parseFloat(payment.percentage) || 0,
+            date: payment.date,
+          })),
+        products: productsWithQuantities
+          .filter((item) => item.quantity > 0)
+          .map((item) => ({
+            id: item.id,
+            name: item.product.name,
+            quantity: item.quantity,
+            priceExclTax: item.priceExclTax,
+            total: item.total,
+            sku: item.sku,
+          })),
+        files: uploadedFiles.map((file) => ({ id: file.id })),
+      };
+
+      console.log("Données de la commande avant envoi:", orderData);
+
       const response = await fetch("/api/purchase", {
         method: "POST",
         headers: {
@@ -317,15 +328,21 @@ const SupplierForm = ({
         body: JSON.stringify(orderData),
       });
 
-      if (!response.ok) throw new Error("Error saving");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error saving");
+      }
 
       const result = await response.json();
       console.log("Purchase Order Saved:", result);
+      toast.success("Purchase order saved successfully!");
+
+      return result;
     } catch (error) {
-      console.error("Erreur:", error);
-      toast.error("Registration failed.");
+      throw new Error("registration failed");
     }
   };
+
   const handleSelectWarehouse = (warehouseName: string): void => {
     const warehouse = warehouses.find((w) => w.name === warehouseName);
 
@@ -380,15 +397,29 @@ const SupplierForm = ({
     setProductsWithQuantities([]);
   };
   const handleSendEmail = () => {
-    if (
-      !selectedSupplier ||
-      !selectedWarehouse ||
-      productsWithQuantities.length === 0
-    ) {
-      toast.error("Please complete all fields before sending an email");
+    const productsText = productRows
 
-      return;
-    }
+      .filter((row) => row.productId && row.quantity > 0)
+
+      .map((row) => {
+        const product = productsWithQuantities.find(
+          (p) => p.id === row.productId,
+        );
+
+        return `
+
+        Product Name: ${product?.product.name || "Unknown Product"}
+
+        Quantity: ${row.quantity || 0}
+
+        Price (Excl. Tax): ${row.priceExclTax?.toFixed(2) || "0.00"}
+
+        Total: ${row.total?.toFixed(2) || "0.00"}
+
+      `;
+      })
+
+      .join("\n\n");
 
     const templateParams = {
       supplierName: selectedSupplier?.companyName || "Unknown Supplier",
@@ -396,15 +427,8 @@ const SupplierForm = ({
       totalAmount: totalAmount?.toFixed(2) || "0.00",
       remainingAmount: remainingAmount?.toFixed(2) || "0.00",
       comment: comment || "No comment provided",
-
-      products: productsWithQuantities.map((item) => ({
-        productName: item.product.name || "Unknown Product",
-        quantity: item.quantity || 0,
-        priceExclTax: item.priceExclTax?.toFixed(2) || "0.00",
-        total: item.total?.toFixed(2) || "0.00",
-      })),
+      productsText: productsText,
     };
-    console.log("Template Params:", templateParams);
 
     emailjs
       .send(
@@ -443,6 +467,7 @@ const SupplierForm = ({
         type: "",
         percentage: newPercentage.toFixed(2),
         amount: "",
+        date: new Date(),
       });
     }
 
@@ -801,18 +826,9 @@ const SupplierForm = ({
   const handleSaveAndSendEmail = async () => {
     try {
       await handleSaveOrder();
-      if (
-        selectedSupplier &&
-        selectedWarehouse &&
-        productsWithQuantities.length > 0
-      ) {
-        await handleSendEmail();
-        toast.success("Order saved and email sent successfully!");
-      } else {
-        toast.error("Failed to send email. Please check the form data.");
-      }
+      handleSendEmail();
+      toast.success("Order saved and email sent successfully!");
     } catch (error) {
-      console.error("Error saving order or sending email:", error);
       toast.error("Failed to save order or send email.");
     }
   };
@@ -829,7 +845,9 @@ const SupplierForm = ({
 
     setProductsWithQuantities([]);
 
-    setPaymentTypes([{ type: "", percentage: "", amount: "" }]);
+    setPaymentTypes([
+      { type: "", percentage: "", amount: "", date: new Date() },
+    ]);
 
     setComment("");
 
@@ -844,6 +862,13 @@ const SupplierForm = ({
     setTotalAmount(0);
 
     setRemainingAmount(0);
+  };
+  const handlePaymentDateChange = (index: number, date: Date) => {
+    const updatedPayments = [...paymentTypes];
+
+    updatedPayments[index].date = date;
+
+    setPaymentTypes(updatedPayments);
   };
   const { data: session } = useSession();
 
@@ -1099,17 +1124,33 @@ const SupplierForm = ({
                     <h4 className="mb-6 text-lg font-semibold text-gray-800">
                       Total Amount
                     </h4>
+                    {paymentTypes.some((payment) => payment.type) && (
+                      <div className="mb-4 grid grid-cols-5 gap-4 px-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          Type
+                        </span>
+                        <span className="text-sm font-medium text-gray-700">
+                          Percentage
+                        </span>
+                        <span className="text-sm font-medium text-gray-700">
+                          Amount
+                        </span>
+                        <span className="text-sm font-medium text-gray-700">
+                          Payment date
+                        </span>
+                        <span className="text-sm font-medium text-gray-700">
+                          Remaining Amount
+                        </span>
+                      </div>
+                    )}
                     {paymentTypes.map((payment, index) => (
-                      <div
-                        key={index}
-                        className="mb-6 flex items-center space-x-4"
-                      >
+                      <div key={index} className="mb-6 grid grid-cols-5 gap-4">
                         <select
                           value={payment.type}
                           onChange={(e) =>
                             handlePaymentTypeChange(index, e.target.value)
                           }
-                          className="w-1/3 rounded-md border border-gray-300 p-3"
+                          className="rounded-md border border-gray-300 p-3"
                         >
                           <option value="0">Select a payment method</option>
                           <option value="CHEQUE">Cheque</option>
@@ -1120,23 +1161,21 @@ const SupplierForm = ({
                           <input
                             type="number"
                             value={payment.percentage}
-                            onBlur={() => {
+                            onBlur={() =>
                               handlePaymentPercentageChange(
                                 index,
                                 payment.percentage,
-                              );
-                            }}
+                              )
+                            }
                             onChange={(e) => {
                               const value = e.target.value;
                               setPaymentTypes((prev) => {
                                 const updatedPayments = [...prev];
-
                                 updatedPayments[index].percentage = value;
-
                                 return updatedPayments;
                               });
                             }}
-                            className="w-1/3 rounded-md border border-gray-300 p-3"
+                            className="rounded-md border border-gray-300 p-3"
                             placeholder="Percentage"
                           />
                         )}
@@ -1147,33 +1186,36 @@ const SupplierForm = ({
                             onChange={(e) =>
                               handlePaymentAmountChange(index, e.target.value)
                             }
-                            className="w-1/3 rounded-md border border-gray-300 p-3"
+                            className="rounded-md border border-gray-300 p-3"
                             placeholder="Amount"
                           />
                         )}
-
-                        <div className="flex w-full items-center space-x-2 sm:w-1/3 lg:w-1/4">
-                          <label className="block w-1/3 text-sm font-medium text-gray-700">
-                            R.Amount
-                          </label>
+                        {payment.type && (
                           <input
-                            type="number"
-                            value={remainingAmount.toFixed(2) || "0.00"}
-                            disabled
-                            className="w-2/3 rounded-md border border-gray-300 bg-gray-100 p-3"
+                            type="date"
+                            value={payment.date.toISOString().split("T")[0]}
+                            onChange={(e) => {
+                              const newDate = new Date(e.target.value);
+                              handlePaymentDateChange(index, newDate);
+                            }}
+                            className="rounded-md border border-gray-300 p-3"
                           />
-                        </div>
+                        )}
+                        <input
+                          type="number"
+                          value={remainingAmount.toFixed(2) || "0.00"}
+                          disabled
+                          className="rounded-md border border-gray-300 bg-gray-100 p-3"
+                        />
                       </div>
                     ))}
-                    <div className="mt-6">
-                      <div className="flex justify-between">
-                        <span className="text-lg font-medium text-gray-800">
-                          Total Amount
-                        </span>
-                        <span className="text-lg font-semibold text-gray-800">
-                          {totalAmount.toFixed(2)}
-                        </span>
-                      </div>
+                    <div className="mt-6 flex justify-between">
+                      <span className="text-lg font-medium text-gray-800">
+                        Total Amount
+                      </span>
+                      <span className="text-lg font-semibold text-gray-800">
+                        {totalAmount.toFixed(2)}
+                      </span>
                     </div>
                   </div>
                 </div>

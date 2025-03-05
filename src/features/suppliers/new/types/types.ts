@@ -32,21 +32,3 @@ export type Product = {
 
   manufacturer: string;
 };
-
-export interface ProductDetails {
-  productName: string;
-  quantity: number;
-  priceExclTax: number;
-  total: number;
-}
-
-export interface EmailParams {
-  supplier: string;
-  warehouse: string;
-  state: string;
-  products: ProductDetails[];
-  totalAmount: string;
-  remainingAmount: string;
-  comment: string;
-  [key: string]: unknown;
-}

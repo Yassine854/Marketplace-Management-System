@@ -122,6 +122,7 @@ model Payment {
 
   paymentMethod  PaymentMethod
   percentage     Float
+  paymentDate    DateTime?
 
   manufacturer   Manufacturer   @relation(fields: [manufacturerId], references: [manufacturerId])
 

@@ -67,6 +67,7 @@ export async function POST(req: Request) {
                     paymentMethod: payment.paymentMethod.toUpperCase(),
                     percentage: parseFloat(payment.percentage) || 0,
                     manufacturerId: Number(manufacturerId) || 0,
+                    paymentDate: new Date(payment.date),
                   })),
               }
             : undefined,

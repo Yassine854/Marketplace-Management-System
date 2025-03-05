@@ -59,7 +59,18 @@ export async function GET(request: Request) {
         include: {
           manufacturer: true,
           warehouse: { select: { name: true } },
-          payments: true,
+          payments: {
+            select: {
+              id: true,
+              amount: true,
+              paymentMethod: true,
+              percentage: true,
+              manufacturerId: true,
+              purchaseOrderId: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
         },
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * pageSize,
