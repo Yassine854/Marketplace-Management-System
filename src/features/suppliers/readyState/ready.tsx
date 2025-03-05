@@ -4,7 +4,8 @@ import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersPers";
 
 const ReadyPage = () => {
-  const { purchases, loading, error, fetchPurchases } = usePurchaseStore();
+  const { purchases, total, loading, error, fetchPurchases } =
+    usePurchaseStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -12,26 +13,20 @@ const ReadyPage = () => {
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
     {},
   );
-  const [pageSize, setPageSize] = useState(10);
+  const pageSize = 10;
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await fetchPurchases(currentPage, pageSize, {
-          search: debouncedSearchTerm,
-          ...activeFilters,
-        });
-      } catch (error) {
-        console.error("Error loading data:", error);
-      }
-    };
-
-    fetchData();
+    fetchPurchases(currentPage, pageSize, {
+      search: debouncedSearchTerm,
+      status: "READY",
+      ...activeFilters,
+    });
   }, [currentPage, debouncedSearchTerm, activeFilters]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1);
     }, 500);
 
     return () => clearTimeout(handler);
@@ -50,6 +45,9 @@ const ReadyPage = () => {
       </div>
     );
   }
+
+  const totalPages = Math.ceil(total / pageSize);
+
   return (
     <div className="flex h-full flex-grow">
       <div className="h-full w-full rounded-lg bg-[url(/images/login-bg.png)] bg-cover">
@@ -90,20 +88,6 @@ const ReadyPage = () => {
                   }}
                 />
               )}
-
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(activeFilters).map(
-                  ([key, value]) =>
-                    value && (
-                      <span
-                        key={key}
-                        className="rounded-full bg-gray-100 px-2 py-1 text-sm"
-                      >
-                        {key}: {value}
-                      </span>
-                    ),
-                )}
-              </div>
             </div>
 
             <div
@@ -111,6 +95,41 @@ const ReadyPage = () => {
               style={{ maxHeight: "600px" }}
             >
               <PurchaseTable data={purchases} loading={loading} />
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="mt-4 flex justify-center gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="rounded bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300"
+              >
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`rounded px-4 py-2 ${
+                      currentPage === page
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="rounded bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300"
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>

@@ -20,6 +20,7 @@ const InProgressPage = () => {
       try {
         await fetchPurchases(currentPage, pageSize, {
           search: debouncedSearchTerm,
+          status: "IN_PROGRESS",
           ...activeFilters,
         });
       } catch (error) {
@@ -39,7 +40,7 @@ const InProgressPage = () => {
   }, [searchTerm]);
 
   const handleSearch = () => {
-    setCurrentPage(1); // Reset to the first page on new search
+    setCurrentPage(1);
     setDebouncedSearchTerm(searchTerm.toLowerCase());
   };
 
@@ -52,7 +53,7 @@ const InProgressPage = () => {
     );
   }
 
-  const totalPages = Math.ceil(total / pageSize); // Calculate total pages
+  const totalPages = Math.ceil(total / pageSize);
 
   return (
     <div className="flex h-full flex-grow">
@@ -90,7 +91,7 @@ const InProgressPage = () => {
                 <AdvancedFilters
                   onApply={(filters) => {
                     setActiveFilters(filters);
-                    setCurrentPage(1); // Reset to the first page on filter apply
+                    setCurrentPage(1);
                   }}
                 />
               )}
@@ -115,6 +116,41 @@ const InProgressPage = () => {
               style={{ maxHeight: "600px" }}
             >
               <PurchaseTable data={purchases} loading={loading} />
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="mt-4 flex justify-center gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="rounded bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300"
+              >
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`rounded px-4 py-2 ${
+                      currentPage === page
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="rounded bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300"
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>

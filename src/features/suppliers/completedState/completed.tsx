@@ -4,7 +4,8 @@ import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersPers";
 
 const CompletedPage = () => {
-  const { purchases, loading, error, fetchPurchases } = usePurchaseStore();
+  const { purchases, loading, error, fetchPurchases, total } =
+    usePurchaseStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -18,7 +19,8 @@ const CompletedPage = () => {
     const fetchData = async () => {
       try {
         await fetchPurchases(currentPage, pageSize, {
-          search: searchTerm,
+          search: debouncedSearchTerm,
+          status: "COMPLETED",
           ...activeFilters,
         });
       } catch (error) {
@@ -27,7 +29,7 @@ const CompletedPage = () => {
     };
 
     fetchData();
-  }, [currentPage, pageSize, searchTerm, activeFilters]);
+  }, [currentPage, debouncedSearchTerm, activeFilters]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -37,24 +39,11 @@ const CompletedPage = () => {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetchPurchases(currentPage, pageSize, {
-        search: debouncedSearchTerm,
-        ...activeFilters,
-      });
-    };
-
-    fetchData();
-  }, [debouncedSearchTerm]);
-
   const handleSearch = () => {
-    const normalizedSearch = searchTerm.toLowerCase();
-    fetchPurchases(1, pageSize, {
-      search: normalizedSearch,
-      ...activeFilters,
-    });
+    setCurrentPage(1);
+    setDebouncedSearchTerm(searchTerm.toLowerCase());
   };
+
   if (error) {
     return (
       <div className="p-6 text-red-500">
@@ -63,6 +52,8 @@ const CompletedPage = () => {
       </div>
     );
   }
+
+  const totalPages = Math.ceil(total / pageSize);
 
   return (
     <div className="flex h-full flex-grow">
@@ -125,6 +116,41 @@ const CompletedPage = () => {
               style={{ maxHeight: "600px" }}
             >
               <PurchaseTable data={purchases} loading={loading} />
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="mt-4 flex justify-center gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="rounded bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300"
+              >
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`rounded px-4 py-2 ${
+                      currentPage === page
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="rounded bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300"
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>

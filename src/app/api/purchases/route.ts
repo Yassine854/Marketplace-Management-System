@@ -8,6 +8,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const searchTerm = (searchParams.get("search") || "").toLowerCase();
     const status = (searchParams.get("status") as OrderState) || undefined;
+    const page = Number(searchParams.get("page") || "1");
+    const pageSize = Number(searchParams.get("pageSize") || "10");
 
     const where: any = {
       OR: [
@@ -50,6 +52,7 @@ export async function GET(request: Request) {
     if (searchParams.get("deliveryDateEnd")) {
       where.deliveryDate.lte = new Date(searchParams.get("deliveryDateEnd")!);
     }
+
     const [data, total] = await prisma.$transaction([
       prisma.purchaseOrder.findMany({
         where,
@@ -59,6 +62,8 @@ export async function GET(request: Request) {
           payments: true,
         },
         orderBy: { createdAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
       }),
       prisma.purchaseOrder.count({ where }),
     ]);
