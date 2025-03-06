@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Modal,
-  Button,
-  ModalFooter,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-} from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/react";
 import ImageModal from "./ImageModal";
 import CarouselModal from "./CarouselModal";
 import ProductShowcaseModal from "./ProductShowcaseModal";
@@ -26,11 +19,20 @@ const EditElementModal: React.FC<EditElementModalProps> = ({
         : selectedElement.title
     ) {
       case "image":
-        return <ImageModal selectedElement={selectedElement} />;
+        return (
+          <ImageModal selectedElement={selectedElement} onClose={onClose} />
+        );
       case "carousel":
-        return <CarouselModal selectedElement={selectedElement} />;
+        return (
+          <CarouselModal selectedElement={selectedElement} onClose={onClose} />
+        );
       case "ProductShowcase":
-        return <ProductShowcaseModal selectedElement={selectedElement} />;
+        return (
+          <ProductShowcaseModal
+            selectedElement={selectedElement}
+            onClose={onClose}
+          />
+        );
       default:
         return (
           <>

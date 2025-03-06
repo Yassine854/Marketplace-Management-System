@@ -12,7 +12,8 @@ interface UseAxiosProps<T> {
     method?: HttpMethod,
     data?: any,
     config?: AxiosRequestConfig,
-  ) => Promise<void>;
+    apiKey?: string,
+  ) => Promise<AxiosResponse<T> | void>; // Return the response or void
 }
 
 const BASE_URL = "http://localhost:3000/";
@@ -32,7 +33,8 @@ const useAxios = <T>(): UseAxiosProps<T> => {
       method: HttpMethod = "get",
       data?: any,
       config?: AxiosRequestConfig,
-    ) => {
+      apiKey?: string,
+    ): Promise<AxiosResponse<T> | void> => {
       setLoading(true);
       setError(null);
       setResponse(null);
@@ -45,8 +47,16 @@ const useAxios = <T>(): UseAxiosProps<T> => {
           ...config,
         };
 
+        if (apiKey) {
+          axiosConfig.headers = {
+            ...axiosConfig.headers,
+            "X-API-Key": apiKey,
+          };
+        }
+
         const result = await axiosInstance(axiosConfig);
         setResponse(result);
+        return result; // Return the response
       } catch (err) {
         if (axios.isAxiosError(err)) {
           setError(err);

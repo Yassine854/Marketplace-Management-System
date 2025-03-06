@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import { CalendarIcon } from "@radix-ui/react-icons"; // You can use any icon library
+import { CalendarIcon } from "@radix-ui/react-icons";
 
 interface DateInputProps {
-  value: string; // Expects a string value (e.g., "2023-10-15")
-  onChange: (date: string) => void; // Returns a string value
+  value: string;
+  onChange: (date: string) => void;
   placeholder?: string;
 }
 
@@ -16,16 +16,14 @@ const DateInput: React.FC<DateInputProps> = ({
 }) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-  // Convert the string value to a Date object for the DayPicker
   const dateValue = value ? new Date(value) : undefined;
 
   const handleDayClick = (date: Date | undefined) => {
     if (date) {
-      // Convert the selected date to an ISO string (e.g., "2023-10-15")
       const isoDateString = date.toISOString().split("T")[0];
-      onChange(isoDateString); // Update the form with the string value
+      onChange(isoDateString);
     }
-    setIsCalendarOpen(false); // Close the calendar
+    setIsCalendarOpen(false);
   };
 
   return (
@@ -34,7 +32,7 @@ const DateInput: React.FC<DateInputProps> = ({
         <input
           type="text"
           readOnly
-          value={value || ""} // Display the string value directly
+          value={value || ""}
           placeholder={placeholder || "Select a date"}
           className="flex-1 outline-none"
         />
@@ -48,10 +46,10 @@ const DateInput: React.FC<DateInputProps> = ({
       </div>
 
       {isCalendarOpen && (
-        <div className="absolute z-10 mt-2 rounded-md border bg-white shadow-lg">
+        <div className="absolute -top-2 z-10 rounded-md border bg-white shadow-lg">
           <DayPicker
             mode="single"
-            selected={dateValue} // Pass the Date object to DayPicker
+            selected={dateValue}
             onSelect={handleDayClick}
           />
         </div>

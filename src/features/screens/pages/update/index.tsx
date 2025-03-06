@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import DraggableForm from "../../widgets/DraggableForm/DraggableForm";
-import axios from "axios";
 import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
+import useAxios from "../../hooks/useAxios";
+import { toast } from "react-hot-toast";
 
 const UpdatePage = () => {
   const pathname = usePathname();
@@ -16,24 +17,31 @@ const UpdatePage = () => {
 
   const [formElements, setFormElements] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState();
+  const [data, setData] = useState<any>();
   const [title, setTitle] = useState("");
+
+  const { loading: axiosLoading, fetchData } = useAxios();
+
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
   const fetchForms = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(
-        `http://localhost:3000/api/screen/${id}`,
-      );
+      const response = await fetchData(`api/screen/${id}`, "get", undefined, {
+        headers: { "X-API-Key": apiKey },
+      });
+
       if (response && response.data) {
         setData(response.data);
         setFormElements(response.data.ad);
         setTitle(response.data.title);
       } else {
         console.error("Failed to fetch data");
+        toast.error("Failed to fetch data. Please try again.");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+      toast.error("Failed to fetch data. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -47,31 +55,31 @@ const UpdatePage = () => {
     try {
       const newData = { ...data, ad: formElements, title: title };
 
-      const response = await axios.put(
-        `http://localhost:3000/api/screen/${id}`,
-        newData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      await fetchData(`api/screen/${id}`, "put", newData, {
+        headers: { "X-API-Key": apiKey },
+      });
+
+      toast.success("Screen saved successfully!");
     } catch (error) {
       console.error("Error saving data:", error);
+      toast.error("Failed to save data. Please try again.");
     }
   };
 
   const handlePublish = async () => {
     try {
-      const response = await axios.put(
-        `http://localhost:3000/api/screen/${id}/activate`,
-      );
+      await fetchData(`api/screen/${id}/activate`, "put", undefined, {
+        headers: { "X-API-Key": apiKey },
+      });
+
+      toast.success("Screen published successfully!");
     } catch (error) {
-      console.error("Error saving data:", error);
+      console.error("Error publishing data:", error);
+      toast.error("Failed to publish data. Please try again.");
     }
   };
 
-  const renderStatusIcon = (status) => {
+  const renderStatusIcon = (status: string) => {
     switch (status) {
       case "draft":
         return (
@@ -177,6 +185,7 @@ const UpdatePage = () => {
           <button
             className="inline-flex items-center rounded border border-gray-500 bg-white px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50"
             onClick={handleSave}
+            disabled={axiosLoading}
           >
             <svg
               className="mr-2 h-4 w-4"
@@ -192,13 +201,14 @@ const UpdatePage = () => {
                 d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
               />
             </svg>
-            Save
+            {axiosLoading ? "Saving..." : "Save"}
           </button>
           <button
             onClick={handlePublish}
             className="inline-flex items-center rounded border border-gray-500 bg-blue-300 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50"
+            disabled={axiosLoading}
           >
-            Publish
+            {axiosLoading ? "Publishing..." : "Publish"}
           </button>
         </div>
       </div>

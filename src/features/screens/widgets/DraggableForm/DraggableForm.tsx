@@ -2,9 +2,11 @@ import React from "react";
 import { DragDropContext } from "react-beautiful-dnd";
 import ElementsSection from "./ElementsSection";
 import ScreenBuilderSection from "./ScreenBuilderSection";
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 
 const DraggableForm = ({ elements, formElements, setFormElements }) => {
+  const { fetchData } = useAxios();
+
   const onDragEnd = async (result) => {
     const { source, destination } = result;
 
@@ -19,18 +21,25 @@ const DraggableForm = ({ elements, formElements, setFormElements }) => {
     const element = elements.find((el) => el.id === result.draggableId);
 
     try {
-      const response = await axios.post("http://localhost:3000/api/ad", {
-        adType: element.title,
-      });
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+      const response = await fetchData(
+        "api/ad",
+        "post",
+        { adType: element.title },
+        { headers: { "X-API-Key": apiKey } },
+      );
 
-      const newData = response.data;
+      if (response && response.data) {
+        const newData = response.data;
+        const newElement = { ...newData, title: newData.adType };
 
-      const newElement = { ...newData, title: newData.adType };
+        const newFormElements = Array.from(formElements);
+        newFormElements.splice(destination.index, 0, newElement);
 
-      const newFormElements = Array.from(formElements);
-      newFormElements.splice(destination.index, 0, newElement);
-
-      setFormElements(newFormElements);
+        setFormElements(newFormElements);
+      } else {
+        console.error("Failed to create new element");
+      }
     } catch (error) {
       console.error("Error creating new element:", error);
     }

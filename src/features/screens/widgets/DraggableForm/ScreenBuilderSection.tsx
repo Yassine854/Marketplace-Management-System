@@ -1,26 +1,39 @@
 import React, { useState } from "react";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import EditElementModal from "./modals/EditElementModal";
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
+import { toast } from "react-hot-toast";
 
 const ScreenBuilderSection = ({ formElements, setFormElements }) => {
   const [selectedElement, setSelectedElement] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const { fetchData } = useAxios();
+
   const handleElementClick = (element) => {
     setSelectedElement(element);
     setIsModalOpen(true);
   };
+
   const handleDeleteElement = async (elementId) => {
     try {
-      await axios.delete(`http://localhost:3000/api/ad/${elementId}`);
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+      await fetchData(`api/ad/${elementId}`, "delete", undefined, {
+        headers: {
+          "X-API-Key": apiKey,
+        },
+      });
 
       const updatedElements = formElements.filter(
         (element) => element._id !== elementId,
       );
       setFormElements(updatedElements);
+
+      toast.success("Element deleted successfully!");
     } catch (error) {
       console.error("Error deleting element:", error);
+      toast.error("Failed to delete element. Please try again.");
     }
   };
 

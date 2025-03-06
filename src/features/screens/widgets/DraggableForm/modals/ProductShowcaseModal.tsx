@@ -3,11 +3,14 @@ import { ModalBody, ModalHeader } from "@nextui-org/react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ProductFormValues, ProductFormSchema } from "./types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import TextInput from "@/features/shared/inputs/TextInput";
-import DateInput from "./DateInput";
+import TextInput from "../../inputs/TextInput";
+import DateInput from "../../inputs/DateInput";
+import SearchSelectInput from "../../inputs/SearchSelectInput";
+import useAxios from "../../../hooks/useAxios";
+import { toast } from "react-hot-toast";
+import FileInput from "../../inputs/FileInput";
 
-const ProductShowcaseModal: React.FC = ({ selectedElement }) => {
+const ProductShowcaseModal: React.FC = ({ selectedElement, onClose }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -32,6 +35,8 @@ const ProductShowcaseModal: React.FC = ({ selectedElement }) => {
     },
   });
 
+  const { fetchData } = useAxios();
+
   useEffect(() => {
     reset({
       title: selectedElement.title,
@@ -45,20 +50,31 @@ const ProductShowcaseModal: React.FC = ({ selectedElement }) => {
 
   const fetchFilteredProducts = async (query) => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/api/products/search",
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+      const response = await fetchData(
+        "api/products/search",
+        "get",
+        undefined,
         {
           params: { query },
+          headers: {
+            "X-API-Key": apiKey,
+          },
         },
       );
-      setFilteredProducts(response.data);
+
+      if (response && response.data) {
+        setFilteredProducts(response.data);
+      } else {
+        toast.error("Failed to fetch products. Please try again.");
+      }
     } catch (error) {
       console.error("Error fetching filtered products:", error);
     }
   };
 
-  const handleSearch = (e) => {
-    const query = e.target.value;
+  const handleSearch = (query) => {
     setSearchQuery(query);
 
     if (query.trim()) {
@@ -95,19 +111,29 @@ const ProductShowcaseModal: React.FC = ({ selectedElement }) => {
         data.append("backgroundImage", file);
       });
 
-      const response = await axios.put(
-        `http://localhost:3000/api/ad/${selectedElement._id}`,
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+      const response = await fetchData(
+        `api/ad/${selectedElement._id}`,
+        "put",
         data,
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            "X-API-Key": apiKey,
           },
         },
       );
 
-      console.log("API Response:", response.data);
+      if (response && response.data) {
+        toast.success("Product showcase updated successfully!");
+        onClose();
+      } else {
+        toast.error("Failed to update product showcase. Please try again.");
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
+      toast.error("Failed to update product showcase. Please try again.");
     }
   };
 
@@ -167,72 +193,24 @@ const ProductShowcaseModal: React.FC = ({ selectedElement }) => {
             )}
           </div>
 
-          <div>
-            <label className="ml-4 block font-medium md:text-lg">
-              Search and Select Products
-            </label>
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={handleSearch}
-              className="w-full rounded-3xl border border-n30 bg-n0 px-3 py-2 text-sm focus:outline-none dark:border-n500 dark:bg-bg4 md:px-6 md:py-3"
-            />
-            <div className="mt-2">
-              {filteredProducts.map((product) => (
-                <div
-                  key={product._id}
-                  onClick={() => handleProductSelection(product)}
-                  className="cursor-pointer p-2 hover:bg-gray-100"
-                >
-                  {product.name}
-                </div>
-              ))}
-            </div>
-          </div>
+          <SearchSelectInput
+            label="Search and Select Products"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={handleSearch}
+            filteredProducts={filteredProducts}
+            onSelectProduct={handleProductSelection}
+            selectedProducts={selectedProducts}
+            onRemoveProduct={removeSelectedProduct}
+          />
 
-          <div>
-            <label className="ml-4 block font-medium md:text-lg">
-              Selected Products
-            </label>
-            <div className="mt-2">
-              {selectedProducts.map((product) => (
-                <div
-                  key={product._id}
-                  className="mb-2 flex items-center justify-between rounded-md bg-gray-100 p-2"
-                >
-                  <span>{product.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeSelectedProduct(product._id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label
-              htmlFor="username"
-              className="ml-4 block font-medium md:text-lg"
-            >
-              Background image
-            </label>
-            <input
-              id="images"
-              type="file"
-              {...register("images")}
-              className="mt-1 block w-full sm:text-sm"
-            />
-            {errors.images && (
-              <p className="mt-2 text-sm text-red-600">
-                {errors.images.message}
-              </p>
-            )}
-          </div>
+          <FileInput
+            id="images"
+            label="Image"
+            register={register}
+            error={errors.images}
+            accept="image/*"
+          />
 
           <div className="flex w-full justify-end">
             <button
