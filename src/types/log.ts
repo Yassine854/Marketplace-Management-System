@@ -1,3 +1,5 @@
+import { JsonValue } from "@prisma/client/runtime/library";
+
 export interface LogContext {
   userId?: string;
   username?: string;
@@ -8,18 +10,18 @@ export interface Log {
   id: string;
   type: string;
   message: string;
-  timestamp: String;
-  context: LogContext;
-  dataBefore: any;
-  dataAfter: any;
+  timestamp: Date;
+  context: JsonValue | null;
+  dataBefore: JsonValue | null;
+  dataAfter: JsonValue | null;
 }
 export type LogType = "info" | "error" | "warning" | "order";
 
 export interface LogCreateInput {
   type: string;
   message: string;
-  context: LogContext;
-  timestamp: String;
-  dataBefore?: any;
-  dataAfter?: any;
+  context: JsonValue | null;
+  timestamp: Date;
+  dataBefore?: JsonValue | null;
+  dataAfter?: JsonValue | null;
 }

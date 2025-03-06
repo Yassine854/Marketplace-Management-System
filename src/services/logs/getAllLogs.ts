@@ -1,14 +1,12 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+import { prisma } from "@/clients/prisma";
+import { Log } from "@/types/log"; // Adjust the import path as necessary
 
-export const getAllLogs = async () => {
+export const getAllLogs = async (): Promise<Log[]> => {
   try {
-    const logs = await prisma.log.findMany();
-    console.log("Logs récupérés :", logs);
+    const logs = await prisma.getAllLogs();
+
     return logs;
-  } catch (error) {
-    console.error("Erreur lors de la récupération des logs :", error);
+  } catch (error: any) {
+    throw new Error(error);
   }
 };
-
-getAllLogs();
