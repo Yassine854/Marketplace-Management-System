@@ -3,13 +3,28 @@ import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/clients/prisma";
-import { createAuditLog } from "@/services/auditing/orders";
 import { getOrder } from "@/services/orders/getOrder";
 import { axios } from "@/libs/axios";
+import { createLog } from "@/clients/prisma/getLogs";
+import { auth } from "../../../../services/auth";
+
 export const POST = async (request: NextRequest) => {
   const errorMessages: string[] = [];
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = session.user as {
+      id: string;
+      roleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
     const { orders, status, state, username } = await request.json();
     let ordersArray = Array.isArray(orders)
       ? orders
@@ -75,12 +90,24 @@ export const POST = async (request: NextRequest) => {
     for (const orderId of ordersArray) {
       if (!changeResponse?.data?.includes(`order id : ${orderId}`)) {
         try {
+          const orderBefore = await getOrder(orderId);
+
           await typesense.orders.updateOne({
             id: orderId,
             status,
             state,
           });
-          const order = await getOrder(orderId);
+
+          const orderAfter = await getOrder(orderId);
+          await createLog({
+            type: "Order",
+            message: `Order status changed `,
+            context: JSON.stringify({ user }),
+            timestamp: new Date(),
+            dataBefore: orderBefore,
+            dataAfter: orderAfter,
+            id: "",
+          });
           // const user = await prisma.getUser(username);
           /*    if (!user) {
             results.push({ orderId, success: false, message: "User not found" });

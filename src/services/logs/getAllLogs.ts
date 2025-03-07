@@ -1,5 +1,5 @@
 import { prisma } from "@/clients/prisma";
-import { Log } from "@/types/log"; // Adjust the import path as necessary
+import { Log } from "@/types/log";
 
 export const getAllLogs = async (): Promise<Log[]> => {
   try {

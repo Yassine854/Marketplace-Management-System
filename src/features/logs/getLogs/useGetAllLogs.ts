@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { axios } from "@/libs/axios";
-import { Log } from "@/types/log"; // Import your Log type
+import { Log } from "@/types/log";
 
 export const useGetAllLogs = () => {
   const [logs, setLogs] = useState<Log[]>([]);
@@ -28,7 +28,7 @@ export const useGetAllLogs = () => {
       }
 
       setError(errorMessage);
-      setLogs([]); // Clear existing logs on error
+      setLogs([]);
     } finally {
       setIsLoading(false);
     }

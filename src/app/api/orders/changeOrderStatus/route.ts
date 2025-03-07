@@ -32,9 +32,12 @@ export const POST = async (request: NextRequest) => {
     if (!state) return responses.invalidRequest("state is Required");
 
     const currentOrder = await getOrder(orderId);
+
     if (!currentOrder)
       return responses.invalidRequest("Missing required fields");
-    // Change order status
+
+    const dataBefore = JSON.stringify(currentOrder);
+
     const changeResponse = await magento.mutations.changeOrderStatus({
       orderId,
       status,
@@ -43,7 +46,6 @@ export const POST = async (request: NextRequest) => {
 
     console.log(changeResponse);
 
-    // Check for failure in the response
     if (
       typeof changeResponse === "string" &&
       changeResponse.includes("Orders failed")
@@ -56,9 +58,9 @@ export const POST = async (request: NextRequest) => {
           username: user.username,
           storeId: currentOrder.storeId,
         },
-        timestamp: Date(),
-        dataBefore: currentOrder.status,
-        dataAfter: "",
+        timestamp: new Date(),
+        dataBefore: dataBefore,
+        dataAfter: "error",
         id: "",
       });
       return NextResponse.json(
@@ -71,12 +73,17 @@ export const POST = async (request: NextRequest) => {
 
     console.log("no error");
 
-    // If no error, continue with updating Typesense
     await typesense.orders.updateOne({
       id: orderId,
       status,
       state,
     });
+
+    const updatedOrder = getOrder(orderId);
+    if (!updatedOrder)
+      return responses.invalidRequest("failed to fetch updated order");
+
+    const dataAfter = JSON.stringify(updatedOrder);
 
     console.log("updated successfully");
 
@@ -91,7 +98,7 @@ export const POST = async (request: NextRequest) => {
         username: user.username,
         storeId: currentOrder.storeId,
       },
-      timestamp: Date(),
+      timestamp: new Date(),
       dataBefore: currentOrder.status,
       dataAfter: status,
       id: "",

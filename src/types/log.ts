@@ -6,6 +6,7 @@ export interface LogContext {
   storeId?: string;
   [key: string]: any;
 }
+
 export interface Log {
   id: string;
   type: string;
@@ -15,7 +16,7 @@ export interface Log {
   dataBefore: JsonValue | null;
   dataAfter: JsonValue | null;
 }
-export type LogType = "info" | "error" | "warning" | "order";
+export type LogType = "info" | "error" | "warning" | "order" | "milk run";
 
 export interface LogCreateInput {
   type: string;
