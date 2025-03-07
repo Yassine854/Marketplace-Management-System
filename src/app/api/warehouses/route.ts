@@ -4,12 +4,11 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const MAGENTO_API_URL =
-  "https://uat.kamioun.com/rest/default/V1/store/storeViews?fields=id,website_id,name";
+  "https://uat.kamioun.com/rest/default/V1/store/storeViews?fields=id,code,website_id,name";
 const MAGENTO_BEARER_TOKEN = "pd2as4cqycmj671bga4egknw2csoa9b6";
 
 export async function GET() {
   try {
-    // Récupérer warehouses
     const response = await fetch(MAGENTO_API_URL, {
       method: "GET",
       headers: {
@@ -40,8 +39,8 @@ export async function GET() {
       );
     }
     for (let storeView of storeViews) {
-      if (storeView.id === 0 || storeView.id === 1) {
-        console.log("Ignorer le warehouse avec id 0 et 1", storeView);
+      if (storeView.id === 0) {
+        console.log("Ignorer le warehouse avec id 0", storeView);
         continue;
       }
 
@@ -53,6 +52,7 @@ export async function GET() {
           warehouseId: storeView.id,
           websiteId: storeView.website_id,
           name: storeView.name,
+          code:storeView.code
         },
       });
 
