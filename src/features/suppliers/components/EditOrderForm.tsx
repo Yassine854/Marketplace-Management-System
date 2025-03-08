@@ -64,15 +64,19 @@ export default function EditOrderForm({
   const totalAmount = formData.totalAmount || 0;
 
   const [paymentTypes, setPaymentTypes] = useState<
-    { type: string; percentage: string; amount: string }[]
+    {
+      type: string;
+      percentage: string;
+      amount: string;
+      paymentDate: Date;
+    }[]
   >(
     order.paymentTypes?.map((p) => ({
       type: p.type,
-
       percentage: p.percentage?.toString() || "",
-
       amount: p.amount?.toString() || "",
-    })) || [{ type: "", percentage: "", amount: "" }],
+      paymentDate: new Date(p.paymentDate),
+    })) || [{ type: "", percentage: "", amount: "", paymentDate: new Date() }],
   );
 
   const [remainingAmount, setRemainingAmount] = useState(0);
@@ -97,11 +101,14 @@ export default function EditOrderForm({
   useEffect(() => {
     const totalAllocated = paymentTypes.reduce(
       (acc, payment) => acc + (parseFloat(payment.amount || "0") || 0),
-
       0,
     );
 
-    setRemainingAmount(totalAmount - totalAllocated);
+    const remaining = totalAmount - totalAllocated;
+
+    const roundedRemaining = Math.round(remaining * 100) / 100;
+
+    setRemainingAmount(roundedRemaining);
   }, [paymentTypes, totalAmount]);
 
   const handlePaymentAmountChange = (index: number, value: string) => {
@@ -127,7 +134,12 @@ export default function EditOrderForm({
     );
 
     if (totalAllocated < totalAmount && index === updatedPayments.length - 1) {
-      updatedPayments.push({ type: "", percentage: "", amount: "" });
+      updatedPayments.push({
+        type: "",
+        percentage: "",
+        amount: "",
+        paymentDate: new Date(),
+      });
     }
 
     setPaymentTypes(updatedPayments);
@@ -145,8 +157,6 @@ export default function EditOrderForm({
       try {
         const response = await fetch(`/api/purchaseOrder/${order.id}`);
         const data = await response.json();
-        console.log("Fetched data:", data);
-        console.log("hedha:", data);
 
         if (response.ok) {
           setFormData({
@@ -184,8 +194,23 @@ export default function EditOrderForm({
           }
           const initialPayments =
             data.paymentTypes?.length > 0
-              ? [...data.paymentTypes, { type: "", percentage: "", amount: "" }]
-              : [{ type: "", percentage: "", amount: "" }];
+              ? [
+                  ...data.paymentTypes,
+                  {
+                    type: "",
+                    percentage: "",
+                    amount: "",
+                    paymentDate: new Date(),
+                  },
+                ]
+              : [
+                  {
+                    type: "",
+                    percentage: "",
+                    amount: "",
+                    paymentDate: new Date(),
+                  },
+                ];
 
           setPaymentTypes(
             initialPayments.map((p) => ({
@@ -194,6 +219,7 @@ export default function EditOrderForm({
               percentage: p.percentage?.toString() || "",
 
               amount: p.amount?.toString() || "",
+              paymentDate: p.paymentDate ? new Date(p.paymentDate) : new Date(),
             })),
           );
           const initialProductRows = data.products.map((product: any) => ({
@@ -250,7 +276,7 @@ export default function EditOrderForm({
     try {
       const convertedPaymentTypes = paymentTypes
 
-        .filter((p) => p.type && p.amount)
+        .filter((p) => p.type && p.amount && p.paymentDate)
 
         .map((p) => ({
           type: p.type,
@@ -258,6 +284,7 @@ export default function EditOrderForm({
           percentage: parseFloat(p.percentage),
 
           amount: parseFloat(p.amount),
+          paymentDate: p.paymentDate,
         }));
       const updatedOrder = await updatePurchaseOrder(order.id, {
         ...formData,
@@ -308,14 +335,19 @@ export default function EditOrderForm({
     );
 
     if (totalAllocated < 100 && index === updatedPayments.length - 1) {
-      updatedPayments.push({ type: "", percentage: "", amount: "" });
+      updatedPayments.push({
+        type: "",
+        percentage: "",
+        amount: "",
+        paymentDate: new Date(),
+      });
     }
 
     setPaymentTypes(updatedPayments);
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 p-6 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-6 backdrop-blur-md">
       <form
         onSubmit={handleSubmit}
         className="relative max-h-[80vh] w-full max-w-4xl space-y-5 overflow-y-auto rounded-xl bg-white p-8 shadow-2xl"
@@ -531,24 +563,29 @@ export default function EditOrderForm({
             <label className="mb-4 block text-sm font-medium text-gray-700">
               Payment Methods
             </label>
-
-            {/* En-têtes des colonnes */}
-            <div className="mb-2 grid grid-cols-12 gap-4">
-              <div className="col-span-3 text-sm font-medium text-gray-700">
+            <div className="mb-2 grid grid-cols-12 items-start">
+              <div className="col-span-3 px-3 pb-1 text-sm font-medium text-gray-700">
                 Type
               </div>
-              <div className="col-span-2 text-sm font-medium text-gray-700">
+
+              <div className="col-span-2 px-3 pb-1 text-sm font-medium text-gray-700">
                 Percentage
               </div>
-              <div className="col-span-3 text-sm font-medium text-gray-700">
+
+              <div className="col-span-2 px-3 pb-1 text-sm font-medium text-gray-700">
                 Amount
               </div>
-              <div className="col-span-3 text-sm font-medium text-gray-700">
+
+              <div className="col-span-2 px-3 pb-1 text-sm font-medium text-gray-700">
+                Payment Date
+              </div>
+
+              <div className="col-span-2 px-3 pb-1 text-sm font-medium text-gray-700">
                 Remaining
               </div>
+
               <div className="col-span-1"></div>
             </div>
-
             {paymentTypes.map((payment, index) => (
               <div
                 key={index}
@@ -589,13 +626,23 @@ export default function EditOrderForm({
                   onChange={(e) =>
                     handlePaymentAmountChange(index, e.target.value)
                   }
-                  className="col-span-3 rounded-lg border-gray-300 p-3 shadow-md"
+                  className="col-span-2 rounded-lg border-gray-300 p-3 shadow-md"
                   placeholder="Amount"
                   step="0.01"
                 />
+                <input
+                  type="date"
+                  value={payment.paymentDate?.toISOString().split("T")[0] || ""}
+                  onChange={(e) => {
+                    const updated = [...paymentTypes];
+                    updated[index].paymentDate = new Date(e.target.value);
+                    setPaymentTypes(updated);
+                  }}
+                  className="col-span-2 rounded-lg border-gray-300 p-3 shadow-md"
+                />
 
                 {/* Montant restant */}
-                <div className="col-span-3">
+                <div className="col-span-2">
                   <input
                     type="number"
                     value={remainingAmount.toFixed(2)}

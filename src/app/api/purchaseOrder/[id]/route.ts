@@ -47,6 +47,7 @@ export async function GET(
         type: payment.paymentMethod,
         percentage: payment.percentage,
         amount: payment.amount,
+        paymentDate: payment.paymentDate,
       })),
       products: formattedProducts,
     };

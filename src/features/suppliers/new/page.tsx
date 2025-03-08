@@ -150,7 +150,11 @@ const SupplierForm = ({
       (acc, payment) => acc + (parseFloat(payment.amount || "0") || 0),
       0,
     );
-    setRemainingAmount(totalAmount - totalAllocated);
+
+    const remaining = totalAmount - totalAllocated;
+    const roundedRemaining = Math.round(remaining * 100) / 100;
+
+    setRemainingAmount(roundedRemaining);
   }, [paymentTypes, totalAmount]);
 
   const handlePaymentTypeChange = (index: number, type: string) => {

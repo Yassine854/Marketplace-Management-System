@@ -105,6 +105,7 @@ export async function PUT(
           percentage: payment.percentage,
 
           amount: payment.amount,
+          paymentDate: new Date(payment.paymentDate),
 
           purchaseOrderId: orderId,
 
