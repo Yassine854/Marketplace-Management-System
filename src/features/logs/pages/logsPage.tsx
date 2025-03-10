@@ -8,8 +8,8 @@ export default function LogsPage() {
   const { logs, isLoading, error, refetch } = useGetAllLogs();
   const [searchTerm, setSearchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [filterType, setFilterType] = useState<
-    "all" | "error" | "warning" | "info"
+  const [activeTab, setActiveTab] = useState<
+    "all" | "error" | "warning" | "info" | "order" | "milk run"
   >("all");
   const [sortLog, setSortLog] = useState<"newest" | "oldest">("newest");
 
@@ -20,15 +20,21 @@ export default function LogsPage() {
           log.context ? JSON.stringify(log.context) : ""
         } ${log.dataBefore ? JSON.stringify(log.dataBefore) : ""} ${
           log.dataAfter ? JSON.stringify(log.dataAfter) : ""
-        }`.toLowerCase();
-        return searchContent.includes(searchTerm.toLowerCase());
+        }`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+
+        const matchesTab =
+          activeTab === "all" ? true : log.type.toLowerCase() === activeTab;
+
+        return searchContent && matchesTab;
       })
       .sort((a, b) =>
         sortLog === "newest"
           ? new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
           : new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
       );
-  }, [logs, searchTerm, sortLog]);
+  }, [logs, searchTerm, sortLog, activeTab]);
 
   return (
     <div
@@ -38,7 +44,8 @@ export default function LogsPage() {
           : "ml-[60px] w-[calc(100%-60px)]"
       }`}
     >
-      <div className={`mb-6 flex items-center justify-between`}>
+      <div className="mb-6 flex flex-col gap-4">
+        {/* Barre de recherche */}
         <div className="relative w-1/3">
           <input
             type="text"
@@ -48,40 +55,36 @@ export default function LogsPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-            <svg
-              className="h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+            🔍
           </span>
         </div>
 
-        <div className="flex gap-2">
-          <select
-            value={sortLog}
-            onChange={(e) => setSortLog(e.target.value as "newest" | "oldest")}
-            className="rounded-lg border p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-          </select>
+        <div className="tab flex gap-2 border-b pb-2">
+          {["all", "error", "order", "milk run"].map((tab) => (
+            <button
+              key={tab}
+              className={`rounded-t-lg px-4 py-2 ${
+                activeTab === tab
+                  ? "bg-gray-300 font-bold"
+                  : "bg-gray-100 hover:bg-gray-200"
+              }`}
+              onClick={() =>
+                setActiveTab(tab as "all" | "error" | "order" | "milk run")
+              }
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
+
+        <LogTable
+          logs={filteredLogs}
+          isLoading={isLoading}
+          error={error}
+          refetch={refetch}
+          isSidebarOpen={isSidebarOpen}
+        />
       </div>
-      <LogTable
-        logs={filteredLogs}
-        isLoading={isLoading}
-        error={error}
-        refetch={refetch}
-        isSidebarOpen={isSidebarOpen}
-      />
     </div>
   );
 }

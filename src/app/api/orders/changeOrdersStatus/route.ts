@@ -92,6 +92,8 @@ export const POST = async (request: NextRequest) => {
         try {
           const orderBefore = await getOrder(orderId);
 
+          const orderBefore = await getOrder(orderId);
+
           await typesense.orders.updateOne({
             id: orderId,
             status,
@@ -99,10 +101,15 @@ export const POST = async (request: NextRequest) => {
           });
 
           const orderAfter = await getOrder(orderId);
+          const storeId = orderBefore.storeId;
           await createLog({
             type: "Order",
             message: `Order status changed `,
-            context: JSON.stringify({ user }),
+            context: JSON.stringify({
+              userId: user.id,
+              username: user.username,
+              storeId: storeId,
+            }),
             timestamp: new Date(),
             dataBefore: orderBefore,
             dataAfter: orderAfter,

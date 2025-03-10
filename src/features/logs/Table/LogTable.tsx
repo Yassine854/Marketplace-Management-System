@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Modal from "./Modal";
 
 interface LogTableProps {
   logs: any[];
@@ -177,22 +178,12 @@ export default function LogTable({
             })}
         </tbody>
       </table>
-
       {modalOpen && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-          onClick={closeModal}
-        >
-          <div
-            className="flex max-h-[70vh] w-96 flex-col overflow-y-auto rounded-lg bg-white p-6 shadow-lg  sm:w-11/12 md:w-1/2 lg:w-1/3 xl:w-1/3"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="mb-4 text-lg font-semibold">Détails</h2>
-            <pre className="whitespace-pre-wrap break-words">
-              {modalContent}
-            </pre>
-          </div>
-        </div>
+        <Modal isOpen={modalOpen} onClose={closeModal} content={modalContent}>
+          <pre className="whitespace-pre-wrap break-words text-sm text-gray-900">
+            {modalContent}
+          </pre>
+        </Modal>
       )}
     </div>
   );
