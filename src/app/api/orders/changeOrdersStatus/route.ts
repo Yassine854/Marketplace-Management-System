@@ -90,9 +90,12 @@ export const POST = async (request: NextRequest) => {
     for (const orderId of ordersArray) {
       if (!changeResponse?.data?.includes(`order id : ${orderId}`)) {
         try {
-          const orderBefore = await getOrder(orderId);
-
-          const orderBefore = await getOrder(orderId);
+          const orderBefor = await getOrder(orderId);
+          const orderBefore = {
+            orderId: orderBefor.orderId,
+            state: orderBefor.state,
+            status: orderBefor.status,
+          };
 
           await typesense.orders.updateOne({
             id: orderId,
@@ -100,8 +103,13 @@ export const POST = async (request: NextRequest) => {
             state,
           });
 
-          const orderAfter = await getOrder(orderId);
-          const storeId = orderBefore.storeId;
+          const orderAftere = await getOrder(orderId);
+          const orderAfter = {
+            orderId: orderAftere.orderId,
+            state: orderAftere.state,
+            status: orderAftere.status,
+          };
+          const storeId = orderBefor.storeId;
           await createLog({
             type: "Order",
             message: `Order status changed `,

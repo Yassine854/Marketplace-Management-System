@@ -5,7 +5,6 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   content: any;
-  children?: React.ReactNode;
 }
 
 export default function Modal({ isOpen, onClose, title, content }: ModalProps) {
@@ -13,38 +12,46 @@ export default function Modal({ isOpen, onClose, title, content }: ModalProps) {
 
   const renderContent = () => {
     if (typeof content === "object" && !Array.isArray(content)) {
-      // Afficher un tableau structuré pour un objet
       return (
-        <div className="space-y-4">
+        <div className="space-y-2 p-2">
           {Object.entries(content).map(([key, value]) => (
             <div
               key={key}
-              className="flex items-center justify-between rounded-lg bg-gray-100 p-4 shadow-md"
+              className="flex items-center border-b border-gray-300 py-2"
             >
-              <span className="font-semibold text-gray-800">{key}</span>
-              <span className="text-gray-600">{String(value)}</span>
+              <span className="w-1/2 text-sm font-medium text-gray-700">
+                {key}
+              </span>
+              <span className="w-1/2 text-base text-gray-900">
+                {value as React.ReactNode}
+              </span>
             </div>
           ))}
         </div>
       );
     } else if (Array.isArray(content)) {
-      // Si c'est un tableau, on le présente de manière lisible
       return (
-        <div className="space-y-2">
+        <div className="space-y-2 p-2">
           {content.map((item, index) => (
-            <div key={index} className="rounded-lg bg-gray-100 p-4 shadow-sm">
-              <pre className="whitespace-pre-wrap text-sm text-gray-700">
-                {JSON.stringify(item, null, 2)}
-              </pre>
+            <div key={index} className="border-b border-gray-300 py-2">
+              {Object.entries(item).map(([key, value]) => (
+                <div key={key} className="flex items-center">
+                  <span className="w-1/2 text-sm font-medium text-gray-700">
+                    {key}
+                  </span>
+                  <span className="w-1/2 text-base text-gray-900">
+                    {value as React.ReactNode}
+                  </span>
+                </div>
+              ))}
             </div>
           ))}
         </div>
       );
     } else {
-      // Sinon, afficher directement la donnée
       return (
-        <div className="rounded-lg bg-gray-100 p-4 shadow-sm">
-          <p className="text-gray-700">{String(content)}</p>
+        <div className="border-b border-gray-300 py-2">
+          <p className="text-base text-gray-900">{content}</p>
         </div>
       );
     }
@@ -59,12 +66,18 @@ export default function Modal({ isOpen, onClose, title, content }: ModalProps) {
         className="w-96 overflow-hidden rounded-lg bg-white shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b bg-blue-500 p-4 text-white">
-          <h2 className="text-xl font-semibold">{title || "Détails"}</h2>
-          <button className="text-white hover:text-gray-300" onClick={onClose}>
+        {/* Header */}
+        <div className="flex items-center justify-between border-b bg-gray-800 p-4 text-white">
+          <h2 className="text-lg font-semibold">{title || "Détails"}</h2>
+          <button
+            className="text-white transition hover:text-gray-400"
+            onClick={onClose}
+          >
             ✖
           </button>
         </div>
+
+        {/* Contenu */}
         <div className="p-4">{renderContent()}</div>
       </div>
     </div>

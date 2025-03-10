@@ -25,18 +25,16 @@ export const POST = async (request: NextRequest) => {
   console.log(user);
   try {
     const { orderId, status, state } = await request.json();
-
-    // Validate input parameters
     if (!orderId) return responses.invalidRequest("orderId is Required");
     if (!status) return responses.invalidRequest("status is Required");
     if (!state) return responses.invalidRequest("state is Required");
 
     const currentOrder = await getOrder(orderId);
-
-    if (!currentOrder)
-      return responses.invalidRequest("Missing required fields");
-
-    const dataBefore = JSON.stringify(currentOrder);
+    const orderBefore = {
+      orderId: currentOrder.orderId,
+      state: currentOrder.state,
+      status: currentOrder.status,
+    };
 
     const changeResponse = await magento.mutations.changeOrderStatus({
       orderId,
@@ -59,7 +57,7 @@ export const POST = async (request: NextRequest) => {
           storeId: currentOrder.storeId,
         },
         timestamp: new Date(),
-        dataBefore: dataBefore,
+        dataBefore: orderBefore,
         dataAfter: "error",
         id: "",
       });
@@ -79,11 +77,12 @@ export const POST = async (request: NextRequest) => {
       state,
     });
 
-    const updatedOrder = getOrder(orderId);
-    if (!updatedOrder)
-      return responses.invalidRequest("failed to fetch updated order");
-
-    const dataAfter = JSON.stringify(updatedOrder);
+    const updatedOrder = await getOrder(orderId);
+    const orderAfter = {
+      orderId: updatedOrder.orderId,
+      state: updatedOrder.state,
+      status: updatedOrder.status,
+    };
 
     console.log("updated successfully");
 
@@ -99,8 +98,8 @@ export const POST = async (request: NextRequest) => {
         storeId: currentOrder.storeId,
       },
       timestamp: new Date(),
-      dataBefore: currentOrder.status,
-      dataAfter: status,
+      dataBefore: orderBefore,
+      dataAfter: orderAfter,
       id: "",
     });
 

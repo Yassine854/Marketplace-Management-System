@@ -179,11 +179,7 @@ export default function LogTable({
         </tbody>
       </table>
       {modalOpen && (
-        <Modal isOpen={modalOpen} onClose={closeModal} content={modalContent}>
-          <pre className="whitespace-pre-wrap break-words text-sm text-gray-900">
-            {modalContent}
-          </pre>
-        </Modal>
+        <Modal isOpen={modalOpen} onClose={closeModal} content={modalContent} />
       )}
     </div>
   );
