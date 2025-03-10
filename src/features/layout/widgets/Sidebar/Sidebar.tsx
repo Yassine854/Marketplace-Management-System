@@ -16,6 +16,7 @@ import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import SidebarButton from "@/features/shared/elements/SidebarElements/SidebarButton";
 import SidebarSubMenu from "@/features/shared/elements/SidebarElements/SidebarSubMenu";
 import SidebarOrdersSubMenu from "@/features/shared/elements/SidebarElements/SidebarOrdersSubMenu";
+import path from "path";
 
 const Sidebar = ({
   isAdmin,
@@ -144,6 +145,7 @@ const Sidebar = ({
                 items={[
                   { name: "Users", path: "/access/users" },
                   { name: "Roles", path: "/access/roles" },
+                  { name: "Logs", path: "/access/logs" },
                 ]}
               />
 

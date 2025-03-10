@@ -3,90 +3,133 @@ import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/clients/prisma";
-import { createAuditLog } from "@/services/auditing/orders";
 import { getOrder } from "@/services/orders/getOrder";
 import { axios } from "@/libs/axios";
+import { createLog } from "@/clients/prisma/getLogs";
+import { auth } from "../../../../services/auth";
 
 export const POST = async (request: NextRequest) => {
-  const errorMessages: string[] = []; 
+  const errorMessages: string[] = [];
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = session.user as {
+      id: string;
+      roleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
     const { orders, status, state, username } = await request.json();
-
-    let ordersArray = Array.isArray(orders) ? orders : orders?.split(",").map((order: string) => order.trim());
-
+    let ordersArray = Array.isArray(orders)
+      ? orders
+      : orders?.split(",").map((order: string) => order.trim());
     if (!Array.isArray(ordersArray) || ordersArray.length === 0) {
       return NextResponse.json(
         { message: "orders is required and must be a non-empty array" },
-        { status: 400 } 
+        { status: 400 },
       );
     }
-
     if (!status) return responses.invalidRequest("status is required");
     if (!state) return responses.invalidRequest("state is required");
     if (!username) return responses.invalidRequest("username is required");
-
-    const formattedOrders = ordersArray.map(orderId => ({
+    const formattedOrders = ordersArray.map((orderId) => ({
       orderId: orderId,
       status: status,
-      state: state
+      state: state,
     }));
-
-    let changeResponse: any = '';  
-
-    
-    if (status === 'unpaid') {
-      changeResponse = await axios.magentoClient.post("orders/manage/complete", {
-        orders: ordersArray.join(","),
-      });
+    let changeResponse: any = "";
+    if (status === "unpaid") {
+      changeResponse = await axios.magentoClient.post(
+        "orders/manage/complete",
+        {
+          orders: ordersArray.join(","),
+        },
+      );
     } else {
-    
       changeResponse = await axios.magentoClient.put("orders/status_change", {
-        orders: formattedOrders, 
+        orders: formattedOrders,
       });
     }
-
-   
-    if (typeof changeResponse === 'string') {
+    if (typeof changeResponse === "string") {
       if (changeResponse.includes("Orders failed")) {
         logError(changeResponse);
         const failedOrderIds = changeResponse.match(/order id : (\d+)/g);
-        const extractedOrderIds = failedOrderIds ? failedOrderIds.map((order: string) => order.split(": ")[1]).join(", ") : "";
+        const extractedOrderIds = failedOrderIds
+          ? failedOrderIds
+              .map((order: string) => order.split(": ")[1])
+              .join(", ")
+          : "";
         errorMessages.push(`Failed to process orders: ${changeResponse}`);
       }
-    } else if (changeResponse && typeof changeResponse === 'object') {
-      if (changeResponse.data && typeof changeResponse.data === 'string' && changeResponse.data.includes("Orders failed")) {
+    } else if (changeResponse && typeof changeResponse === "object") {
+      if (
+        changeResponse.data &&
+        typeof changeResponse.data === "string" &&
+        changeResponse.data.includes("Orders failed")
+      ) {
         logError(changeResponse.data);
         const failedOrderIds = changeResponse.data.match(/order id : (\d+)/g);
-        const extractedOrderIds = failedOrderIds ? failedOrderIds.map((order: string) => order.split(": ")[1]).join(", ") : "";
+        const extractedOrderIds = failedOrderIds
+          ? failedOrderIds
+              .map((order: string) => order.split(": ")[1])
+              .join(", ")
+          : "";
         errorMessages.push(`Failed to process orders: ${changeResponse.data}`);
       }
     } else {
       logError("Unexpected response format");
       errorMessages.push("Unexpected response format received.");
     }
-
-   
     const results = [];
     for (const orderId of ordersArray) {
       if (!changeResponse?.data?.includes(`order id : ${orderId}`)) {
         try {
-        
+          const orderBefor = await getOrder(orderId);
+          const orderBefore = {
+            orderId: orderBefor.orderId,
+            state: orderBefor.state,
+            status: orderBefor.status,
+          };
+
           await typesense.orders.updateOne({
             id: orderId,
             status,
             state,
           });
 
-        
-          const order = await getOrder(orderId);
-         // const user = await prisma.getUser(username);
-      /*    if (!user) {
+          const orderAftere = await getOrder(orderId);
+          const orderAfter = {
+            orderId: orderAftere.orderId,
+            state: orderAftere.state,
+            status: orderAftere.status,
+          };
+          const storeId = orderBefor.storeId;
+          await createLog({
+            type: "Order",
+            message: `Order status changed `,
+            context: JSON.stringify({
+              userId: user.id,
+              username: user.username,
+              storeId: storeId,
+            }),
+            timestamp: new Date(),
+            dataBefore: orderBefore,
+            dataAfter: orderAfter,
+            id: "",
+          });
+          // const user = await prisma.getUser(username);
+          /*    if (!user) {
             results.push({ orderId, success: false, message: "User not found" });
-            continue; 
+            continue;
           }
 */
-/*
+          /*
           await createAuditLog({
             username: user.username ?? "",
             userId: user.id ?? "",
@@ -96,33 +139,43 @@ export const POST = async (request: NextRequest) => {
             storeId: order?.storeId,
           });
 */
-          results.push({ orderId, success: true, message: "Order Status Changed Successfully" });
+          results.push({
+            orderId,
+            success: true,
+            message: "Order Status Changed Successfully",
+          });
         } catch (error) {
           logError(error);
-          results.push({ orderId, success: false, message: `Failed to update order ${orderId}: ` });
+          results.push({
+            orderId,
+            success: false,
+            message: `Failed to update order ${orderId}: `,
+          });
           errorMessages.push(`Error processing order ${orderId}:`);
         }
       } else {
-        results.push({ orderId, success: false, message: "Order not processed due to previous errors" });
+        results.push({
+          orderId,
+          success: false,
+          message: "Order not processed due to previous errors",
+        });
       }
     }
-
     return NextResponse.json(
       {
         results,
-        message: errorMessages.length > 0 ? errorMessages : undefined, 
+        message: errorMessages.length > 0 ? errorMessages : undefined,
       },
-      { status: errorMessages.length > 0 ? 400 : 200 } 
+      { status: errorMessages.length > 0 ? 400 : 200 },
     );
-
   } catch (error: any) {
     logError(error);
     return NextResponse.json(
       {
-        message: errorMessages || error.message || "Internal Server Error", 
-        errors: errorMessages.length > 0 ? errorMessages : undefined, 
+        message: errorMessages || error.message || "Internal Server Error",
+        errors: errorMessages.length > 0 ? errorMessages : undefined,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };

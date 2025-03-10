@@ -5,9 +5,25 @@ import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/clients/prisma";
 import { createMilkRunAuditLog } from "@/services/auditing/milkRun";
 import { magento } from "@/clients/magento";
+import { auth } from "../../../../services/auth";
+import { createLog } from "@/clients/prisma/getLogs";
 
 export const PUT = async (request: NextRequest) => {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const User = session.user as {
+      id: string;
+      roleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
     const { order, username } = await request.json();
 
     if (!order) {
@@ -34,23 +50,59 @@ export const PUT = async (request: NextRequest) => {
     }
 
     const sorder: any = await typesense.orders.getOne(order.id);
+    let changes = {};
+    if (sorder.deliverySlot !== order.deliverySlot) {
+      changes = {
+        ...changes,
+        deliverySlot: {
+          before: sorder.deliverySlot,
+          after: order.deliverySlot,
+        },
+      };
+    }
+    if (sorder.deliveryAgentId !== order.deliveryAgentId) {
+      changes = {
+        ...changes,
+        deliveryAgentId: {
+          before: sorder.deliveryAgentId,
+          after: order.deliveryAgentId,
+        },
+      };
+    }
+    if (sorder.deliveryAgentName !== order.deliveryAgentName) {
+      changes = {
+        ...changes,
+        deliveryAgentName: {
+          before: sorder.deliveryAgentName,
+          after: order.deliveryAgentName,
+        },
+      };
+    }
     await magento.mutations.editOrderMilkRun({
       orderId: order?.id,
       deliverySlot: order?.deliverySlot,
       deliveryAgentName: order?.deliveryAgentName,
       deliveryAgentId: order?.deliveryAgentId,
-      status:sorder?.status,
-      state:sorder?.state, 
-      
+      status: sorder?.status,
+      state: sorder?.state,
     });
 
     await typesense.orders.updateOne(order);
 
-    const user = await prisma.getUser(username);
+    const dbUser = await prisma.getUser(username);
+    await createLog({
+      type: "milk run",
+      message: `milk run updated for order `,
+      context: JSON.stringify({ User }),
+      timestamp: new Date(),
+      dataBefore: sorder,
+      dataAfter: changes,
+      id: order?.id,
+    });
 
-    await createMilkRunAuditLog({
-      username: user?.username ?? "",
-      userId: user?.id ?? "",
+    /* await createMilkRunAuditLog({
+      username: dbUser?.username ?? "",
+      userId: dbUser?.id ?? "",
       action: `${username} edit order`,
       actionTime: new Date(),
       orderId: order?.id,
@@ -58,7 +110,7 @@ export const PUT = async (request: NextRequest) => {
       agentId: order?.deliveryAgentId,
       agentName: order?.deliveryAgentName,
       deliveryDate: order.deliveryDate ? order.deliveryDate.toString() : 'N/A',
-    });
+    });*/
 
     return NextResponse.json(
       {

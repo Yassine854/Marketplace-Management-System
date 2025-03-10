@@ -8,6 +8,7 @@ const adminRoutes = [
   "/access/users",
   "/logs/orders-logs",
   "/logs/activities-logs",
+  "/access/logs",
 ];
 
 const intlMiddleware = createIntlMiddleware({

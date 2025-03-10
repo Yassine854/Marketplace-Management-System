@@ -6,6 +6,7 @@ import { editUser } from "./editUser";
 import { getAllUsers } from "./getAllUsers";
 import { getAllOrdersLogs } from "./getAllOrdersLogs";
 import { getAllMilkRunAuditLogs } from "./getAllMilkRunAuditLogs";
+import { getAllLogs } from "./getAllLog";
 
 export const prisma = {
   getUser,
@@ -13,4 +14,5 @@ export const prisma = {
   getAllUsers,
   getAllOrdersLogs,
   getAllMilkRunAuditLogs,
+  getAllLogs,
 };

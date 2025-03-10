@@ -42,3 +42,15 @@ model MilkRunAuditTrail {
   agentName    String
   deliveryDate String
 }
+model Log {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  type       String
+  message    String
+  context    Json?
+  dataBefore Json?
+  dataAfter  Json?
+  timestamp  DateTime @default(now())
+
+  @@map("logs")
+}
+

@@ -3,73 +3,121 @@ import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/clients/prisma";
-import { createAuditLog } from "@/services/auditing/orders";
+import { prismaClient } from "@/clients/prisma";
+import { createLog } from "../../../../clients/prisma/getLogs";
 import { getOrder } from "@/services/orders/getOrder";
+import { auth } from "../../../../services/auth";
 
 export const POST = async (request: NextRequest) => {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+  console.log(session);
+  const user = session.user as {
+    id: string;
+    roleId: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    isActive: boolean;
+  };
+  console.log(user);
   try {
-    const { orderId, status, state, username } = await request.json();
-
-    // Validate input parameters
+    const { orderId, status, state } = await request.json();
     if (!orderId) return responses.invalidRequest("orderId is Required");
     if (!status) return responses.invalidRequest("status is Required");
     if (!state) return responses.invalidRequest("state is Required");
-    if (!username) return responses.invalidRequest("username is Required");
 
-    // Change order status
-    const changeResponse = await magento.mutations.changeOrderStatus({ orderId, status, state });
-    
+    const currentOrder = await getOrder(orderId);
+    const orderBefore = {
+      orderId: currentOrder.orderId,
+      state: currentOrder.state,
+      status: currentOrder.status,
+    };
 
-    // Check for failure in the response
-    if (typeof changeResponse === 'string' && changeResponse.includes("Orders failed")) {
-      logError(changeResponse); // Log the error
+    const changeResponse = await magento.mutations.changeOrderStatus({
+      orderId,
+      status,
+      state,
+    });
+
+    console.log(changeResponse);
+
+    if (
+      typeof changeResponse === "string" &&
+      changeResponse.includes("Orders failed")
+    ) {
+      await createLog({
+        type: "error",
+        message: `Status change failed`,
+        context: {
+          userId: user.id,
+          username: user.username,
+          storeId: currentOrder.storeId,
+        },
+        timestamp: new Date(),
+        dataBefore: orderBefore,
+        dataAfter: "error",
+        id: "",
+      });
       return NextResponse.json(
         {
-          message: changeResponse, // Return the error message
+          message: changeResponse,
         },
-        { status: 400 } // Use a 400 status for a client error
+        { status: 400 },
       );
     }
 
-    // If no error, continue with updating Typesense
+    console.log("no error");
+
     await typesense.orders.updateOne({
       id: orderId,
       status,
       state,
     });
 
-    // Get order and user information
-    const order = await getOrder(orderId);
-   // const user = await prisma.getUser(username);
-   // if (!user) return responses.invalidRequest("User not found");
+    const updatedOrder = await getOrder(orderId);
+    const orderAfter = {
+      orderId: updatedOrder.orderId,
+      state: updatedOrder.state,
+      status: updatedOrder.status,
+    };
 
-    // Create audit log
-    /*
-    await createAuditLog({
-      username: user?.username ?? "",
-      userId: user?.id ?? "",
-      action: `${username} changed order status to ${status}`,
-      actionTime: new Date(),
-      orderId: orderId,
-      storeId: order?.storeId,
+    console.log("updated successfully");
+
+    // const user = await prisma.getUser(username);
+    // if (!user) return responses.invalidRequest("User not found");
+
+    await createLog({
+      type: "Order",
+      message: `order changed`,
+      context: {
+        userId: user.id,
+        username: user.username,
+        storeId: currentOrder.storeId,
+      },
+      timestamp: new Date(),
+      dataBefore: orderBefore,
+      dataAfter: orderAfter,
+      id: "",
     });
-*/
-    // Return success response
+
+    console.log(" created successfully");
+
     return NextResponse.json(
       {
         message: "Order Status Changed Successfully",
       },
-      { status: 200 }
+      { status: 200 },
     );
-
   } catch (error: any) {
     logError(error);
     return NextResponse.json(
       {
-        message: error.message || "Internal Server Error", // Include error message
+        message: error.message || "Internal Server Error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };

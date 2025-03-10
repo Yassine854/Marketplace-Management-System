@@ -1,18 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-
-// Static user data for testing purposes
-let staticUser = {
-  id: "100",
-  username: "intern",
-  firstName: "intern",
-  lastName: "intern",
-  password: "intern", // Remember to hash passwords in production
-  roleId: "1",
-  isActive: true,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
+import { handleAuthentication } from "./handleAuthentication";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
@@ -23,61 +11,62 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // Simulate checking credentials against the static user
-        if (credentials.password === staticUser.password) {
-          // Return the static user if credentials match
-          staticUser.username=credentials.username;
-          staticUser.firstName=credentials.username;
-          staticUser.lastName="";
-          return staticUser;
-        } else {
-          // Return null if credentials don't match (simulating invalid login)
-          return null;
-        }
+        const user = await handleAuthentication(
+          credentials.username,
+          credentials.password,
+        );
+
+        if (!user) return null;
+
+        return {
+          id: user.id,
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          status: user.status,
+          roleId: user.roleId,
+          isActive: user.isActive,
+        };
       },
     }),
   ],
 
   callbacks: {
-    // Sign-in callback - Checks if the user is active before allowing sign-in
-    async signIn({ user }) {
-    /*  if (!user?.isActive) {
-        return false; // Prevent sign-in if the user is not active
-      }*/
-      return true; // Allow sign-in if the user is active
-    },
-
-    // JWT callback - Populates the token with user data
     async jwt({ token, user }) {
+      //console.log("jwt() - Before Update:", token);
+
       if (user) {
-        return {
-          ...token,
-          userId: user.id,
-          userRoleId: user.roleId,
-          username: user.username,
-          userFirstName: user.firstName,
-          userLastName: user.lastName,
-          isActive: user.isActive,
-        };
+        token.userId = user.id;
+        token.userRoleId = user.roleId;
+        token.username = user.username;
+        token.userFirstName = user.firstName;
+        token.userLastName = user.lastName;
+        token.isActive = user.isActive;
       }
-      return token; // Return the existing token if no user is provided
+
+      //console.log("jwt() - After Update:", token);
+      return token;
     },
 
-    // Session callback - Adds user data from the token to the session object
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.userId;
-        session.user.roleId = token.userRoleId;
-        session.user.username = token.username;
-        session.user.firstName = token.userFirstName;
-        session.user.lastName = token.userLastName;
-        session.user.isActive = token.isActive;
-      }
+      // console.log("session() - Before Fix:", session);
+      // console.log("session() - Token Data:", token);
+
+      session.user = {
+        id: token.userId,
+        roleId: token.userRoleId,
+        username: token.username,
+        firstName: token.userFirstName,
+        lastName: token.userLastName,
+        isActive: token.isActive,
+      };
+
+      // console.log("session() - After Fix:", session);
       return session;
     },
   },
 
   secret: process.env.AUTH_SECRET,
   trustHost: true,
-  debug: process.env.NODE_ENV === "development", // Enable debug mode in development only
+  debug: process.env.NODE_ENV === "development",
 });
