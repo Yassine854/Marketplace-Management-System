@@ -53,7 +53,7 @@ export const PUT = async (request: NextRequest) => {
     }
 
     const { total, orderId, items, deliveryDate } = order;
-    const orderObjectBefore = await getOrder(orderId);
+    const orderBefore = await getOrder(orderId);
 
     const res = await magento.mutations.editOrderDetails({
       total,
@@ -69,19 +69,8 @@ export const PUT = async (request: NextRequest) => {
       deliveryDate: convertIsoDateToUnixTimestamp(deliveryDate),
     });
 
-    const orderObjectAfter = await getOrder(orderId);
-    const user = await prisma.getUser(username);
-    const compareFields = (before: any, after: any) => {
-      const changes: { [key: string]: { before: any; after: any } } = {};
-      Object.keys(before).forEach((key) => {
-        if (JSON.stringify(before[key]) !== JSON.stringify(after[key])) {
-          changes[key] = { before: before[key], after: after[key] };
-        }
-      });
-      return changes;
-    };
+    const orderAfter = await getOrder(orderId);
 
-    const changes = compareFields(orderObjectBefore, orderObjectAfter);
     /* await createAuditLog({
       username: user?.username ?? "",
       userId: user?.id ?? "",
@@ -93,10 +82,28 @@ export const PUT = async (request: NextRequest) => {
     await createLog({
       type: "Order",
       message: `Order edited `,
-      context: JSON.stringify(user),
+      context: {
+        userId: user?.id,
+        username: user?.username,
+        storeId: orderBefore?.storeId,
+      },
       timestamp: new Date(),
-      dataBefore: orderObjectBefore,
-      dataAfter: { ...orderObjectAfter, changes },
+      dataBefore: {
+        orderId: orderBefore?.orderId,
+        state: orderBefore?.state,
+        status: orderBefore?.status,
+        total: orderBefore?.total,
+        items: orderBefore?.items,
+        deliveryDate: orderBefore?.deliveryDate,
+      },
+      dataAfter: {
+        orderId: orderAfter?.orderId,
+        state: orderAfter?.state,
+        status: orderAfter?.status,
+        total: orderAfter?.total,
+        items: orderAfter?.items,
+        deliveryDate: orderAfter?.deliveryDate,
+      },
       id: "",
     });
     return NextResponse.json(

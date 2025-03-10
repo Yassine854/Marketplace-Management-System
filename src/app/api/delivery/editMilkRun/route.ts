@@ -50,34 +50,7 @@ export const PUT = async (request: NextRequest) => {
     }
 
     const sorder: any = await typesense.orders.getOne(order.id);
-    let changes = {};
-    if (sorder.deliverySlot !== order.deliverySlot) {
-      changes = {
-        ...changes,
-        deliverySlot: {
-          before: sorder.deliverySlot,
-          after: order.deliverySlot,
-        },
-      };
-    }
-    if (sorder.deliveryAgentId !== order.deliveryAgentId) {
-      changes = {
-        ...changes,
-        deliveryAgentId: {
-          before: sorder.deliveryAgentId,
-          after: order.deliveryAgentId,
-        },
-      };
-    }
-    if (sorder.deliveryAgentName !== order.deliveryAgentName) {
-      changes = {
-        ...changes,
-        deliveryAgentName: {
-          before: sorder.deliveryAgentName,
-          after: order.deliveryAgentName,
-        },
-      };
-    }
+
     await magento.mutations.editOrderMilkRun({
       orderId: order?.id,
       deliverySlot: order?.deliverySlot,
@@ -88,6 +61,7 @@ export const PUT = async (request: NextRequest) => {
     });
 
     await typesense.orders.updateOne(order);
+    const Order: any = await typesense.orders.getOne(order.id);
 
     const dbUser = await prisma.getUser(username);
     await createLog({
@@ -95,8 +69,20 @@ export const PUT = async (request: NextRequest) => {
       message: `milk run updated for order `,
       context: JSON.stringify({ User }),
       timestamp: new Date(),
-      dataBefore: sorder,
-      dataAfter: changes,
+      dataBefore: {
+        orderId: sorder?.id,
+        storeId: sorder?.storeId,
+        agentId: sorder?.deliveryAgentId,
+        agentName: sorder?.deliveryAgentName,
+        deliveryDate: sorder?.deliverySlot,
+      },
+      dataAfter: {
+        orderId: Order?.id,
+        storeId: Order?.storeId,
+        agentId: Order?.deliveryAgentId,
+        agentName: Order?.deliveryAgentName,
+        deliveryDate: Order?.deliverySlot,
+      },
       id: order?.id,
     });
 
