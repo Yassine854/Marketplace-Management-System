@@ -2,7 +2,7 @@
 
 import LogTable from "../Table/LogTable";
 import { useGetAllLogs } from "../getLogs/useGetAllLogs";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 export default function LogsPage() {
   const { logs, isLoading, error, refetch } = useGetAllLogs();
@@ -12,6 +12,28 @@ export default function LogsPage() {
     "all" | "error" | "warning" | "info" | "order" | "milk run"
   >("all");
   const [sortLog, setSortLog] = useState<"newest" | "oldest">("newest");
+  useEffect(() => {
+    const validLogs = logs.filter((log) => {
+      try {
+        if (log.context) JSON.parse(JSON.stringify(log.context));
+        if (log.dataBefore) JSON.parse(JSON.stringify(log.dataBefore));
+        if (log.dataAfter) JSON.parse(JSON.stringify(log.dataAfter));
+        return true;
+      } catch {
+        return false;
+      }
+    });
+
+    if (validLogs.length > 0) {
+      setIsSidebarOpen(false);
+    }
+  }, [logs]);
+
+  useEffect(() => {
+    if (logs.length > 0) {
+      setIsSidebarOpen(false);
+    }
+  }, [logs]);
 
   const filteredLogs = useMemo(() => {
     return logs

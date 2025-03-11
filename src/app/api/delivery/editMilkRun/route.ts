@@ -67,7 +67,11 @@ export const PUT = async (request: NextRequest) => {
     await createLog({
       type: "milk run",
       message: `milk run updated for order `,
-      context: JSON.stringify({ User }),
+      context: JSON.stringify({
+        userId: User?.id,
+        username: User.username,
+        storeId: sorder.storeId,
+      }),
       timestamp: new Date(),
       dataBefore: {
         orderId: sorder?.id,
@@ -75,6 +79,7 @@ export const PUT = async (request: NextRequest) => {
         agentId: sorder?.deliveryAgentId,
         agentName: sorder?.deliveryAgentName,
         deliveryDate: sorder?.deliverySlot,
+        status: sorder?.status,
       },
       dataAfter: {
         orderId: Order?.id,
@@ -82,6 +87,7 @@ export const PUT = async (request: NextRequest) => {
         agentId: Order?.deliveryAgentId,
         agentName: Order?.deliveryAgentName,
         deliveryDate: Order?.deliverySlot,
+        status: order.status,
       },
       id: order?.id,
     });

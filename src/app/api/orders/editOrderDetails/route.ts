@@ -10,6 +10,7 @@ import { createLog } from "../../../../clients/prisma/getLogs";
 import { auth } from "../../../../services/auth";
 
 import { convertIsoDateToUnixTimestamp } from "@/utils/date/convertIsoDateToUnixTimestamp";
+import { orderStatus } from "@/features/shared/elements/SidebarElements/SidebarOrdersSubMenu/orderStatus";
 
 export const PUT = async (request: NextRequest) => {
   const session = await auth();
@@ -54,6 +55,7 @@ export const PUT = async (request: NextRequest) => {
 
     const { total, orderId, items, deliveryDate } = order;
     const orderBefore = await getOrder(orderId);
+    const storeId = orderBefore.storeId;
 
     const res = await magento.mutations.editOrderDetails({
       total,
@@ -70,6 +72,7 @@ export const PUT = async (request: NextRequest) => {
     });
 
     const orderAfter = await getOrder(orderId);
+    const user = await prisma.getUser(username);
 
     /* await createAuditLog({
       username: user?.username ?? "",
@@ -82,28 +85,26 @@ export const PUT = async (request: NextRequest) => {
     await createLog({
       type: "Order",
       message: `Order edited `,
-      context: {
+      context: JSON.stringify({
         userId: user?.id,
         username: user?.username,
-        storeId: orderBefore?.storeId,
-      },
+        storeId: storeId,
+      }),
       timestamp: new Date(),
-      dataBefore: {
-        orderId: orderBefore?.orderId,
-        state: orderBefore?.state,
-        status: orderBefore?.status,
-        total: orderBefore?.total,
-        items: orderBefore?.items,
-        deliveryDate: orderBefore?.deliveryDate,
-      },
-      dataAfter: {
-        orderId: orderAfter?.orderId,
-        state: orderAfter?.state,
-        status: orderAfter?.status,
-        total: orderAfter?.total,
-        items: orderAfter?.items,
-        deliveryDate: orderAfter?.deliveryDate,
-      },
+      dataBefore: JSON.stringify({
+        orderId: orderBefore.orderId,
+        deliveryDate: orderBefore.deliveryDate,
+        total: orderBefore.total,
+
+        status: orderBefore.status,
+      }),
+      dataAfter: JSON.stringify({
+        orderId: orderAfter.orderId,
+        deliveryDate: orderAfter.deliveryDate,
+        total: orderAfter.total,
+
+        status: orderAfter.status,
+      }),
       id: "",
     });
     return NextResponse.json(
