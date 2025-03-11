@@ -4,12 +4,69 @@ import { responses } from "@/utils/responses";
 import { typesense } from "@/clients/typesense";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/clients/prisma";
-import { createAuditLog } from "@/services/auditing/orders";
-import { getOrder } from "@/services/orders/getOrder";
 import { createLog } from "../../../../clients/prisma/getLogs";
 import { auth } from "../../../../services/auth";
-
 import { convertIsoDateToUnixTimestamp } from "@/utils/date/convertIsoDateToUnixTimestamp";
+import { getOrder } from "@/services/orders/getOrder";
+
+const areItemsDifferent = (beforeItem: any, afterItem: any) => {
+  return (
+    beforeItem.id !== afterItem.id ||
+    beforeItem.quantity !== afterItem.quantity ||
+    beforeItem.price !== afterItem.price ||
+    beforeItem.totalPrice !== afterItem.totalPrice ||
+    beforeItem.sku !== afterItem.sku ||
+    beforeItem.weight !== afterItem.weight
+  );
+};
+
+const compareItems = (beforeItems: any[], afterItems: any[]) => {
+  const removedItems = beforeItems.filter(
+    (beforeItem) =>
+      !afterItems.some((afterItem) => afterItem.id === beforeItem.id),
+  );
+
+  const addedItems = afterItems.filter(
+    (afterItem) =>
+      !beforeItems.some((beforeItem) => beforeItem.id === afterItem.id),
+  );
+
+  const updatedItems = afterItems.filter((afterItem) =>
+    beforeItems.some(
+      (beforeItem) =>
+        beforeItem.id === afterItem.id &&
+        areItemsDifferent(beforeItem, afterItem),
+    ),
+  );
+  const updatedItems1 = beforeItems.filter((beforeItem) =>
+    afterItems.some(
+      (afterItem) =>
+        afterItem.id === beforeItem.id &&
+        areItemsDifferent(afterItem, beforeItem),
+    ),
+  );
+
+  const extractItemProperties = (items: any[]) => {
+    return items.map((item) => ({
+      productId: item.productId,
+      productName: item.productName,
+      sku: item.sku,
+      weight: item.weight,
+    }));
+  };
+
+  return {
+    removedItems: extractItemProperties(removedItems),
+    addedItems: extractItemProperties(addedItems),
+    updatedItems: extractItemProperties(updatedItems),
+    updatedItems1: extractItemProperties(updatedItems1),
+  };
+};
+
+const convertUnixToDate = (timestamp: number): string => {
+  const date = new Date(timestamp * 1000);
+  return date.toISOString().split("T")[0];
+};
 
 export const PUT = async (request: NextRequest) => {
   const session = await auth();
@@ -48,12 +105,14 @@ export const PUT = async (request: NextRequest) => {
     if (!order?.total) {
       return responses.invalidRequest("total is Required");
     }
+
     if (!username) {
       return responses.invalidRequest("username is Required");
     }
 
     const { total, orderId, items, deliveryDate } = order;
-    const orderObjectBefore = await getOrder(orderId);
+    const orderBefore = await getOrder(orderId);
+    const storeId = orderBefore.storeId;
 
     const res = await magento.mutations.editOrderDetails({
       total,
@@ -69,36 +128,64 @@ export const PUT = async (request: NextRequest) => {
       deliveryDate: convertIsoDateToUnixTimestamp(deliveryDate),
     });
 
-    const orderObjectAfter = await getOrder(orderId);
+    const orderAfter = await getOrder(orderId);
     const user = await prisma.getUser(username);
-    const compareFields = (before: any, after: any) => {
-      const changes: { [key: string]: { before: any; after: any } } = {};
-      Object.keys(before).forEach((key) => {
-        if (JSON.stringify(before[key]) !== JSON.stringify(after[key])) {
-          changes[key] = { before: before[key], after: after[key] };
-        }
-      });
-      return changes;
+
+    const { removedItems, addedItems, updatedItems, updatedItems1 } =
+      compareItems(orderBefore.items, orderAfter.items);
+
+    const stateBeforeUpdate = {
+      updatedItems: updatedItems1.map((item) => {
+        const originalItem = orderBefore.items.find(
+          (i: { id: any }) => i.id === item.productId,
+        );
+        return { ...item, ...originalItem };
+      }),
+      removedItems: removedItems.map((item) => {
+        const originalItem = orderBefore.items.find(
+          (i) => i.productId === item.productId,
+        );
+        return { ...item, ...originalItem };
+      }),
+      addedItems: addedItems.map((item) => {
+        return { ...item };
+      }),
     };
 
-    const changes = compareFields(orderObjectBefore, orderObjectAfter);
-    /* await createAuditLog({
-      username: user?.username ?? "",
-      userId: user?.id ?? "",
-      action: `${username} edit order`,
-      actionTime: new Date(),
-      orderId: orderId,
-      storeId: orderObject?.storeId,
-    });*/
     await createLog({
       type: "Order",
-      message: `Order edited `,
-      context: JSON.stringify(user),
+      message: `Order edited`,
+      context: JSON.stringify({
+        userId: user?.id,
+        username: user?.username,
+        storeId: storeId,
+      }),
       timestamp: new Date(),
-      dataBefore: orderObjectBefore,
-      dataAfter: { ...orderObjectAfter, changes },
+      dataBefore: JSON.stringify({
+        orderId: orderBefore.orderId,
+        deliveryDate: convertUnixToDate(orderBefore.deliveryDate),
+        total: orderBefore.total,
+        items: {
+          updatedItems: stateBeforeUpdate.updatedItems,
+          removedItems: stateBeforeUpdate.removedItems,
+          addedItems: stateBeforeUpdate.addedItems,
+        },
+        status: orderBefore.status,
+      }),
+      dataAfter: JSON.stringify({
+        orderId: orderAfter.orderId,
+        deliveryDate: convertUnixToDate(orderAfter.deliveryDate),
+        total: orderAfter.total,
+        items: {
+          updatedItems: updatedItems,
+          removedItems: removedItems,
+          addedItems: addedItems,
+        },
+        status: orderAfter.status,
+      }),
       id: "",
     });
+
     return NextResponse.json(
       {
         message: "Order Edited Successfully",
