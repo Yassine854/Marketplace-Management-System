@@ -2,6 +2,19 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { handleAuthentication } from "./handleAuthentication";
 
+// Static user data for testing purposes
+let staticUser = {
+  id: "100",
+  username: "intern",
+  firstName: "intern",
+  lastName: "intern",
+  password: "intern",
+  roleId: "1",
+  isActive: true,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
     CredentialsProvider({
@@ -68,5 +81,5 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
   secret: process.env.AUTH_SECRET,
   trustHost: true,
-  debug: process.env.NODE_ENV === "development",
+  debug: process.env.NODE_ENV === "development", // Enable debug mode in development only
 });

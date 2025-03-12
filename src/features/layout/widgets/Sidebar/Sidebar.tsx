@@ -173,6 +173,20 @@ const Sidebar = ({
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
             </>
           )}
+          {isAdmin && (
+            <>
+              <SidebarSubMenu
+                icon={<IconList />}
+                name={"screen"}
+                onClick={() => {
+                  push("/screen");
+                }}
+                isActive={pathname?.includes("screen")}
+                items={[{ name: "screen", path: "" }, ,]}
+              />
+              <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
+            </>
+          )}
         </div>
       </div>
     </aside>
