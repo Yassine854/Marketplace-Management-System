@@ -6,9 +6,25 @@ import Card from "../widgets/Card";
 import Pagination from "../widgets/Pagination";
 import useAxios from "../hooks/useAxios";
 
+type Screen = {
+  id: string;
+  name: string;
+};
+
+type Pagination = {
+  totalPages: number;
+  totalItems: number;
+  currentPage: number;
+};
+
+type ApiResponse = {
+  screens: Screen[];
+  pagination: Pagination;
+};
+
 const Screen = () => {
   const [showModal, setShowModal] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Screen[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -32,9 +48,9 @@ const Screen = () => {
 
   useEffect(() => {
     if (response && response.data) {
-      const { screens, pagination } = response.data;
+      const { screens, pagination } = response.data as ApiResponse;
       setData(screens);
-      setTotalPages(pagination.totalPages);
+      setTotalPages(pagination?.totalPages || 1);
     }
   }, [response]);
 
