@@ -41,7 +41,7 @@ const Profile = () => {
         <Image
           loading="eager"
           priority={true}
-          src="/profile.png"
+          src="/images/etudiant.png"
           className="rounded-full"
           width={48}
           height={48}
@@ -57,7 +57,7 @@ const Profile = () => {
           <Image
             loading="eager"
             priority={true}
-            src="/profile.png"
+            src="/images/etudiant.png"
             width={60}
             height={60}
             className="rounded-full"
