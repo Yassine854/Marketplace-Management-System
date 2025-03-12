@@ -143,7 +143,7 @@ export const PUT = async (request: NextRequest) => {
       }),
       removedItems: removedItems.map((item) => {
         const originalItem = orderBefore.items.find(
-          (i) => i.productId === item.productId,
+          (i: { productId: any }) => i.productId === item.productId,
         );
         return { ...item, ...originalItem };
       }),
