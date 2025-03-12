@@ -19,6 +19,14 @@ export const useNavigation = () => {
     push("/dashboard");
   };
 
+  const navigateToAllSuppliersDashboard = () => {
+    push("/suppliers");
+  };
+
+  const navigateToSupplierDashboard = () => {
+    push("/SupplierDashboard");
+  };
+
   const navigateToOrders = () => {
     push("/orders");
   };
@@ -44,6 +52,8 @@ export const useNavigation = () => {
     navigateToLogin,
     navigateToOrders,
     navigateToDashboard,
+    navigateToAllSuppliersDashboard,
+    navigateToSupplierDashboard,
     navigateToUsersTable,
     navigateToOrderDetails,
     locale: String(locale),

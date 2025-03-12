@@ -7,6 +7,7 @@ import {
   IconDashboard,
   IconList,
   IconShoppingCart,
+  IconDeviceAnalytics,
 } from "@tabler/icons-react";
 
 import Link from "next/link";
@@ -18,6 +19,7 @@ import SidebarButton from "@/features/shared/elements/SidebarElements/SidebarBut
 import SidebarSubMenu from "@/features/shared/elements/SidebarElements/SidebarSubMenu";
 import SidebarOrdersSubMenu from "@/features/shared/elements/SidebarElements/SidebarOrdersSubMenu";
 import path from "path";
+import SidebarSuppliersSubMenu from "@/features/shared/elements/SidebarElements/SidebarSuppliersSubMenu";
 
 const Sidebar = ({
   isAdmin,
@@ -70,6 +72,17 @@ const Sidebar = ({
             isActive={pathname?.includes("dashboard")}
           />
           <Divider />
+
+          {/* Suppliers Analytics */}
+
+          <SidebarSuppliersSubMenu
+            name={"Supplier Dashboard"}
+            icon={<IconDeviceAnalytics />}
+            isActive={pathname?.includes("supplierDashboard")}
+          />
+
+          <Divider />
+
           <SidebarOrdersSubMenu
             onClick={() => push("/orders")}
             items={statuses}
