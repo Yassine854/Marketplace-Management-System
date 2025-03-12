@@ -20,6 +20,7 @@ import InventoryTrendChart from "../charts/super_admin/InventoryTrendChart";
 import SupplierTopProductsChart from "../charts/super_admin/SupplierTopProductsChart";
 
 import TopArticlesOrdered from "../charts/super_admin/TopArticlesOrdered";
+import { API_BASE_URL } from "../config";
 
 const AllSuppliersDashboard = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -41,6 +42,8 @@ const AllSuppliersDashboard = () => {
   const [warehouses, setWarehouses] = useState<any[]>([]);
 
   useEffect(() => {
+    const token = localStorage.getItem("authToken");
+
     const fetchData = async () => {
       try {
         const [
@@ -51,14 +54,26 @@ const AllSuppliersDashboard = () => {
           customersRes,
           warehousesRes,
         ] = await Promise.all([
-          axios.get("http://localhost:3000/api/categories"),
-          axios.get("http://localhost:3000/api/products"),
-          axios.get("http://localhost:3000/api/orders"),
-          axios.get("http://localhost:3000/api/products_stock"),
-          axios.get("http://localhost:3000/api/customers"),
-          axios.get("http://localhost:3000/api/warehouses"),
+          // Add Authorization header to ALL requests
+          axios.get(`${API_BASE_URL}/api/categories`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${API_BASE_URL}/api/supplier_products`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${API_BASE_URL}/api/orders`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${API_BASE_URL}/api/products_stock`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${API_BASE_URL}/api/customers`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${API_BASE_URL}/api/warehouses`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
         ]);
-
         setCategories(categoriesRes.data);
         setProducts(productsRes.data);
         setOrders(ordersRes.data);
@@ -160,7 +175,10 @@ const AllSuppliersDashboard = () => {
               className="rounded border p-2 text-lg"
             >
               {warehouses.map((warehouse) => (
-                <option key={warehouse.id} value={warehouse.id}>
+                <option
+                  key={warehouse.warehouseId}
+                  value={warehouse.warehouseId}
+                >
                   {warehouse.name}
                 </option>
               ))}

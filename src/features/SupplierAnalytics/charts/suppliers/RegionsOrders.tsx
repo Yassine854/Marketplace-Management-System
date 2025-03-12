@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ApexCharts from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
-import axios from "axios";
 
 const newColors = ["#FF5733", "#33FF57", "#3357FF", "#F1C40F"];
 const quarters = ["Q1", "Q2", "Q3", "Q4"];
@@ -27,7 +26,19 @@ interface Customer {
   addresses: { region: { region: string } }[];
 }
 
-const OrdersByRegion: React.FC<{ supplierId: string }> = ({ supplierId }) => {
+interface OrdersByRegionProps {
+  supplierId: string;
+  orders: Order[];
+  products: Product[];
+  customers: Customer[];
+}
+
+const OrdersByRegion: React.FC<OrdersByRegionProps> = ({
+  supplierId,
+  orders,
+  products,
+  customers,
+}) => {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [regions, setRegions] = useState<
@@ -36,19 +47,9 @@ const OrdersByRegion: React.FC<{ supplierId: string }> = ({ supplierId }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const processData = () => {
       try {
         setLoading(true);
-
-        const [ordersRes, productsRes, customersRes] = await Promise.all([
-          axios.get("http://localhost:3000/api/orders"),
-          axios.get("http://localhost:3000/api/products"),
-          axios.get("http://localhost:3000/api/customers"),
-        ]);
-
-        const orders: Order[] = ordersRes.data;
-        const products: Product[] = productsRes.data;
-        const customers: Customer[] = customersRes.data;
 
         const validProductIds = new Set(
           products
@@ -107,14 +108,14 @@ const OrdersByRegion: React.FC<{ supplierId: string }> = ({ supplierId }) => {
 
         setRegions(countRegions);
       } catch (error) {
-        console.error("Error fetching data", error);
+        console.error("Error processing data", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [selectedYear, supplierId]);
+    processData();
+  }, [selectedYear, supplierId, orders, products, customers]);
 
   const quarterSeries = quarters.map((quarter) => ({
     name: quarter,

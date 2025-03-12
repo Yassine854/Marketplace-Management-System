@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 interface Product {
   product_id: number;
@@ -23,7 +21,7 @@ interface Order {
 }
 
 interface Supplier {
-  manufacturer_id: number;
+  manufacturerId: number;
   company_name: string;
   email: string;
   phone_number: string;
@@ -39,11 +37,27 @@ interface CompetitorSales {
   sales: number;
 }
 
-const SupplierCategoryComparisonChart: React.FC<{
+interface SupplierCategoryComparisonChartProps {
   supplierId: string;
+  products: Product[];
+  categories: Category[];
+  orders: Order[];
+  suppliers: Supplier[];
   startDate?: Date | null;
   endDate?: Date | null;
-}> = ({ supplierId, startDate: propStartDate, endDate: propEndDate }) => {
+}
+
+const SupplierCategoryComparisonChart: React.FC<
+  SupplierCategoryComparisonChartProps
+> = ({
+  supplierId,
+  products,
+  categories,
+  orders,
+  suppliers,
+  startDate: propStartDate,
+  endDate: propEndDate,
+}) => {
   const [chartState, setChartState] = useState<ChartState>({
     series: [],
     options: {
@@ -84,7 +98,7 @@ const SupplierCategoryComparisonChart: React.FC<{
     propStartDate || null,
   );
   const [endDate, setEndDate] = useState<Date | null>(propEndDate || null);
-  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     setStartDate(propStartDate || null);
     setEndDate(propEndDate || null);
@@ -111,55 +125,36 @@ const SupplierCategoryComparisonChart: React.FC<{
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const API_URL =
-          process.env.REACT_APP_API_URL || "http://localhost:3000";
+    try {
+      // Add null checks for critical data sources
+      const safeSuppliers = suppliers || [];
+      const safeProducts = products || [];
+      const safeOrders = orders || [];
+      const safeCategories = categories || [];
 
-        const [productsRes, categoriesRes, ordersRes, suppliersRes] =
-          await Promise.all([
-            fetch(`${API_URL}/api/products`),
-            fetch(`${API_URL}/api/categories`),
-            fetch(`${API_URL}/api/orders`),
-            fetch(`${API_URL}/api/suppliers`),
-          ]);
+      const currentSupplier = safeSuppliers.find(
+        (s) => s.manufacturerId?.toString() === supplierId,
+      );
 
-        if (
-          !productsRes.ok ||
-          !categoriesRes.ok ||
-          !ordersRes.ok ||
-          !suppliersRes.ok
-        ) {
-          throw new Error("Failed to fetch data");
-        }
+      const competitorSuppliers = safeSuppliers.filter(
+        (s) => s.manufacturerId?.toString() !== supplierId,
+      );
 
-        const products: Product[] = await productsRes.json();
-        const categories: Category[] = await categoriesRes.json();
-        const orders: Order[] = await ordersRes.json();
-        const suppliers: Supplier[] = await suppliersRes.json();
+      const supplierProducts = safeProducts.filter(
+        (p) => p.manufacturer === supplierId,
+      );
 
-        if (!Array.isArray(suppliers) || !Array.isArray(products)) {
-          throw new Error("Invalid data format from API");
-        }
+      // Safely get category IDs
+      const supplierCategories = new Set<string>(
+        supplierProducts.flatMap((p) => p.category_ids || []).filter(Boolean),
+      );
 
-        const currentSupplier = suppliers.find(
-          (s) => s.manufacturer_id.toString() === supplierId,
-        );
-        const competitorSuppliers = suppliers.filter(
-          (s) => s.manufacturer_id.toString() !== supplierId,
-        );
+      // Process categories safely
+      const categoryMap = new Map<number, string>();
+      const categoryCompetitors: Record<string, CompetitorSales[]> = {};
 
-        const supplierProducts = products.filter(
-          (p) => p.manufacturer === supplierId,
-        );
-        const supplierCategories = new Set<string>(
-          supplierProducts.flatMap((p) => p.category_ids).filter(Boolean),
-        );
-
-        const categoryMap = new Map<number, string>();
-        const categoryCompetitors: Record<string, CompetitorSales[]> = {};
-
-        categories.forEach((c) => {
+      safeCategories.forEach((c) => {
+        if (c?.categoryId && c?.nameCategory) {
           categoryMap.set(c.categoryId, c.nameCategory);
           if (supplierCategories.has(String(c.categoryId))) {
             categoryCompetitors[c.nameCategory] = competitorSuppliers.map(
@@ -169,146 +164,121 @@ const SupplierCategoryComparisonChart: React.FC<{
               }),
             );
           }
-        });
+        }
+      });
 
-        const filteredOrders = filterOrdersByDate(orders, startDate, endDate);
+      // Ensure filteredOrders is always an array
+      const filteredOrders =
+        filterOrdersByDate(safeOrders, startDate, endDate) || [];
 
-        filteredOrders.forEach((order) => {
-          if (order.state === "canceled") return;
+      // Safe order processing
+      filteredOrders.forEach((order) => {
+        if (order.state === "canceled") return;
 
-          order.items.forEach((item) => {
-            const product = products.find(
-              (p) => p.product_id === item.product_id,
-            );
-            if (
-              !product ||
-              !product.category_ids?.some((c) => supplierCategories.has(c))
-            )
-              return;
+        // Add null check for order.items
+        const items = order.items || [];
+        items.forEach((item) => {
+          const product = safeProducts.find(
+            (p) => p.product_id === item.product_id,
+          );
 
-            const productSupplier = suppliers.find(
-              (s) => s.manufacturer_id.toString() === product.manufacturer,
-            );
-            if (!productSupplier) return;
+          // Add null checks for product and category_ids
+          const validCategories = (product?.category_ids || []).filter((c) =>
+            supplierCategories.has(c),
+          );
 
-            product.category_ids?.forEach((catId) => {
-              if (!supplierCategories.has(catId)) return;
-              const categoryName = categoryMap.get(Number(catId));
-              if (!categoryName) return;
+          if (!product || validCategories.length === 0) return;
 
-              if (productSupplier.manufacturer_id.toString() !== supplierId) {
-                const competitors = categoryCompetitors[categoryName] || [];
-                const competitorIndex = competitors.findIndex(
-                  (c) =>
-                    c.supplier.manufacturer_id ===
-                    productSupplier.manufacturer_id,
-                );
+          const productSupplier = safeSuppliers.find(
+            (s) => s.manufacturerId?.toString() === product.manufacturer,
+          );
 
-                if (competitorIndex !== -1) {
-                  competitors[competitorIndex].sales += item.qty_invoiced;
-                }
+          if (!productSupplier) return;
+
+          validCategories.forEach((catId) => {
+            const categoryName = categoryMap.get(Number(catId));
+            if (!categoryName) return;
+
+            if (productSupplier.manufacturerId?.toString() !== supplierId) {
+              const competitors = categoryCompetitors[categoryName] || [];
+              const competitorIndex = competitors.findIndex(
+                (c) =>
+                  c.supplier.manufacturerId === productSupplier.manufacturerId,
+              );
+
+              if (competitorIndex !== -1) {
+                competitors[competitorIndex].sales += item.qty_invoiced || 0;
               }
-            });
+            }
           });
         });
+      });
 
-        const categoriesList = Object.keys(categoryCompetitors);
-        const mySalesData = categoriesList.map((category) => {
-          return filteredOrders.reduce((acc, order) => {
-            if (order.state === "canceled") return acc;
-            return (
-              acc +
-              order.items.reduce((sum, item) => {
-                const product = products.find(
-                  (p) => p.product_id === item.product_id,
-                );
-                return product?.manufacturer === supplierId &&
-                  product?.category_ids?.some(
-                    (catId) => categoryMap.get(Number(catId)) === category,
-                  )
-                  ? sum + item.qty_invoiced
-                  : sum;
-              }, 0)
-            );
-          }, 0);
-        });
+      // Safe reduce with default values
+      const categoriesList = Object.keys(categoryCompetitors);
+      const mySalesData = categoriesList.map((category) => {
+        return filteredOrders.reduce((acc, order) => {
+          if (order.state === "canceled") return acc;
 
-        setCompetitorsData(categoryCompetitors);
+          // Add null check for order.items
+          const items = order.items || [];
+          return (
+            acc +
+            items.reduce((sum, item) => {
+              const product = safeProducts.find(
+                (p) => p.product_id === item.product_id,
+              );
+              return product?.manufacturer === supplierId &&
+                (product?.category_ids || []).some(
+                  (catId) => categoryMap.get(Number(catId)) === category,
+                )
+                ? sum + (item.qty_invoiced || 0)
+                : sum;
+            }, 0)
+          );
+        }, 0);
+      });
 
-        setChartState((prev) => ({
-          ...prev,
-          series: [
-            {
-              name: currentSupplier?.company_name || "My Sales",
-              data: mySalesData,
-            },
+      // Update state
+      setCompetitorsData(categoryCompetitors);
+      setChartState((prev) => ({
+        ...prev,
+        series: [
+          {
+            name: currentSupplier?.company_name || "My Sales",
+            data: mySalesData,
+          },
+        ],
+        options: {
+          ...prev.options,
+          xaxis: { ...prev.options.xaxis, categories: categoriesList },
+          colors: [
+            "#3B82F6",
+            ...competitorSuppliers.map(
+              () =>
+                `#${Math.floor(Math.random() * 16777215)
+                  .toString(16)
+                  .padStart(6, "0")}`,
+            ),
           ],
-          options: {
-            ...prev.options,
-            xaxis: { ...prev.options.xaxis, categories: categoriesList },
-            colors: [
-              "#3B82F6",
-              ...competitorSuppliers.map(
-                () =>
-                  "#" +
-                  Math.floor(Math.random() * 16777215)
-                    .toString(16)
-                    .padStart(6, "0"),
-              ),
-            ],
-          },
-        }));
-        setError(null);
-      } catch (err) {
-        console.error("Error:", err);
-        setError(
-          "Failed to load data. Please refresh or check your connection.",
-        );
-        setCompetitorsData({});
-        setChartState((prev) => ({
-          ...prev,
-          series: [],
-          options: {
-            ...prev.options,
-            xaxis: { ...prev.options.xaxis, categories: [] },
-          },
-        }));
-      }
-    };
-
-    fetchData();
-  }, [supplierId, startDate, endDate]);
+        },
+      }));
+    } catch (err) {
+      console.error("Error processing data:", err);
+      setCompetitorsData({});
+      setChartState((prev) => ({
+        ...prev,
+        series: [],
+        options: {
+          ...prev.options,
+          xaxis: { ...prev.options.xaxis, categories: [] },
+        },
+      }));
+    }
+  }, [supplierId, products, categories, orders, suppliers, startDate, endDate]);
 
   return (
     <div className="w-full rounded-xl border border-gray-100 bg-white p-6 shadow-lg">
-      {/* <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <label className="text-sm font-medium">Période:</label>
-        <div className="flex gap-3">
-          <DatePicker
-            selected={startDate}
-            onChange={setStartDate}
-            placeholderText="Date Début"
-            className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            dateFormat="MMM d, yyyy"
-            isClearable
-          />
-          <DatePicker
-            selected={endDate}
-            onChange={setEndDate}
-            placeholderText="Date Fin"
-            className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            dateFormat="MMM d, yyyy"
-            isClearable
-          />
-        </div>
-      </div> */}
-
-      {error && (
-        <div className="mb-4 rounded-lg bg-red-100 p-3 text-red-700">
-          {error}
-        </div>
-      )}
-
       <div className="rounded-lg border border-gray-100 bg-white p-4 shadow-inner">
         <h3 className="mb-6 text-center text-2xl font-semibold">
           Comparaison des Ventes par Catégorie
@@ -322,7 +292,7 @@ const SupplierCategoryComparisonChart: React.FC<{
           />
         ) : (
           <div className="flex h-[450px] items-center justify-center text-gray-500">
-            No sales data available for selected period
+            Aucune donnée de vente disponible pour la période sélectionnée
           </div>
         )}
       </div>
@@ -342,7 +312,7 @@ const SupplierCategoryComparisonChart: React.FC<{
                 ?.sort((a, b) => (b?.sales || 0) - (a?.sales || 0))
                 ?.map((competitor, idx) => (
                   <div
-                    key={competitor.supplier.manufacturer_id}
+                    key={competitor.supplier.manufacturerId}
                     className="flex items-center justify-between"
                   >
                     <div className="flex items-center gap-2">

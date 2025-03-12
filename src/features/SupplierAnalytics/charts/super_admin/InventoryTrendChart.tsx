@@ -30,7 +30,7 @@ interface Category {
 }
 
 interface Warehouse {
-  id: number;
+  warehouseId: number;
   name: string;
   [key: string]: any;
 }
@@ -62,7 +62,7 @@ const InventoryTrendChart: React.FC<InventoryTrendChartProps> = ({
 
   // Get warehouse details from props
   const selectedWarehouse = useMemo(() => {
-    return warehouses.find((wh) => wh.id === warehouseId);
+    return warehouses.find((wh) => wh.warehouseId === warehouseId);
   }, [warehouseId, warehouses]);
 
   const salesMap = useMemo(() => {
@@ -103,6 +103,7 @@ const InventoryTrendChart: React.FC<InventoryTrendChartProps> = ({
         );
 
         return (
+          product &&
           warehouseStock &&
           warehouseStock.quantity > 0 &&
           (!selectedCategory ||
@@ -135,7 +136,7 @@ const InventoryTrendChart: React.FC<InventoryTrendChartProps> = ({
         });
 
         return {
-          name: product.name,
+          name: product?.name,
           data: inventoryData.sort((a, b) => a.x.getTime() - b.x.getTime()),
         };
       });
