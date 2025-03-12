@@ -29,8 +29,6 @@ export default function EditOrderForm({
   });
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const [selectedProductId, setSelectedProductId] = useState("");
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
     null,
   );
@@ -40,6 +38,8 @@ export default function EditOrderForm({
   const [quantities, setQuantities] = useState<{ [productId: string]: number }>(
     {},
   );
+  const [remainingAmount, setRemainingAmount] = useState(0);
+
   const [productRows, setProductRows] = useState([
     {
       productId: "",
@@ -79,7 +79,6 @@ export default function EditOrderForm({
     })) || [{ type: "", percentage: "", amount: "", paymentDate: new Date() }],
   );
 
-  const [remainingAmount, setRemainingAmount] = useState(0);
   useEffect(() => {
     const updatedPayments = paymentTypes.map((payment) => {
       if (payment.percentage) {
@@ -96,7 +95,7 @@ export default function EditOrderForm({
     });
 
     setPaymentTypes(updatedPayments);
-  }, [totalAmount]);
+  }, [totalAmount, paymentTypes]);
 
   useEffect(() => {
     const totalAllocated = paymentTypes.reduce(

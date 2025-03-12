@@ -1,16 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import toast from "react-hot-toast";
-import { Supplier, Product, Warehouse } from "./types/types";
-import "../styles/NeonButton.css";
-import emailjs from "emailjs-com";
+import { Supplier, Product, Warehouse, PaymentType } from "./utils/types";
+import { generateOrderPDF } from "./utils/generatePdf";
+import "@/features/suppliers/styles/NeonButton.css";
 import jsPDF from "jspdf";
 import { FaFileDownload } from "react-icons/fa";
 import { useSession } from "next-auth/react";
-const SupplierForm = ({
-  onChange,
-}: {
-  onChange?: (supplier: Supplier) => void;
-}) => {
+import { sendOrderEmail } from "./utils/emailService";
+const SupplierForm = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState<string>("");
@@ -40,9 +37,9 @@ const SupplierForm = ({
   const [newPaymentType, setNewPaymentType] = useState<string>("");
   const [comment, setComment] = useState("");
   const [message, setMessage] = useState("");
-  const [paymentTypes, setPaymentTypes] = useState<
-    { type: string; percentage: string; amount: string; date: Date }[]
-  >([{ type: "", percentage: "", amount: "", date: new Date() }]);
+  const [paymentTypes, setPaymentTypes] = useState<PaymentType[]>([
+    { type: "", percentage: "", amount: "", date: new Date() },
+  ]);
   const [remainingAmount, setRemainingAmount] = useState(0);
   const [productsWithQuantities, setProductsWithQuantities] = useState<
     {
@@ -125,13 +122,13 @@ const SupplierForm = ({
   useEffect(() => {
     const remaining = totalAmount * ((100 - totalPercentage) / 100);
     setRemainingAmount(remaining);
-  }, [paymentTypes, totalPercentage]);
+  }, [paymentTypes, totalPercentage, totalAmount]);
 
   useEffect(() => {
     if (remainingAmount === 0 && paymentTypes.length > 1) {
       setPaymentTypes((prevState) => prevState.slice(0, prevState.length - 1));
     }
-  }, [remainingAmount]);
+  }, [remainingAmount, paymentTypes.length]);
   useEffect(() => {
     if (
       newPaymentType &&
@@ -141,9 +138,7 @@ const SupplierForm = ({
       const remainingPercentage = 100 - parseFloat(paymentPercentage);
       setPaymentPercentage(remainingPercentage.toString());
     }
-  }, [newPaymentType]);
-
-  const [remainingAmounts, setRemainingAmounts] = useState([totalAmount]);
+  }, [newPaymentType, paymentPercentage]);
 
   useEffect(() => {
     const totalAllocated = paymentTypes.reduce(
@@ -251,20 +246,30 @@ const SupplierForm = ({
       const remainingPercentage = 100 - parseFloat(paymentPercentage);
       setRemainingAmount((totalAmount * remainingPercentage) / 100); // Recalculer montant restant
     }
-  }, [paymentPercentage]);
+  }, [paymentPercentage, totalAmount]);
 
+  const [state, dispatch] = useReducer(
+    (prevState: any, action: any) => {
+      switch (action.type) {
+        case "UPDATE_REMAINING":
+          return {
+            ...prevState,
+
+            remainingAmounts: action.payload,
+          };
+
+        default:
+          return prevState;
+      }
+    },
+
+    { remainingAmounts: [] },
+  );
   const handleSelectSupplier = (supplier: Supplier): void => {
     setQuery(supplier.companyName);
     setSelectedSupplier(supplier);
-    onChange?.(supplier);
     resetFormFields();
   };
-
-  enum PaymentMethod {
-    CHEQUE = "CHEQUE",
-    TRAITE = "TRAITE",
-    CASH = "CASH",
-  }
 
   const handleSaveOrder = async () => {
     try {
@@ -400,52 +405,24 @@ const SupplierForm = ({
     setSelectedState("");
     setProductsWithQuantities([]);
   };
-  const handleSendEmail = () => {
-    const productsText = productRows
+  const handleSendEmail = async () => {
+    try {
+      await sendOrderEmail({
+        supplier: selectedSupplier,
 
-      .filter((row) => row.productId && row.quantity > 0)
+        warehouse: selectedWarehouse,
 
-      .map((row) => {
-        const product = productsWithQuantities.find(
-          (p) => p.id === row.productId,
-        );
+        products: productsWithQuantities,
 
-        return `
-
-        Product Name: ${product?.product.name || "Unknown Product"}
-
-        Quantity: ${row.quantity || 0}
-
-        Price (Excl. Tax): ${row.priceExclTax?.toFixed(2) || "0.00"}
-
-        Total: ${row.total?.toFixed(2) || "0.00"}
-
-      `;
-      })
-
-      .join("\n\n");
-
-    const templateParams = {
-      supplierName: selectedSupplier?.companyName || "Unknown Supplier",
-      warehouse: selectedWarehouse?.name || "Unknown Warehouse",
-      totalAmount: totalAmount?.toFixed(2) || "0.00",
-      remainingAmount: remainingAmount?.toFixed(2) || "0.00",
-      comment: comment || "No comment provided",
-      productsText: productsText,
-    };
-
-    emailjs
-      .send(
-        "service_z1bkm7y",
-        "template_b63ikd2",
-        templateParams,
-        "1I-USeEEq-xcp9edT",
-      )
-      .catch(() => {
-        toast.error("Failed to send email. Please try again.");
+        totalAmount,
+        comment,
       });
-  };
 
+      toast.success("Email sent successfully!");
+    } catch (error) {
+      toast.error("Failed to send email. Please try again.");
+    }
+  };
   const handlePaymentAmountChange = (index: number, value: string) => {
     const newAmount = Math.min(parseFloat(value) || 0, totalAmount);
     const updatedPaymentTypes = [...paymentTypes];
@@ -478,193 +455,6 @@ const SupplierForm = ({
     setPaymentTypes(updatedPaymentTypes);
     setRemainingAmount(totalAmount - totalAllocated);
   };
-  const generateOrderPDF = (
-    doc: jsPDF,
-
-    supplier: Supplier | null,
-
-    warehouse: Warehouse | null,
-
-    state: string,
-
-    products: typeof productsWithQuantities,
-
-    total: number,
-
-    paymentTypes: any[],
-
-    remainingAmount: number,
-
-    deliveryDate: Date,
-    userName: string,
-  ) => {
-    const lineHeight = 7;
-
-    const margin = 10;
-
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    let yOffset = margin;
-    doc.setFontSize(12);
-
-    yOffset += lineHeight;
-    const headerStyle = {
-      fontSize: 18,
-
-      fontStyle: "bold" as const,
-
-      textColor: [0, 0, 0] as [number, number, number],
-    };
-
-    const subHeaderStyle = {
-      fontSize: 14,
-
-      fontStyle: "bold" as const,
-
-      textColor: [0, 0, 0] as [number, number, number],
-    };
-
-    const bodyStyle = {
-      fontSize: 12,
-
-      textColor: [51, 51, 51] as [number, number, number],
-    };
-    doc.setFontSize(headerStyle.fontSize);
-
-    doc.setFont("helvetica", headerStyle.fontStyle);
-
-    doc.text("Order Details", margin, yOffset);
-
-    yOffset += lineHeight * 2;
-    doc.setFontSize(bodyStyle.fontSize);
-
-    doc.setTextColor(...bodyStyle.textColor);
-
-    doc.setFont("helvetica", "normal");
-
-    const details = [
-      `Supplier: ${supplier?.companyName || "Not specified"}`,
-
-      `Warehouse: ${warehouse?.name || "Not specified"}`,
-
-      `Order Date: ${new Date().toLocaleDateString()}`,
-
-      `Delivery Date: ${deliveryDate.toLocaleDateString()}`,
-
-      `Status: ${state || "Not specified"}`,
-    ];
-    details.forEach((detail) => {
-      doc.text(detail, margin, yOffset);
-
-      yOffset += lineHeight;
-    });
-    yOffset += lineHeight;
-
-    doc.line(margin, yOffset, pageWidth - margin, yOffset);
-
-    yOffset += lineHeight * 2;
-
-    doc.setFontSize(subHeaderStyle.fontSize);
-
-    doc.setTextColor(...subHeaderStyle.textColor);
-
-    doc.setFont("helvetica", subHeaderStyle.fontStyle);
-
-    doc.text("Ordered Products:", margin, yOffset);
-
-    yOffset += lineHeight * 1.5;
-
-    doc.setFontSize(bodyStyle.fontSize);
-
-    doc.setTextColor(...bodyStyle.textColor);
-
-    doc.setFont("helvetica", "bold");
-
-    const columns = [
-      { text: "Product", x: margin },
-
-      { text: "Quantity", x: 70 },
-
-      { text: "Unit Price", x: 100 },
-
-      { text: "Total", x: 140 },
-    ];
-
-    columns.forEach((col) => doc.text(col.text, col.x, yOffset));
-
-    yOffset += lineHeight;
-    doc.setLineWidth(0.1);
-
-    doc.line(margin, yOffset, pageWidth - margin, yOffset);
-
-    yOffset += lineHeight;
-    doc.setFont("helvetica", "normal");
-
-    products
-
-      .filter((item) => item.quantity > 0)
-
-      .forEach((item) => {
-        const startY = yOffset;
-
-        let maxHeight = lineHeight;
-        const productLines = doc.splitTextToSize(item.product.name, 60);
-
-        productLines.forEach((line: string, i: number) => {
-          doc.text(line, margin, yOffset + i * lineHeight);
-        });
-
-        maxHeight = Math.max(maxHeight, productLines.length * lineHeight);
-
-        doc.text(`${item.quantity}`, 70, startY);
-
-        doc.text(`${item.priceExclTax.toFixed(2)} DT`, 100, startY);
-
-        doc.text(`${item.total.toFixed(2)} DT`, 140, startY);
-
-        yOffset += maxHeight + lineHeight / 2;
-      });
-
-    yOffset += lineHeight;
-
-    doc.setFontSize(subHeaderStyle.fontSize);
-
-    doc.setFont("helvetica", subHeaderStyle.fontStyle);
-
-    doc.text(`Total Amount: ${total.toFixed(2)} DT`, margin, yOffset);
-
-    yOffset += lineHeight * 2;
-
-    doc.text("Payment Details:", margin, yOffset);
-
-    yOffset += lineHeight * 1.5;
-
-    doc.setFontSize(bodyStyle.fontSize);
-
-    doc.setFont("helvetica", "normal");
-
-    paymentTypes.forEach((payment, index) => {
-      if (payment.type && payment.amount) {
-        doc.text(
-          `${payment.type}: ${payment.percentage}% (${parseFloat(
-            payment.amount,
-          ).toFixed(2)} DT)`,
-
-          margin,
-
-          yOffset + index * lineHeight,
-        );
-      }
-    });
-
-    yOffset += paymentTypes.length * lineHeight + lineHeight;
-
-    doc.setLineWidth(0.1);
-
-    doc.line(margin, yOffset, pageWidth - margin, yOffset);
-    yOffset += lineHeight;
-    doc.text(`Made by ${userName}`, margin, yOffset);
-  };
   const handleDownloadPDF = () => {
     if (productsWithQuantities.length === 0) {
       toast.error("Please add products before generating the PDF");
@@ -682,7 +472,6 @@ const SupplierForm = ({
       productsWithQuantities,
       totalAmount,
       paymentTypes,
-      remainingAmount,
       deliveryDate,
       userName,
     );
@@ -705,11 +494,13 @@ const SupplierForm = ({
   useEffect(() => {
     const updatedRemainingAmounts = paymentTypes.map((payment) => {
       const amount = parseFloat(payment.amount || "0");
+
       const percentage = parseFloat(payment.percentage || "0");
+
       return calculateRemainingAmount(totalAmount, amount, percentage);
     });
 
-    setRemainingAmounts(updatedRemainingAmounts);
+    dispatch({ type: "UPDATE_REMAINING", payload: updatedRemainingAmounts });
   }, [paymentTypes, totalAmount]);
 
   useEffect(() => {
