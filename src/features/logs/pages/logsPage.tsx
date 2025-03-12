@@ -12,28 +12,10 @@ export default function LogsPage() {
     "all" | "error" | "warning" | "info" | "order" | "milk run"
   >("all");
   const [sortLog, setSortLog] = useState<"newest" | "oldest">("newest");
-  useEffect(() => {
-    const validLogs = logs.filter((log) => {
-      try {
-        if (log.context) JSON.parse(JSON.stringify(log.context));
-        if (log.dataBefore) JSON.parse(JSON.stringify(log.dataBefore));
-        if (log.dataAfter) JSON.parse(JSON.stringify(log.dataAfter));
-        return true;
-      } catch {
-        return false;
-      }
-    });
-
-    if (validLogs.length > 0) {
-      setIsSidebarOpen(false);
-    }
-  }, [logs]);
 
   useEffect(() => {
-    if (logs.length > 0) {
-      setIsSidebarOpen(false);
-    }
-  }, [logs]);
+    console.log("Sidebar state:", isSidebarOpen);
+  }, [isSidebarOpen]);
 
   const filteredLogs = useMemo(() => {
     return logs
@@ -60,27 +42,45 @@ export default function LogsPage() {
 
   return (
     <div
-      className={`min-h-screen bg-gray-50 p-6 pt-24 transition-all duration-300 ${
-        isSidebarOpen
-          ? "ml-[260px] w-[calc(100%-260px)]"
-          : "ml-[60px] w-[calc(100%-60px)]"
-      }`}
+      style={{
+        width: "100%",
+        padding: "100px 16px",
+        boxSizing: "border-box",
+        margin: 0,
+      }}
     >
       <div className="mb-6 flex flex-col gap-4">
-        {/* Barre de recherche */}
-        <div className="relative w-1/3">
-          <input
-            type="text"
-            placeholder="Rechercher des logs..."
-            className="w-full rounded-lg border p-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-            🔍
-          </span>
-        </div>
+        <div className="flex items-center justify-between gap-4">
+          <div className="relative w-1/3">
+            <input
+              type="text"
+              placeholder="Rechercher des logs..."
+              className="w-full rounded-lg border p-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+              🔍
+            </span>
+          </div>
 
+          <div className="flex items-center gap-2">
+            <label htmlFor="sort" className="text-sm font-medium text-gray-700">
+              Sort by :
+            </label>
+            <select
+              id="sort"
+              className="rounded-lg border p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={sortLog}
+              onChange={(e) =>
+                setSortLog(e.target.value as "newest" | "oldest")
+              }
+            >
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+          </div>
+        </div>
         <div className="tab flex gap-2 border-b pb-2">
           {["all", "error", "order", "milk run"].map((tab) => (
             <button

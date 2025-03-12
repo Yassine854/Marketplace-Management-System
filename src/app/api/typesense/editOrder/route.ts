@@ -5,6 +5,8 @@ import { checkApiKey } from "@/services/auth/checkApiKey";
 import { NextResponse, type NextRequest } from "next/server";
 import { getOrderProductsNames } from "@/services/typesense/getOrderProductsNames";
 import { convertIsoDateToUnixTimestamp } from "@/utils/date/convertIsoDateToUnixTimestamp";
+import { createLog } from "../../../../clients/prisma/getLogs";
+import { auth } from "../../../../services/auth";
 // function findExtraFields(order: any, predefinedFields: string[]): string[] {
 //   // Get the keys of the order object
 //   const orderKeys = Object.keys(order);
@@ -33,6 +35,19 @@ import { convertIsoDateToUnixTimestamp } from "@/utils/date/convertIsoDateToUnix
 
 const webSocketApiUrl = process.env.WEBSOCKET_API_URL;
 export const PUT = async (request: NextRequest) => {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const User = session.user as {
+    id: string;
+    roleId: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    isActive: boolean;
+  };
   // Only update  : deliveryDate, items, state,status,   deliverySlot,
   try {
     const isAuthorized = await checkApiKey(request);
@@ -176,6 +191,18 @@ export const PUT = async (request: NextRequest) => {
 
       return responses.invalidRequest(serverSaidPart);
     }
+    await createLog({
+      type: "error",
+      message: error.message || "Internal Server Error",
+      context: {
+        userId: User.id,
+        username: User.username,
+      },
+      timestamp: new Date(),
+      dataBefore: {},
+      dataAfter: "error",
+      id: "",
+    });
 
     return responses.internalServerError(error);
   }

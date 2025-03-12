@@ -9,21 +9,21 @@ import { auth } from "../../../../services/auth";
 import { createLog } from "@/clients/prisma/getLogs";
 
 export const PUT = async (request: NextRequest) => {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const User = session.user as {
+    id: string;
+    roleId: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    isActive: boolean;
+  };
+  let storeId = "";
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const User = session.user as {
-      id: string;
-      roleId: string;
-      username: string;
-      firstName: string;
-      lastName: string;
-      isActive: boolean;
-    };
-
     const { order, username } = await request.json();
 
     if (!order) {
@@ -87,7 +87,7 @@ export const PUT = async (request: NextRequest) => {
         agentId: Order?.deliveryAgentId,
         agentName: Order?.deliveryAgentName,
         deliveryDate: Order?.deliverySlot,
-        status: order.status,
+        status: sorder.status,
       },
       id: order?.id,
     });
@@ -114,6 +114,19 @@ export const PUT = async (request: NextRequest) => {
       },
     );
   } catch (error: any) {
+    await createLog({
+      type: "error",
+      message: error.message || "Internal Server Error",
+      context: {
+        userId: User?.id,
+        username: User.username,
+        storeId: storeId,
+      },
+      timestamp: new Date(),
+      dataBefore: {},
+      dataAfter: "error",
+      id: "",
+    });
     logError(error);
 
     const message: string = error?.message ?? "";

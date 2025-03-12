@@ -23,13 +23,14 @@ export const POST = async (request: NextRequest) => {
     isActive: boolean;
   };
   console.log(user);
+  let currentOrder;
   try {
     const { orderId, status, state } = await request.json();
     if (!orderId) return responses.invalidRequest("orderId is Required");
     if (!status) return responses.invalidRequest("status is Required");
     if (!state) return responses.invalidRequest("state is Required");
 
-    const currentOrder = await getOrder(orderId);
+    currentOrder = await getOrder(orderId);
     const orderBefore = {
       orderId: currentOrder.orderId,
       state: currentOrder.state,
@@ -112,6 +113,19 @@ export const POST = async (request: NextRequest) => {
       { status: 200 },
     );
   } catch (error: any) {
+    await createLog({
+      type: "error",
+      message: error.message || "Internal Server Error",
+      context: {
+        userId: user.id,
+        username: user.username,
+        storeId: currentOrder?.storeId || "unknown",
+      },
+      timestamp: new Date(),
+      dataBefore: {},
+      dataAfter: "error",
+      id: "",
+    });
     logError(error);
     return NextResponse.json(
       {

@@ -18,13 +18,13 @@ export default function LogTable({
   isSidebarOpen,
 }: LogTableProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
   const [modalContent, setModalContent] = useState("");
 
-  const openModal = (content: any) => {
+  const openModal = (title: string, content: any) => {
+    setModalTitle(title);
     setModalContent(
-      typeof content === "object"
-        ? JSON.stringify(content, null, 2)
-        : String(content),
+      typeof content === "object" ? content : { value: String(content) },
     );
     setModalOpen(true);
   };
@@ -45,13 +45,16 @@ export default function LogTable({
 
   return (
     <div
-      className={`min-w-0 flex-1 overflow-auto rounded-lg border bg-white shadow-md ${
-        isSidebarOpen
-          ? "ml-64 w-[calc(100%-260px)]"
-          : "ml-10 w-[calc(100%-60px)]"
-      } `}
+      style={{
+        overflowX: "auto",
+      }}
     >
-      <table className="w-full min-w-[1400px] divide-y divide-gray-200 ">
+      <table
+        border={0}
+        cellPadding={0}
+        cellSpacing={0}
+        style={{ width: "100%" }}
+      >
         <thead className="sticky top-0 bg-gradient-to-r from-blue-50 to-gray-50 shadow-sm">
           <tr>
             <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
@@ -151,24 +154,18 @@ export default function LogTable({
                   </td>
                   <td
                     className="break-words px-4 py-2 text-sm text-gray-500"
-                    onClick={() => openModal(context)}
+                    onClick={() => openModal("context", context)}
                   >
                     <pre className="whitespace-pre-wrap break-words rounded bg-gray-100 p-2 text-xs">
                       {context?.username || "N/A"}
                     </pre>
                   </td>
-                  <td
-                    className="break-words px-4 py-2 text-sm text-gray-500"
-                    onClick={() => openModal(dataBefore)}
-                  >
+                  <td className="break-words px-4 py-2 text-sm text-gray-500">
                     <pre className="whitespace-pre-wrap break-words rounded bg-gray-100 p-2 text-xs">
                       {dataBefore?.status || String(dataBefore) || "N/A"}
                     </pre>
                   </td>
-                  <td
-                    className="break-words px-4 py-2 text-sm text-gray-500"
-                    onClick={() => openModal(dataAfter)}
-                  >
+                  <td className="break-words px-4 py-2 text-sm text-gray-500">
                     <pre className="whitespace-pre-wrap break-words rounded bg-gray-100 p-2 text-xs">
                       {dataAfter?.status || String(dataAfter) || "N/A"}
                     </pre>
@@ -179,7 +176,12 @@ export default function LogTable({
         </tbody>
       </table>
       {modalOpen && (
-        <Modal isOpen={modalOpen} onClose={closeModal} content={modalContent} />
+        <Modal
+          isOpen={Boolean(modalOpen)}
+          onClose={closeModal}
+          title={modalTitle}
+          data={modalContent}
+        />
       )}
     </div>
   );

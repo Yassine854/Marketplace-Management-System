@@ -5,6 +5,8 @@ import { checkApiKey } from "@/services/auth/checkApiKey";
 import { NextResponse, type NextRequest } from "next/server";
 import { getOrderProductsNames } from "@/services/typesense/getOrderProductsNames";
 import { convertIsoDateToUnixTimestamp } from "@/utils/date/convertIsoDateToUnixTimestamp";
+import { auth } from "../../../../services/auth";
+import { createLog } from "../../../../clients/prisma/getLogs";
 
 function getUnixTimestampTomorrow() {
   // Get the current date
@@ -44,6 +46,20 @@ function findMissingProperties(order: any) {
 const webSocketApiUrl = process.env.WEBSOCKET_API_URL;
 
 export const POST = async (request: NextRequest) => {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const User = session.user as {
+    id: string;
+    roleId: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    isActive: boolean;
+  };
+
   try {
     const isAuthorized = await checkApiKey(request);
 
@@ -73,17 +89,14 @@ export const POST = async (request: NextRequest) => {
     //     "deliveryDate is required and must be a valid date.",
     //   );
     // }
-    let delivdate= 0;
+    let delivdate = 0;
     const date = new Date(order.deliveryDate);
-     if (isNaN(date.getTime()) ) {
-      delivdate=getUnixTimestampTomorrow();
-     }
-else 
-{
-  delivdate= Math.floor(date.getTime() / 1000);
-
-}
-    const deliveryDate=delivdate;
+    if (isNaN(date.getTime())) {
+      delivdate = getUnixTimestampTomorrow();
+    } else {
+      delivdate = Math.floor(date.getTime() / 1000);
+    }
+    const deliveryDate = delivdate;
     await typesense.orders.addOne({
       ...order,
       deliveryDate,
@@ -115,6 +128,18 @@ else
       },
     );
   } catch (error: any) {
+    await createLog({
+      type: "error",
+      message: error.message || "Internal Server Error",
+      context: {
+        userId: User.id,
+        username: User.username,
+      },
+      timestamp: new Date(),
+      dataBefore: {},
+      dataAfter: "error",
+      id: "",
+    });
     logError(error);
 
     const message: string = error?.message ?? "";

@@ -1,11 +1,26 @@
 import { magento } from "@/clients/magento";
 import { typesense } from "@/clients/typesense";
 import { logError } from "@/utils/logError";
+import { createLog } from "@/clientsprisma/getLogs";
+import { auth } from "@/servicesauth";
 
 export const getOrdersByDeliveryDate = async ({
   deliveryDate,
   storeId,
 }: any): Promise<{ orders: any[]; count: number }> => {
+  const session = await auth();
+  if (!session?.user) {
+    return { orders: [], count: 0 };
+  }
+
+  const User = session.user as {
+    id: string;
+    roleId: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    isActive: boolean;
+  };
   try {
     const orders: any = await magento.queries.getMilkRunOrdersByDate(
       deliveryDate,
@@ -32,6 +47,18 @@ export const getOrdersByDeliveryDate = async ({
 
     return { orders: filteredOrders, count: filteredOrders?.length || 0 };
   } catch (error: any) {
+    await createLog({
+      type: "error",
+      message: (error as Error).message || "Internal Server Error",
+      context: {
+        userId: User.id,
+        username: User.username,
+      },
+      timestamp: new Date(),
+      dataBefore: {},
+      dataAfter: "error",
+      id: "",
+    });
     logError(error);
     throw error;
   }

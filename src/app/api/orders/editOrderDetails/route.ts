@@ -83,8 +83,10 @@ export const PUT = async (request: NextRequest) => {
     isActive: boolean;
   };
 
+  let storeId: string = "";
   try {
     const { order, username } = await request.json();
+    storeId = order.storeId;
 
     if (!order) {
       return responses.invalidRequest("order is Required");
@@ -112,7 +114,6 @@ export const PUT = async (request: NextRequest) => {
 
     const { total, orderId, items, deliveryDate } = order;
     const orderBefore = await getOrder(orderId);
-    const storeId = orderBefore.storeId;
 
     const res = await magento.mutations.editOrderDetails({
       total,
@@ -143,7 +144,7 @@ export const PUT = async (request: NextRequest) => {
       }),
       removedItems: removedItems.map((item) => {
         const originalItem = orderBefore.items.find(
-          (i: { productId: any; }) => i.productId === item.productId,
+          (i: { productId: any }) => i.productId === item.productId,
         );
         return { ...item, ...originalItem };
       }),
@@ -193,6 +194,19 @@ export const PUT = async (request: NextRequest) => {
       { status: 200 },
     );
   } catch (error: any) {
+    await createLog({
+      type: "error",
+      message: error.message || "Internal Server Error",
+      context: {
+        userId: user.id,
+        username: user.username,
+        storeId: storeId,
+      },
+      timestamp: new Date(),
+      dataBefore: {},
+      dataAfter: "error",
+      id: "",
+    });
     logError(error);
     return responses.internalServerError(error);
   }

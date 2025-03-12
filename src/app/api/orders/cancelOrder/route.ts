@@ -10,6 +10,7 @@ import { createLog } from "@/clients/prisma/getLogs";
 import { auth } from "../../../../services/auth";
 
 export const POST = async (request: NextRequest) => {
+  let storeId: string = "";
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -68,6 +69,19 @@ export const POST = async (request: NextRequest) => {
           id: "",
         });
       } catch (error) {
+        await createLog({
+          type: "error",
+          message: (error as Error).message || "Internal Server Error",
+          context: {
+            userId: user?.id,
+            username: user.username,
+            storeId: storeId,
+          },
+          timestamp: new Date(),
+          dataBefore: {},
+          dataAfter: "error",
+          id: "",
+        });
         console.error(`Failed to process order ${id}:`, error);
       }
     }
