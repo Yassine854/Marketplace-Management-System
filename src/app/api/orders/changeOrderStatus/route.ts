@@ -92,7 +92,7 @@ export const POST = async (request: NextRequest) => {
 
     await createLog({
       type: "Order",
-      message: `order changed`,
+      message: `order status changed`,
       context: {
         userId: user.id,
         username: user.username,

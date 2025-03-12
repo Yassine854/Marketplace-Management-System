@@ -1,6 +1,9 @@
 "use client";
 import { useState } from "react";
-import Modal from "./Modal";
+import ContextModal from "../components/ContextModal";
+import { MilkRunUpdatedModal } from "../components/MilkRunUpdated";
+import { OrderEditedModal } from "../components/OrderEditedModal";
+import { OrderStatusChangedModal } from "../components/OrderStatusChangedModal";
 
 interface LogTableProps {
   logs: any[];
@@ -17,21 +20,44 @@ export default function LogTable({
   refetch,
   isSidebarOpen,
 }: LogTableProps) {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalTitle, setModalTitle] = useState("");
-  const [modalContent, setModalContent] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedContext, setSelectedContext] = useState<any>(null);
+  const [selectedData, setSelectedData] = useState<any>(null);
+  const [modalType, setModalType] = useState<
+    "context" | "statusChanged" | "edited" | "milkRunUpdated" | null
+  >(null);
 
-  const openModal = (title: string, content: any) => {
-    setModalTitle(title);
-    setModalContent(
-      typeof content === "object" ? content : { value: String(content) },
-    );
-    setModalOpen(true);
+  const handleDataClick = (data: any, message: string) => {
+    setSelectedData(data);
+
+    if (message.includes("Order Status Changed")) {
+      setModalType("statusChanged");
+    } else if (message.includes("Order edited")) {
+      setModalType("edited");
+    } else if (message.includes("milk run updated for order")) {
+      setModalType("milkRunUpdated");
+    } else {
+      return;
+    }
+
+    setIsModalOpen(true);
   };
 
-  const closeModal = () => {
-    setModalOpen(false);
-    setModalContent("");
+  const handleContextClick = (context: any) => {
+    setSelectedContext(context);
+    setModalType("context");
+    setIsModalOpen(true);
+  };
+  const safeDataDisplay = (data: any) => {
+    if (data === "error") {
+      return "error";
+    }
+
+    if (typeof data === "object" && data !== null) {
+      return Object.keys(data).length > 0 ? JSON.stringify(data, null, 2) : "";
+    }
+
+    return data && data !== "" ? data : "";
   };
 
   const parseJsonSafely = (data: any) => {
@@ -44,11 +70,7 @@ export default function LogTable({
   };
 
   return (
-    <div
-      style={{
-        overflowX: "auto",
-      }}
-    >
+    <div style={{ overflowX: "auto" }}>
       <table
         border={0}
         cellPadding={0}
@@ -153,21 +175,27 @@ export default function LogTable({
                     {new Date(log.timestamp).toLocaleString("fr-FR")}
                   </td>
                   <td
-                    className="break-words px-4 py-2 text-sm text-gray-500"
-                    onClick={() => openModal("context", context)}
+                    className="cursor-pointer break-words px-4 py-2 text-sm text-gray-500"
+                    onClick={() => handleContextClick(context)}
                   >
                     <pre className="whitespace-pre-wrap break-words rounded bg-gray-100 p-2 text-xs">
-                      {context?.username || "N/A"}
+                      {context?.username || " "}
                     </pre>
                   </td>
-                  <td className="break-words px-4 py-2 text-sm text-gray-500">
+                  <td
+                    className="cursor-pointer break-words px-4 py-2 text-sm text-gray-500"
+                    onClick={() => handleDataClick(dataBefore, log.message)}
+                  >
                     <pre className="whitespace-pre-wrap break-words rounded bg-gray-100 p-2 text-xs">
-                      {dataBefore?.status || String(dataBefore) || "N/A"}
+                      {safeDataDisplay(dataBefore.status)}
                     </pre>
                   </td>
-                  <td className="break-words px-4 py-2 text-sm text-gray-500">
+                  <td
+                    className="cursor-pointer break-words px-4 py-2 text-sm text-gray-500"
+                    onClick={() => handleDataClick(dataAfter, log.message)}
+                  >
                     <pre className="whitespace-pre-wrap break-words rounded bg-gray-100 p-2 text-xs">
-                      {dataAfter?.status || String(dataAfter) || "N/A"}
+                      {dataAfter?.status || String(dataAfter) || ""}
                     </pre>
                   </td>
                 </tr>
@@ -175,12 +203,32 @@ export default function LogTable({
             })}
         </tbody>
       </table>
-      {modalOpen && (
-        <Modal
-          isOpen={Boolean(modalOpen)}
-          onClose={closeModal}
-          title={modalTitle}
-          data={modalContent}
+
+      {isModalOpen && modalType === "context" && (
+        <ContextModal
+          data={selectedContext}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+
+      {isModalOpen && modalType === "statusChanged" && (
+        <OrderStatusChangedModal
+          data={selectedData}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+
+      {isModalOpen && modalType === "edited" && (
+        <OrderEditedModal
+          data={selectedData}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+
+      {isModalOpen && modalType === "milkRunUpdated" && (
+        <MilkRunUpdatedModal
+          data={selectedData}
+          onClose={() => setIsModalOpen(false)}
         />
       )}
     </div>

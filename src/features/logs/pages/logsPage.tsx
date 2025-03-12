@@ -50,8 +50,8 @@ export default function LogsPage() {
       }}
     >
       <div className="mb-6 flex flex-col gap-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="relative w-1/3">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative w-full sm:w-1/3">
             <input
               type="text"
               placeholder="Rechercher des logs..."
@@ -64,7 +64,7 @@ export default function LogsPage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
             <label htmlFor="sort" className="text-sm font-medium text-gray-700">
               Sort by :
             </label>
@@ -81,7 +81,8 @@ export default function LogsPage() {
             </select>
           </div>
         </div>
-        <div className="tab flex gap-2 border-b pb-2">
+
+        <div className="tab flex flex-wrap gap-2 border-b pb-2">
           {["all", "error", "order", "milk run"].map((tab) => (
             <button
               key={tab}
