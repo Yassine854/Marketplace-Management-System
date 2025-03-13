@@ -16,7 +16,7 @@ interface UseAxiosProps<T> {
   ) => Promise<AxiosResponse<T> | void>;
 }
 
-const BASE_URL = "http://localhost:3000/";
+const BASE_URL = process.env.BASE_URL_EXPRESS_PUBLIC || "http://localhost:3000";
 
 const useAxios = <T>(): UseAxiosProps<T> => {
   const [loading, setLoading] = useState<boolean>(false);
