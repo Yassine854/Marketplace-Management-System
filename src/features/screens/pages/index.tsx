@@ -6,17 +6,38 @@ import Card from "../widgets/Card";
 import Pagination from "../widgets/Pagination";
 import useAxios from "../hooks/useAxios";
 
-const Screen = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [data, setData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+interface ScreenData {
+  id: string;
+  name: string;
+}
 
-  const { loading, error, fetchData, response } = useAxios();
+interface PaginationData {
+  totalPages: number;
+}
 
-  const apiKey = process.env.NEXT_PUBLIC_API_KEY || "your-default-api-key";
+interface ApiResponse {
+  screens: ScreenData[];
+  pagination: PaginationData;
+}
 
-  const fetchForms = async (page = 1) => {
+const Screen: React.FC = () => {
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [data, setData] = useState<ScreenData[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  const { loading, error, fetchData, response } = useAxios<{
+    data: ApiResponse;
+  }>();
+
+  const apiKey: string | undefined = process.env.NEXT_PUBLIC_API_KEY;
+
+  const fetchForms = async (page: number = 1): Promise<void> => {
+    if (!apiKey) {
+      console.error("API key is not set.");
+      return;
+    }
+
     await fetchData(
       `api/screen?page=${page}&limit=5`,
       "get",
@@ -32,13 +53,13 @@ const Screen = () => {
 
   useEffect(() => {
     if (response && response.data) {
-      const { screens, pagination } = response.data;
-      setData(screens);
-      setTotalPages(pagination.totalPages);
+      const apiResponse = response.data as any;
+      setData(apiResponse.screens);
+      setTotalPages(apiResponse.pagination.totalPages);
     }
   }, [response]);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = (page: number): void => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }

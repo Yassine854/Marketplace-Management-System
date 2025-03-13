@@ -4,18 +4,34 @@ import EditElementModal from "./modals/EditElementModal";
 import useAxios from "../../hooks/useAxios";
 import { toast } from "react-hot-toast";
 
-const ScreenBuilderSection = ({ formElements, setFormElements }) => {
-  const [selectedElement, setSelectedElement] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+interface FormElement {
+  id: string;
+  _id: string;
+  title: string;
+}
+
+interface ScreenBuilderSectionProps {
+  formElements: FormElement[];
+  setFormElements: (elements: FormElement[]) => void;
+}
+
+const ScreenBuilderSection: React.FC<ScreenBuilderSectionProps> = ({
+  formElements,
+  setFormElements,
+}) => {
+  const [selectedElement, setSelectedElement] = useState<FormElement | null>(
+    null,
+  );
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const { fetchData } = useAxios();
 
-  const handleElementClick = (element) => {
+  const handleElementClick = (element: FormElement) => {
     setSelectedElement(element);
     setIsModalOpen(true);
   };
 
-  const handleDeleteElement = async (elementId) => {
+  const handleDeleteElement = async (elementId: string) => {
     try {
       const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 

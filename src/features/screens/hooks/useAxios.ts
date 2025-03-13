@@ -13,7 +13,7 @@ interface UseAxiosProps<T> {
     data?: any,
     config?: AxiosRequestConfig,
     apiKey?: string,
-  ) => Promise<AxiosResponse<T> | void>; // Return the response or void
+  ) => Promise<AxiosResponse<T> | void>;
 }
 
 const BASE_URL = "http://localhost:3000/";
@@ -56,7 +56,7 @@ const useAxios = <T>(): UseAxiosProps<T> => {
 
         const result = await axiosInstance(axiosConfig);
         setResponse(result);
-        return result; // Return the response
+        return result;
       } catch (err) {
         if (axios.isAxiosError(err)) {
           setError(err);

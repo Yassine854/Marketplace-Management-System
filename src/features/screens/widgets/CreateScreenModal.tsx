@@ -43,11 +43,9 @@ const CreateAdModal = ({ showModal, setShowModal }: CreateScreenModalProps) => {
     resolver: zodResolver(screenSchema),
   });
 
-  // Use the useAxios hook
   const { loading, fetchData } = useAxios();
 
-  // Fetch the API key from environment variables or a secure source
-  const apiKey = process.env.NEXT_PUBLIC_API_KEY || "your-default-api-key";
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
   const onSubmit = async (data: ScreenFormData) => {
     try {
@@ -58,14 +56,12 @@ const CreateAdModal = ({ showModal, setShowModal }: CreateScreenModalProps) => {
         { headers: { "X-API-Key": apiKey } },
       );
 
-      // Show success toast
       toast.success("Screen created successfully!");
       setShowModal(false);
       reset();
     } catch (error) {
       console.error("Error creating screen:", error);
 
-      // Show error toast
       toast.error("Failed to create screen. Please try again.");
     }
   };

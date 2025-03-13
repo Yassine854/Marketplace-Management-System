@@ -5,11 +5,29 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ImageFormSchema, ImageFormValues } from "./types";
 import TextInput from "../../inputs/TextInput";
 import DateInput from "../../inputs/DateInput";
-import FileInput from "../../inputs/FileInput"; // Import the custom FileInput
 import useAxios from "../../../hooks/useAxios";
 import { toast } from "react-hot-toast";
+import SingleFileInput from "../../inputs/SingleFileInput";
 
-const ImageModal: React.FC = ({ selectedElement, onClose }) => {
+interface SelectedElement {
+  _id: string;
+  title: string;
+  description?: string;
+  imageUrl?: string[];
+  startDate?: string;
+  endDate?: string;
+}
+
+interface ImageModalProps {
+  selectedElement: SelectedElement;
+  onClose: () => void;
+}
+
+const ImageModal: React.FC<ImageModalProps> = ({
+  selectedElement,
+  onClose,
+}) => {
+  const [previewUrls, setPreviewUrls] = useState<any>([]);
   const {
     control,
     register,
@@ -23,7 +41,7 @@ const ImageModal: React.FC = ({ selectedElement, onClose }) => {
     defaultValues: {
       title: selectedElement.title,
       description: selectedElement.description || "",
-      images: [],
+      images: undefined,
       startDate: selectedElement.startDate || "",
       endDate: selectedElement.endDate || "",
     },
@@ -35,21 +53,30 @@ const ImageModal: React.FC = ({ selectedElement, onClose }) => {
     reset({
       title: selectedElement.title,
       description: selectedElement.description || "",
-      images: [],
+      images: undefined,
       startDate: selectedElement.startDate || "",
       endDate: selectedElement.endDate || "",
     });
+
+    if (selectedElement.imageUrl) {
+      setPreviewUrls(selectedElement.imageUrl);
+    } else {
+      setPreviewUrls([]);
+    }
   }, [selectedElement, reset]);
 
   const onSubmit: SubmitHandler<ImageFormValues> = async (formData) => {
     const data = new FormData();
     data.append("title", formData.title);
     data.append("description", formData.description);
-    data.append("startDate", startDate);
-    data.append("endDate", endDate);
-    Array.from(formData.images).forEach((file) => {
-      data.append("images", file);
-    });
+    data.append("startDate", formData.startDate);
+    data.append("endDate", formData.endDate);
+
+    if (formData.images && formData.images.length > 0) {
+      Array.from(formData.images).forEach((file: any) => {
+        data.append("images", file);
+      });
+    }
 
     const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
@@ -87,22 +114,19 @@ const ImageModal: React.FC = ({ selectedElement, onClose }) => {
         <h2 className="text-xl font-bold">Edit Image</h2>
       </ModalHeader>
       <ModalBody className="h-full">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-4 py-5 pb-20"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-5">
           <TextInput
             label="Title"
             placeholder="Enter your Title"
             register={register("title")}
-            isError={errors.title}
+            isError={!!errors.title}
             errorMessage={errors.title?.message}
           />
           <TextInput
             label="Description"
             placeholder="Enter your description"
             register={register("description")}
-            isError={errors.description}
+            isError={!!errors.description}
             errorMessage={errors.description?.message}
           />
           <div>
@@ -132,14 +156,28 @@ const ImageModal: React.FC = ({ selectedElement, onClose }) => {
               </p>
             )}
           </div>
-          <FileInput
-            id="images"
-            label="Image"
-            register={register}
-            error={errors.images}
-            accept="image/*"
+          <Controller
+            name="images"
+            control={control}
+            render={({ field }) => (
+              <SingleFileInput
+                id="images"
+                label="Background Image"
+                accept="image/*"
+                previewUrls={previewUrls}
+                onChange={(files) => {
+                  field.onChange(files);
+                  if (files && files.length > 0) {
+                    const url = URL.createObjectURL(files[0]);
+                    setPreviewUrls([url]);
+                    setPreviewUrls([]);
+                  }
+                }}
+              />
+            )}
           />
-          <div className="flex w-full justify-end pt-20">
+
+          <div className="flex w-full justify-end">
             <button
               type="submit"
               className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"

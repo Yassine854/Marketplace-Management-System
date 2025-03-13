@@ -1,18 +1,26 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ModalBody, ModalHeader } from "@nextui-org/react";
-import { SubmitHandler, useForm, useFieldArray } from "react-hook-form";
+import {
+  SubmitHandler,
+  useForm,
+  Controller,
+  FieldError,
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CarouselFormSchema, CarouselFormValues } from "./types";
 import TextInput from "../../inputs/TextInput";
 import DateInput from "../../inputs/DateInput";
 import useAxios from "../../../hooks/useAxios";
 import toast from "react-hot-toast";
+import MultipleFileInput from "../../inputs/MultipleFileInput";
+import { DynamicSelectInput } from "../../inputs/DynamicSelectInput";
 
 interface CarouselModalProps {
   selectedElement: {
     _id: string;
     title: string;
     description?: string;
+    imageUrl?: string[];
     clickUrl?: string[];
     startDate?: string;
     endDate?: string;
@@ -24,6 +32,7 @@ const CarouselModal: React.FC<CarouselModalProps> = ({
   selectedElement,
   onClose,
 }) => {
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const {
     control,
     register,
@@ -44,11 +53,6 @@ const CarouselModal: React.FC<CarouselModalProps> = ({
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "clickUrl",
-  });
-
   const { loading, error: axiosError, fetchData } = useAxios();
 
   useEffect(() => {
@@ -60,6 +64,11 @@ const CarouselModal: React.FC<CarouselModalProps> = ({
       startDate: selectedElement?.startDate || "",
       endDate: selectedElement?.endDate || "",
     });
+    if (selectedElement.imageUrl) {
+      setPreviewUrls(selectedElement.imageUrl);
+    } else {
+      setPreviewUrls([]);
+    }
   }, [selectedElement, reset]);
 
   const onSubmit: SubmitHandler<CarouselFormValues> = async (formData) => {
@@ -69,9 +78,11 @@ const CarouselModal: React.FC<CarouselModalProps> = ({
     data.append("startDate", formData.startDate);
     data.append("endDate", formData.endDate);
 
-    Array.from(formData.images).forEach((file) => {
-      data.append("images", file);
-    });
+    if (formData.images && formData.images.length > 0) {
+      Array.from(formData.images).forEach((file) => {
+        data.append("images", file);
+      });
+    }
 
     formData.clickUrl.forEach((url) => {
       if (url.trim()) {
@@ -79,24 +90,45 @@ const CarouselModal: React.FC<CarouselModalProps> = ({
       }
     });
 
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
     try {
-      await fetchData(`api/ad/${selectedElement._id}`, "put", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
+      const response = await fetchData(
+        `api/ad/${selectedElement._id}`,
+        "put",
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "X-API-Key": apiKey,
+          },
         },
-      });
+      );
 
-      toast.success("Carousel updated successfully!");
-
-      onClose();
+      if (response && response.data) {
+        toast.success("Image updated successfully!");
+        onClose();
+      } else {
+        toast.error("Failed to update image. Please try again.");
+      }
     } catch (error) {
-      toast.error("Failed to update carousel. Please try again.");
       console.error("Error submitting form:", error);
+      toast.error(
+        axiosError?.message || "Failed to update image. Please try again.",
+      );
     }
   };
 
   const startDate = watch("startDate");
   const endDate = watch("endDate");
+
+  const clickUrlOptions = [
+    "Home",
+    "ProductsList",
+    "UserProfileRetailer",
+    "كاتالوغ",
+    "Cart",
+  ] as const;
 
   return (
     <>
@@ -104,10 +136,7 @@ const CarouselModal: React.FC<CarouselModalProps> = ({
         <h2 className="text-xl font-bold">Edit Carousel</h2>
       </ModalHeader>
       <ModalBody>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-4 py-10 pb-10"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-10">
           <TextInput
             label="Title"
             placeholder="Enter your Title"
@@ -151,94 +180,41 @@ const CarouselModal: React.FC<CarouselModalProps> = ({
             )}
           </div>
 
-          <div className="space-y-4">
-            <label className="block text-lg font-semibold text-gray-700">
-              Click URLs
-            </label>
-            <button
-              type="button"
-              onClick={() => append("")}
-              className="mt-2 flex items-center text-blue-500 transition-colors duration-200 hover:text-blue-700"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="mr-2 h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Add URL
-            </button>
+          <DynamicSelectInput
+            name="clickUrl"
+            options={clickUrlOptions}
+            register={register}
+            control={control}
+            label="Click URLs"
+            errors={errors.clickUrl as FieldError | (FieldError | undefined)[]}
+          />
 
-            {fields.map((field, index) => (
-              <div key={field.id} className="relative">
-                <div className="flex w-full items-center">
-                  <TextInput
-                    label=""
-                    placeholder="Enter URL"
-                    register={register(`clickUrl.${index}` as const)}
-                    isError={!!errors.clickUrl?.[index]}
-                    errorMessage={errors.clickUrl?.[index]?.message}
-                    className="w-full flex-1 pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => remove(index)}
-                    className="absolute right-2 top-2 text-red-500 transition-colors duration-200 hover:text-red-700"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            {errors.clickUrl && (
-              <p className="mt-2 text-sm text-red-600">
-                {errors.clickUrl.message}
-              </p>
+          <Controller
+            name="images"
+            control={control}
+            render={({ field }) => (
+              <MultipleFileInput
+                id="images"
+                label="Image"
+                accept="image/*"
+                onChange={(files) => {
+                  field.onChange(files);
+                  if (files) {
+                    const urls = Array.from(files).map((file) =>
+                      URL.createObjectURL(file),
+                    );
+                    setPreviewUrls(urls);
+                  } else {
+                    setPreviewUrls([]);
+                  }
+                }}
+                previewUrls={previewUrls}
+              />
             )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="images"
-              className="ml-4 block font-medium md:text-lg"
-            >
-              Images (Select multiple)
-            </label>
-            <input
-              id="images"
-              type="file"
-              multiple
-              {...register("images")}
-              className="mt-1 block w-full sm:text-sm"
-            />
-            {errors.images && (
-              <p className="mt-2 text-sm text-red-600">
-                {errors.images.message}
-              </p>
-            )}
-          </div>
+          />
+          {errors.images && (
+            <p className="mt-2 text-sm text-red-600">{errors.images.message}</p>
+          )}
 
           <div className="flex w-full justify-end">
             <button
