@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { handleAuthentication } from "./handleAuthentication";
-
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
     CredentialsProvider({
@@ -30,7 +29,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       },
     }),
   ],
-
   callbacks: {
     async jwt({ token, user }) {
       //console.log("jwt() - Before Update:", token);
@@ -56,6 +54,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         id: token.userId,
         roleId: token.userRoleId,
         username: token.username,
+        name: `${token.userFirstName} ${token.userLastName}`,
         firstName: token.userFirstName,
         lastName: token.userLastName,
         isActive: token.isActive,
@@ -68,5 +67,5 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
   secret: process.env.AUTH_SECRET,
   trustHost: true,
-  debug: process.env.NODE_ENV === "development",
+  debug: process.env.NODE_ENV === "development", // Enable debug mode in development only
 });

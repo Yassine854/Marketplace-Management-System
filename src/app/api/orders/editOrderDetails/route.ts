@@ -114,6 +114,7 @@ export const PUT = async (request: NextRequest) => {
 
     const { total, orderId, items, deliveryDate } = order;
     const orderBefore = await getOrder(orderId);
+    const storeId = orderBefore.storeId;
 
     const res = await magento.mutations.editOrderDetails({
       total,

@@ -8,6 +8,7 @@ import { useAuth } from "../../../shared/hooks/useAuth";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { API_BASE_URL } from "../../../SupplierAnalytics/config";
 
 type FormData = z.infer<typeof FormSchema>;
 
@@ -28,11 +29,52 @@ export const useLoginForm = () => {
     },
   });
 
+  //Get Token to access supplier dashboard
+  const handleApiLogin = async (username: string, password: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { error: errorData.message || "Login failed" };
+      }
+
+      const result = await response.json();
+      return {
+        token: result.token,
+        user: result.user,
+        role: result.user?.role,
+      };
+    } catch (error) {
+      return { error: "Network error. Please try again." };
+    }
+  };
+
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setIsLoading(true);
     const { username, password } = data;
     const res = await login(username, password);
 
+    //Supplier Access //
+
+    const apiResponse = await handleApiLogin(username, password);
+
+    if (apiResponse.error) {
+      throw new Error(apiResponse.error);
+    }
+
+    if (apiResponse.token) {
+      localStorage.setItem("authToken", apiResponse.token);
+    }
+    console.log(apiResponse);
+
+    //End Supplier Access //
     setIsLoading(false);
     if (res?.error === "CredentialsSignin") {
       toast.error("Invalid username or password");

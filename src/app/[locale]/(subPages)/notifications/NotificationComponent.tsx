@@ -13,7 +13,7 @@ const NotificationComponent = ({ data }: any) => {
       } mb-4 flex flex-wrap items-start gap-4 border border-n30 last:mb-0 dark:border-n500 md:gap-6`}
     >
       <Image
-        src="/profile.png"
+        src="/images/etudiant.png"
         width={48}
         className="rounded-full"
         height={48}
