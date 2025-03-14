@@ -23,7 +23,6 @@ export const CarouselFormSchema = z.object({
 });
 
 export type CarouselFormValues = z.infer<typeof CarouselFormSchema>;
-// Define the Product schema
 const ProductSchema = z.object({
   _id: z.string(),
   name: z.string(),

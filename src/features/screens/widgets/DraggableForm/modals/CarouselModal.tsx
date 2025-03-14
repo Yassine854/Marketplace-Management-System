@@ -199,14 +199,6 @@ const CarouselModal: React.FC<CarouselModalProps> = ({
                 accept="image/*"
                 onChange={(files) => {
                   field.onChange(files);
-                  if (files) {
-                    const urls = Array.from(files).map((file) =>
-                      URL.createObjectURL(file),
-                    );
-                    setPreviewUrls(urls);
-                  } else {
-                    setPreviewUrls([]);
-                  }
                 }}
                 previewUrls={previewUrls}
               />

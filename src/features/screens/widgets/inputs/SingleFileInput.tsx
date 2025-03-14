@@ -20,6 +20,7 @@ const SingleFileInput: React.FC<SingleFileInputProps> = ({
   onChange,
   previewUrls = [],
 }) => {
+  console.log("🚀 ~ previewUrls:", previewUrls);
   const [newPreviewUrl, setNewPreviewUrl] = useState<string>("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,15 +47,15 @@ const SingleFileInput: React.FC<SingleFileInputProps> = ({
       >
         {previewUrls.length > 0 || newPreviewUrl ? (
           <div className="flex h-full w-full flex-col items-center justify-center p-2">
-            {previewUrls.map((url, index) => (
-              <div key={`existing-${index}`} className="relative mb-2">
+            {previewUrls.length > 0 && !newPreviewUrl && (
+              <div className="relative mb-2">
                 <img
-                  src={`http://localhost:3000/api/ad${url}`}
-                  alt={`Existing Preview ${index}`}
+                  src={`http://102.219.178.14:3000/api/ad${previewUrls[0]}`}
+                  alt={`Existing Preview `}
                   className="h-full w-full rounded-lg object-cover"
                 />
               </div>
-            ))}
+            )}
 
             {newPreviewUrl && (
               <div className="relative">

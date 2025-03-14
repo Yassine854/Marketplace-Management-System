@@ -16,7 +16,8 @@ interface UseAxiosProps<T> {
   ) => Promise<AxiosResponse<T> | void>;
 }
 
-const BASE_URL = process.env.BASE_URL_EXPRESS_PUBLIC || "http://localhost:3000";
+const BASE_URL =
+  process.env.BASE_URL_EXPRESS_PUBLIC || "http://102.219.178.14:3000";
 
 const useAxios = <T>(): UseAxiosProps<T> => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -58,6 +59,7 @@ const useAxios = <T>(): UseAxiosProps<T> => {
         setResponse(result);
         return result;
       } catch (err) {
+        console.log("🚀 ~ err:", err);
         if (axios.isAxiosError(err)) {
           setError(err);
         } else {

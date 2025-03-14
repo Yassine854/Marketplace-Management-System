@@ -66,6 +66,10 @@ const ImageModal: React.FC<ImageModalProps> = ({
   }, [selectedElement, reset]);
 
   const onSubmit: SubmitHandler<ImageFormValues> = async (formData) => {
+    console.log(
+      "🚀 ~ constonSubmit:SubmitHandler<ImageFormValues>= ~ formData:",
+      formData,
+    );
     const data = new FormData();
     data.append("title", formData.title);
     data.append("description", formData.description);
@@ -167,11 +171,6 @@ const ImageModal: React.FC<ImageModalProps> = ({
                 previewUrls={previewUrls}
                 onChange={(files) => {
                   field.onChange(files);
-                  if (files && files.length > 0) {
-                    const url = URL.createObjectURL(files[0]);
-                    setPreviewUrls([url]);
-                    setPreviewUrls([]);
-                  }
                 }}
               />
             )}

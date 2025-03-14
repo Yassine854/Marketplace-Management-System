@@ -20,7 +20,9 @@ const MultipleFileInput: React.FC<MultipleFileInputProps> = ({
   onChange,
   previewUrls = [],
 }) => {
+  console.log("🚀 ~ previewUrls:", previewUrls);
   const [newPreviewUrls, setNewPreviewUrls] = useState<string[]>([]);
+  console.log("🚀 ~ newPreviewUrls:", newPreviewUrls);
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -58,25 +60,27 @@ const MultipleFileInput: React.FC<MultipleFileInputProps> = ({
       >
         {previewUrls.length > 0 || newPreviewUrls.length > 0 ? (
           <div className="grid h-full w-full grid-cols-3 gap-2 overflow-y-auto p-2">
-            {previewUrls.map((url, index) => (
-              <div key={`existing-${index}`} className="relative">
-                <img
-                  src={`http://localhost:3000/api/ad${url}`}
-                  alt={`Existing Preview ${index}`}
-                  className="h-24 w-full rounded-lg object-cover"
-                />
-              </div>
-            ))}
+            {previewUrls.length > 0 &&
+              previewUrls.map((url, index) => (
+                <div key={`existing-${index}`} className="relative">
+                  <img
+                    src={`http://102.219.178.14:3000/api/ad${url}`}
+                    alt={`Existing Preview ${index}`}
+                    className="h-24 w-full rounded-lg object-cover"
+                  />
+                </div>
+              ))}
 
-            {newPreviewUrls.map((url, index) => (
-              <div key={`new-${index}`} className="relative">
-                <img
-                  src={url}
-                  alt={`New Preview ${index}`}
-                  className="h-24 w-full rounded-lg object-cover"
-                />
-              </div>
-            ))}
+            {newPreviewUrls.length > 0 &&
+              newPreviewUrls.map((url, index) => (
+                <div key={`new-${index}`} className="relative">
+                  <img
+                    src={url}
+                    alt={`New Preview ${index}`}
+                    className="h-24 w-full rounded-lg object-cover"
+                  />
+                </div>
+              ))}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center pb-6 pt-5">

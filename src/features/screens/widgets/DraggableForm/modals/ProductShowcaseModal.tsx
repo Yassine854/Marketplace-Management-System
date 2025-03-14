@@ -9,24 +9,7 @@ import SearchSelectInput from "../../inputs/SearchSelectInput";
 import useAxios from "../../../hooks/useAxios";
 import { toast } from "react-hot-toast";
 import SingleFileInput from "../../inputs/SingleFileInput";
-
-const ProductSchema = z.object({
-  _id: z.string(),
-  name: z.string(),
-});
-
-export const ProductFormSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
-  images: z
-    .instanceof(FileList)
-    .refine((files) => files.length > 0, "Image is required"),
-  products: z.array(ProductSchema),
-  startDate: z.string(),
-  endDate: z.string(),
-});
-
-export type ProductFormValues = z.infer<typeof ProductFormSchema>;
+import { ProductFormSchema, ProductFormValues } from "./types";
 
 interface Product {
   _id: string;
@@ -37,8 +20,8 @@ interface SelectedElement {
   _id: string;
   title: string;
   description?: string;
-  imageUrl?: string[];
-  products?: Product[];
+  backgroundImage?: string;
+  product?: Product[];
   startDate?: string;
   endDate?: string;
 }
@@ -54,8 +37,10 @@ const ProductShowcaseModal: React.FC<ProductShowcaseModalProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<any>([]);
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>(
+    selectedElement.product || [],
+  );
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const {
     control,
@@ -71,7 +56,7 @@ const ProductShowcaseModal: React.FC<ProductShowcaseModalProps> = ({
       title: selectedElement.title,
       description: selectedElement.description || "",
       images: undefined,
-      products: selectedElement.products || [],
+      products: selectedElement.product || [],
       startDate: selectedElement.startDate || "",
       endDate: selectedElement.endDate || "",
     },
@@ -89,18 +74,15 @@ const ProductShowcaseModal: React.FC<ProductShowcaseModalProps> = ({
       endDate: selectedElement.endDate || "",
     });
 
-    if (selectedElement.imageUrl && selectedElement.imageUrl.length > 0) {
-      setPreviewUrls(selectedElement.imageUrl);
+    if (
+      selectedElement.backgroundImage &&
+      selectedElement.backgroundImage.length > 0
+    ) {
+      setPreviewUrls([selectedElement.backgroundImage]);
     } else {
       setPreviewUrls([]);
     }
-  }, [selectedElement, reset, selectedProducts]);
-
-  useEffect(() => {
-    if (selectedElement.products) {
-      setSelectedProducts(selectedElement.products);
-    }
-  }, [selectedElement]);
+  }, [selectedElement, reset]);
 
   const fetchFilteredProducts = async (query: string) => {
     try {
@@ -119,7 +101,7 @@ const ProductShowcaseModal: React.FC<ProductShowcaseModalProps> = ({
       );
 
       if (response && response.data) {
-        setFilteredProducts(response.data as Product[]); // Type assertion
+        setFilteredProducts(response.data as Product[]);
       } else {
         toast.error("Failed to fetch products. Please try again.");
       }
@@ -156,11 +138,11 @@ const ProductShowcaseModal: React.FC<ProductShowcaseModalProps> = ({
       const data = new FormData();
       data.append("title", formData.title);
       data.append("description", formData.description);
-      data.append("startDate", startDate);
-      data.append("endDate", endDate);
+      data.append("startDate", formData.startDate);
+      data.append("endDate", formData.endDate);
 
       const productIds = selectedProducts.map((product) => product._id);
-      data.append("products", JSON.stringify(productIds));
+      data.append("product", JSON.stringify(productIds));
 
       if (formData.images && formData.images.length > 0) {
         Array.from(formData.images).forEach((file: File) => {
@@ -269,12 +251,6 @@ const ProductShowcaseModal: React.FC<ProductShowcaseModalProps> = ({
                 previewUrls={previewUrls}
                 onChange={(files) => {
                   field.onChange(files);
-                  if (files && files.length > 0) {
-                    const url = URL.createObjectURL(files[0]);
-                    setPreviewUrls([url]);
-                  } else {
-                    setPreviewUrls([]);
-                  }
                 }}
               />
             )}
