@@ -1,7 +1,22 @@
 import { magento } from "@/clients/magento";
 import { logError } from "@/utils/logError";
+import { createLog } from "@/clientsprisma/getLogs";
+import { auth } from "@/servicesauth";
 
 export const getOrderProducts = async (orderId: string): Promise<any> => {
+  const session = await auth();
+  if (!session?.user) {
+    return { orders: [], count: 0 };
+  }
+
+  const User = session.user as {
+    id: string;
+    roleId: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    isActive: boolean;
+  };
   try {
     const magnetoOrderProducts: any[] = await magento.queries.getOrderProducts(
       orderId,
@@ -19,9 +34,11 @@ export const getOrderProducts = async (orderId: string): Promise<any> => {
         custom_attributes.find((attr: any) => attr.attribute_code === "qty_pcb")
           ?.value,
       );
-   //const minSaleQuantity = Number(extension_attributes.stock_item.qty_increments,);
-      const qtyIncrements = Number(extension_attributes.stock_item.qty_increments,);
-const minSaleQuantity = qtyIncrements === 0 ? 1 : qtyIncrements;
+      //const minSaleQuantity = Number(extension_attributes.stock_item.qty_increments,);
+      const qtyIncrements = Number(
+        extension_attributes.stock_item.qty_increments,
+      );
+      const minSaleQuantity = qtyIncrements === 0 ? 1 : qtyIncrements;
 
       const brand = custom_attributes.find(
         (attr: any) => attr.attribute_code === "brand",
@@ -41,6 +58,18 @@ const minSaleQuantity = qtyIncrements === 0 ? 1 : qtyIncrements;
 
     return orderProducts;
   } catch (error: any) {
+    await createLog({
+      type: "error",
+      message: (error as Error).message || "Internal Server Error",
+      context: {
+        userId: User.id,
+        username: User.username,
+      },
+      timestamp: new Date(),
+      dataBefore: {},
+      dataAfter: "error",
+      id: "",
+    });
     logError(error);
     throw error;
   }

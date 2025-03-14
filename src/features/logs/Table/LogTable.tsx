@@ -1,6 +1,9 @@
 "use client";
 import { useState } from "react";
-import Modal from "./Modal";
+import ContextModal from "../components/ContextModal";
+import { MilkRunUpdatedModal } from "../components/MilkRunUpdated";
+import { OrderEditedModal } from "../components/OrderEditedModal";
+import { OrderStatusChangedModal } from "../components/OrderStatusChangedModal";
 
 interface LogTableProps {
   logs: any[];
@@ -17,21 +20,47 @@ export default function LogTable({
   refetch,
   isSidebarOpen,
 }: LogTableProps) {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedContext, setSelectedContext] = useState<any>(null);
+  const [selectedData, setSelectedData] = useState<any>(null);
+  const [modalType, setModalType] = useState<
+    "context" | "statusChanged" | "edited" | "milkRunUpdated" | null
+  >(null);
 
-  const openModal = (content: any) => {
-    setModalContent(
-      typeof content === "object"
-        ? JSON.stringify(content, null, 2)
-        : String(content),
-    );
-    setModalOpen(true);
+  const handleDataClick = (data: any, message: string) => {
+    setSelectedData(data);
+
+    if (
+      message.includes("Order Status Changed") ||
+      message.includes("order changed")
+    ) {
+      setModalType("statusChanged");
+    } else if (message.includes("Order edited")) {
+      setModalType("edited");
+    } else if (message.includes("milk run updated for order")) {
+      setModalType("milkRunUpdated");
+    } else {
+      return;
+    }
+
+    setIsModalOpen(true);
   };
 
-  const closeModal = () => {
-    setModalOpen(false);
-    setModalContent("");
+  const handleContextClick = (context: any) => {
+    setSelectedContext(context);
+    setModalType("context");
+    setIsModalOpen(true);
+  };
+  const safeDataDisplay = (data: any) => {
+    if (data === "error") {
+      return "error";
+    }
+
+    if (typeof data === "object" && data !== null) {
+      return Object.keys(data).length > 0 ? JSON.stringify(data, null, 2) : "";
+    }
+
+    return data && data !== "" ? data : "";
   };
 
   const parseJsonSafely = (data: any) => {
@@ -44,14 +73,13 @@ export default function LogTable({
   };
 
   return (
-    <div
-      className={`min-w-0 flex-1 overflow-auto rounded-lg border bg-white shadow-md ${
-        isSidebarOpen
-          ? "ml-64 w-[calc(100%-260px)]"
-          : "ml-10 w-[calc(100%-60px)]"
-      } `}
-    >
-      <table className="w-full min-w-[1400px] divide-y divide-gray-200 ">
+    <div style={{ overflowX: "auto" }}>
+      <table
+        border={0}
+        cellPadding={0}
+        cellSpacing={0}
+        style={{ width: "100%" }}
+      >
         <thead className="sticky top-0 bg-gradient-to-r from-blue-50 to-gray-50 shadow-sm">
           <tr>
             <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
@@ -64,7 +92,7 @@ export default function LogTable({
               Timestamp
             </th>
             <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-              Context
+              Username
             </th>
             <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
               Data Before
@@ -150,27 +178,27 @@ export default function LogTable({
                     {new Date(log.timestamp).toLocaleString("fr-FR")}
                   </td>
                   <td
-                    className="break-words px-4 py-2 text-sm text-gray-500"
-                    onClick={() => openModal(context)}
+                    className="cursor-pointer break-words px-4 py-2 text-sm text-gray-500"
+                    onClick={() => handleContextClick(context)}
                   >
                     <pre className="whitespace-pre-wrap break-words rounded bg-gray-100 p-2 text-xs">
-                      {context?.username || "N/A"}
+                      {context?.username || " "}
                     </pre>
                   </td>
                   <td
-                    className="break-words px-4 py-2 text-sm text-gray-500"
-                    onClick={() => openModal(dataBefore)}
+                    className="cursor-pointer break-words px-4 py-2 text-sm text-gray-500"
+                    onClick={() => handleDataClick(dataBefore, log.message)}
                   >
                     <pre className="whitespace-pre-wrap break-words rounded bg-gray-100 p-2 text-xs">
-                      {dataBefore?.status || String(dataBefore) || "N/A"}
+                      {safeDataDisplay(dataBefore.status)}
                     </pre>
                   </td>
                   <td
-                    className="break-words px-4 py-2 text-sm text-gray-500"
-                    onClick={() => openModal(dataAfter)}
+                    className="cursor-pointer break-words px-4 py-2 text-sm text-gray-500"
+                    onClick={() => handleDataClick(dataAfter, log.message)}
                   >
                     <pre className="whitespace-pre-wrap break-words rounded bg-gray-100 p-2 text-xs">
-                      {dataAfter?.status || String(dataAfter) || "N/A"}
+                      {dataAfter?.status || String(dataAfter) || ""}
                     </pre>
                   </td>
                 </tr>
@@ -178,8 +206,33 @@ export default function LogTable({
             })}
         </tbody>
       </table>
-      {modalOpen && (
-        <Modal isOpen={modalOpen} onClose={closeModal} content={modalContent} />
+
+      {isModalOpen && modalType === "context" && (
+        <ContextModal
+          data={selectedContext}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+
+      {isModalOpen && modalType === "statusChanged" && (
+        <OrderStatusChangedModal
+          data={selectedData}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+
+      {isModalOpen && modalType === "edited" && (
+        <OrderEditedModal
+          data={selectedData}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+
+      {isModalOpen && modalType === "milkRunUpdated" && (
+        <MilkRunUpdatedModal
+          data={selectedData}
+          onClose={() => setIsModalOpen(false)}
+        />
       )}
     </div>
   );

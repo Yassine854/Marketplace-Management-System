@@ -83,8 +83,10 @@ export const PUT = async (request: NextRequest) => {
     isActive: boolean;
   };
 
+  let storeId: string = "";
   try {
     const { order, username } = await request.json();
+    storeId = order.storeId;
 
     if (!order) {
       return responses.invalidRequest("order is Required");
@@ -193,6 +195,19 @@ export const PUT = async (request: NextRequest) => {
       { status: 200 },
     );
   } catch (error: any) {
+    await createLog({
+      type: "error",
+      message: error.message || "Internal Server Error",
+      context: {
+        userId: user.id,
+        username: user.username,
+        storeId: storeId,
+      },
+      timestamp: new Date(),
+      dataBefore: {},
+      dataAfter: "error",
+      id: "",
+    });
     logError(error);
     return responses.internalServerError(error);
   }

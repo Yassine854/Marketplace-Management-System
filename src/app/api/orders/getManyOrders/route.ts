@@ -4,8 +4,23 @@ import { logError } from "@/utils/logError";
 import { responses } from "@/utils/responses";
 import { NextResponse, type NextRequest } from "next/server";
 import { getManyOrders } from "@/services/orders/getManyOrders/getManyOrders";
+import { auth } from "../../../../services/auth";
+import { createLog } from "../../../../clients/prisma/getLogs";
 
 export const GET = async (request: NextRequest) => {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const User = session.user as {
+    id: string;
+    roleId: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    isActive: boolean;
+  };
   try {
     const { searchParams } = new URL(request.url);
 
@@ -39,20 +54,16 @@ export const GET = async (request: NextRequest) => {
     if (!status && storeId) {
       filterBy = `storeId:=${storeId}`;
     }
-    const filterB = searchParams.get("filterBY");  // The filter string passed from the client
-//console.log("eeeeee",filterB);
-if(filterB!= null) filterBy=filterB;
-//console.log("eeeeeesss",filterBy);
-const filters = searchParams.get("filters"); 
-//console.log("rachwan",filters);
-if(filters!== "")
+    const filterB = searchParams.get("filterBY"); // The filter string passed from the client
+    //console.log("eeeeee",filterB);
+    if (filterB != null) filterBy = filterB;
+    //console.log("eeeeeesss",filterBy);
+    const filters = searchParams.get("filters");
+    //console.log("rachwan",filters);
+    if (filters !== "") filterBy = filterBy + " && " + filters;
+    const query = filterBy.replace(/, /g, " && ");
 
-filterBy = filterBy + " && "+ filters;
-const query =  filterBy.replace(/, /g, " && ");
-
-
-
-//console.log("rachwancccc",query);
+    //console.log("rachwancccc",query);
     //@ts-ignore
     const res = await getManyOrders({
       page,
@@ -60,7 +71,6 @@ const query =  filterBy.replace(/, /g, " && ");
       sortBy: sortBy || "",
       search: search || "",
       filterBy: filterBy || "",
-
     });
 
     return NextResponse.json(
@@ -75,6 +85,18 @@ const query =  filterBy.replace(/, /g, " && ");
       },
     );
   } catch (error: any) {
+    await createLog({
+      type: "error",
+      message: error.message || "Internal Server Error",
+      context: {
+        userId: User.id,
+        username: User.username,
+      },
+      timestamp: new Date(),
+      dataBefore: {},
+      dataAfter: "error",
+      id: "",
+    });
     logError(error);
 
     return responses.internalServerError();

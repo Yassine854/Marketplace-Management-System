@@ -10,21 +10,21 @@ import { auth } from "../../../../services/auth";
 
 export const POST = async (request: NextRequest) => {
   const errorMessages: string[] = [];
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  let user = session.user as {
+    id: string;
+    roleId: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    isActive: boolean;
+  };
+  let storeId: string = "";
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = session.user as {
-      id: string;
-      roleId: string;
-      username: string;
-      firstName: string;
-      lastName: string;
-      isActive: boolean;
-    };
-
     const { orders, status, state, username } = await request.json();
     let ordersArray = Array.isArray(orders)
       ? orders
@@ -145,6 +145,19 @@ export const POST = async (request: NextRequest) => {
             message: "Order Status Changed Successfully",
           });
         } catch (error) {
+          await createLog({
+            type: "error",
+            message: (error as any).message || "Internal Server Error",
+            context: {
+              userId: user?.id,
+              username: user.username,
+              storeId: storeId,
+            },
+            timestamp: new Date(),
+            dataBefore: {},
+            dataAfter: "error",
+            id: "",
+          });
           logError(error);
           results.push({
             orderId,
@@ -169,6 +182,19 @@ export const POST = async (request: NextRequest) => {
       { status: errorMessages.length > 0 ? 400 : 200 },
     );
   } catch (error: any) {
+    await createLog({
+      type: "error",
+      message: error.message || "Internal Server Error",
+      context: {
+        userId: user?.id,
+        username: user.username,
+        storeId: storeId,
+      },
+      timestamp: new Date(),
+      dataBefore: {},
+      dataAfter: "error",
+      id: "",
+    });
     logError(error);
     return NextResponse.json(
       {

@@ -9,21 +9,21 @@ import { auth } from "../../../../services/auth";
 import { createLog } from "@/clients/prisma/getLogs";
 
 export const PUT = async (request: NextRequest) => {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const User = session.user as {
+    id: string;
+    roleId: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    isActive: boolean;
+  };
+  let storeId = "";
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const User = session.user as {
-      id: string;
-      roleId: string;
-      username: string;
-      firstName: string;
-      lastName: string;
-      isActive: boolean;
-    };
-
     const { order, username } = await request.json();
 
     if (!order) {
@@ -50,34 +50,7 @@ export const PUT = async (request: NextRequest) => {
     }
 
     const sorder: any = await typesense.orders.getOne(order.id);
-    let changes = {};
-    if (sorder.deliverySlot !== order.deliverySlot) {
-      changes = {
-        ...changes,
-        deliverySlot: {
-          before: sorder.deliverySlot,
-          after: order.deliverySlot,
-        },
-      };
-    }
-    if (sorder.deliveryAgentId !== order.deliveryAgentId) {
-      changes = {
-        ...changes,
-        deliveryAgentId: {
-          before: sorder.deliveryAgentId,
-          after: order.deliveryAgentId,
-        },
-      };
-    }
-    if (sorder.deliveryAgentName !== order.deliveryAgentName) {
-      changes = {
-        ...changes,
-        deliveryAgentName: {
-          before: sorder.deliveryAgentName,
-          after: order.deliveryAgentName,
-        },
-      };
-    }
+
     await magento.mutations.editOrderMilkRun({
       orderId: order?.id,
       deliverySlot: order?.deliverySlot,
@@ -88,15 +61,34 @@ export const PUT = async (request: NextRequest) => {
     });
 
     await typesense.orders.updateOne(order);
+    const Order: any = await typesense.orders.getOne(order.id);
 
     const dbUser = await prisma.getUser(username);
     await createLog({
       type: "milk run",
       message: `milk run updated for order `,
-      context: JSON.stringify({ User }),
+      context: JSON.stringify({
+        userId: User?.id,
+        username: User.username,
+        storeId: sorder.storeId,
+      }),
       timestamp: new Date(),
-      dataBefore: sorder,
-      dataAfter: changes,
+      dataBefore: {
+        orderId: sorder?.id,
+        storeId: sorder?.storeId,
+        agentId: sorder?.deliveryAgentId,
+        agentName: sorder?.deliveryAgentName,
+        deliveryDate: sorder?.deliverySlot,
+        status: sorder?.status,
+      },
+      dataAfter: {
+        orderId: Order?.id,
+        storeId: Order?.storeId,
+        agentId: Order?.deliveryAgentId,
+        agentName: Order?.deliveryAgentName,
+        deliveryDate: Order?.deliverySlot,
+        status: sorder.status,
+      },
       id: order?.id,
     });
 
@@ -122,6 +114,19 @@ export const PUT = async (request: NextRequest) => {
       },
     );
   } catch (error: any) {
+    await createLog({
+      type: "error",
+      message: error.message || "Internal Server Error",
+      context: {
+        userId: User?.id,
+        username: User.username,
+        storeId: storeId,
+      },
+      timestamp: new Date(),
+      dataBefore: {},
+      dataAfter: "error",
+      id: "",
+    });
     logError(error);
 
     const message: string = error?.message ?? "";

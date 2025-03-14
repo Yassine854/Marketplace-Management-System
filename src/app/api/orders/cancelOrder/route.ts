@@ -10,11 +10,12 @@ import { createLog } from "@/clients/prisma/getLogs";
 import { auth } from "../../../../services/auth";
 
 export const POST = async (request: NextRequest) => {
+  let storeId: string = "";
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  console.log(session);
+  // console.log(session);
   const user = session.user as {
     id: string;
     roleId: string;
@@ -23,7 +24,7 @@ export const POST = async (request: NextRequest) => {
     lastName: string;
     isActive: boolean;
   };
-  console.log(user);
+  // console.log(user);
   try {
     const { orderId, username } = await request.json();
 
@@ -35,23 +36,24 @@ export const POST = async (request: NextRequest) => {
     }
     await magento.mutations.cancelOrder(orderId);
 
-    // Ensure orderId is a string, if it's an array, join it into a string
     const orderIds = Array.isArray(orderId)
       ? orderId
       : orderId.split(",").map((id: string) => id.trim());
 
-    // Check if orderIds is an array of order IDs
     if (!Array.isArray(orderIds)) {
       return responses.invalidRequest("Invalid orderId format");
     }
 
-    const user = await prisma.getUser(username.username);
-
     for (let id of orderIds) {
       try {
+        const orderBefor = await getOrder(orderId);
+        const storeId = orderBefor.storeId;
+        const orderBefore = {
+          orderId: orderBefor.orderId,
+          state: orderBefor.state,
+          status: orderBefor.status,
+        };
         await typesense.orders.cancelOne(id);
-
-        const currentOrder = await getOrder(id);
 
         await createLog({
           type: "Order",
@@ -59,7 +61,7 @@ export const POST = async (request: NextRequest) => {
           context: {
             userId: user?.id,
             username: user?.username,
-            storeId: currentOrder?.storeId,
+            storeId: storeId,
           },
           timestamp: new Date(),
           dataBefore: currentOrder.status,
@@ -67,6 +69,19 @@ export const POST = async (request: NextRequest) => {
           id: "",
         });
       } catch (error) {
+        await createLog({
+          type: "error",
+          message: (error as Error).message || "Internal Server Error",
+          context: {
+            userId: user?.id,
+            username: user.username,
+            storeId: storeId,
+          },
+          timestamp: new Date(),
+          dataBefore: {},
+          dataAfter: "error",
+          id: "",
+        });
         console.error(`Failed to process order ${id}:`, error);
       }
     }
