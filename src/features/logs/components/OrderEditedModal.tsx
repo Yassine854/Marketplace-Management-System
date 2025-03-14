@@ -121,7 +121,7 @@ export function OrderEditedModal({ data, onClose }: OrderEditedModalProps) {
                             <div>
                               <strong>Weight:</strong>{" "}
                               {item.weight
-                                ? `${item.weight} g`
+                                ? `${item.weight} `
                                 : "Not Available"}
                             </div>
                           </li>

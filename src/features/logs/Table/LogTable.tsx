@@ -92,7 +92,7 @@ export default function LogTable({
               Timestamp
             </th>
             <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-              Context
+              Username
             </th>
             <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
               Data Before
