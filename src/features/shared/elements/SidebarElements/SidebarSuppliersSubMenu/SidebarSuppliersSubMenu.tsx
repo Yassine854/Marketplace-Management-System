@@ -5,36 +5,99 @@ import SidebarButton from "../SidebarButton";
 import SidebarSubMenuItem from "../SidebarSubMenuItem";
 import { IconDeviceAnalytics } from "@tabler/icons-react";
 import { useRouter } from "@/libs/next-intl/i18nNavigation";
+import { API_BASE_URL } from "../../../../SupplierAnalytics/config";
+
+interface Supplier {
+  _id: string;
+  manufacturerId: number;
+  code: string;
+  company_name: string;
+  contact_name: string;
+  phone_number?: string;
+  postal_code?: string;
+  city?: string;
+  country?: string;
+  capital?: string;
+  email?: string;
+  createdAt?: string;
+}
+
+interface SidebarSuppliersSubMenuProps {
+  name: string;
+  icon: React.ReactNode;
+  isActive?: boolean;
+  items?: Array<{ name: string; status: string }>;
+  selectedSupplierStatus?: string;
+  onSubMenuItemClick?: (status: string) => void;
+}
 
 const SidebarSuppliersSubMenu = ({
   isActive = false,
   items = [],
   selectedSupplierStatus,
   onSubMenuItemClick = () => {},
-}: any) => {
+}: SidebarSuppliersSubMenuProps) => {
   const [isOpen, setIsOpen] = useState(isActive);
   const [searchTerm, setSearchTerm] = useState("");
-  const [allSuppliers, setAllSuppliers] = useState<any[]>([]);
-  const [filteredSuppliers, setFilteredSuppliers] = useState<any[]>([]);
-  const [selectedSupplier, setSelectedSupplier] = useState<any>(null);
+  const [allSuppliers, setAllSuppliers] = useState<Supplier[]>([]);
+  const [filteredSuppliers, setFilteredSuppliers] = useState<Supplier[]>([]);
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
+    null,
+  );
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     setIsOpen(isActive);
   }, [isActive]);
 
-  // Fetch all suppliers on component mount
   useEffect(() => {
+    const authToken = localStorage.getItem("authToken");
+    if (!authToken) return;
+
     const fetchSuppliers = async () => {
       setIsLoading(true);
+      setError(null);
       try {
-        const response = await fetch("http://localhost:3000/api/suppliers");
+        const response = await fetch(`${API_BASE_URL}/api/suppliers`, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
-        setAllSuppliers(data);
+
+        if (!Array.isArray(data)) {
+          throw new Error("Invalid data format received from server");
+        }
+
+        // Validate and transform supplier data
+        const validatedSuppliers = data.map((item: any) => ({
+          _id: item._id,
+          manufacturerId: Number(item.manufacturerId) || 0,
+          code: item.code || "N/A",
+          company_name: item.company_name || "Unnamed Supplier",
+          contact_name: item.contact_name || "N/A",
+          phone_number: item.phone_number,
+          postal_code: item.postal_code,
+          city: item.city,
+          country: item.country,
+          capital: item.capital,
+          email: item.email,
+          createdAt: item.createdAt,
+        }));
+
+        setAllSuppliers(validatedSuppliers);
       } catch (error) {
         console.error("Error fetching suppliers:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to fetch suppliers",
+        );
+        setAllSuppliers([]);
       } finally {
         setIsLoading(false);
       }
@@ -45,29 +108,23 @@ const SidebarSuppliersSubMenu = ({
     }
   }, [isDropdownVisible]);
 
-  // Filter suppliers locally
   useEffect(() => {
-    const filterSuppliers = () => {
+    const debounceTimer = setTimeout(() => {
       if (!searchTerm) {
         setFilteredSuppliers([]);
         return;
       }
 
-      const lowerSearchTerm = searchTerm.toLowerCase();
+      const lowerSearchTerm = searchTerm.toLowerCase().trim();
       const filtered = allSuppliers.filter((supplier) => {
-        const idMatch = supplier.manufacturer_id
-          .toString()
-          .includes(lowerSearchTerm);
-        const nameMatch = supplier.company_name
-          .toLowerCase()
-          .includes(lowerSearchTerm);
-        return idMatch || nameMatch;
+        const id = String(supplier?.manufacturerId ?? "").toLowerCase();
+        const name = (supplier?.company_name ?? "").toLowerCase();
+        return id.includes(lowerSearchTerm) || name.includes(lowerSearchTerm);
       });
 
       setFilteredSuppliers(filtered);
-    };
+    }, 300);
 
-    const debounceTimer = setTimeout(filterSuppliers, 300);
     return () => clearTimeout(debounceTimer);
   }, [searchTerm, allSuppliers]);
 
@@ -77,9 +134,11 @@ const SidebarSuppliersSubMenu = ({
     setFilteredSuppliers([]);
   };
 
-  const handleSupplierSelect = (supplier: any) => {
+  const handleSupplierSelect = (supplier: Supplier) => {
+    if (!supplier.manufacturerId) return;
+
     setSelectedSupplier(supplier);
-    router.push(`/supplierDashboard?supplierId=${supplier.manufacturer_id}`);
+    router.push(`/supplierDashboard?supplierId=${supplier.manufacturerId}`);
     setIsDropdownVisible(false);
   };
 
@@ -108,7 +167,7 @@ const SidebarSuppliersSubMenu = ({
               isActive={selectedSupplierStatus === "all"}
             />
 
-            {items.map(({ name, status }: any) => (
+            {items.map(({ name, status }) => (
               <SidebarSubMenuItem
                 key={name}
                 name={name}
@@ -137,37 +196,45 @@ const SidebarSuppliersSubMenu = ({
                   )}
                 </div>
 
-                {!isLoading && filteredSuppliers.length > 0 && (
-                  <div className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-white shadow-lg">
-                    {filteredSuppliers.map((supplier) => (
-                      <div
-                        key={supplier._id}
-                        className="cursor-pointer p-2 hover:bg-gray-100"
-                        onClick={() => handleSupplierSelect(supplier)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">
-                            ID: {supplier.manufacturer_id}
-                          </span>
-                          <span className="text-sm text-gray-500">
-                            {supplier.code}
-                          </span>
-                        </div>
-                        <div className="text-gray-600">
-                          {supplier.company_name}
-                        </div>
-                        <div className="text-sm text-gray-400">
-                          Contact: {supplier.contact_name}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                {error && (
+                  <div className="p-2 text-sm text-red-500">{error}</div>
                 )}
 
-                {!isLoading && filteredSuppliers.length === 0 && searchTerm && (
-                  <div className="p-2 text-gray-500">
-                    No matching suppliers found
-                  </div>
+                {!isLoading && !error && (
+                  <>
+                    {filteredSuppliers.length > 0 ? (
+                      <div className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-white shadow-lg">
+                        {filteredSuppliers.map((supplier) => (
+                          <div
+                            key={supplier._id}
+                            className="cursor-pointer p-2 hover:bg-gray-100"
+                            onClick={() => handleSupplierSelect(supplier)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium">
+                                ID: {supplier.manufacturerId}
+                              </span>
+                              <span className="text-sm text-gray-500">
+                                {supplier.code}
+                              </span>
+                            </div>
+                            <div className="text-gray-600">
+                              {supplier.company_name}
+                            </div>
+                            <div className="text-sm text-gray-400">
+                              Contact: {supplier.contact_name}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      searchTerm && (
+                        <div className="p-2 text-gray-500">
+                          No matching suppliers found
+                        </div>
+                      )
+                    )}
+                  </>
                 )}
               </div>
             )}

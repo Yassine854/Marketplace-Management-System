@@ -24,6 +24,7 @@ import SupplierTopProductsChart from "../charts/suppliers/SupplierTopProductsCha
 import InventoryTrendChart from "../charts/suppliers/InventoryTrendChart";
 import "react-datepicker/dist/react-datepicker.css";
 import Footer from "./footer";
+import { API_BASE_URL } from "../config";
 
 // const supplierId = "27"; // Example supplier ID (e.g., Technofood)
 
@@ -31,6 +32,7 @@ const SupplierDashboard = () => {
   const router = useRouter(); // Initialize useRouter hook to access the query parameters
   const searchParams = useSearchParams();
   const supplierId: string = searchParams.get("supplierId") ?? "";
+
   const [startDate, setStartDate] = useState<Date | null>(null); // Default to null
   const [endDate, setEndDate] = useState<Date | null>(null); // Default to null
 
@@ -40,67 +42,65 @@ const SupplierDashboard = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
+  const [suppliers, setSuppliers] = useState<any>(null);
   const [supplier, setSupplier] = useState<any>(null);
+  const [customers, setCustomers] = useState<any>(null);
 
   useEffect(() => {
-    console.log(supplierId);
-    const fetchCategories = async () => {
+    const token = localStorage.getItem("authToken");
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/categories",
-        );
-        setCategories(response.data);
-        console.log(response.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
+        const [
+          categoriesRes,
+          suppliersRes,
+          ordersRes,
+          productsRes,
+          customersRes,
+        ] = await Promise.all([
+          axios.get(`${API_BASE_URL}/api/categories`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${API_BASE_URL}/api/suppliers`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${API_BASE_URL}/api/orders`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${API_BASE_URL}/api/supplier_products`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${API_BASE_URL}/api/customers`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
 
-    const fetchSupplier = async () => {
-      try {
-        // Fetch all suppliers from the API
-        const response = await axios.get("http://localhost:3000/api/suppliers");
-        const foundSupplier = response.data.find(
-          (supplier: any) => supplier.manufacturer_id === Number(supplierId),
-        );
+        setSuppliers(suppliersRes.data);
+        setCategories(categoriesRes.data);
+        setOrders(ordersRes.data);
+        setProducts(productsRes.data);
+        setCustomers(customersRes.data);
 
+        const foundSupplier: any = suppliersRes.data.find(
+          (supplier: any) => supplier.manufacturerId === Number(supplierId),
+        );
         if (foundSupplier) {
           setSupplier(foundSupplier);
+          console.log(foundSupplier);
         } else {
           console.error("Supplier not found");
         }
       } catch (error) {
-        console.error("Error fetching supplier:", error);
+        console.error("Error fetching data:", error);
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          localStorage.removeItem("authToken");
+        }
       }
     };
 
-    const fetchOrders = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/api/orders");
-        setOrders(response.data);
-        console.log(response.data);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      }
-    };
-
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/api/products");
-        setProducts(response.data);
-        console.log(response.data);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      }
-    };
-    fetchSupplier();
-    fetchProducts();
-    fetchOrders();
-    fetchCategories();
+    fetchData();
   }, [supplierId]);
 
   const handleApplyFilters = () => {
-    // Only apply the current dates if they are not null
     setAppliedStartDate(startDate);
     setAppliedEndDate(endDate);
   };
@@ -169,13 +169,8 @@ const SupplierDashboard = () => {
       return sum + item.qty_invoiced * (product?.cost || 0);
     }, 0);
 
-  const supplierDetails = orderData.products.find(
-    (p) => p.product.supplier?.manufacturer_id === supplierId,
-  )?.product.supplier;
-
   const handleStartDateChange = (date: Date | null) => {
     setStartDate(date);
-    // Automatically clear the applied start date if input is cleared
     if (date === null) {
       setAppliedStartDate(null);
     }
@@ -183,16 +178,14 @@ const SupplierDashboard = () => {
 
   const handleEndDateChange = (date: Date | null) => {
     setEndDate(date);
-    // Automatically clear the applied end date if input is cleared
     if (date === null) {
       setAppliedEndDate(null);
     }
   };
-
   return (
     <div>
       <div className="mt-[4.8rem] w-full bg-n20 p-6">
-        {supplier && (
+        {supplier ? (
           <div className="mb-6 text-center">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               {supplier.company_name}
@@ -203,7 +196,11 @@ const SupplierDashboard = () => {
               </p>
             )}
           </div>
+        ) : (
+          <p>Loading supplier data...</p> // Add a loading message or spinner
         )}
+
+        {/* Filter Section */}
         <div className="mb-6 flex flex-col md:flex-row md:space-x-4">
           <div className="flex flex-col md:mr-4">
             <label htmlFor="startDate" className="text-lg">
@@ -274,29 +271,43 @@ const SupplierDashboard = () => {
           </CardDataStats>
         </div>
 
-        {/* Charts */}
+        {/* Charts Grid */}
         <div className="mt-6 grid w-full grid-cols-1 justify-center gap-6 md:grid-cols-3">
           <div className="md:col-span-2">
-            <SupplierAreaChart supplierId={supplierId} />
+            <SupplierAreaChart
+              supplierId={supplierId!}
+              orders={orders}
+              products={products}
+            />{" "}
           </div>
           <div className="mt-6 flex w-full justify-center">
-            <SupplierQuarterlyMetrics supplierId={supplierId} />
+            <SupplierQuarterlyMetrics
+              supplierId={supplierId!}
+              orders={orders}
+              products={products}
+            />
           </div>
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
           <div className="flex w-full justify-center md:col-span-2">
-            <ProductRevenueLossChart supplierId={supplierId} />
+            <ProductRevenueLossChart
+              supplierId={supplierId!}
+              orders={orders}
+              products={products}
+            />
           </div>
           <div className="mt-6 flex w-full justify-center">
-            <AvailableProducts supplierId={supplierId} />
+            <AvailableProducts supplierId={supplierId!} products={products} />
           </div>
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-1">
           <div>
             <TopArticlesOrdered
-              supplierId={supplierId}
+              supplierId={supplierId!}
+              orders={orders}
+              products={products}
               startDate={startDate}
               endDate={endDate}
             />
@@ -306,14 +317,21 @@ const SupplierDashboard = () => {
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="flex w-full justify-center">
             <SupplierCategoryPieChart
-              supplierId={supplierId}
+              supplierId={supplierId!}
+              orders={orders}
+              products={products}
+              categories={categories}
+              suppliers={suppliers}
               startDate={startDate}
               endDate={endDate}
             />
           </div>
           <div className="flex w-full justify-center">
             <ClientSegment
-              supplierId={supplierId}
+              supplierId={supplierId!}
+              orders={orders}
+              customers={customers}
+              products={products}
               startDate={startDate}
               endDate={endDate}
             />
@@ -322,24 +340,35 @@ const SupplierDashboard = () => {
 
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
           <div className="flex w-full justify-center md:col-span-2">
-            <RegionsOrders supplierId={supplierId} />
+            <RegionsOrders
+              supplierId={supplierId!}
+              orders={orders}
+              products={products}
+              customers={customers}
+            />
           </div>
           <div className="flex w-full justify-center md:col-span-1">
-            <InventoryTrendChart supplierId={supplierId} />
+            <InventoryTrendChart
+              supplierId={supplierId!}
+              products={products}
+              orders={orders}
+            />
           </div>
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-1">
           <div>
             <SupplierTopProductsChart
-              supplierId={supplierId}
+              supplierId={supplierId!}
+              products={products}
+              orders={orders}
               startDate={startDate}
               endDate={endDate}
             />
           </div>
         </div>
+        <Footer supplier={supplier} />
       </div>
-      <Footer supplier={supplier} />
     </div>
   );
 };
