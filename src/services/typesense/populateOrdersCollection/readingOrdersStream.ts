@@ -1,6 +1,9 @@
 import { Readable } from "stream";
 import { magento } from "@/clients/magento";
 
+type MagentoOrderResponse = { items: any[] } | "Unauthorized";
+type MagentoPageCountResponse = { pagesCount: number } | "Unauthorized";
+
 export const readingOrdersStream = () => {
   let page = 1;
   let isEnd = false;
@@ -13,7 +16,15 @@ export const readingOrdersStream = () => {
           return;
         }
 
-        const { pagesCount } = await magento.queries.getAllOrdersPagesCount();
+        const pageCountResponse: MagentoPageCountResponse =
+          await magento.queries.getAllOrdersPagesCount();
+
+        if (pageCountResponse === "Unauthorized") {
+          this.emit("error", new Error("Unauthorized access"));
+          return;
+        }
+
+        const { pagesCount } = pageCountResponse;
 
         if (page <= pagesCount) {
           console.info(
@@ -24,7 +35,15 @@ export const readingOrdersStream = () => {
             "total pages ...",
           );
 
-          const { items } = await magento.queries.getOrdersByBatch(page);
+          const ordersResponse: MagentoOrderResponse =
+            await magento.queries.getOrdersByBatch(page);
+
+          if (ordersResponse === "Unauthorized") {
+            this.emit("error", new Error("Unauthorized access"));
+            return;
+          }
+
+          const { items } = ordersResponse;
 
           this.push(JSON.stringify(items));
           page++;

@@ -64,7 +64,7 @@ export const POST = async (request: NextRequest) => {
             storeId: storeId,
           },
           timestamp: new Date(),
-          dataBefore: currentOrder.status,
+          dataBefore: orderBefore.status,
           dataAfter: "canceled",
           id: "",
         });
