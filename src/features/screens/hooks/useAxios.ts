@@ -13,10 +13,11 @@ interface UseAxiosProps<T> {
     data?: any,
     config?: AxiosRequestConfig,
     apiKey?: string,
-  ) => Promise<AxiosResponse<T> | void>; // Return the response or void
+  ) => Promise<AxiosResponse<T> | void>;
 }
 
-const BASE_URL = "http://localhost:3000/";
+const BASE_URL =
+  process.env.BASE_URL_EXPRESS_PUBLIC || "http://102.219.178.14:3000";
 
 const useAxios = <T>(): UseAxiosProps<T> => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -56,8 +57,9 @@ const useAxios = <T>(): UseAxiosProps<T> => {
 
         const result = await axiosInstance(axiosConfig);
         setResponse(result);
-        return result; // Return the response
+        return result;
       } catch (err) {
+        console.log("🚀 ~ err:", err);
         if (axios.isAxiosError(err)) {
           setError(err);
         } else {

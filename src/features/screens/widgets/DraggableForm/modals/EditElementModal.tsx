@@ -3,7 +3,31 @@ import { Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/react";
 import ImageModal from "./ImageModal";
 import CarouselModal from "./CarouselModal";
 import ProductShowcaseModal from "./ProductShowcaseModal";
-import { EditElementModalProps } from "../types";
+
+interface Element {
+  _id: string;
+  adType?: string;
+  title?: string;
+}
+
+interface EditElementModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  selectedElement: Element | null;
+}
+interface Product {
+  _id: string;
+  name: string;
+}
+interface SelectedElement {
+  _id: string;
+  title: string;
+  description?: string;
+  imageUrl?: string[];
+  products?: Product[];
+  startDate?: string;
+  endDate?: string;
+}
 
 const EditElementModal: React.FC<EditElementModalProps> = ({
   isOpen,
@@ -13,23 +37,27 @@ const EditElementModal: React.FC<EditElementModalProps> = ({
   if (!selectedElement) return null;
 
   const renderModalContent = () => {
-    switch (
-      selectedElement.adType !== undefined
-        ? selectedElement.adType
-        : selectedElement.title
-    ) {
+    const elementType = selectedElement.adType ?? selectedElement.title;
+
+    switch (elementType) {
       case "image":
         return (
-          <ImageModal selectedElement={selectedElement} onClose={onClose} />
+          <ImageModal
+            selectedElement={selectedElement as SelectedElement}
+            onClose={onClose}
+          />
         );
       case "carousel":
         return (
-          <CarouselModal selectedElement={selectedElement} onClose={onClose} />
+          <CarouselModal
+            selectedElement={selectedElement as SelectedElement}
+            onClose={onClose}
+          />
         );
       case "ProductShowcase":
         return (
           <ProductShowcaseModal
-            selectedElement={selectedElement}
+            selectedElement={selectedElement as SelectedElement}
             onClose={onClose}
           />
         );

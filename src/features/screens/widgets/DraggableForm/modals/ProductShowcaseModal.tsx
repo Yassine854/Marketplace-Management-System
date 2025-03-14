@@ -1,19 +1,46 @@
 import React, { useEffect, useState } from "react";
 import { ModalBody, ModalHeader } from "@nextui-org/react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { ProductFormValues, ProductFormSchema } from "./types";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import TextInput from "../../inputs/TextInput";
 import DateInput from "../../inputs/DateInput";
 import SearchSelectInput from "../../inputs/SearchSelectInput";
 import useAxios from "../../../hooks/useAxios";
 import { toast } from "react-hot-toast";
-import FileInput from "../../inputs/FileInput";
+import SingleFileInput from "../../inputs/SingleFileInput";
+import { ProductFormSchema, ProductFormValues } from "./types";
 
-const ProductShowcaseModal: React.FC = ({ selectedElement, onClose }) => {
+interface Product {
+  _id: string;
+  name: string;
+}
+
+interface SelectedElement {
+  _id: string;
+  title: string;
+  description?: string;
+  backgroundImage?: string;
+  product?: Product[];
+  startDate?: string;
+  endDate?: string;
+}
+
+interface ProductShowcaseModalProps {
+  selectedElement: SelectedElement;
+  onClose: () => void;
+}
+
+const ProductShowcaseModal: React.FC<ProductShowcaseModalProps> = ({
+  selectedElement,
+  onClose,
+}) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>(
+    selectedElement.product || [],
+  );
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const {
     control,
@@ -28,8 +55,8 @@ const ProductShowcaseModal: React.FC = ({ selectedElement, onClose }) => {
     defaultValues: {
       title: selectedElement.title,
       description: selectedElement.description || "",
-      images: [],
-      products: [],
+      images: undefined,
+      products: selectedElement.product || [],
       startDate: selectedElement.startDate || "",
       endDate: selectedElement.endDate || "",
     },
@@ -41,14 +68,23 @@ const ProductShowcaseModal: React.FC = ({ selectedElement, onClose }) => {
     reset({
       title: selectedElement.title,
       description: selectedElement.description || "",
-      images: [],
+      images: undefined,
       products: selectedProducts,
       startDate: selectedElement.startDate || "",
       endDate: selectedElement.endDate || "",
     });
-  }, [selectedElement, reset, selectedProducts]);
 
-  const fetchFilteredProducts = async (query) => {
+    if (
+      selectedElement.backgroundImage &&
+      selectedElement.backgroundImage.length > 0
+    ) {
+      setPreviewUrls([selectedElement.backgroundImage]);
+    } else {
+      setPreviewUrls([]);
+    }
+  }, [selectedElement, reset]);
+
+  const fetchFilteredProducts = async (query: string) => {
     try {
       const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
@@ -65,16 +101,17 @@ const ProductShowcaseModal: React.FC = ({ selectedElement, onClose }) => {
       );
 
       if (response && response.data) {
-        setFilteredProducts(response.data);
+        setFilteredProducts(response.data as Product[]);
       } else {
         toast.error("Failed to fetch products. Please try again.");
       }
     } catch (error) {
       console.error("Error fetching filtered products:", error);
+      toast.error("Failed to fetch products. Please try again.");
     }
   };
 
-  const handleSearch = (query) => {
+  const handleSearch = (query: string) => {
     setSearchQuery(query);
 
     if (query.trim()) {
@@ -84,7 +121,7 @@ const ProductShowcaseModal: React.FC = ({ selectedElement, onClose }) => {
     }
   };
 
-  const handleProductSelection = (product) => {
+  const handleProductSelection = (product: Product) => {
     if (!selectedProducts.some((p) => p._id === product._id)) {
       setSelectedProducts([...selectedProducts, product]);
     }
@@ -92,7 +129,7 @@ const ProductShowcaseModal: React.FC = ({ selectedElement, onClose }) => {
     setFilteredProducts([]);
   };
 
-  const removeSelectedProduct = (productId) => {
+  const removeSelectedProduct = (productId: string) => {
     setSelectedProducts(selectedProducts.filter((p) => p._id !== productId));
   };
 
@@ -101,15 +138,17 @@ const ProductShowcaseModal: React.FC = ({ selectedElement, onClose }) => {
       const data = new FormData();
       data.append("title", formData.title);
       data.append("description", formData.description);
-      data.append("startDate", startDate);
-      data.append("endDate", endDate);
+      data.append("startDate", formData.startDate);
+      data.append("endDate", formData.endDate);
 
       const productIds = selectedProducts.map((product) => product._id);
-      data.append("products", JSON.stringify(productIds));
+      data.append("product", JSON.stringify(productIds));
 
-      Array.from(formData.images).forEach((file) => {
-        data.append("backgroundImage", file);
-      });
+      if (formData.images && formData.images.length > 0) {
+        Array.from(formData.images).forEach((file: File) => {
+          data.append("backgroundImage", file);
+        });
+      }
 
       const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
@@ -146,22 +185,19 @@ const ProductShowcaseModal: React.FC = ({ selectedElement, onClose }) => {
         <h2 className="text-xl font-bold">Edit Product Showcase</h2>
       </ModalHeader>
       <ModalBody>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-4 py-10 pb-10"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <TextInput
             label="Title"
             placeholder="Enter your Title"
             register={register("title")}
-            isError={errors.title}
+            isError={!!errors.title}
             errorMessage={errors.title?.message}
           />
           <TextInput
             label="Description"
             placeholder="Enter your description"
             register={register("description")}
-            isError={errors.description}
+            isError={!!errors.description}
             errorMessage={errors.description?.message}
           />
 
@@ -204,13 +240,28 @@ const ProductShowcaseModal: React.FC = ({ selectedElement, onClose }) => {
             onRemoveProduct={removeSelectedProduct}
           />
 
-          <FileInput
-            id="images"
-            label="Image"
-            register={register}
-            error={errors.images}
-            accept="image/*"
+          <Controller
+            name="images"
+            control={control}
+            render={({ field }) => (
+              <SingleFileInput
+                id="images"
+                label="Background Image"
+                accept="image/*"
+                previewUrls={previewUrls}
+                onChange={(files) => {
+                  field.onChange(files);
+                }}
+              />
+            )}
           />
+          {errors.images &&
+            typeof errors.images === "object" &&
+            "message" in errors.images && (
+              <p className="mt-2 text-sm text-red-600">
+                {errors.images.message}
+              </p>
+            )}
 
           <div className="flex w-full justify-end">
             <button

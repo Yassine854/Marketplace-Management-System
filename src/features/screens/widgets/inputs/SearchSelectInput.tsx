@@ -23,7 +23,7 @@ const SearchSelectInput: React.FC<SearchSelectInputProps> = ({
 }) => {
   return (
     <div>
-      <label className="ml-4 block font-medium md:text-lg">{label}</label>
+      <label className=" block font-medium md:text-lg">{label}</label>
       <input
         type="text"
         placeholder={placeholder}
@@ -43,7 +43,7 @@ const SearchSelectInput: React.FC<SearchSelectInputProps> = ({
         ))}
       </div>
       <div className="mt-4">
-        <label className="ml-4 block font-medium md:text-lg">
+        <label className="block font-medium md:text-lg">
           Selected Products
         </label>
         <div className="mt-2">

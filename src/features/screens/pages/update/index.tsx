@@ -3,38 +3,57 @@ import DraggableForm from "../../widgets/DraggableForm/DraggableForm";
 import { usePathname, useRouter } from "@/libs/next-intl/i18nNavigation";
 import useAxios from "../../hooks/useAxios";
 import { toast } from "react-hot-toast";
+import { AxiosResponse } from "axios";
 
-const UpdatePage = () => {
+interface FormElement {
+  id: string;
+  _id: string;
+  title: string;
+}
+
+interface ScreenData {
+  id: string;
+  title: string;
+  status: "draft" | "active" | "inactive";
+  ad: FormElement[];
+}
+
+const UpdatePage: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const id = pathname.split("/").pop();
+  const id = pathname.split("/").pop() || "";
 
-  const [elements, setElements] = useState([
+  const [elements, setElements] = useState<any>([
     { id: "1", title: "image" },
     { id: "2", title: "carousel" },
     { id: "3", title: "ProductShowcase" },
   ]);
 
-  const [formElements, setFormElements] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<any>();
-  const [title, setTitle] = useState("");
+  const [formElements, setFormElements] = useState<FormElement[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [data, setData] = useState<ScreenData | null>(null);
+  const [title, setTitle] = useState<string>("");
 
-  const { loading: axiosLoading, fetchData } = useAxios();
+  const { fetchData } = useAxios();
+  const apiKey: string | undefined = process.env.NEXT_PUBLIC_API_KEY;
 
-  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-
-  const fetchForms = async () => {
+  const fetchForms = async (): Promise<void> => {
     setIsLoading(true);
     try {
-      const response = await fetchData(`api/screen/${id}`, "get", undefined, {
-        headers: { "X-API-Key": apiKey },
-      });
+      const response: any = await fetchData(
+        `api/screen/${id}`,
+        "get",
+        undefined,
+        {
+          headers: { "X-API-Key": apiKey },
+        },
+      );
 
-      if (response && response.data) {
-        setData(response.data);
-        setFormElements(response.data.ad);
-        setTitle(response.data.title);
+      if (response.data) {
+        const screenData = response.data;
+        setData(screenData);
+        setFormElements(screenData.ad || []);
+        setTitle(screenData.title || "");
       } else {
         console.error("Failed to fetch data");
         toast.error("Failed to fetch data. Please try again.");
@@ -51,9 +70,12 @@ const UpdatePage = () => {
     fetchForms();
   }, []);
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
+    if (!data) return;
+
+    setIsLoading(true);
     try {
-      const newData = { ...data, ad: formElements, title: title };
+      const newData: ScreenData = { ...data, ad: formElements, title };
 
       await fetchData(`api/screen/${id}`, "put", newData, {
         headers: { "X-API-Key": apiKey },
@@ -63,10 +85,13 @@ const UpdatePage = () => {
     } catch (error) {
       console.error("Error saving data:", error);
       toast.error("Failed to save data. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handlePublish = async () => {
+  const handlePublish = async (): Promise<void> => {
+    setIsLoading(true);
     try {
       await fetchData(`api/screen/${id}/activate`, "put", undefined, {
         headers: { "X-API-Key": apiKey },
@@ -76,10 +101,14 @@ const UpdatePage = () => {
     } catch (error) {
       console.error("Error publishing data:", error);
       toast.error("Failed to publish data. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const renderStatusIcon = (status: string) => {
+  const renderStatusIcon = (
+    status: "draft" | "active" | "inactive",
+  ): JSX.Element | null => {
     switch (status) {
       case "draft":
         return (
@@ -185,7 +214,7 @@ const UpdatePage = () => {
           <button
             className="inline-flex items-center rounded border border-gray-500 bg-white px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50"
             onClick={handleSave}
-            disabled={axiosLoading}
+            disabled={isLoading}
           >
             <svg
               className="mr-2 h-4 w-4"
@@ -201,20 +230,19 @@ const UpdatePage = () => {
                 d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
               />
             </svg>
-            {axiosLoading ? "Saving..." : "Save"}
+            {isLoading ? "Saving..." : "Save"}
           </button>
           <button
             onClick={handlePublish}
             className="inline-flex items-center rounded border border-gray-500 bg-blue-300 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50"
-            disabled={axiosLoading}
+            disabled={isLoading}
           >
-            {axiosLoading ? "Publishing..." : "Publish"}
+            {isLoading ? "Publishing..." : "Publish"}
           </button>
         </div>
       </div>
       <DraggableForm
         elements={elements}
-        setElements={setElements}
         formElements={formElements}
         setFormElements={setFormElements}
       />

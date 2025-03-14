@@ -1,13 +1,12 @@
 import { UseFormRegister, FieldError } from "react-hook-form";
 
-type SelectInputProps = {
+interface SelectInputProps {
   name: string;
-  options: string[];
-  register: UseFormRegister<any>;
-  errors?: FieldError;
-  label?: string;
-};
-
+  options: readonly string[];
+  register: any;
+  errors: any;
+  label: string;
+}
 export const SelectInput = ({
   name,
   options,
