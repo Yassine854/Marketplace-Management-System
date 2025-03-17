@@ -58,6 +58,12 @@ model Category {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   categoryId   Int      @unique // ID Magento
   nameCategory String
+  image        String?             
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  products    ProductCategory[]  
+  subCategories  SubCategory[]
 }
 
 model Warehouse {
@@ -70,7 +76,7 @@ model Warehouse {
   updatedAt   DateTime @updatedAt
   purchaseOrders PurchaseOrder[] 
 }
-model products {
+model Product {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   product_id     Int      @unique // ID Magento
   sku            String   @unique
@@ -87,8 +93,45 @@ model products {
   updated_at     String
   stock_item     StockItem?
 
+
+  pcb                  String?    
+  weight               Float?   
+  description          String?  
+  stock                Int?     
+  promo                Boolean  @default(false)  
+  skuPartner           String?  
+  minimumQte           Int?     
+  maximumQte           Int?     
+  sealableAlertQte     Int?     
+
+  typePcbId            String?  @db.ObjectId 
+  typePcb              TypePcb? @relation(fields: [typePcbId], references: [id]) 
+  productTypeId        String?  @db.ObjectId  
+  productType          ProductType? @relation(fields: [productTypeId], references: [id])  
+  productStatusId      String?  @db.ObjectId  
+  productStatus        ProductStatus? @relation(fields: [productStatusId], references: [id]) 
+  supplierId           String?  @db.ObjectId 
+  supplier             Manufacturer? @relation(fields: [supplierId], references: [id]) 
+  taxId                String?   @db.ObjectId 
+  tax                  Tax?      @relation(fields: [taxId], references: [id])
+  promotion            Promotion?  @relation(fields: [promotionId], references: [id])
+  promotionId          String?     @db.ObjectId
+  images               Image[]
+  notifyRequests       NotifyMe[]
+  
+  relatedProducts      RelatedProduct[] @relation("ProductToRelatedProduct")
+  relatedTo            RelatedProduct[] @relation("RelatedProductToProduct")
+
+  categories       ProductCategory[]
+  favoriteProducts FavoriteProduct[]
+  favoritePartners FavoritePartner[]
+  orderItems OrderItem[]
+  reservationItems    ReservationItem[]
+  loyaltyPoints LoyaltyPoints[]
   @@index([category_ids])
+  @@map("products")
 }
+
 model StockItem {
   id             String  @id @default(auto()) @map("_id") @db.ObjectId
   item_id        Int?
@@ -101,7 +144,7 @@ model StockItem {
   max_sale_qty   Float?
   backorders     Int?
   low_stock_date String?
-  product        products @relation(fields: [product_id], references: [product_id])
+  product        Product @relation(fields: [product_id], references: [product_id])
 }
 
 
@@ -124,6 +167,7 @@ model Manufacturer {
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
+  products Product[]  
   @@map("manufacturers")
 }
 model Payment {
@@ -228,3 +272,401 @@ model ProductOrdered {
   @@map("productOrdered")
 }
 
+
+model TypePartner {
+  id   String  @id @default(auto()) @map("_id") @db.ObjectId
+  name String  @unique
+  partners Partner[]
+  
+  @@map("type_partners")
+}
+
+
+model Partner {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  username        String   @unique
+  firstName       String
+  lastName        String
+  email           String   @unique
+  telephone       String
+  address         String
+  password        String
+  roleId          String
+  isActive        Boolean  @default(true)
+  logo            String?  
+  patent          String?  
+  responsibleName String   
+  position        String  
+  coverageArea    String   
+  minimumAmount   Float    
+  typePartner     TypePartner @relation(fields: [typePartnerId], references: [id])
+  typePartnerId   String   @db.ObjectId   
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  favoritePartners FavoritePartner[]
+  orders   Order[]
+  reservations Reservation[]
+  loyaltyPoints LoyaltyPoints[]
+  @@map("partners")
+}
+
+
+
+model Customer {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstName String
+  lastName  String
+  email     String?   
+  telephone String
+  address   String
+  password  String
+  roleId    String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  favoriteProducts FavoriteProduct[]
+  favoritePartners FavoritePartner[]
+  orders   Order[]
+  reservations Reservation[]
+  notifications   NotifyMe[] 
+  @@map("customers")
+}
+
+
+model Agent {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  username  String   @unique
+  firstName String
+  lastName  String
+  email     String   @unique
+  telephone String
+  address   String
+  password  String
+  roleId    String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders   Order[]
+  reservations Reservation[]
+  @@map("agents")
+}
+
+
+
+model TypePcb {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name    String   @unique 
+  products Product[]  
+  
+  @@map("type_pcb") 
+}
+
+
+model ProductType {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  type    String   @unique 
+  products Product[] 
+  
+  @@map("product_types") 
+}
+
+
+model ProductStatus {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  actif   Boolean  @default(true) 
+  name    String   @unique         
+  products Product[]  
+
+  @@map("product_statuses")
+}
+
+model Tax {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  value    Float     
+  products Product[] 
+  orderItems OrderItem[]
+  reservationItems    ReservationItem[]
+  @@map("taxes")
+}
+
+model Promotion {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  startDate  DateTime  
+  endDate    DateTime  
+  promoPrice Float     
+  products   Product[] 
+
+  @@map("promotions")
+}
+
+model Image {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  url        String   
+  altText    String?  
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  String   @db.ObjectId
+
+  @@map("images")
+}
+
+
+model NotifyMe {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  clientName  String   
+  product     Product  @relation(fields: [productSku], references: [sku])
+  productSku  String
+  customerId  String   @db.ObjectId
+
+  customer    Customer @relation(fields: [customerId], references: [id])
+
+
+
+  @@map("notify_me")
+}
+
+model RelatedProduct {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId         String   @db.ObjectId
+  relatedProductId  String   @db.ObjectId
+
+
+  product          Product  @relation("ProductToRelatedProduct", fields: [productId], references: [id])
+  relatedProduct   Product  @relation("RelatedProductToProduct", fields: [relatedProductId], references: [id])
+
+  @@unique([productId, relatedProductId])  
+  @@map("related_products")
+}
+
+
+
+model ProductCategory {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  productId  String    @db.ObjectId
+  categoryId String    @db.ObjectId
+
+  product    Product   @relation(fields: [productId], references: [id])
+  category   Category  @relation(fields: [categoryId], references: [id])
+
+  @@unique([productId, categoryId])  
+}
+
+model SubCategory {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  categoryId  String    @db.ObjectId
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([name, categoryId]) 
+}
+
+
+model FavoriteProduct {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  customerId  String   @db.ObjectId
+  productId   String   @db.ObjectId
+
+  customer    Customer @relation(fields: [customerId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id])
+
+  @@unique([customerId, productId])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model FavoritePartner {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  customerId  String   @db.ObjectId
+  productId   String   @db.ObjectId
+  partnerId   String   @db.ObjectId
+
+  customer    Customer @relation(fields: [customerId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id])
+  partner     Partner  @relation(fields: [partnerId], references: [id])
+
+  @@unique([customerId, productId, partnerId])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model State {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  statuses  Status[] 
+  orders   Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Status {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String   @unique
+  stateId  String   @db.ObjectId
+  state    State    @relation(fields: [stateId], references: [id])
+  orders   Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  amountExclTaxe      Float
+  amountTTC           Float
+  amountBeforePromo   Float
+  amountAfterPromo    Float
+  amountRefunded      Float
+  amountCanceled      Float
+  amountOrdered       Float
+  amountShipped       Float
+  shippingMethod      String
+  loyaltyPtsValue     Int      @default(0)
+  fromMobile          Boolean  @default(false)
+  weight              Float
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relationships
+  statusId            String   @db.ObjectId
+  status              Status   @relation(fields: [statusId], references: [id]) 
+
+  stateId             String   @db.ObjectId
+  state               State    @relation(fields: [stateId], references: [id]) 
+
+  customerId          String   @db.ObjectId
+  customer            Customer @relation(fields: [customerId], references: [id]) 
+
+  agentId             String?  @db.ObjectId
+  agent               Agent?   @relation(fields: [agentId], references: [id]) 
+
+  reservationId       String?  @db.ObjectId @unique
+  reservation        Reservation? @relation
+
+  partnerId           String   @db.ObjectId
+  partner            Partner   @relation(fields: [partnerId], references: [id]) 
+  orderItems OrderItem[]
+  loyaltyPoints LoyaltyPoints[]
+  paymentMethodId   String       @db.ObjectId
+  paymentMethod     OrderPayment @relation(fields: [paymentMethodId], references: [id]) // Each Order has 1 PaymentMethod
+
+}
+
+
+model OrderItem {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  qteOrdered      Int
+  qteRefunded     Int      @default(0)
+  qteShipped      Int      @default(0)
+  qteCanceled     Int      @default(0)
+  discountedPrice Float
+  weight          Float
+  sku             String   @unique
+  taxId           String   @db.ObjectId
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relationships
+  orderId         String   @db.ObjectId
+  order           Order    @relation(fields: [orderId], references: [id]) 
+
+  productId       String   @db.ObjectId
+  product         Product   @relation(fields: [productId], references: [id]) 
+
+  tax             Tax      @relation(fields: [taxId], references: [id]) 
+}
+
+model OrderPayment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  orders    Order[]  
+  reservations    Reservation[]
+}
+
+model Reservation {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  amountExclTaxe      Float
+  amountTTC           Float
+  amountBeforePromo   Float
+  amountAfterPromo    Float
+  amountRefunded      Float
+  amountCanceled      Float
+  amountOrdered       Float
+  amountShipped       Float
+  shippingMethod      String
+  state               Boolean  @default(false)
+  loyaltyPtsValue     Int      @default(0)
+  fromMobile          Boolean  @default(false)
+  weight              Float
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relationships
+  customerId          String   @db.ObjectId
+  customer            Customer @relation(fields: [customerId], references: [id]) 
+
+  agentId             String?  @db.ObjectId
+  agent               Agent?   @relation(fields: [agentId], references: [id]) 
+
+  partnerId           String   @db.ObjectId
+  partner             Partner  @relation(fields: [partnerId], references: [id]) 
+
+  orderId             String?  @db.ObjectId @unique
+  order               Order?   @relation(fields: [orderId], references: [id])
+
+  reservationItems    ReservationItem[]
+  loyaltyPoints       LoyaltyPoints[]
+
+  paymentMethodId     String   @db.ObjectId
+  paymentMethod       OrderPayment @relation(fields: [paymentMethodId], references: [id]) 
+}
+
+model ReservationItem {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  qteReserved    Int
+  qteCanceled    Int
+  discountedPrice Float
+  weight         Float
+  sku            String
+  taxId           String   @db.ObjectId
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relationships
+  reservationId  String   @db.ObjectId
+  reservation    Reservation @relation(fields: [reservationId], references: [id]) 
+
+  productId      String   @db.ObjectId
+  product        Product @relation(fields: [productId], references: [id]) 
+  tax             Tax      @relation(fields: [taxId], references: [id]) 
+}
+
+model LoyaltyPoints {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  ptsNumber    Int
+  ptsValue     Float
+  minAmount    Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relationships
+  productId    String?   @db.ObjectId
+  product      Product?  @relation(fields: [productId], references: [id]) 
+
+  partnerId    String?   @db.ObjectId
+  partner      Partner?  @relation(fields: [partnerId], references: [id]) 
+
+  orderId      String?   @db.ObjectId
+  order        Order?    @relation(fields: [orderId], references: [id]) 
+
+  reservationId String?  @db.ObjectId
+  reservation  Reservation? @relation(fields: [reservationId], references: [id]) 
+}
