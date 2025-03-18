@@ -4,7 +4,7 @@ import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve all order items
+// 🟢 GET: Retrieve all products with related entities
 export async function GET(req: Request) {
   try {
     const session = await auth();
@@ -12,22 +12,29 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const orderItems = await prisma.orderItem.findMany({
+    const products = await prisma.product.findMany({
       include: {
-        order: true,
-        product: true,
+        productType: true,
+        productStatus: true,
+        supplier: true,
         tax: true,
+        promotion: true,
+        images: true,
+        categories: { include: { category: true } },
+        favoriteProducts: true,
+        favoritePartners: true,
+        relatedProducts: { include: { relatedProduct: true } },
       },
     });
 
     return NextResponse.json(
-      { message: "Order items retrieved", orderItems },
+      { message: "Products retrieved", products },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching order items:", error);
+    console.error("Error fetching products:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve order items" },
+      { error: "Failed to retrieve products" },
       { status: 500 },
     );
   }

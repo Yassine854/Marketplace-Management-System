@@ -4,7 +4,7 @@ import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve an order item by ID
+// 🟢 GET: Retrieve a product by ID (with includes)
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
@@ -16,36 +16,43 @@ export async function GET(
     }
 
     const { id } = params;
-    const orderItem = await prisma.orderItem.findUnique({
+    const product = await prisma.product.findUnique({
       where: { id },
       include: {
-        order: true,
-        product: true,
+        productType: true,
+        productStatus: true,
+        supplier: true,
         tax: true,
+        promotion: true,
+        images: true,
+        categories: { include: { category: true } },
+        favoriteProducts: true,
+        favoritePartners: true,
+        relatedProducts: { include: { relatedProduct: true } },
       },
     });
 
-    if (!orderItem) {
+    if (!product) {
       return NextResponse.json(
-        { message: "Order item not found" },
+        { message: "Product not found" },
         { status: 404 },
       );
     }
 
     return NextResponse.json(
-      { message: "Order item retrieved", orderItem },
+      { message: "Product retrieved", product },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching order item:", error);
+    console.error("Error fetching product:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve order item" },
+      { error: "Failed to retrieve product" },
       { status: 500 },
     );
   }
 }
 
-// 🟡 PATCH: Update an order item by ID
+// 🟡 PATCH: Update a product by ID
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -59,25 +66,25 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    const updatedOrderItem = await prisma.orderItem.update({
+    const updatedProduct = await prisma.product.update({
       where: { id },
       data: body,
     });
 
     return NextResponse.json(
-      { message: "Order item updated", orderItem: updatedOrderItem },
+      { message: "Product updated", product: updatedProduct },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error updating order item:", error);
+    console.error("Error updating product:", error);
     return NextResponse.json(
-      { error: "Failed to update order item" },
+      { error: "Failed to update product" },
       { status: 500 },
     );
   }
 }
 
-// 🔴 DELETE: Remove an order item by ID
+// 🔴 DELETE: Remove a product by ID
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
@@ -90,16 +97,13 @@ export async function DELETE(
 
     const { id } = params;
 
-    await prisma.orderItem.delete({ where: { id } });
+    await prisma.product.delete({ where: { id } });
 
-    return NextResponse.json(
-      { message: "Order item deleted" },
-      { status: 200 },
-    );
+    return NextResponse.json({ message: "Product deleted" }, { status: 200 });
   } catch (error) {
-    console.error("Error deleting order item:", error);
+    console.error("Error deleting product:", error);
     return NextResponse.json(
-      { error: "Failed to delete order item" },
+      { error: "Failed to delete product" },
       { status: 500 },
     );
   }

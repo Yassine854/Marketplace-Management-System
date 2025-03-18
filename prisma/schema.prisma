@@ -423,7 +423,6 @@ model NotifyMe {
   customer    Customer @relation(fields: [customerId], references: [id])
 
 
-
   @@map("notify_me")
 }
 

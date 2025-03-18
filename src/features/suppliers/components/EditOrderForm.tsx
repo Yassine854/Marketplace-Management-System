@@ -171,7 +171,7 @@ export default function EditOrderForm({
 
           if (data.manufacturer.manufacturerId) {
             const supplierId = data.manufacturer.manufacturerId.toString();
-            const apiUrl = `/api/prod?supplierId=${encodeURIComponent(
+            const apiUrl = `/api/getOrderProducts?supplierId=${encodeURIComponent(
               supplierId,
             )}`;
             const productsResponse = await fetch(apiUrl);
