@@ -1,51 +1,48 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs"; // Install bcryptjs if not already installed
 import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve a single agent by ID
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
     const session = await auth(); // Get user session
-
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = params;
+    const typePartner = await prisma.typePartner.findUnique({ where: { id } });
 
-    const agent = await prisma.agent.findUnique({ where: { id } });
-
-    if (!agent) {
-      return NextResponse.json({ message: "Agent not found" }, { status: 404 });
+    if (!typePartner) {
+      return NextResponse.json(
+        { message: "TypePartner not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(
-      { message: "Agent retrieved successfully", agent },
+      { message: "TypePartner retrieved successfully", typePartner },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching agent:", error);
+    console.error("Error fetching TypePartner:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve agent" },
+      { error: "Failed to retrieve TypePartner" },
       { status: 500 },
     );
   }
 }
 
-// 🟡 PATCH: Update an agent's details
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
     const session = await auth(); // Get user session
-
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -53,54 +50,48 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    // Hash new password if provided
-    let updatedData = { ...body };
-    if (body.password) {
-      updatedData.password = await hash(body.password, 10);
-    }
-
-    const updatedAgent = await prisma.agent.update({
+    const updatedTypePartner = await prisma.typePartner.update({
       where: { id },
-      data: updatedData,
+      data: body,
     });
 
     return NextResponse.json(
-      { message: "Agent updated successfully", agent: updatedAgent },
+      {
+        message: "TypePartner updated successfully",
+        typePartner: updatedTypePartner,
+      },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error updating agent:", error);
+    console.error("Error updating TypePartner:", error);
     return NextResponse.json(
-      { error: "Failed to update agent" },
+      { error: "Failed to update TypePartner" },
       { status: 500 },
     );
   }
 }
 
-// 🔴 DELETE: Remove an agent by ID
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
     const session = await auth(); // Get user session
-
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = params;
-
-    await prisma.agent.delete({ where: { id } });
+    await prisma.typePartner.delete({ where: { id } });
 
     return NextResponse.json(
-      { message: "Agent deleted successfully" },
+      { message: "TypePartner deleted successfully" },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error deleting agent:", error);
+    console.error("Error deleting TypePartner:", error);
     return NextResponse.json(
-      { error: "Failed to delete agent" },
+      { error: "Failed to delete TypePartner" },
       { status: 500 },
     );
   }

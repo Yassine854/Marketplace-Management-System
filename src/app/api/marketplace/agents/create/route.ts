@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
+import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
 // POST: Create a new agent
 export async function POST(req: Request) {
   try {
+    const session = await auth(); // Get user session
+
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
 
     // Check if the agent already exists by username or email

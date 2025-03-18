@@ -1,11 +1,11 @@
+// app/api/subCategories/[id]/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs"; // Install bcryptjs if not already installed
 import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve a single agent by ID
+// 🟢 GET: Retrieve a subcategory by ID
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
@@ -19,26 +19,34 @@ export async function GET(
 
     const { id } = params;
 
-    const agent = await prisma.agent.findUnique({ where: { id } });
+    const subCategory = await prisma.subCategory.findUnique({
+      where: { id },
+      include: {
+        category: true, // Include related category details
+      },
+    });
 
-    if (!agent) {
-      return NextResponse.json({ message: "Agent not found" }, { status: 404 });
+    if (!subCategory) {
+      return NextResponse.json(
+        { message: "SubCategory not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(
-      { message: "Agent retrieved successfully", agent },
+      { message: "SubCategory retrieved successfully", subCategory },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching agent:", error);
+    console.error("Error fetching subCategory:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve agent" },
+      { error: "Failed to retrieve subCategory" },
       { status: 500 },
     );
   }
 }
 
-// 🟡 PATCH: Update an agent's details
+// 🟡 PATCH: Update a subcategory by ID
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -53,31 +61,31 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    // Hash new password if provided
-    let updatedData = { ...body };
-    if (body.password) {
-      updatedData.password = await hash(body.password, 10);
-    }
-
-    const updatedAgent = await prisma.agent.update({
+    const updatedSubCategory = await prisma.subCategory.update({
       where: { id },
-      data: updatedData,
+      data: {
+        name: body.name,
+        categoryId: body.categoryId,
+      },
     });
 
     return NextResponse.json(
-      { message: "Agent updated successfully", agent: updatedAgent },
+      {
+        message: "SubCategory updated successfully",
+        subCategory: updatedSubCategory,
+      },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error updating agent:", error);
+    console.error("Error updating subCategory:", error);
     return NextResponse.json(
-      { error: "Failed to update agent" },
+      { error: "Failed to update subCategory" },
       { status: 500 },
     );
   }
 }
 
-// 🔴 DELETE: Remove an agent by ID
+// 🔴 DELETE: Remove a subcategory by ID
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
@@ -91,16 +99,17 @@ export async function DELETE(
 
     const { id } = params;
 
-    await prisma.agent.delete({ where: { id } });
+    // Delete the subCategory by ID
+    await prisma.subCategory.delete({ where: { id } });
 
     return NextResponse.json(
-      { message: "Agent deleted successfully" },
+      { message: "SubCategory deleted successfully" },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error deleting agent:", error);
+    console.error("Error deleting subCategory:", error);
     return NextResponse.json(
-      { error: "Failed to delete agent" },
+      { error: "Failed to delete subCategory" },
       { status: 500 },
     );
   }

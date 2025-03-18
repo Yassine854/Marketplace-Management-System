@@ -1,11 +1,11 @@
+// app/api/images/[id]/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs"; // Install bcryptjs if not already installed
 import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve a single agent by ID
+// 🟢 GET: Retrieve a single image by ID with related Product
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
@@ -19,26 +19,28 @@ export async function GET(
 
     const { id } = params;
 
-    const agent = await prisma.agent.findUnique({ where: { id } });
+    const image = await prisma.image.findUnique({
+      where: { id },
+    });
 
-    if (!agent) {
-      return NextResponse.json({ message: "Agent not found" }, { status: 404 });
+    if (!image) {
+      return NextResponse.json({ message: "Image not found" }, { status: 404 });
     }
 
     return NextResponse.json(
-      { message: "Agent retrieved successfully", agent },
+      { message: "Image retrieved successfully", image },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching agent:", error);
+    console.error("Error fetching image:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve agent" },
+      { error: "Failed to retrieve image" },
       { status: 500 },
     );
   }
 }
 
-// 🟡 PATCH: Update an agent's details
+// 🟡 PATCH: Update an image by ID
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -53,31 +55,30 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    // Hash new password if provided
-    let updatedData = { ...body };
-    if (body.password) {
-      updatedData.password = await hash(body.password, 10);
-    }
-
-    const updatedAgent = await prisma.agent.update({
+    // Update the image by ID
+    const updatedImage = await prisma.image.update({
       where: { id },
-      data: updatedData,
+      data: {
+        url: body.url,
+        altText: body.altText ?? null, // Alt text is optional
+        productId: body.productId,
+      },
     });
 
     return NextResponse.json(
-      { message: "Agent updated successfully", agent: updatedAgent },
+      { message: "Image updated successfully", image: updatedImage },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error updating agent:", error);
+    console.error("Error updating image:", error);
     return NextResponse.json(
-      { error: "Failed to update agent" },
+      { error: "Failed to update image" },
       { status: 500 },
     );
   }
 }
 
-// 🔴 DELETE: Remove an agent by ID
+// 🔴 DELETE: Remove an image by ID
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
@@ -91,16 +92,17 @@ export async function DELETE(
 
     const { id } = params;
 
-    await prisma.agent.delete({ where: { id } });
+    // Delete the image by ID
+    await prisma.image.delete({ where: { id } });
 
     return NextResponse.json(
-      { message: "Agent deleted successfully" },
+      { message: "Image deleted successfully" },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error deleting agent:", error);
+    console.error("Error deleting image:", error);
     return NextResponse.json(
-      { error: "Failed to delete agent" },
+      { error: "Failed to delete image" },
       { status: 500 },
     );
   }

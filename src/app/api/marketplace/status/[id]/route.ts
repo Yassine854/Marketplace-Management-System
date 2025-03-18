@@ -1,11 +1,11 @@
+// app/api/statuses/[id]/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs"; // Install bcryptjs if not already installed
 import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve a single agent by ID
+// GET: Retrieve a single status by ID
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
@@ -19,26 +19,29 @@ export async function GET(
 
     const { id } = params;
 
-    const agent = await prisma.agent.findUnique({ where: { id } });
+    const status = await prisma.status.findUnique({ where: { id } });
 
-    if (!agent) {
-      return NextResponse.json({ message: "Agent not found" }, { status: 404 });
+    if (!status) {
+      return NextResponse.json(
+        { message: "Status not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(
-      { message: "Agent retrieved successfully", agent },
+      { message: "Status retrieved successfully", status },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching agent:", error);
+    console.error("Error fetching status:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve agent" },
+      { error: "Failed to retrieve status" },
       { status: 500 },
     );
   }
 }
 
-// 🟡 PATCH: Update an agent's details
+// PATCH: Update a status's details
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -53,31 +56,28 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    // Hash new password if provided
-    let updatedData = { ...body };
-    if (body.password) {
-      updatedData.password = await hash(body.password, 10);
-    }
-
-    const updatedAgent = await prisma.agent.update({
+    const updatedStatus = await prisma.status.update({
       where: { id },
-      data: updatedData,
+      data: {
+        name: body.name,
+        stateId: body.stateId,
+      },
     });
 
     return NextResponse.json(
-      { message: "Agent updated successfully", agent: updatedAgent },
+      { message: "Status updated successfully", status: updatedStatus },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error updating agent:", error);
+    console.error("Error updating status:", error);
     return NextResponse.json(
-      { error: "Failed to update agent" },
+      { error: "Failed to update status" },
       { status: 500 },
     );
   }
 }
 
-// 🔴 DELETE: Remove an agent by ID
+// DELETE: Remove a status by ID
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
@@ -91,16 +91,16 @@ export async function DELETE(
 
     const { id } = params;
 
-    await prisma.agent.delete({ where: { id } });
+    await prisma.status.delete({ where: { id } });
 
     return NextResponse.json(
-      { message: "Agent deleted successfully" },
+      { message: "Status deleted successfully" },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error deleting agent:", error);
+    console.error("Error deleting status:", error);
     return NextResponse.json(
-      { error: "Failed to delete agent" },
+      { error: "Failed to delete status" },
       { status: 500 },
     );
   }

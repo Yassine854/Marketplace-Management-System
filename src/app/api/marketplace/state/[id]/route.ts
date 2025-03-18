@@ -1,17 +1,17 @@
+// app/api/states/[id]/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs"; // Install bcryptjs if not already installed
 import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve a single agent by ID
+// GET: Retrieve a single state by ID
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
+    const session = await auth();
 
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -19,26 +19,31 @@ export async function GET(
 
     const { id } = params;
 
-    const agent = await prisma.agent.findUnique({ where: { id } });
+    const state = await prisma.state.findUnique({
+      where: { id },
+      include: {
+        statuses: true,
+      },
+    });
 
-    if (!agent) {
-      return NextResponse.json({ message: "Agent not found" }, { status: 404 });
+    if (!state) {
+      return NextResponse.json({ message: "State not found" }, { status: 404 });
     }
 
     return NextResponse.json(
-      { message: "Agent retrieved successfully", agent },
+      { message: "State retrieved successfully", state },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching agent:", error);
+    console.error("Error fetching state:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve agent" },
+      { error: "Failed to retrieve state" },
       { status: 500 },
     );
   }
 }
 
-// 🟡 PATCH: Update an agent's details
+// PATCH: Update a state's details
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -53,37 +58,33 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    // Hash new password if provided
-    let updatedData = { ...body };
-    if (body.password) {
-      updatedData.password = await hash(body.password, 10);
-    }
-
-    const updatedAgent = await prisma.agent.update({
+    const updatedState = await prisma.state.update({
       where: { id },
-      data: updatedData,
+      data: {
+        name: body.name,
+      },
     });
 
     return NextResponse.json(
-      { message: "Agent updated successfully", agent: updatedAgent },
+      { message: "State updated successfully", state: updatedState },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error updating agent:", error);
+    console.error("Error updating state:", error);
     return NextResponse.json(
-      { error: "Failed to update agent" },
+      { error: "Failed to update state" },
       { status: 500 },
     );
   }
 }
 
-// 🔴 DELETE: Remove an agent by ID
+// DELETE: Remove a state by ID
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
+    const session = await auth();
 
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -91,16 +92,16 @@ export async function DELETE(
 
     const { id } = params;
 
-    await prisma.agent.delete({ where: { id } });
+    await prisma.state.delete({ where: { id } });
 
     return NextResponse.json(
-      { message: "Agent deleted successfully" },
+      { message: "State deleted successfully" },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error deleting agent:", error);
+    console.error("Error deleting state:", error);
     return NextResponse.json(
-      { error: "Failed to delete agent" },
+      { error: "Failed to delete state" },
       { status: 500 },
     );
   }

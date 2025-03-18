@@ -1,11 +1,11 @@
+// app/api/productStatuses/[id]/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs"; // Install bcryptjs if not already installed
 import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve a single agent by ID
+// 🟢 GET: Retrieve a single ProductStatus by ID with related Products
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
@@ -19,26 +19,34 @@ export async function GET(
 
     const { id } = params;
 
-    const agent = await prisma.agent.findUnique({ where: { id } });
+    const productStatus = await prisma.productStatus.findUnique({
+      where: { id },
+      include: {
+        products: true,
+      },
+    });
 
-    if (!agent) {
-      return NextResponse.json({ message: "Agent not found" }, { status: 404 });
+    if (!productStatus) {
+      return NextResponse.json(
+        { message: "ProductStatus not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(
-      { message: "Agent retrieved successfully", agent },
+      { message: "ProductStatus retrieved successfully", productStatus },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching agent:", error);
+    console.error("Error fetching ProductStatus:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve agent" },
+      { error: "Failed to retrieve ProductStatus" },
       { status: 500 },
     );
   }
 }
 
-// 🟡 PATCH: Update an agent's details
+// 🟡 PATCH: Update a ProductStatus by ID
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -53,31 +61,29 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    // Hash new password if provided
-    let updatedData = { ...body };
-    if (body.password) {
-      updatedData.password = await hash(body.password, 10);
-    }
-
-    const updatedAgent = await prisma.agent.update({
+    // Update the ProductStatus
+    const updatedProductStatus = await prisma.productStatus.update({
       where: { id },
-      data: updatedData,
+      data: body, // Update with the provided body fields
     });
 
     return NextResponse.json(
-      { message: "Agent updated successfully", agent: updatedAgent },
+      {
+        message: "ProductStatus updated successfully",
+        productStatus: updatedProductStatus,
+      },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error updating agent:", error);
+    console.error("Error updating ProductStatus:", error);
     return NextResponse.json(
-      { error: "Failed to update agent" },
+      { error: "Failed to update ProductStatus" },
       { status: 500 },
     );
   }
 }
 
-// 🔴 DELETE: Remove an agent by ID
+// 🔴 DELETE: Remove a ProductStatus by ID
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
@@ -91,16 +97,17 @@ export async function DELETE(
 
     const { id } = params;
 
-    await prisma.agent.delete({ where: { id } });
+    // Delete the ProductStatus
+    await prisma.productStatus.delete({ where: { id } });
 
     return NextResponse.json(
-      { message: "Agent deleted successfully" },
+      { message: "ProductStatus deleted successfully" },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error deleting agent:", error);
+    console.error("Error deleting ProductStatus:", error);
     return NextResponse.json(
-      { error: "Failed to delete agent" },
+      { error: "Failed to delete ProductStatus" },
       { status: 500 },
     );
   }

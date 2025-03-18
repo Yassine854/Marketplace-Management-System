@@ -1,11 +1,11 @@
+// app/api/categories/[id]/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs"; // Install bcryptjs if not already installed
 import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve a single agent by ID
+// 🟢 GET: Retrieve a single category by ID with related products and subcategories
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
@@ -19,33 +19,45 @@ export async function GET(
 
     const { id } = params;
 
-    const agent = await prisma.agent.findUnique({ where: { id } });
+    const category = await prisma.category.findUnique({
+      where: { id },
+      include: {
+        products: {
+          include: {
+            product: true, // Include related product details
+          },
+        },
+        subCategories: true, // Include related subcategories
+      },
+    });
 
-    if (!agent) {
-      return NextResponse.json({ message: "Agent not found" }, { status: 404 });
+    if (!category) {
+      return NextResponse.json(
+        { message: "Category not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(
-      { message: "Agent retrieved successfully", agent },
+      { message: "Category retrieved successfully", category },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching agent:", error);
+    console.error("Error fetching category:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve agent" },
+      { error: "Failed to retrieve category" },
       { status: 500 },
     );
   }
 }
 
-// 🟡 PATCH: Update an agent's details
+// 🟡 PATCH: Update a category by ID
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
     const session = await auth(); // Get user session
-
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -53,31 +65,28 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    // Hash new password if provided
-    let updatedData = { ...body };
-    if (body.password) {
-      updatedData.password = await hash(body.password, 10);
-    }
-
-    const updatedAgent = await prisma.agent.update({
+    const updatedCategory = await prisma.category.update({
       where: { id },
-      data: updatedData,
+      data: {
+        nameCategory: body.nameCategory,
+        image: body.image ?? null,
+      },
     });
 
     return NextResponse.json(
-      { message: "Agent updated successfully", agent: updatedAgent },
+      { message: "Category updated successfully", category: updatedCategory },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error updating agent:", error);
+    console.error("Error updating category:", error);
     return NextResponse.json(
-      { error: "Failed to update agent" },
+      { error: "Failed to update category" },
       { status: 500 },
     );
   }
 }
 
-// 🔴 DELETE: Remove an agent by ID
+// 🔴 DELETE: Remove a category by ID
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
@@ -91,16 +100,17 @@ export async function DELETE(
 
     const { id } = params;
 
-    await prisma.agent.delete({ where: { id } });
+    // Delete the category by ID
+    await prisma.category.delete({ where: { id } });
 
     return NextResponse.json(
-      { message: "Agent deleted successfully" },
+      { message: "Category deleted successfully" },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error deleting agent:", error);
+    console.error("Error deleting category:", error);
     return NextResponse.json(
-      { error: "Failed to delete agent" },
+      { error: "Failed to delete category" },
       { status: 500 },
     );
   }

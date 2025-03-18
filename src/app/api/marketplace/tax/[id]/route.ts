@@ -1,11 +1,11 @@
+// app/api/taxes/[id]/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs"; // Install bcryptjs if not already installed
 import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve a single agent by ID
+// GET: Retrieve a single tax by ID
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
@@ -19,26 +19,26 @@ export async function GET(
 
     const { id } = params;
 
-    const agent = await prisma.agent.findUnique({ where: { id } });
+    const tax = await prisma.tax.findUnique({ where: { id } });
 
-    if (!agent) {
-      return NextResponse.json({ message: "Agent not found" }, { status: 404 });
+    if (!tax) {
+      return NextResponse.json({ message: "Tax not found" }, { status: 404 });
     }
 
     return NextResponse.json(
-      { message: "Agent retrieved successfully", agent },
+      { message: "Tax retrieved successfully", tax },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching agent:", error);
+    console.error("Error fetching tax:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve agent" },
+      { error: "Failed to retrieve tax" },
       { status: 500 },
     );
   }
 }
 
-// 🟡 PATCH: Update an agent's details
+// PATCH: Update a tax's details
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -53,31 +53,27 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    // Hash new password if provided
-    let updatedData = { ...body };
-    if (body.password) {
-      updatedData.password = await hash(body.password, 10);
-    }
-
-    const updatedAgent = await prisma.agent.update({
+    const updatedTax = await prisma.tax.update({
       where: { id },
-      data: updatedData,
+      data: {
+        value: body.value,
+      },
     });
 
     return NextResponse.json(
-      { message: "Agent updated successfully", agent: updatedAgent },
+      { message: "Tax updated successfully", tax: updatedTax },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error updating agent:", error);
+    console.error("Error updating tax:", error);
     return NextResponse.json(
-      { error: "Failed to update agent" },
+      { error: "Failed to update tax" },
       { status: 500 },
     );
   }
 }
 
-// 🔴 DELETE: Remove an agent by ID
+// DELETE: Remove a tax by ID
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
@@ -91,16 +87,16 @@ export async function DELETE(
 
     const { id } = params;
 
-    await prisma.agent.delete({ where: { id } });
+    await prisma.tax.delete({ where: { id } });
 
     return NextResponse.json(
-      { message: "Agent deleted successfully" },
+      { message: "Tax deleted successfully" },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error deleting agent:", error);
+    console.error("Error deleting tax:", error);
     return NextResponse.json(
-      { error: "Failed to delete agent" },
+      { error: "Failed to delete tax" },
       { status: 500 },
     );
   }
