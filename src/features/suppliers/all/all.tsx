@@ -58,8 +58,24 @@ const SupplierPurchasesPage = () => {
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="flex h-full flex-grow">
-      <div className="h-full w-full rounded-lg bg-[url(/images/login-bg.png)] bg-cover">
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        padding: "16px",
+        boxSizing: "border-box",
+      }}
+    >
+      <div
+        style={{
+          flexShrink: 0,
+          backgroundColor: "white",
+          padding: "16px",
+          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        }}
+      >
         <div className="relative grid h-full w-full items-center justify-center gap-4">
           <div className="box w-full min-w-[800px] xl:p-8">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
@@ -90,20 +106,17 @@ const SupplierPurchasesPage = () => {
             </div>
 
             <div className="mb-5 space-y-4">
-              <div className="flex gap-2">
+              <div className="relative flex w-full gap-2 sm:w-auto sm:min-w-[200px] sm:flex-1">
                 <input
-                  placeholder="Search (Order ID, Supplier, Warehouse)"
+                  type="text"
+                  placeholder="Search Supplier Orders..."
+                  className="w-[400px] rounded-lg border p-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1 rounded border p-2"
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 />
-                <button
-                  onClick={handleSearch}
-                  className="rounded bg-blue-500 px-4 py-2 text-white"
-                >
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                   🔍
-                </button>
+                </span>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
                   className="rounded bg-gray-200 px-4 py-2"
