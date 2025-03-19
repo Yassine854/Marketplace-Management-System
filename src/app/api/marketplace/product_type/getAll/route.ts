@@ -14,7 +14,11 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const productTypes = await prisma.productType.findMany(); // Retrieve all ProductTypes
+    const productTypes = await prisma.productType.findMany({
+      include: {
+        products: true,
+      },
+    }); // Retrieve all ProductTypes
 
     if (productTypes.length === 0) {
       return NextResponse.json(

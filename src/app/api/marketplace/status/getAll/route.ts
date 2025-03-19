@@ -14,7 +14,12 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const statuses = await prisma.status.findMany(); // Retrieve all statuses
+    const statuses = await prisma.status.findMany({
+      include: {
+        orders: true,
+        state: true,
+      },
+    }); // Retrieve all statuses
 
     if (statuses.length === 0) {
       return NextResponse.json(

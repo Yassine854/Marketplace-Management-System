@@ -18,7 +18,12 @@ export async function GET(
 
     const { id } = params;
 
-    const productType = await prisma.productType.findUnique({ where: { id } });
+    const productType = await prisma.productType.findUnique({
+      where: { id },
+      include: {
+        products: true,
+      },
+    });
 
     if (!productType) {
       return NextResponse.json(

@@ -11,7 +11,11 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const typePcbs = await prisma.typePcb.findMany();
+    const typePcbs = await prisma.typePcb.findMany({
+      include: {
+        products: true,
+      },
+    });
     return NextResponse.json(
       { message: "TypePcbs retrieved successfully", typePcbs },
       { status: 200 },

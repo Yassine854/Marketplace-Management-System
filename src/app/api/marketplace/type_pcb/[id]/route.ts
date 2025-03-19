@@ -16,6 +16,9 @@ export async function GET(
 
     const typePcb = await prisma.typePcb.findUnique({
       where: { id: params.id },
+      include: {
+        products: true,
+      },
     });
     if (!typePcb) {
       return NextResponse.json(

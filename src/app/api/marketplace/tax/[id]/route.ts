@@ -19,7 +19,14 @@ export async function GET(
 
     const { id } = params;
 
-    const tax = await prisma.tax.findUnique({ where: { id } });
+    const tax = await prisma.tax.findUnique({
+      where: { id },
+      include: {
+        products: true,
+        orderItems: true,
+        reservationItems: true,
+      },
+    });
 
     if (!tax) {
       return NextResponse.json({ message: "Tax not found" }, { status: 404 });

@@ -59,10 +59,10 @@ model Category {
   categoryId   Int      @unique // ID Magento
   nameCategory String
   image        String?             
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  createdAt    DateTime?           @default(now())
+  updatedAt    DateTime?           @updatedAt
 
-  products    ProductCategory[]  
+  productCategories    ProductCategory[]  
   subCategories  SubCategory[]
 }
 
@@ -122,7 +122,7 @@ model Product {
   relatedProducts      RelatedProduct[] @relation("ProductToRelatedProduct")
   relatedTo            RelatedProduct[] @relation("RelatedProductToProduct")
 
-  categories       ProductCategory[]
+  productCategories       ProductCategory[]
   favoriteProducts FavoriteProduct[]
   favoritePartners FavoritePartner[]
   orderItems OrderItem[]
@@ -315,16 +315,19 @@ model Partner {
 
 model Customer {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  firstName String
-  lastName  String
+  firstName String?
+  lastName  String?
+  gender    Int?
+  governorate String?
+  retailer_profile String?
   email     String?   
-  telephone String
-  address   String
-  password  String
-  roleId    String
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  telephone String?
+  address   String?
+  password  String?
+  roleId    String?
+  isActive  Boolean?  @default(true)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
 
   favoriteProducts FavoriteProduct[]
   favoritePartners FavoritePartner[]
@@ -385,7 +388,7 @@ model ProductStatus {
 
 model Tax {
   id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  value    Float     
+  value    Float     @unique 
   products Product[] 
   orderItems OrderItem[]
   reservationItems    ReservationItem[]
@@ -449,7 +452,8 @@ model ProductCategory {
   product    Product   @relation(fields: [productId], references: [id])
   category   Category  @relation(fields: [categoryId], references: [id])
 
-  @@unique([productId, categoryId])  
+  // Remove the unique constraint to allow multiple entries for the same productId and categoryId
+  // @@unique([productId, categoryId])  
 }
 
 model SubCategory {
@@ -533,6 +537,7 @@ model Order {
   // Relationships
   statusId            String   @db.ObjectId
   status              Status   @relation(fields: [statusId], references: [id]) 
+  isActive            Boolean  @default(true)
 
   stateId             String   @db.ObjectId
   state               State    @relation(fields: [stateId], references: [id]) 
@@ -544,7 +549,11 @@ model Order {
   agent               Agent?   @relation(fields: [agentId], references: [id]) 
 
   reservationId       String?  @db.ObjectId @unique
-  reservation        Reservation? @relation
+  reservation         Reservation? @relation
+
+   mainOrderId   String?   @db.ObjectId
+  mainOrder     MainOrder? @relation(fields: [mainOrderId], references: [id])
+
 
   partnerId           String   @db.ObjectId
   partner            Partner   @relation(fields: [partnerId], references: [id]) 
@@ -668,4 +677,16 @@ model LoyaltyPoints {
 
   reservationId String?  @db.ObjectId
   reservation  Reservation? @relation(fields: [reservationId], references: [id]) 
+}
+
+
+model MainOrder {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  // One-to-many relationship with Order
+  orders    Order[]
 }

@@ -15,7 +15,12 @@ export async function GET(
     }
 
     const { id } = params;
-    const typePartner = await prisma.typePartner.findUnique({ where: { id } });
+    const typePartner = await prisma.typePartner.findUnique({
+      where: { id },
+      include: {
+        partners: true,
+      },
+    });
 
     if (!typePartner) {
       return NextResponse.json(

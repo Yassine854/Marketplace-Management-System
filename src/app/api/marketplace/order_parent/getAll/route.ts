@@ -1,12 +1,11 @@
-// app/api/taxes/getAll/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// GET: Retrieve all taxes
-export async function GET(req: Request) {
+// 🟢 GET: Retrieve all order items
+export async function GET() {
   try {
     const session = await auth(); // Get user session
 
@@ -14,29 +13,27 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const taxes = await prisma.tax.findMany({
+    const mainOrders = await prisma.mainOrder.findMany({
       include: {
-        products: true,
-        orderItems: true,
-        reservationItems: true,
+        orders: true, // Include related orders
       },
-    }); // Retrieve all taxes
+    });
 
-    if (taxes.length === 0) {
+    if (mainOrders.length === 0) {
       return NextResponse.json(
-        { message: "No taxes found", taxes: [] },
+        { message: "No main orders found", mainOrders: [] },
         { status: 200 },
       );
     }
 
     return NextResponse.json(
-      { message: "Taxes retrieved successfully", taxes },
+      { message: "Main orders retrieved successfully", mainOrders },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching taxes:", error);
+    console.error("Error fetching main orders:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve taxes" },
+      { error: "Failed to retrieve main orders" },
       { status: 500 },
     );
   }

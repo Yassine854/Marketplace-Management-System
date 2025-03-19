@@ -13,7 +13,11 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const promotions = await prisma.promotion.findMany();
+    const promotions = await prisma.promotion.findMany({
+      include: {
+        products: true,
+      },
+    });
 
     if (promotions.length === 0) {
       return NextResponse.json(

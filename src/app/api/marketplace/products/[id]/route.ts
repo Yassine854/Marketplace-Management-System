@@ -25,7 +25,7 @@ export async function GET(
         tax: true,
         promotion: true,
         images: true,
-        categories: { include: { category: true } },
+        productCategories: { include: { category: true } },
         favoriteProducts: true,
         favoritePartners: true,
         relatedProducts: { include: { relatedProduct: true } },

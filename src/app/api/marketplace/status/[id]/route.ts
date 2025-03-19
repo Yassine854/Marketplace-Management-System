@@ -19,7 +19,13 @@ export async function GET(
 
     const { id } = params;
 
-    const status = await prisma.status.findUnique({ where: { id } });
+    const status = await prisma.status.findUnique({
+      where: { id },
+      include: {
+        orders: true,
+        state: true,
+      },
+    });
 
     if (!status) {
       return NextResponse.json(
