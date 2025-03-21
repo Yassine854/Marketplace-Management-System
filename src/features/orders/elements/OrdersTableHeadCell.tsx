@@ -3,9 +3,7 @@ const OrdersTableHeadCell = ({ children, onClick }: any) => (
     className={`h-14 px-8 ${onClick ? "cursor-pointer" : ""}`}
     onClick={onClick}
   >
-    <div className="flex h-full w-full items-center justify-center font-bold">
-      {children}
-    </div>
+    <div className="border-b border-gray-100 bg-gray-50">{children}</div>
   </td>
 );
 

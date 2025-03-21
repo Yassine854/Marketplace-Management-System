@@ -138,7 +138,7 @@ export default function LogsPage() {
   const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
 
   const handleExport = () => {
-    console.log("Selected Logs:", selectedLogs); // Vérifiez que ce sont bien des objets
+    console.log("Selected Logs:", selectedLogs);
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Logs");

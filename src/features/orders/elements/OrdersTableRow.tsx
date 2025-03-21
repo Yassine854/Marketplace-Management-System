@@ -49,12 +49,16 @@ const OrdersTableRow = ({
 
   return (
     <tr
-      className="cursor-pointer even:bg-primary/5 hover:bg-n60 dark:even:bg-bg3"
+      className=" transition-colors duration-150 hover:bg-gray-50"
       onClick={onClick}
     >
-      <td onClick={handleParentClick}>
+      <td
+        onClick={handleParentClick}
+        className="px-6 py-4 text-sm font-semibold text-gray-900"
+      >
         <div className="flex h-full w-full items-center justify-center ">
           <Checkbox
+            className="h-2 w-2 cursor-pointer appearance-none rounded-full border-2 border-gray-400 transition-colors checked:border-blue-500 checked:bg-blue-500 hover:border-blue-600 hover:bg-blue-200"
             checkboxRef={checkboxRef}
             isChecked={order.isSelected}
             onClick={(isChecked: boolean) => {
@@ -64,7 +68,7 @@ const OrdersTableRow = ({
         </div>
       </td>
       <OrdersTableCell>
-        <div className="flex h-full w-full pl-6">
+        <div>
           {/* <IconTruck color="green" />- */}
           {order?.incrementId}
         </div>

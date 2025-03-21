@@ -14,10 +14,10 @@ const OrdersTableHead = ({
     useOrdersTableHead(changeSelectedSort);
   const { selectedOrders } = useOrdersStore();
   return (
-    <thead className="sticky left-0 right-0 top-0  bg-n40 ">
+    <thead className="border-b border-gray-100 bg-gray-50">
       <tr>
         <OrdersTableHeadSmallCell>
-          <div className="relative flex w-full items-center justify-center">
+          <div className="relative px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
             {!!selectedOrders.length && (
               <div className="absolute right-0">{selectedOrders.length}</div>
             )}
@@ -66,7 +66,7 @@ const Checkbox = ({ checkboxRef, isChecked = false, onClick }: any) => {
   return (
     <div
       ref={checkboxRef}
-      className="flex h-8 w-8 items-center justify-center rounded-full   hover:bg-n70"
+      className="flex h-5 w-5 items-center justify-center rounded-full   hover:bg-n70"
       onClick={(event: any) => {
         //  event.stopPropagation();
         onClick(!checked);
@@ -78,12 +78,13 @@ const Checkbox = ({ checkboxRef, isChecked = false, onClick }: any) => {
         onChange={() => {
           setChecked((e: boolean) => !e);
         }}
-        className="absolute   flex  h-8 w-8 cursor-pointer items-center justify-center bg-blue-500 opacity-0"
+        //className="h-3 w-3 cursor-pointer appearance-none rounded-full border-2 border-gray-400 transition-colors checked:border-blue-500 checked:bg-blue-500 hover:border-blue-600 hover:bg-blue-200"
+        className="absolute   flex  h-3 w-3 cursor-pointer items-center justify-center  rounded-full border-2 border-gray-400 opacity-0 transition-colors checked:border-blue-500 checked:bg-blue-500 hover:border-blue-600 hover:bg-blue-200"
         checked={checked}
       />
-      <div className=" flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-400 bg-n0 focus-within:border-primary dark:bg-bg4 ">
+      <div className=" flex h-3 w-3 shrink-0 items-center justify-center rounded-full border border-gray-400 bg-n0 focus-within:border-primary dark:bg-bg4 ">
         <svg
-          className="pointer-events-none hidden h-[10px] w-[10px] fill-current text-primary"
+          className="pointer-events-none hidden h-[8px] w-[8px] fill-current text-primary"
           version="1.1"
           viewBox="0 0 17 12"
           xmlns="http://www.w3.org/2000/svg"

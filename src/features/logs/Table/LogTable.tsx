@@ -86,10 +86,10 @@ export default function LogTable({
         return JSON.parse(data);
       } catch (error) {
         console.error("Erreur de parsing JSON :", error);
-        return null; // Retourne null si le parsing échoue
+        return null;
       }
     }
-    return data; // Retourne la donnée telle quelle si ce n'est pas une chaîne JSON
+    return data;
   };
   return (
     <div style={{ overflowX: "auto" }}>
@@ -157,7 +157,7 @@ export default function LogTable({
             )}
 
             {!isLoading && !error && logs.length === 0 && (
-              <tr>
+              <tr className="cursor-pointer even:bg-primary/5 hover:bg-n60 dark:even:bg-bg3">
                 <td className="px-4 py-4 text-center text-gray-500" colSpan={6}>
                   <p>Aucun log ne correspond à vos critères de recherche.</p>
                 </td>

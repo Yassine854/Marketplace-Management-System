@@ -9,7 +9,7 @@ const Checkbox = ({ checkboxRef, isChecked = false, onClick }: any) => {
   return (
     <div
       ref={checkboxRef}
-      className="flex h-8 w-8 items-center justify-center rounded-full   hover:bg-n70"
+      className="flex h-5 w-5 items-center justify-center rounded-full   hover:bg-n70"
       onClick={(event: any) => {
         //  event.stopPropagation();
         onClick(!checked);
@@ -21,10 +21,10 @@ const Checkbox = ({ checkboxRef, isChecked = false, onClick }: any) => {
         onChange={() => {
           setChecked((e: boolean) => !e);
         }}
-        className="absolute   flex  h-8 w-8 cursor-pointer items-center justify-center bg-blue-500 opacity-0"
+        className="absolute   flex  h-3 w-3 cursor-pointer items-center justify-center bg-blue-500 opacity-0"
         checked={checked}
       />
-      <div className=" flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-400 bg-n0 focus-within:border-primary dark:bg-bg4 ">
+      <div className=" flex h-3 w-3 shrink-0 items-center justify-center rounded-full border border-gray-400 bg-n0 focus-within:border-primary dark:bg-bg4 ">
         <svg
           className="pointer-events-none hidden h-[10px] w-[10px] fill-current text-primary"
           version="1.1"

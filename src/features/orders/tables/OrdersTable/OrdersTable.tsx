@@ -52,63 +52,73 @@ const OrdersTable = () => {
     useOrderActionsStore();
 
   return (
-    <table border={0} cellPadding={0} cellSpacing={0}>
-      <OrdersTableHead
-        onSelectAllClick={selectAllOrders}
-        changeSelectedSort={changeSelectedSort}
-        isAllOrdersSelected={isAllOrdersSelected}
-      />
+    <div
+      className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+      style={{ maxHeight: "600px" }}
+    >
+      <table
+        border={0}
+        cellPadding={0}
+        cellSpacing={0}
+        style={{ width: "100%" }}
+      >
+        <OrdersTableHead
+          onSelectAllClick={selectAllOrders}
+          changeSelectedSort={changeSelectedSort}
+          isAllOrdersSelected={isAllOrdersSelected}
+        />
 
-      <tbody>
-        <>
-          {isLoading && (
-            <>
-              {[...Array(25)].map((_, i) => (
-                <TableRowSkeleton key={i} number={9} />
-              ))}
-            </>
-          )}
-
-          {!isLoading && (
-            <>
-              {orders?.length > 0 &&
-                orders?.map((order: any) => (
-                  <OrdersTableRow
-                    order={order}
-                    key={order.id}
-                    actionsList={actions}
-                    onSelectClick={selectOrder}
-                    onPDFIconClick={() => {
-                      summary.action(order.id);
-                    }}
-                    // onPDFIconClick2={async () => {
-                    //   setOrderUnderActionId(order.id);
-                    //   setIsSomeActionPending(true);
-                    //   //  const url = await handlePDFGeneration(order.id);
-                    //   //      window.open(url, "_blank");
-                    //   setIsSomeActionPending(false);
-                    //   setOrderUnderActionId(undefined);
-                    // }}
-                    isSomeActionPending={
-                      isSomeActionPending && orderUnderActionId === order.id
-                    }
-                    onClick={() => {
-                      onOrderClick(order.id);
-                    }}
-                  />
+        <tbody className="divide-y divide-gray-200">
+          <>
+            {isLoading && (
+              <>
+                {[...Array(25)].map((_, i) => (
+                  <TableRowSkeleton key={i} number={9} />
                 ))}
-            </>
-          )}
-        </>
-      </tbody>
-      <OrderCancelingModal
-        onConfirm={cancelOrder}
-        isOpen={isCancelingModalOpen}
-        isPending={isCancelingPending}
-        onClose={onCancelingModalClose}
-        message=" Are you sure you want to cancel this order? "
-      />
-    </table>
+              </>
+            )}
+
+            {!isLoading && (
+              <>
+                {orders?.length > 0 &&
+                  orders?.map((order: any) => (
+                    <OrdersTableRow
+                      order={order}
+                      key={order.id}
+                      actionsList={actions}
+                      onSelectClick={selectOrder}
+                      onPDFIconClick={() => {
+                        summary.action(order.id);
+                      }}
+                      // onPDFIconClick2={async () => {
+                      //   setOrderUnderActionId(order.id);
+                      //   setIsSomeActionPending(true);
+                      //   //  const url = await handlePDFGeneration(order.id);
+                      //   //      window.open(url, "_blank");
+                      //   setIsSomeActionPending(false);
+                      //   setOrderUnderActionId(undefined);
+                      // }}
+                      isSomeActionPending={
+                        isSomeActionPending && orderUnderActionId === order.id
+                      }
+                      onClick={() => {
+                        onOrderClick(order.id);
+                      }}
+                    />
+                  ))}
+              </>
+            )}
+          </>
+        </tbody>
+        <OrderCancelingModal
+          onConfirm={cancelOrder}
+          isOpen={isCancelingModalOpen}
+          isPending={isCancelingPending}
+          onClose={onCancelingModalClose}
+          message=" Are you sure you want to cancel this order? "
+        />
+      </table>
+    </div>
   );
 };
 
