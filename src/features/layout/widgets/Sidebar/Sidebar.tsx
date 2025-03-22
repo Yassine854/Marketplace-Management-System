@@ -8,6 +8,8 @@ import {
   IconList,
   IconShoppingCart,
   IconDeviceAnalytics,
+  IconCurrencyDollar,
+  IconDiscount,
 } from "@tabler/icons-react";
 
 import Link from "next/link";
@@ -124,6 +126,22 @@ const Sidebar = ({
               { name: "Delivered", path: "/suppliers/deliveredState" },
               { name: "Completed", path: "/suppliers/completedState" },
             ]}
+          />
+          <Divider />
+          <SidebarSubMenu
+            icon={<IconCurrencyDollar />}
+            name="Taxe"
+            onClick={() => push("/taxe/all")}
+            isActive={pathname?.includes("taxe")}
+            items={[{ name: "All", path: "/taxe/all" }]}
+          />
+          <Divider />
+          <SidebarSubMenu
+            icon={<IconDiscount />}
+            name="Promotion"
+            onClick={() => push("/promotion/all")}
+            isActive={pathname?.includes("promotion")}
+            items={[{ name: "All", path: "/promotion/all" }]}
           />
 
           <Divider />

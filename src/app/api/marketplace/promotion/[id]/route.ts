@@ -44,7 +44,6 @@ export async function GET(
     );
   }
 }
-
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -59,11 +58,22 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
+    // Ensure that startDate and endDate are valid
+    const startDate = new Date(body.startDate);
+    const endDate = new Date(body.endDate);
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return NextResponse.json(
+        { error: "Invalid date provided" },
+        { status: 400 },
+      );
+    }
+
     const updatedPromotion = await prisma.promotion.update({
       where: { id },
       data: {
-        startDate: new Date(body.startDate),
-        endDate: new Date(body.endDate),
+        startDate,
+        endDate,
         promoPrice: body.promoPrice,
       },
     });

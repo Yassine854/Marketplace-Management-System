@@ -5,14 +5,18 @@ import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// GET: Retrieve all taxes
 export async function GET(req: Request) {
   try {
-    const session = await auth(); // Get user session
+    const session = await auth();
 
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
+
+    const url = new URL(req.url);
+    const search = url.searchParams.get("search") || "";
+    const page = parseInt(url.searchParams.get("page") || "1", 10);
+    const size = parseInt(url.searchParams.get("size") || "10", 10);
 
     const taxes = await prisma.tax.findMany({
       include: {
@@ -20,9 +24,15 @@ export async function GET(req: Request) {
         orderItems: true,
         reservationItems: true,
       },
-    }); // Retrieve all taxes
+    });
 
-    if (taxes.length === 0) {
+    const filteredTaxes = taxes.filter(
+      (tax) => tax.value.toString().includes(search) || tax.id.includes(search),
+    );
+
+    const paginatedTaxes = filteredTaxes.slice((page - 1) * size, page * size);
+
+    if (paginatedTaxes.length === 0) {
       return NextResponse.json(
         { message: "No taxes found", taxes: [] },
         { status: 200 },
@@ -30,7 +40,11 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json(
-      { message: "Taxes retrieved successfully", taxes },
+      {
+        message: "Taxes retrieved successfully",
+        taxes: paginatedTaxes,
+        total: filteredTaxes.length,
+      },
       { status: 200 },
     );
   } catch (error) {

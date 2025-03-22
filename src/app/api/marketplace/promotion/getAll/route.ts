@@ -1,4 +1,3 @@
-// app/api/promotions/getAll/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
@@ -13,21 +12,58 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    const url = new URL(req.url);
+    const page = parseInt(url.searchParams.get("page") || "1", 10); // Page courante (par défaut 1)
+    const limit = parseInt(url.searchParams.get("limit") || "10", 10); // Nombre d'éléments par page (par défaut 10)
+
+    const startDate = url.searchParams.get("startDate");
+    const endDate = url.searchParams.get("endDate");
+    const promoPrice = url.searchParams.get("promoPrice");
+
+    const filterConditions: any = {};
+
+    if (startDate) {
+      filterConditions.startDate = {
+        gte: new Date(startDate), // Filtrer par date de début
+      };
+    }
+
+    if (endDate) {
+      filterConditions.endDate = {
+        lte: new Date(endDate), // Filtrer par date de fin
+      };
+    }
+
+    if (promoPrice) {
+      filterConditions.promoPrice = {
+        gte: parseFloat(promoPrice), // Filtrer par prix de promotion
+      };
+    }
+
+    // Calcul du décalage pour la pagination
+    const skip = (page - 1) * limit;
+
+    // Recherche avec pagination et filtrage
     const promotions = await prisma.promotion.findMany({
+      where: filterConditions,
+      skip,
+      take: limit,
       include: {
         products: true,
       },
     });
 
-    if (promotions.length === 0) {
-      return NextResponse.json(
-        { message: "No promotions found", promotions: [] },
-        { status: 200 },
-      );
-    }
+    const totalPromotions = await prisma.promotion.count({
+      where: filterConditions,
+    });
 
     return NextResponse.json(
-      { message: "Promotions retrieved successfully", promotions },
+      {
+        message: "Promotions retrieved successfully",
+        promotions,
+        totalPromotions,
+        currentPage: page,
+      },
       { status: 200 },
     );
   } catch (error) {

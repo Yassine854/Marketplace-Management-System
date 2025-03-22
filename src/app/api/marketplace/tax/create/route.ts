@@ -8,15 +8,13 @@ const prisma = new PrismaClient();
 // POST: Create a new tax
 export async function POST(req: Request) {
   try {
-    const session = await auth(); // Get user session
+    const session = await auth();
 
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
-
-    // Create the tax in the database
     const newTax = await prisma.tax.create({
       data: {
         value: body.value,

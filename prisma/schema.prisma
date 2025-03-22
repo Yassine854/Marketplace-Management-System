@@ -387,11 +387,11 @@ model ProductStatus {
 }
 
 model Tax {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  value    Float     @unique 
-  products Product[] 
-  orderItems OrderItem[]
-  reservationItems    ReservationItem[]
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  value              Float     @unique 
+  products           Product[] 
+  orderItems         OrderItem[]
+  reservationItems   ReservationItem[]
   @@map("taxes")
 }
 
@@ -574,7 +574,7 @@ model OrderItem {
   discountedPrice Float
   weight          Float
   sku             String   @unique
-  taxId           String   @db.ObjectId
+  taxId           String?   @db.ObjectId
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -585,7 +585,7 @@ model OrderItem {
   productId       String   @db.ObjectId
   product         Product   @relation(fields: [productId], references: [id]) 
 
-  tax             Tax      @relation(fields: [taxId], references: [id]) 
+  tax             Tax?      @relation(fields: [taxId], references: [id]) 
 }
 
 model OrderPayment {
@@ -644,7 +644,7 @@ model ReservationItem {
   discountedPrice Float
   weight         Float
   sku            String
-  taxId           String   @db.ObjectId
+  taxId           String?   @db.ObjectId
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -654,7 +654,7 @@ model ReservationItem {
 
   productId      String   @db.ObjectId
   product        Product @relation(fields: [productId], references: [id]) 
-  tax             Tax      @relation(fields: [taxId], references: [id]) 
+  tax             Tax?      @relation(fields: [taxId], references: [id]) 
 }
 
 model LoyaltyPoints {
