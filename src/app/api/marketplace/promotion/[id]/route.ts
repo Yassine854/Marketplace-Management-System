@@ -57,6 +57,7 @@ export async function PATCH(
 
     const { id } = params;
     const body = await req.json();
+    console.log("Body received:", body);
 
     // Ensure that startDate and endDate are valid
     const startDate = new Date(body.startDate);

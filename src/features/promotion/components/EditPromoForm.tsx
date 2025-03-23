@@ -32,7 +32,7 @@ const EditPromoForm = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+    console.log("Promotion ID being updated:", promotion.id);
     if (isNaN(promoPrice) || promoPrice <= 0) {
       setError("Please enter a valid positive number");
       return;
@@ -51,12 +51,15 @@ const EditPromoForm = ({
       return;
     }
 
-    onUpdate({
+    const updatedPromotion: Promotion = {
       ...promotion,
       promoPrice,
       startDate: parsedStartDate,
       endDate: parsedEndDate,
-    });
+    };
+    console.log("Data sent to onUpdate:", updatedPromotion);
+
+    onUpdate(updatedPromotion);
     onClose();
   };
 

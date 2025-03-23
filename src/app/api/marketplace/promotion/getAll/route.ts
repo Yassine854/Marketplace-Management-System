@@ -24,26 +24,24 @@ export async function GET(req: Request) {
 
     if (startDate) {
       filterConditions.startDate = {
-        gte: new Date(startDate), // Filtrer par date de début
+        gte: new Date(startDate),
       };
     }
 
     if (endDate) {
       filterConditions.endDate = {
-        lte: new Date(endDate), // Filtrer par date de fin
+        lte: new Date(endDate),
       };
     }
 
     if (promoPrice) {
       filterConditions.promoPrice = {
-        gte: parseFloat(promoPrice), // Filtrer par prix de promotion
+        gte: parseFloat(promoPrice),
       };
     }
 
-    // Calcul du décalage pour la pagination
     const skip = (page - 1) * limit;
 
-    // Recherche avec pagination et filtrage
     const promotions = await prisma.promotion.findMany({
       where: filterConditions,
       skip,

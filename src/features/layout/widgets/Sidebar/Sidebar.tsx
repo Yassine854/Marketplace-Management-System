@@ -10,6 +10,7 @@ import {
   IconDeviceAnalytics,
   IconCurrencyDollar,
   IconDiscount,
+  IconGrain,
 } from "@tabler/icons-react";
 
 import Link from "next/link";
@@ -142,6 +143,14 @@ const Sidebar = ({
             onClick={() => push("/promotion/all")}
             isActive={pathname?.includes("promotion")}
             items={[{ name: "All", path: "/promotion/all" }]}
+          />
+          <Divider />
+          <SidebarSubMenu
+            icon={<IconGrain />}
+            name="Manufacturer"
+            onClick={() => push("/manufacturer/all")}
+            isActive={pathname?.includes("manufacturer")}
+            items={[{ name: "All", path: "/manufacturer/all" }]}
           />
 
           <Divider />

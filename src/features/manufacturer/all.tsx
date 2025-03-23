@@ -1,47 +1,46 @@
 import { useEffect, useState } from "react";
-import PromotionTable from "./components/PromotionTable";
+import ManufacturerTable from "./components/ManufacturerTable";
 import { useRouter } from "next/navigation";
 import Pagination from "@mui/material/Pagination";
 import styles from "../suppliers/styles/pagination.module.css";
-import { Promotion } from "./types/promo";
+import { Manufacturer } from "./types/manufacturer";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
-import EditPromoForm from "./components/EditPromoForm"; // Import the EditPromoForm component
+import EditManuForm from "./components/EditManuForm";
 
-const PromotionManagementPage = () => {
-  const [promotions, setPromotions] = useState<Promotion[]>([]);
+const ManufacturerManagementPage = () => {
+  const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [totalPromotions, setTotalPromotions] = useState(0);
-  const [deletePromotionId, setDeletePromotionId] = useState<string | null>(
-    null,
-  );
+  const [totalManufacturers, setTotalManufacturers] = useState(0);
+  const [deleteManufacturerId, setDeleteManufacturerId] = useState<
+    string | null
+  >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(
-    null,
-  );
+  const [editingManufacturer, setEditingManufacturer] =
+    useState<Manufacturer | null>(null);
   const pageSize = 10;
   const router = useRouter();
 
   useEffect(() => {
-    const fetchPromotions = async () => {
+    const fetchManufacturers = async () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `/api/marketplace/promotion/getAll?page=${currentPage}&size=${pageSize}&search=${debouncedSearchTerm}`,
+          `/api/marketplace/supplier/getAll?page=${currentPage}&size=${pageSize}&search=${debouncedSearchTerm}`,
         );
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch promotions");
+          throw new Error(data.message || "Failed to fetch manufacturers");
         }
 
-        setPromotions(data.promotions || []);
-        setTotalPromotions(data.totalPromotions || 0);
+        setManufacturers(data.manufacturers || []);
+        setTotalManufacturers(data.totalManufacturers || 0);
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "An unknown error occurred",
@@ -51,7 +50,7 @@ const PromotionManagementPage = () => {
       }
     };
 
-    fetchPromotions();
+    fetchManufacturers();
   }, [currentPage, debouncedSearchTerm]);
 
   useEffect(() => {
@@ -71,54 +70,52 @@ const PromotionManagementPage = () => {
     );
   }
 
-  const totalPages = Math.ceil(totalPromotions / pageSize);
+  const totalPages = Math.ceil(totalManufacturers / pageSize);
 
-  const handleUpdate = async (updatedPromotion: Promotion) => {
+  const handleUpdate = async (updatedManufacturer: Manufacturer) => {
     try {
       const response = await fetch(
-        `/api/marketplace/promotion/${updatedPromotion.id}`,
+        `/api/marketplace/supplier/${updatedManufacturer.id}`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            promoPrice: updatedPromotion.promoPrice,
-            startDate: updatedPromotion.startDate.toISOString(),
-            endDate: updatedPromotion.endDate.toISOString(),
-          }),
+          body: JSON.stringify(updatedManufacturer),
         },
       );
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || "Failed to update promotion");
+        throw new Error(result.message || "Failed to update manufacturer");
       }
 
-      setPromotions((prevPromotions) =>
-        prevPromotions.map((promotion) =>
-          promotion.id === updatedPromotion.id ? updatedPromotion : promotion,
+      setManufacturers((prevManufacturers) =>
+        prevManufacturers.map((manufacturer) =>
+          manufacturer.id === updatedManufacturer.id
+            ? updatedManufacturer
+            : manufacturer,
         ),
       );
 
-      toast.success("Promotion updated successfully!");
+      toast.success("Manufacturer updated successfully!");
     } catch (error) {
       toast.error(`Error: ${(error as Error).message}`);
     }
   };
 
   const handleDelete = async (id: string) => {
-    setDeletePromotionId(id);
+    setDeleteManufacturerId(id);
     setIsModalOpen(true);
   };
 
   const confirmDelete = async () => {
-    if (!deletePromotionId) return;
+    if (!deleteManufacturerId) return;
 
     try {
       const response = await fetch(
-        `/api/marketplace/promotion/${deletePromotionId}`,
+        `/api/marketplace/supplier/${deleteManufacturerId}`,
         {
           method: "DELETE",
         },
@@ -127,31 +124,30 @@ const PromotionManagementPage = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || "Failed to delete promotion");
+        throw new Error(result.message || "Failed to delete manufacturer");
       }
 
-      setPromotions((prevPromotions) =>
-        prevPromotions.filter(
-          (promotion) => promotion.id !== deletePromotionId,
+      setManufacturers((prevManufacturers) =>
+        prevManufacturers.filter(
+          (manufacturer) => manufacturer.id !== deleteManufacturerId,
         ),
       );
 
-      toast.success("Promotion deleted successfully!");
+      toast.success("Manufacturer deleted successfully!");
     } catch (error) {
       toast.error(`Error: ${(error as Error).message}`);
     } finally {
       setIsModalOpen(false);
-      setDeletePromotionId(null);
+      setDeleteManufacturerId(null);
     }
   };
 
-  const handleEdit = (promotion: Promotion) => {
-    console.log(promotion);
-    setEditingPromotion(promotion);
+  const handleEdit = (manufacturer: Manufacturer) => {
+    setEditingManufacturer(manufacturer);
   };
 
   const handleCloseEdit = () => {
-    setEditingPromotion(null);
+    setEditingManufacturer(null);
   };
 
   return (
@@ -178,13 +174,13 @@ const PromotionManagementPage = () => {
           <div className="box w-full min-w-[800px] xl:p-8">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
               <p className="ml-4 mt-6 text-xl font-bold">
-                Promotion Management
+                Manufacturer Management
               </p>
               <div className="mt-6 flex items-center gap-4">
                 <button
-                  onClick={() => router.push("/promotion/new")}
+                  onClick={() => router.push("/manufacturer/new")}
                   className="mr-4 flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"
-                  title="New Promotion"
+                  title="New Manufacturer"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -200,7 +196,7 @@ const PromotionManagementPage = () => {
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  <span className="hidden md:inline">New Promotion</span>
+                  <span className="hidden md:inline">New Manufacturer</span>
                 </button>
               </div>
             </div>
@@ -209,7 +205,7 @@ const PromotionManagementPage = () => {
               <div className="relative flex w-full gap-2 sm:w-auto sm:min-w-[200px] sm:flex-1">
                 <input
                   type="text"
-                  placeholder="Search Promotions..."
+                  placeholder="Search Manufacturers..."
                   className="w-[400px] rounded-lg border p-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -224,8 +220,8 @@ const PromotionManagementPage = () => {
               className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
               style={{ maxHeight: "600px", width: "100%" }}
             >
-              <PromotionTable
-                data={promotions}
+              <ManufacturerTable
+                data={manufacturers}
                 loading={loading}
                 onUpdate={handleUpdate}
                 onDelete={handleDelete}
@@ -250,9 +246,9 @@ const PromotionManagementPage = () => {
       </div>
       <ToastContainer />
 
-      {editingPromotion && (
-        <EditPromoForm
-          promotion={editingPromotion}
+      {editingManufacturer && (
+        <EditManuForm
+          manufacturer={editingManufacturer}
           onClose={handleCloseEdit}
           onUpdate={handleUpdate}
         />
@@ -267,4 +263,4 @@ const PromotionManagementPage = () => {
   );
 };
 
-export default PromotionManagementPage;
+export default ManufacturerManagementPage;
