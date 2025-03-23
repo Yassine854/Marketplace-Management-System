@@ -85,7 +85,6 @@ export default function LogsPage() {
             "username" in context &&
             context.username.toLowerCase() === filters.username.toLowerCase());
 
-        // Filtre par product name
         const matchesProduct =
           !filters.product ||
           (dataBefore &&
@@ -194,42 +193,31 @@ export default function LogsPage() {
           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-          <div className="relative w-full sm:w-auto sm:min-w-[200px] sm:flex-1">
-            <input
-              type="text"
-              placeholder="Rechercher des logs..."
-              className="w-full rounded-lg border p-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-              🔍
-            </span>
-          </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xl font-bold capitalize">Logs</p>
 
-          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
-            <button
-              className="rounded bg-gray-200 px-4 py-2"
-              onClick={() => setIsFilterOpen(true)}
-            >
-              Filter
-            </button>
-            <button
-              className="rounded bg-gray-200 px-4 py-2"
-              onClick={() => {
-                setFilters({ orderId: "", username: "", product: "" });
-                setTempFilters({ orderId: "", username: "", product: "" });
-              }}
-            >
-              Reset Filters
-            </button>
-            <label htmlFor="sort" className="text-sm font-medium text-gray-700">
-              Sort by :
+          {/* Conteneur pour Search, Sort et Filter à droite */}
+
+          <div className="flex flex-wrap gap-2 sm:items-center sm:justify-end sm:justify-between">
+            <div className="relative m-4 w-full sm:w-auto sm:min-w-[200px] sm:flex-1">
+              <input
+                type="text"
+                placeholder="Rechercher..."
+                className="w-full rounded-lg border p-2 pl-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <span className="absolute inset-y-0 left-2 flex items-center">
+                🔍
+              </span>
+            </div>
+
+            <label htmlFor="sort" className="mr-2 whitespace-nowrap font-bold">
+              Sort by:
             </label>
             <select
               id="sort"
-              className="rounded-lg border p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-lg border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={sortLog}
               onChange={(e) =>
                 setSortLog(e.target.value as "newest" | "oldest")
@@ -238,6 +226,23 @@ export default function LogsPage() {
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
             </select>
+
+            <button
+              className="ml-5 rounded-md bg-blue-500 px-4 py-2 text-white transition-colors duration-300"
+              onClick={() => setIsFilterOpen(true)}
+            >
+              Filtrer
+            </button>
+
+            <button
+              className={`rounded-md bg-red-500 px-4 py-2 text-white transition-colors duration-300`}
+              onClick={() => {
+                setFilters({ orderId: "", username: "", product: "" });
+                setTempFilters({ orderId: "", username: "", product: "" });
+              }}
+            >
+              Reset
+            </button>
           </div>
         </div>
 

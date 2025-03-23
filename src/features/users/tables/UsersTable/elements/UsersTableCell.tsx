@@ -1,8 +1,6 @@
 const OrdersTableCell = ({ children }: any) => (
-  <td className="   border-2  ">
-    <div className="flex  select-none items-center justify-center   truncate text-ellipsis p-4 text-sm">
-      {children}
-    </div>
+  <td className="items-center justify-center px-6 py-4 text-sm font-semibold text-gray-900 ">
+    <div>{children}</div>
   </td>
 );
 

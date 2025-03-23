@@ -21,17 +21,17 @@ const SearchBar = forwardRef<searchRef, any>(
     }));
 
     return (
-      <div className="hidden w-full max-w-[250px] items-center justify-between gap-3 rounded-[30px] border border-transparent bg-n30 bg-primary/5 px-3 focus-within:border-primary dark:bg-bg3 md:flex xxl:px-5">
+      <div className="relative w-full sm:w-auto sm:min-w-[200px] sm:flex-1">
         <input
           type="text"
           value={text}
           placeholder="Search"
           onChange={handleInputChange}
-          className="w-full bg-transparent py-2 text-sm focus:outline-none"
+          className="w-full rounded-lg border p-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button onClick={handleSubmit} className="cursor-pointer">
-          <IconSearch size={24} />
-        </button>
+        <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+          🔍
+        </span>
       </div>
     );
   },

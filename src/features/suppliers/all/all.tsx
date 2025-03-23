@@ -81,27 +81,31 @@ const SupplierPurchasesPage = () => {
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
               <p className="ml-4 mt-6 text-xl font-bold">Supplier Orders</p>
               <div className="mt-6 flex items-center gap-4">
-                <button
-                  onClick={() => router.push("/suppliers/new")}
-                  className="mr-4 flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"
-                  title="New Order"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M12 5l0 14" />
-                    <path d="M5 12l14 0" />
-                  </svg>
-                  <span className="hidden md:inline">New Order</span>
-                </button>
+                <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
+                  <div className="flex h-16 w-56  items-center justify-center  ">
+                    <button
+                      onClick={() => router.push("/suppliers/new")}
+                      className="btn"
+                      title="New Order"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5l0 14" />
+                        <path d="M5 12l14 0" />
+                      </svg>
+                      <span className="hidden md:inline">New Order</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 

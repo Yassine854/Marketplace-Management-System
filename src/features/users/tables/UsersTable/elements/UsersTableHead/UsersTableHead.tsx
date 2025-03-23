@@ -17,8 +17,8 @@ const OrdersTableHead = ({ changeSelectedSort }: any) => {
     useOrdersTableHead(changeSelectedSort);
 
   return (
-    <thead className="sticky top-0 z-10">
-      <tr className="  h-12  w-full bg-n40 font-semibold">
+    <thead className="border-b border-gray-100 bg-gray-50">
+      <tr>
         <OrdersTableHeadCell>Username</OrdersTableHeadCell>
         <OrdersTableHeadCell onClick={onCustomerClick}>
           <Sort>Name</Sort>

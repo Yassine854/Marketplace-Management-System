@@ -18,7 +18,7 @@ const UsersTableRow = ({ user }: any) => {
   }, [user]);
 
   return (
-    <tr className=" even:bg-primary/5 hover:bg-n30 dark:even:bg-bg3">
+    <tr className="transition-colors duration-150 hover:bg-gray-50">
       {/* Username */}
       <UsersTableCell>
         <p className=" truncate text-ellipsis text-sm">{user.username}</p>
