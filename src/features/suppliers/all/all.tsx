@@ -3,13 +3,15 @@ import PurchaseTable from "../components/PurchaseTable/PurchaseTable";
 import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersAll";
 import { useRouter } from "next/navigation";
-import Pagination from "@mui/material/Pagination";
+//import Pagination from "@mui/material/Pagination";
 import styles from "../styles/pagination.module.css";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 const SupplierPurchasesPage = () => {
   const { purchases, loading, error, fetchPurchases, total } =
     usePurchaseStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
@@ -160,16 +162,13 @@ const SupplierPurchasesPage = () => {
               <PurchaseTable data={purchases} loading={loading} />
             </div>
 
-            <div className={styles.pagination}>
+            <div>
               <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={(event, value) => setCurrentPage(value)}
-                color="primary"
-                shape="rounded"
-                siblingCount={1}
-                boundaryCount={1}
-                className="pagination"
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
               />
             </div>
           </div>

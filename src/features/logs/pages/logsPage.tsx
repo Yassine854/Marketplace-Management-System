@@ -3,11 +3,11 @@
 import LogTable from "../Table/LogTable";
 import { useGetAllLogs } from "../getLogs/useGetAllLogs";
 import { useMemo, useState, useEffect } from "react";
-//import Pagination from "../components/Pagination";
+import Pagination from "../components/Pagination";
 import ExcelJS from "exceljs";
 import FileSaver from "file-saver";
 import { FaRedo } from "react-icons/fa";
-import Pagination from "@mui/material/Pagination";
+//import Pagination from "@mui/material/Pagination";
 import styles from "../styles/pagination.module.css";
 
 export default function LogsPage() {
@@ -60,9 +60,9 @@ export default function LogsPage() {
           context ? JSON.stringify(context) : ""
         } ${dataBefore ? JSON.stringify(dataBefore) : ""} ${
           dataAfter ? JSON.stringify(dataAfter) : ""
-        }`
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
+        }`.toLowerCase(); // Assurez-vous de convertir en minuscule
+
+        const matchesSearch = searchContent.includes(searchTerm.toLowerCase()); // Vérifiez que la recherche fonctionne correctement
 
         const matchesTab =
           activeTab === "all" ? true : log.type.toLowerCase() === activeTab;
@@ -109,7 +109,7 @@ export default function LogsPage() {
             ));
 
         return (
-          searchContent &&
+          matchesSearch &&
           matchesTab &&
           matchesOrderId &&
           matchesUsername &&
@@ -235,7 +235,7 @@ export default function LogsPage() {
             </button>
 
             <button
-              className={`rounded-md bg-red-500 px-4 py-2 text-white transition-colors duration-300`}
+              className={`rounded-md bg-gray-500 px-4 py-2 text-white transition-colors duration-300`}
               onClick={() => {
                 setFilters({ orderId: "", username: "", product: "" });
                 setTempFilters({ orderId: "", username: "", product: "" });
@@ -291,16 +291,13 @@ export default function LogsPage() {
         />
       </div>
 
-      <div className={styles.pagination}>
+      <div>
         <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={(event, value) => setCurrentPage(value)}
-          color="primary"
-          shape="rounded"
-          siblingCount={1}
-          boundaryCount={1}
-          className="pagination"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
         />
       </div>
 

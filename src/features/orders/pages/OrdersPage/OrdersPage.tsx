@@ -4,14 +4,15 @@ import OrdersPagination from "../../widgets/OrdersPagination";
 import AnyMatchingResults from "../../widgets/AnyMatchingResults";
 import { useOrdersData } from "../../hooks/queries/useOrdersData";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@mui/material/Pagination";
-import styles from "../../styles/pagination.module.css";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
+
 import { useState } from "react";
 
 const OrdersPage = () => {
   const { orders } = useOrdersData();
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(orders.length / 10);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
 
   return (
     <div className="flex h-full w-full flex-grow flex-col justify-between    ">
@@ -24,16 +25,13 @@ const OrdersPage = () => {
         {orders?.length == 0 && <AnyMatchingResults />}
       </div>
       <Divider />
-      <div className={styles.pagination}>
+      <div>
         <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={(event, value) => setCurrentPage(value)}
-          color="primary"
-          shape="rounded"
-          siblingCount={1}
-          boundaryCount={1}
-          className="pagination"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
         />
       </div>
     </div>

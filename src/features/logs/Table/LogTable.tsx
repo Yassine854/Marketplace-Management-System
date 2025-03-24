@@ -30,6 +30,17 @@ export default function LogTable({
   >(null);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
 
+  const [isAllSelected, setIsAllSelected] = useState(false);
+
+  const toggleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedRows(new Set());
+    } else {
+      setSelectedRows(new Set(logs.map((log) => log.id)));
+    }
+    setIsAllSelected(!isAllSelected);
+  };
+
   const toggleRowSelection = (id: string) => {
     setSelectedRows((prev) => {
       const newSelection = new Set(prev);
@@ -38,6 +49,7 @@ export default function LogTable({
       } else {
         newSelection.add(id);
       }
+      setIsAllSelected(newSelection.size === logs.length);
 
       onLogSelection(id);
       return newSelection;
@@ -48,7 +60,7 @@ export default function LogTable({
     setSelectedData(data);
 
     if (
-      message.includes("Order Status Changed") ||
+      message.includes("Order status changed") ||
       message.includes("order changed")
     ) {
       setModalType("statusChanged");
@@ -106,24 +118,29 @@ export default function LogTable({
           <thead className="border-b border-gray-100 bg-gray-50">
             <tr>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Select
+                <input
+                  type="checkbox"
+                  onChange={toggleSelectAll}
+                  checked={isAllSelected}
+                  className="h-3 w-3 cursor-pointer appearance-none rounded-full border-2 border-gray-400 transition-colors checked:border-blue-500 checked:bg-blue-500 hover:border-blue-600 hover:bg-blue-200"
+                />
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
                 Type
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs  font-semibold uppercase tracking-wider text-gray-500">
                 Message
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
                 Timestamp
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
                 Context
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
                 Data Before
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
                 Data After
               </th>
             </tr>
@@ -176,7 +193,7 @@ export default function LogTable({
                     key={log.id}
                     className="transition-colors duration-150 hover:bg-gray-50"
                   >
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                    <td className="px-6 py-4 text-center text-sm font-semibold text-gray-900">
                       <input
                         type="checkbox"
                         checked={selectedRows.has(log.id)}
@@ -184,7 +201,7 @@ export default function LogTable({
                         className="h-3 w-3 cursor-pointer appearance-none rounded-full border-2 border-gray-400 transition-colors checked:border-blue-500 checked:bg-blue-500 hover:border-blue-600 hover:bg-blue-200"
                       />
                     </td>
-                    <td className="px-4 py-2 text-sm">
+                    <td className="px-4 py-2  text-center text-sm">
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-medium ${
                           log.type === "error"
@@ -203,14 +220,14 @@ export default function LogTable({
                         {log.type}
                       </span>
                     </td>
-                    <td className="break-words px-4 py-2 text-sm text-gray-900">
+                    <td className="break-words px-4 py-2 text-center text-sm text-gray-900">
                       {log.message}
                     </td>
-                    <td className="px-4 py-2 text-sm text-gray-500">
+                    <td className="px-4 py-2 text-center text-sm text-gray-500">
                       {new Date(log.timestamp).toLocaleString("fr-FR")}
                     </td>
                     <td
-                      className="cursor-pointer break-words px-4 py-2 text-sm text-gray-500"
+                      className="cursor-pointer break-words px-4 py-2 text-center text-sm text-gray-500"
                       onClick={() => handleContextClick(context)}
                     >
                       <pre className="whitespace-pre-wrap break-words rounded bg-gray-100 p-2 text-xs">
@@ -218,15 +235,15 @@ export default function LogTable({
                       </pre>
                     </td>
                     <td
-                      className="cursor-pointer break-words px-4 py-2 text-sm text-gray-500"
+                      className="cursor-pointer break-words px-4 py-2 text-center text-sm text-gray-500"
                       onClick={() => handleDataClick(dataBefore, log.message)}
                     >
                       <pre className="whitespace-pre-wrap break-words rounded bg-gray-100 p-2 text-xs">
-                        {safeDataDisplay(dataBefore.status)}
+                        {safeDataDisplay(dataBefore?.status)}
                       </pre>
                     </td>
                     <td
-                      className="cursor-pointer break-words px-4 py-2 text-sm text-gray-500"
+                      className="cursor-pointer break-words px-4 py-2 text-center text-sm text-gray-500"
                       onClick={() => handleDataClick(dataAfter, log.message)}
                     >
                       <pre className="whitespace-pre-wrap break-words rounded bg-gray-100 p-2 text-xs">
