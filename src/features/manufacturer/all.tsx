@@ -168,6 +168,7 @@ const ManufacturerManagementPage = () => {
           backgroundColor: "white",
           padding: "16px",
           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+          marginLeft: "20px",
         }}
       >
         <div className="relative grid h-full w-full items-center justify-center gap-4">
