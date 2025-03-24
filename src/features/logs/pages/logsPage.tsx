@@ -39,13 +39,21 @@ export default function LogsPage() {
 
   const parseJsonSafely = (data: any) => {
     if (typeof data === "string") {
-      try {
-        return JSON.parse(data);
-      } catch (error) {
-        console.error("Erreur de parsing JSON :", error);
-        return null;
+      if (
+        (data.trim().startsWith("{") && data.trim().endsWith("}")) ||
+        (data.trim().startsWith("[") && data.trim().endsWith("]"))
+      ) {
+        try {
+          return JSON.parse(data);
+        } catch (error) {
+          console.error("Erreur de parsing JSON :", error);
+          return data;
+        }
       }
+
+      return data;
     }
+
     return data;
   };
 
@@ -60,9 +68,9 @@ export default function LogsPage() {
           context ? JSON.stringify(context) : ""
         } ${dataBefore ? JSON.stringify(dataBefore) : ""} ${
           dataAfter ? JSON.stringify(dataAfter) : ""
-        }`.toLowerCase(); // Assurez-vous de convertir en minuscule
+        }`.toLowerCase();
 
-        const matchesSearch = searchContent.includes(searchTerm.toLowerCase()); // Vérifiez que la recherche fonctionne correctement
+        const matchesSearch = searchContent.includes(searchTerm.toLowerCase());
 
         const matchesTab =
           activeTab === "all" ? true : log.type.toLowerCase() === activeTab;
@@ -87,26 +95,21 @@ export default function LogsPage() {
 
         const matchesProduct =
           !filters.product ||
-          (dataBefore &&
-            typeof dataBefore === "object" &&
-            "items" in dataBefore &&
-            Array.isArray(dataBefore.items) &&
-            dataBefore.items.some(
-              (item: any) =>
-                item.productName &&
-                item.productName.toLowerCase() ===
-                  filters.product.toLowerCase(),
-            )) ||
-          (dataAfter &&
-            typeof dataAfter === "object" &&
-            "items" in dataAfter &&
-            Array.isArray(dataAfter.items) &&
-            dataAfter.items.some(
-              (item: any) =>
-                item.productName &&
-                item.productName.toLowerCase() ===
-                  filters.product.toLowerCase(),
-            ));
+          [dataBefore, dataAfter].some((data) => {
+            return (
+              data &&
+              typeof data === "object" &&
+              "items" in data &&
+              Array.isArray(data.items.updatedItems) &&
+              data.items.updatedItems.some((item: any) => {
+                return (
+                  item.productName &&
+                  item.productName.toLowerCase() ===
+                    filters.product.toLowerCase()
+                );
+              })
+            );
+          });
 
         return (
           matchesSearch &&
@@ -137,8 +140,6 @@ export default function LogsPage() {
   const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
 
   const handleExport = () => {
-    console.log("Selected Logs:", selectedLogs);
-
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Logs");
 
@@ -195,8 +196,6 @@ export default function LogsPage() {
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xl font-bold capitalize">Logs</p>
-
-          {/* Conteneur pour Search, Sort et Filter à droite */}
 
           <div className="flex flex-wrap gap-2 sm:items-center sm:justify-end sm:justify-between">
             <div className="relative m-4 w-full sm:w-auto sm:min-w-[200px] sm:flex-1">
