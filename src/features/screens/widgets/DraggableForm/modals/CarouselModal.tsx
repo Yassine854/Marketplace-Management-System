@@ -195,7 +195,7 @@ const CarouselModal: React.FC<CarouselModalProps> = ({
             render={({ field }) => (
               <MultipleFileInput
                 id="images"
-                label="Image"
+                label="Images"
                 accept="image/*"
                 onChange={(files) => {
                   field.onChange(files);
