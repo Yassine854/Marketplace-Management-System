@@ -1,4 +1,3 @@
-// app/api/taxes/getAll/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
@@ -14,11 +13,25 @@ export async function GET(req: Request) {
     }
 
     const url = new URL(req.url);
-    const search = url.searchParams.get("search") || "";
     const page = parseInt(url.searchParams.get("page") || "1", 10);
     const size = parseInt(url.searchParams.get("size") || "10", 10);
+    const searchTerm = url.searchParams.get("search") || "";
+
+    const filterConditions: any = {};
+
+    if (searchTerm) {
+      const parsedSearchTerm = parseFloat(searchTerm);
+      if (!isNaN(parsedSearchTerm)) {
+        filterConditions.value = parsedSearchTerm;
+      }
+    }
+
+    const skip = (page - 1) * size;
 
     const taxes = await prisma.tax.findMany({
+      where: filterConditions,
+      skip,
+      take: size,
       include: {
         products: true,
         orderItems: true,
@@ -26,13 +39,11 @@ export async function GET(req: Request) {
       },
     });
 
-    const filteredTaxes = taxes.filter(
-      (tax) => tax.value.toString().includes(search) || tax.id.includes(search),
-    );
+    const totalTaxes = await prisma.tax.count({
+      where: filterConditions,
+    });
 
-    const paginatedTaxes = filteredTaxes.slice((page - 1) * size, page * size);
-
-    if (paginatedTaxes.length === 0) {
+    if (taxes.length === 0) {
       return NextResponse.json(
         { message: "No taxes found", taxes: [] },
         { status: 200 },
@@ -42,8 +53,10 @@ export async function GET(req: Request) {
     return NextResponse.json(
       {
         message: "Taxes retrieved successfully",
-        taxes: paginatedTaxes,
-        total: filteredTaxes.length,
+        taxes,
+        totalTaxes,
+        currentPage: page,
+        totalPages: Math.ceil(totalTaxes / size),
       },
       { status: 200 },
     );

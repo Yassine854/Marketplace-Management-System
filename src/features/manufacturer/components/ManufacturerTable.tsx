@@ -3,9 +3,10 @@ import ManufacturerTableHead from "./ManufacturerTableHead";
 import ManufacturerTableRow from "./ManufacturerTableRow";
 import ManufacturerTableSkeleton from "./ManufacturerTableSkeleton";
 import { Manufacturer } from "../types/manufacturer";
-
+import { Category } from "../types/Category"; // Importez votre type Category si nécessaire
 interface ManufacturerTableProps {
   data: Manufacturer[];
+  categories: Category[];
   loading: boolean;
   onUpdate: (updatedManufacturer: Manufacturer) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
@@ -14,6 +15,7 @@ interface ManufacturerTableProps {
 
 const ManufacturerTable = ({
   data,
+  categories,
   loading,
   onUpdate,
   onDelete,
@@ -57,6 +59,7 @@ const ManufacturerTable = ({
                 onUpdate={handleUpdateManufacturer}
                 onDelete={onDelete}
                 onEdit={onEdit}
+                categories={[]}
               />
             ))
           )}

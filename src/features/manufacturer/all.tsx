@@ -227,6 +227,7 @@ const ManufacturerManagementPage = () => {
                 onUpdate={handleUpdate}
                 onDelete={handleDelete}
                 onEdit={handleEdit}
+                categories={[]}
               />
             </div>
 
@@ -252,6 +253,7 @@ const ManufacturerManagementPage = () => {
           manufacturer={editingManufacturer}
           onClose={handleCloseEdit}
           onUpdate={handleUpdate}
+          categories={[]}
         />
       )}
 

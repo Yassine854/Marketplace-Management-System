@@ -8,20 +8,15 @@ const prisma = new PrismaClient();
 // 🟢 GET: Retrieve all categories with related products and subcategories
 export async function GET() {
   try {
-    const session = await auth(); // Get user session
+    // const session = await auth(); // Get user session
 
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
     const categories = await prisma.category.findMany({
       include: {
-        products: {
-          include: {
-            product: true, // Include related product details
-          },
-        },
-        subCategories: true, // Include related subcategories
+        subCategories: true,
       },
     });
 

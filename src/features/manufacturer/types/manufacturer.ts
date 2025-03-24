@@ -12,6 +12,13 @@ export interface Manufacturer {
   capital?: string;
   email?: string;
   address?: string;
+  supplierCategories?: SupplierCategory[];
   createdAt: Date;
   updatedAt: Date;
+}
+export interface SupplierCategory {
+  categoryId: string;
+  category?: {
+    nameCategory: string;
+  };
 }

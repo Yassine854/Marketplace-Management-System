@@ -1,4 +1,3 @@
-// app/api/manufacturers/create/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
@@ -15,21 +14,59 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+    const {
+      manufacturerId,
+      code,
+      companyName,
+      contactName,
+      phoneNumber,
+      postalCode,
+      city,
+      country,
+      capital,
+      email,
+      address,
+      categories, // Liste des IDs des catégories
+    } = body;
+
+    // Log the received data
+    console.log("Received data:", {
+      manufacturerId,
+      code,
+      companyName,
+      contactName,
+      phoneNumber,
+      postalCode,
+      city,
+      country,
+      capital,
+      email,
+      address,
+      categories,
+    });
 
     // Create the manufacturer in the database
     const newManufacturer = await prisma.manufacturer.create({
       data: {
-        manufacturerId: body.manufacturerId,
-        code: body.code,
-        companyName: body.companyName,
-        contactName: body.contactName,
-        phoneNumber: body.phoneNumber,
-        postalCode: body.postalCode,
-        city: body.city,
-        country: body.country,
-        capital: body.capital,
-        email: body.email,
-        address: body.address,
+        manufacturerId,
+        code,
+        companyName,
+        contactName,
+        phoneNumber,
+        postalCode,
+        city,
+        country,
+        capital,
+        email,
+        address,
+        supplierCategories: {
+          create: categories.map((categoryId: string) => ({
+            categoryId,
+          })),
+        },
+      },
+      include: {
+        supplierCategories: true, // Inclure les catégories associées dans la réponse
       },
     });
 

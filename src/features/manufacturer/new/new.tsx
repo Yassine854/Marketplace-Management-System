@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const NewManufacturerPage = () => {
@@ -17,7 +17,38 @@ const NewManufacturerPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api/marketplace/category/getAll");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to fetch categories");
+        }
+
+        setCategories(data.categories);
+        console.log("catgories", data.categories);
+      } catch (error) {
+        setError(
+          error instanceof Error ? error.message : "An unknown error occurred",
+        );
+      }
+    };
+
+    fetchCategories();
+  }, []);
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptions = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value,
+    );
+    setSelectedCategories(selectedOptions);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +62,12 @@ const NewManufacturerPage = () => {
       setLoading(false);
       return;
     }
+    if (!code || !companyName) {
+      setError("Code and Company Name are required.");
+      setLoading(false);
+      return;
+    }
+    console.log("Selected categories:", selectedCategories);
 
     try {
       const response = await fetch("/api/marketplace/supplier/create", {
@@ -49,6 +86,7 @@ const NewManufacturerPage = () => {
           city,
           country,
           capital,
+          categories: selectedCategories,
         }),
       });
 
@@ -69,6 +107,7 @@ const NewManufacturerPage = () => {
       setCity("");
       setCountry("");
       setCapital("");
+      setSelectedCategories([]);
 
       setTimeout(() => {
         router.push("/manufacturer/all");
@@ -83,8 +122,8 @@ const NewManufacturerPage = () => {
   };
 
   return (
-    <div className="flex h-screen w-full flex-col items-center justify-center bg-gray-100 p-6">
-      <div className="mt-32 w-full max-w-4xl rounded-2xl bg-white p-8 shadow-lg">
+    <div className="mt-20 flex h-screen w-full flex-col items-center justify-center bg-gray-100 p-6">
+      <div className="mt-36 w-full max-w-4xl rounded-2xl bg-white p-8 shadow-lg">
         <h1 className="mb-6 text-center text-3xl font-bold text-gray-800">
           New Manufacturer
         </h1>
@@ -262,6 +301,35 @@ const NewManufacturerPage = () => {
                 className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Capital"
               />
+            </div>
+            <div>
+              <label
+                htmlFor="category"
+                className="block font-medium text-gray-700"
+              >
+                Categories
+              </label>
+              <select
+                id="category"
+                multiple
+                value={selectedCategories}
+                onChange={handleCategoryChange}
+                required
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Categories</option>
+                {Array.isArray(categories) && categories.length > 0 ? (
+                  categories.map(
+                    (category: { id: string; nameCategory: string }) => (
+                      <option key={category.id} value={category.id}>
+                        {category.nameCategory}
+                      </option>
+                    ),
+                  )
+                ) : (
+                  <option disabled>No categories available</option>
+                )}
+              </select>
             </div>
           </div>
 

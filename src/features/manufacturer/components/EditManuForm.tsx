@@ -4,10 +4,12 @@ import { Manufacturer } from "../types/manufacturer";
 
 const EditManuForm = ({
   manufacturer,
+  categories,
   onClose,
   onUpdate,
 }: {
   manufacturer: Manufacturer;
+  categories: string[];
   onClose: () => void;
   onUpdate: (updatedManufacturer: Manufacturer) => void;
 }) => {
@@ -24,8 +26,20 @@ const EditManuForm = ({
   const [country, setCountry] = useState(manufacturer.country || "");
   const [postalCode, setPostalCode] = useState(manufacturer.postalCode || "");
   const [capital, setCapital] = useState(manufacturer.capital || "");
+  const [supplierCategories, setSupplierCategories] = useState<
+    { categoryId: string }[]
+  >(manufacturer.supplierCategories || []);
   const [error, setError] = useState("");
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
 
+    setSupplierCategories(
+      (prevCategories) =>
+        checked
+          ? [...prevCategories, { categoryId: value }] // Ajout d'un objet avec `categoryId`
+          : prevCategories.filter((category) => category.categoryId !== value), // Retrait de l'objet par `categoryId`
+    );
+  };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!companyName.trim()) {
@@ -44,6 +58,7 @@ const EditManuForm = ({
       country,
       postalCode,
       capital,
+      supplierCategories,
     };
 
     onUpdate(updatedManufacturer);
@@ -108,6 +123,17 @@ const EditManuForm = ({
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Postal Code
+          </label>
+          <input
+            type="text"
+            value={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
@@ -147,14 +173,24 @@ const EditManuForm = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Postal Code
+            Categories
           </label>
-          <input
-            type="text"
-            value={postalCode}
-            onChange={(e) => setPostalCode(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-          />
+          <div className="space-y-2">
+            {categories.map((category) => (
+              <div key={category} className="flex items-center">
+                <input
+                  type="checkbox"
+                  value={category}
+                  checked={supplierCategories.some(
+                    (sc) => sc.categoryId === category,
+                  )}
+                  onChange={handleCategoryChange}
+                  className="mr-2"
+                />
+                <span>{category}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="flex gap-2">

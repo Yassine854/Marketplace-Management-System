@@ -41,11 +41,6 @@ const SupplierPurchasesPage = () => {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  const handleSearch = () => {
-    setCurrentPage(1);
-    setDebouncedSearchTerm(searchTerm.toLowerCase());
-  };
-
   if (error) {
     return (
       <div className="p-6 text-red-500">

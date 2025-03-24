@@ -3,23 +3,29 @@ import {
   TrashIcon,
   ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
-import { useState } from "react";
-import { Manufacturer } from "../types/manufacturer";
+import { Manufacturer, SupplierCategory } from "../types/manufacturer";
 import { downloadManufacturerPDF } from "../utils/pdfUtils";
-
+import { Category } from "../types/Category";
 const ManufacturerTableRow = ({
   manufacturer,
-  onUpdate,
   onDelete,
   onEdit,
 }: {
   manufacturer: Manufacturer;
+  categories: Category[];
   onUpdate: (updatedManufacturer: Manufacturer) => void;
   onDelete: (id: string) => Promise<void>;
   onEdit: (manufacturer: Manufacturer) => void;
 }) => {
   const handleDownloadPDF = () => {
     downloadManufacturerPDF([manufacturer]);
+  };
+
+  const getCategoryNames = (supplierCategories: SupplierCategory[]) => {
+    return supplierCategories
+      .map((sc) => sc.category?.nameCategory)
+      .filter(Boolean)
+      .join(", ");
   };
 
   return (
@@ -51,6 +57,12 @@ const ManufacturerTableRow = ({
         <td className="px-6 py-4 text-sm text-gray-900">
           {manufacturer.capital}
         </td>
+        <td className="px-6 py-4 text-sm text-gray-900">
+          {manufacturer.supplierCategories?.length
+            ? getCategoryNames(manufacturer.supplierCategories)
+            : "No categories"}
+        </td>
+
         <td className="px-6 py-4">
           <div className="flex items-center space-x-2">
             <button

@@ -13,14 +13,36 @@ export async function GET(req: Request) {
     }
 
     const url = new URL(req.url);
-    const page = parseInt(url.searchParams.get("page") || "1", 10); // Page courante (par défaut 1)
-    const limit = parseInt(url.searchParams.get("limit") || "10", 10); // Nombre d'éléments par page (par défaut 10)
+    const page = parseInt(url.searchParams.get("page") || "1", 10);
+    const limit = parseInt(url.searchParams.get("limit") || "10", 10);
 
+    const promoPrice = url.searchParams.get("promoPrice");
+    const searchTerm = url.searchParams.get("search");
     const startDate = url.searchParams.get("startDate");
     const endDate = url.searchParams.get("endDate");
-    const promoPrice = url.searchParams.get("promoPrice");
 
     const filterConditions: any = {};
+
+    if (promoPrice) {
+      filterConditions.promoPrice = parseFloat(promoPrice);
+    }
+
+    if (searchTerm) {
+      const parsedSearchTerm = new Date(searchTerm);
+      if (!isNaN(parsedSearchTerm.getTime())) {
+        filterConditions.OR = [
+          {
+            promoPrice: parseFloat(searchTerm),
+          },
+        ];
+      } else {
+        filterConditions.OR = [
+          {
+            promoPrice: parseFloat(searchTerm),
+          },
+        ];
+      }
+    }
 
     if (startDate) {
       filterConditions.startDate = {
@@ -34,21 +56,13 @@ export async function GET(req: Request) {
       };
     }
 
-    if (promoPrice) {
-      filterConditions.promoPrice = {
-        gte: parseFloat(promoPrice),
-      };
-    }
-
     const skip = (page - 1) * limit;
 
     const promotions = await prisma.promotion.findMany({
       where: filterConditions,
       skip,
       take: limit,
-      include: {
-        products: true,
-      },
+      include: {},
     });
 
     const totalPromotions = await prisma.promotion.count({
@@ -61,6 +75,7 @@ export async function GET(req: Request) {
         promotions,
         totalPromotions,
         currentPage: page,
+        totalPages: Math.ceil(totalPromotions / limit),
       },
       { status: 200 },
     );

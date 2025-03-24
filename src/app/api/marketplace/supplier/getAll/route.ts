@@ -43,6 +43,13 @@ export async function GET(req: Request) {
           { address: { contains: search, mode: "insensitive" } },
         ],
       },
+      include: {
+        supplierCategories: {
+          include: {
+            category: true,
+          },
+        },
+      },
     });
 
     const totalManufacturers = await prisma.manufacturer.count({
@@ -76,7 +83,15 @@ export async function GET(req: Request) {
     return NextResponse.json(
       {
         message: "Manufacturers retrieved successfully",
-        manufacturers,
+        manufacturers: manufacturers.map((manufacturer) => ({
+          ...manufacturer,
+          supplierCategories: manufacturer.supplierCategories.map(
+            (supplierCategory) => ({
+              ...supplierCategory,
+              categoryName: supplierCategory.category.nameCategory, // Renommer la propriété de catégorie
+            }),
+          ),
+        })),
         totalManufacturers,
         currentPage: page,
         totalPages: Math.ceil(totalManufacturers / limit),

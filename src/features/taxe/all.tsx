@@ -178,7 +178,7 @@ const TaxManagementPage = () => {
               <div className="relative flex w-full gap-2 sm:w-auto sm:min-w-[200px] sm:flex-1">
                 <input
                   type="text"
-                  placeholder="Search Taxes..."
+                  placeholder="Search Taxes by value..."
                   className="w-[400px] rounded-lg border p-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}

@@ -7,7 +7,8 @@ import { Promotion } from "./types/promo";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
-import EditPromoForm from "./components/EditPromoForm"; // Import the EditPromoForm component
+import EditPromoForm from "./components/EditPromoForm";
+import AdvancedFilters from "./components/AdvancedFilters"; // Import the AdvancedFilters component for the filter
 
 const PromotionManagementPage = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -24,6 +25,11 @@ const PromotionManagementPage = () => {
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(
     null,
   );
+  const [showFilters, setShowFilters] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
+    {},
+  );
+
   const pageSize = 10;
   const router = useRouter();
 
@@ -32,7 +38,7 @@ const PromotionManagementPage = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `/api/marketplace/promotion/getAll?page=${currentPage}&size=${pageSize}&search=${debouncedSearchTerm}`,
+          `/api/marketplace/promotion/getAll?page=${currentPage}&size=${pageSize}&search=${debouncedSearchTerm}&startDate=${activeFilters.startDate}&endDate=${activeFilters.endDate}`,
         );
         const data = await response.json();
 
@@ -52,7 +58,7 @@ const PromotionManagementPage = () => {
     };
 
     fetchPromotions();
-  }, [currentPage, debouncedSearchTerm]);
+  }, [currentPage, debouncedSearchTerm, activeFilters]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -217,6 +223,35 @@ const PromotionManagementPage = () => {
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                   🔍
                 </span>
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="rounded bg-gray-200 px-4 py-2"
+                >
+                  {showFilters ? "Hide Filters" : "Filters"}
+                </button>
+              </div>
+
+              {showFilters && (
+                <AdvancedFilters
+                  onApply={(filters) => {
+                    setActiveFilters(filters);
+                    setCurrentPage(1);
+                  }}
+                />
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(activeFilters).map(
+                  ([key, value]) =>
+                    value && (
+                      <span
+                        key={key}
+                        className="rounded-full bg-gray-100 px-2 py-1 text-sm"
+                      >
+                        {key}: {value}
+                      </span>
+                    ),
+                )}
               </div>
             </div>
 
