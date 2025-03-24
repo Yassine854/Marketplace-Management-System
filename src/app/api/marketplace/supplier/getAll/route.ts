@@ -46,7 +46,11 @@ export async function GET(req: Request) {
       include: {
         supplierCategories: {
           include: {
-            category: true,
+            category: {
+              select: {
+                nameCategory: true,
+              },
+            },
           },
         },
       },

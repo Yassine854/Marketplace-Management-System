@@ -45,15 +45,21 @@ export async function GET(req: Request) {
     }
 
     if (startDate) {
-      filterConditions.startDate = {
-        gte: new Date(startDate),
-      };
+      const parsedStartDate = new Date(startDate);
+      if (!isNaN(parsedStartDate.getTime())) {
+        filterConditions.startDate = {
+          gte: parsedStartDate,
+        };
+      }
     }
 
     if (endDate) {
-      filterConditions.endDate = {
-        lte: new Date(endDate),
-      };
+      const parsedEndDate = new Date(endDate);
+      if (!isNaN(parsedEndDate.getTime())) {
+        filterConditions.endDate = {
+          lte: parsedEndDate,
+        };
+      }
     }
 
     const skip = (page - 1) * limit;

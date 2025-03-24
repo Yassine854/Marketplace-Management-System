@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import PromotionTable from "./components/PromotionTable";
 import { useRouter } from "next/navigation";
-import Pagination from "@mui/material/Pagination";
-import styles from "../suppliers/styles/pagination.module.css";
+import Pagination from "../shared/elements/pagination/pagination";
 import { Promotion } from "./types/promo";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -29,6 +28,7 @@ const PromotionManagementPage = () => {
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
     {},
   );
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const pageSize = 10;
   const router = useRouter();
@@ -267,17 +267,13 @@ const PromotionManagementPage = () => {
                 onEdit={handleEdit}
               />
             </div>
-
-            <div className={styles.pagination}>
+            <div>
               <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={(event, value) => setCurrentPage(value)}
-                color="primary"
-                shape="rounded"
-                siblingCount={1}
-                boundaryCount={1}
-                className="pagination"
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
               />
             </div>
           </div>

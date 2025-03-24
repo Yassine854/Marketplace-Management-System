@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ManufacturerTable from "./components/ManufacturerTable";
 import { useRouter } from "next/navigation";
-import Pagination from "@mui/material/Pagination";
+import Pagination from "../shared/elements/pagination/pagination";
 import styles from "../suppliers/styles/pagination.module.css";
 import { Manufacturer } from "./types/manufacturer";
 import { ToastContainer, toast } from "react-toastify";
@@ -23,6 +23,7 @@ const ManufacturerManagementPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingManufacturer, setEditingManufacturer] =
     useState<Manufacturer | null>(null);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const pageSize = 10;
   const router = useRouter();
 
@@ -231,16 +232,13 @@ const ManufacturerManagementPage = () => {
               />
             </div>
 
-            <div className={styles.pagination}>
+            <div>
               <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={(event, value) => setCurrentPage(value)}
-                color="primary"
-                shape="rounded"
-                siblingCount={1}
-                boundaryCount={1}
-                className="pagination"
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
               />
             </div>
           </div>
