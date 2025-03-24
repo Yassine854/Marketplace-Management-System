@@ -83,6 +83,37 @@ const Sidebar = ({
 
           <Divider />
 
+          <Divider />
+          <SidebarSubMenu
+            icon={<IconShoppingCart />}
+            name="Products"
+            onClick={() => push("/marketplace/products/all")} // Update main click
+            isActive={pathname?.includes("products")}
+            items={[
+              { name: "All", path: "/marketplace/products/all" },
+              { name: "New Product", path: "/marketplace/products/add" },
+              {
+                name: "Categories",
+                path: "/marketplace/products/categories/all",
+              },
+              { name: "Suppliers", path: "/marketplace/suppliers/all" },
+              { name: "Tax", path: "/marketplace/taxes/all" },
+              { name: "Promotion", path: "/marketplace/promotions/all" },
+              {
+                name: "Product Type",
+                path: "/marketplace/products/ProductTypes/all",
+              },
+              {
+                name: "Product Status",
+                path: "/marketplace/products/ProductStatus/all",
+              },
+              {
+                name: "Type PCB",
+                path: "/marketplace/products/ProductPCBType/all",
+              },
+            ]}
+          />
+          <Divider />
           <SidebarOrdersSubMenu
             onClick={() => push("/orders")}
             items={statuses}
@@ -111,6 +142,7 @@ const Sidebar = ({
                   ]
             }
           />
+
           <Divider />
           <SidebarSubMenu
             icon={<IconShoppingCart />}
