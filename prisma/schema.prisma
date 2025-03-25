@@ -130,6 +130,8 @@ model Product {
   orderItems OrderItem[]
   reservationItems    ReservationItem[]
   loyaltyPoints LoyaltyPoints[]
+  SkuPartner SkuPartner[]
+
   @@index([category_ids])
   @@map("products")
 }
@@ -311,6 +313,8 @@ model Partner {
   orders   Order[]
   reservations Reservation[]
   loyaltyPoints LoyaltyPoints[]
+  SkuPartner SkuPartner[]
+
   @@map("partners")
 }
 
@@ -431,6 +435,22 @@ model NotifyMe {
 
   @@map("notify_me")
 }
+model SkuPartner {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId  String   @db.ObjectId
+  partnerId  String   @db.ObjectId
+  sku_product String 
+  sku_partner String
+  product    Product  @relation(fields: [productId], references: [id])
+  partner    Partner  @relation(fields: [partnerId], references: [id])
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([productId, partnerId]) 
+  @@map("sku_partners")
+}
+
 
 model RelatedProduct {
   id                String   @id @default(auto()) @map("_id") @db.ObjectId

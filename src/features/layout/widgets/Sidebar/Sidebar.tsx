@@ -10,7 +10,8 @@ import {
   IconDeviceAnalytics,
   IconCurrencyDollar,
   IconDiscount,
-  IconGrain,
+  IconBuildingFactory2,
+  IconClipboardCheck,
 } from "@tabler/icons-react";
 
 import Link from "next/link";
@@ -146,11 +147,19 @@ const Sidebar = ({
           />
           <Divider />
           <SidebarSubMenu
-            icon={<IconGrain />}
+            icon={<IconBuildingFactory2 />}
             name="Manufacturer"
             onClick={() => push("/manufacturer/all")}
             isActive={pathname?.includes("manufacturer")}
             items={[{ name: "All", path: "/manufacturer/all" }]}
+          />
+          <Divider />
+          <SidebarSubMenu
+            icon={<IconClipboardCheck />}
+            name="Reservation"
+            onClick={() => push("/reservation/all")}
+            isActive={pathname?.includes("reservation")}
+            items={[{ name: "All", path: "/reservation/all" }]}
           />
 
           <Divider />

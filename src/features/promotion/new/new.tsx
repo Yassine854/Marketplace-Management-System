@@ -121,14 +121,15 @@ const NewPromotionPage = () => {
             <button
               type="button"
               onClick={() => router.push("/promotion/all")}
-              className="w-1/2 rounded-lg bg-gray-300 px-4 py-3 font-medium text-gray-700 shadow-md transition hover:bg-gray-400"
+              className="flex flex-1 items-center justify-center rounded-lg bg-gray-300 px-4 py-3 font-medium text-gray-700 shadow-md transition duration-300 hover:bg-gray-400 hover:text-gray-900 hover:shadow-lg"
             >
               Cancel
             </button>
+
             <button
               type="submit"
               disabled={loading}
-              className="flex w-1/2 items-center justify-center rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white shadow-md transition hover:bg-blue-700"
+              className="btn flex flex-1 items-center justify-center rounded-lg"
             >
               {loading ? (
                 <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>

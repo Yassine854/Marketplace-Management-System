@@ -28,9 +28,7 @@ const PromotionManagementPage = () => {
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
     {},
   );
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-
-  const pageSize = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const router = useRouter();
 
   useEffect(() => {
@@ -38,7 +36,7 @@ const PromotionManagementPage = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `/api/marketplace/promotion/getAll?page=${currentPage}&size=${pageSize}&search=${debouncedSearchTerm}&startDate=${activeFilters.startDate}&endDate=${activeFilters.endDate}`,
+          `/api/marketplace/promotion/getAll?page=${currentPage}&limit=${itemsPerPage}&search=${debouncedSearchTerm}&startDate=${activeFilters.startDate}&endDate=${activeFilters.endDate}`,
         );
         const data = await response.json();
 
@@ -58,7 +56,7 @@ const PromotionManagementPage = () => {
     };
 
     fetchPromotions();
-  }, [currentPage, debouncedSearchTerm, activeFilters]);
+  }, [currentPage, debouncedSearchTerm, activeFilters, itemsPerPage]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -77,7 +75,7 @@ const PromotionManagementPage = () => {
     );
   }
 
-  const totalPages = Math.ceil(totalPromotions / pageSize);
+  const totalPages = Math.ceil(totalPromotions / itemsPerPage);
 
   const handleUpdate = async (updatedPromotion: Promotion) => {
     try {
@@ -186,10 +184,10 @@ const PromotionManagementPage = () => {
               <p className="ml-4 mt-6 text-xl font-bold">
                 Promotion Management
               </p>
-              <div className="mt-6 flex items-center gap-4">
+              <div className="flex h-16 w-56  items-center justify-center  ">
                 <button
                   onClick={() => router.push("/promotion/new")}
-                  className="mr-4 flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"
+                  className="btn"
                   title="New Promotion"
                 >
                   <svg

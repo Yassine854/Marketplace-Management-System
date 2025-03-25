@@ -23,8 +23,7 @@ const ManufacturerManagementPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingManufacturer, setEditingManufacturer] =
     useState<Manufacturer | null>(null);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const pageSize = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const router = useRouter();
 
   useEffect(() => {
@@ -32,8 +31,9 @@ const ManufacturerManagementPage = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `/api/marketplace/supplier/getAll?page=${currentPage}&size=${pageSize}&search=${debouncedSearchTerm}`,
+          `/api/marketplace/supplier/getAll?page=${currentPage}&limit=${itemsPerPage}&search=${debouncedSearchTerm}`,
         );
+
         const data = await response.json();
 
         if (!response.ok) {
@@ -52,7 +52,7 @@ const ManufacturerManagementPage = () => {
     };
 
     fetchManufacturers();
-  }, [currentPage, debouncedSearchTerm]);
+  }, [currentPage, debouncedSearchTerm, itemsPerPage]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -71,7 +71,7 @@ const ManufacturerManagementPage = () => {
     );
   }
 
-  const totalPages = Math.ceil(totalManufacturers / pageSize);
+  const totalPages = Math.ceil(totalManufacturers / itemsPerPage);
 
   const handleUpdate = async (updatedManufacturer: Manufacturer) => {
     try {
@@ -173,20 +173,20 @@ const ManufacturerManagementPage = () => {
         }}
       >
         <div className="relative grid h-full w-full items-center justify-center gap-4">
-          <div className="box w-full min-w-[800px] xl:p-8">
+          <div className="box w-full min-w-[800px] xl:p-14">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
               <p className="ml-4 mt-6 text-xl font-bold">
                 Manufacturer Management
               </p>
-              <div className="mt-6 flex items-center gap-4">
+              <div className="flex h-12 items-center justify-center">
                 <button
                   onClick={() => router.push("/manufacturer/new")}
-                  className="mr-4 flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"
+                  className="btn flex items-center gap-2 px-3 py-2.5 text-sm"
                   title="New Manufacturer"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
+                    className="h-4 w-4"
                     viewBox="0 0 24 24"
                     strokeWidth="2"
                     stroke="currentColor"
@@ -198,7 +198,7 @@ const ManufacturerManagementPage = () => {
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  <span className="hidden md:inline">New Manufacturer</span>
+                  <span className="md:inline">New Manufacturer</span>
                 </button>
               </div>
             </div>

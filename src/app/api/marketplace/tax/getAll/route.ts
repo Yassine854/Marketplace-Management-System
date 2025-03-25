@@ -14,7 +14,7 @@ export async function GET(req: Request) {
 
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get("page") || "1", 10);
-    const size = parseInt(url.searchParams.get("size") || "10", 10);
+    const limit = parseInt(url.searchParams.get("limit") || "25", 10);
     const searchTerm = url.searchParams.get("search") || "";
 
     const filterConditions: any = {};
@@ -31,12 +31,12 @@ export async function GET(req: Request) {
       }
     }
 
-    const skip = (page - 1) * size;
+    const skip = (page - 1) * limit;
 
     const taxes = await prisma.tax.findMany({
       where: filterConditions,
       skip,
-      take: size,
+      take: limit,
     });
 
     const totalTaxes = await prisma.tax.count({
@@ -56,7 +56,7 @@ export async function GET(req: Request) {
         taxes,
         totalTaxes,
         currentPage: page,
-        totalPages: Math.ceil(totalTaxes / size),
+        totalPages: Math.ceil(totalTaxes / limit),
       },
       { status: 200 },
     );

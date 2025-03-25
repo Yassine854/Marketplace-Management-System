@@ -13,8 +13,9 @@ export async function GET(req: Request) {
     }
 
     const url = new URL(req.url);
+    ("");
     const page = parseInt(url.searchParams.get("page") || "1", 10);
-    const limit = parseInt(url.searchParams.get("limit") || "10", 10);
+    const limit = parseInt(url.searchParams.get("limit") || "25", 10);
 
     const promoPrice = url.searchParams.get("promoPrice");
     const searchTerm = url.searchParams.get("search");
