@@ -68,6 +68,8 @@ export async function PATCH(
     const formData = await req.formData();
 
     const name = formData.get("name") as string;
+    const isActive = formData.get("isActive") === "true";
+
     const imageFile = formData.get("image") as File | null;
 
     // Validate required field
@@ -134,6 +136,7 @@ export async function PATCH(
       where: { id },
       data: {
         name,
+        isActive,
         ...(imageUrl && { image: imageUrl }),
       },
     });

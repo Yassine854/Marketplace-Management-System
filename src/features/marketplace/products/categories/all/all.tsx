@@ -5,6 +5,7 @@ import { useRouter } from "@/libs/next-intl/i18nNavigation";
 type Category = {
   id: string;
   nameCategory: string;
+  isActive: boolean;
   image: string | null;
   createdAt: string;
   updatedAt: string;
@@ -221,6 +222,8 @@ const CategoryList = () => {
                     {/* Sort arrow */}
                   </div>
                 </td>
+                <td className="p-5">Active</td>
+
                 <td className="p-5">Subcategories</td>
                 <td className="p-5 text-center">Action</td>
               </tr>
@@ -258,6 +261,15 @@ const CategoryList = () => {
                       )}
                     </td>
                     <td className="px-3 py-2">{category.nameCategory}</td>
+                    <td className="px-3 py-2">
+                      <span
+                        className={`badge ${
+                          category.isActive ? "bg-success" : "bg-danger"
+                        }`}
+                      >
+                        {category.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
                     <td className="px-3 py-2">
                       {category.subCategories.length}
                     </td>

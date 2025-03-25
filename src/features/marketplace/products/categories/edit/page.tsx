@@ -10,8 +10,7 @@ const EditCategoryPage = () => {
   const [nameCategory, setNameCategory] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-
-  // Fetch category data when the component mounts
+  const [isActive, setIsActive] = useState<boolean>(true);
   useEffect(() => {
     const fetchCategory = async () => {
       setLoading(true);
@@ -20,7 +19,8 @@ const EditCategoryPage = () => {
         if (!response.ok) throw new Error("Failed to fetch category");
         const data = await response.json();
         setCategory(data.category);
-        setNameCategory(data.category.nameCategory); // Set initial value for the input
+        setNameCategory(data.category.nameCategory);
+        setIsActive(data.category.isActive);
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Failed to load category",
@@ -45,6 +45,7 @@ const EditCategoryPage = () => {
 
     const formData = new FormData();
     formData.append("nameCategory", nameCategory);
+    formData.append("isActive", isActive.toString());
     if (imageFile) formData.append("image", imageFile);
 
     try {
@@ -128,6 +129,35 @@ const EditCategoryPage = () => {
                   value={nameCategory}
                   onChange={(e) => setNameCategory(e.target.value)}
                 />
+              </div>
+              <div className="col-span-2 md:col-span-1">
+                <label className="mb-4 block font-medium md:text-lg">
+                  Category Status *
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="isActive" // Changed to match model field name
+                      value="true"
+                      checked={isActive === true}
+                      onChange={() => setIsActive(true)}
+                      className="accent-primary"
+                    />
+                    Active
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="isActive" // Changed to match model field name
+                      value="false"
+                      checked={isActive === false}
+                      onChange={() => setIsActive(false)}
+                      className="accent-primary"
+                    />
+                    Inactive
+                  </label>
+                </div>
               </div>
 
               {/* Image Upload */}

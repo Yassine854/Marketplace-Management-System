@@ -96,9 +96,12 @@ const Sidebar = ({
                 name: "Categories",
                 path: "/marketplace/products/categories/all",
               },
-              { name: "Suppliers", path: "/marketplace/suppliers/all" },
-              { name: "Tax", path: "/marketplace/taxes/all" },
-              { name: "Promotion", path: "/marketplace/promotions/all" },
+              { name: "Suppliers", path: "/marketplace/manufacturer/all" },
+              { name: "Tax", path: "/marketplace/products/taxe/all" },
+              {
+                name: "Promotion",
+                path: "/marketplace/products/promotion/all",
+              },
               {
                 name: "Product Type",
                 path: "/marketplace/products/ProductTypes/all",

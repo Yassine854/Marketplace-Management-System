@@ -19,29 +19,32 @@ export async function GET(
 
     const { id } = params;
 
-    const productCategory = await prisma.productCategory.findUnique({
+    const productSubCategory = await prisma.productSubCategory.findUnique({
       where: { id },
       include: {
         product: true, // Include related product details
-        category: true, // Include related category details
+        subcategory: true, // Include related category details
       },
     });
 
-    if (!productCategory) {
+    if (!productSubCategory) {
       return NextResponse.json(
-        { message: "ProductCategory not found" },
+        { message: "productSubCategory not found" },
         { status: 404 },
       );
     }
 
     return NextResponse.json(
-      { message: "ProductCategory retrieved successfully", productCategory },
+      {
+        message: "productSubCategory retrieved successfully",
+        productSubCategory,
+      },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching productCategory:", error);
+    console.error("Error fetching productSubCategory:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve productCategory" },
+      { error: "Failed to retrieve productSubCategory" },
       { status: 500 },
     );
   }
@@ -62,25 +65,25 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    const updatedProductCategory = await prisma.productCategory.update({
+    const updatedProductSubCategory = await prisma.productSubCategory.update({
       where: { id },
       data: {
         productId: body.productId,
-        categoryId: body.categoryId,
+        subcategory: body.categoryId,
       },
     });
 
     return NextResponse.json(
       {
-        message: "ProductCategory updated successfully",
-        productCategory: updatedProductCategory,
+        message: "productSubCategory updated successfully",
+        productSubCategory: updatedProductSubCategory,
       },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error updating productCategory:", error);
+    console.error("Error updating productSubCategory:", error);
     return NextResponse.json(
-      { error: "Failed to update productCategory" },
+      { error: "Failed to update productSubCategory" },
       { status: 500 },
     );
   }
@@ -100,17 +103,17 @@ export async function DELETE(
 
     const { id } = params;
 
-    // Delete the productCategory by ID
-    await prisma.productCategory.delete({ where: { id } });
+    // Delete the productSubCategory by ID
+    await prisma.productSubCategory.delete({ where: { id } });
 
     return NextResponse.json(
-      { message: "ProductCategory deleted successfully" },
+      { message: "productSubCategory deleted successfully" },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error deleting productCategory:", error);
+    console.error("Error deleting productSubCategory:", error);
     return NextResponse.json(
-      { error: "Failed to delete productCategory" },
+      { error: "Failed to delete productSubCategory" },
       { status: 500 },
     );
   }

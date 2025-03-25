@@ -13,6 +13,7 @@ const EditSubcategoryPage = () => {
   const [name, setName] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isActive, setIsActive] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchSubcategory = async () => {
@@ -25,6 +26,7 @@ const EditSubcategoryPage = () => {
         const data = await response.json();
         setSubcategory(data.subcategory);
         setName(data.subcategory.name);
+        setIsActive(data.subcategory.isActive);
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Failed to load subcategory",
@@ -49,6 +51,8 @@ const EditSubcategoryPage = () => {
 
     const formData = new FormData();
     formData.append("name", name);
+    formData.append("isActive", isActive.toString());
+
     if (imageFile) formData.append("image", imageFile);
 
     try {
@@ -140,6 +144,36 @@ const EditSubcategoryPage = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
+              </div>
+
+              <div className="col-span-2 md:col-span-1">
+                <label className="mb-4 block font-medium md:text-lg">
+                  SubCategory Status *
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="isActive"
+                      value="true"
+                      checked={isActive === true}
+                      onChange={() => setIsActive(true)}
+                      className="accent-primary"
+                    />
+                    Active
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="isActive"
+                      value="false"
+                      checked={isActive === false}
+                      onChange={() => setIsActive(false)}
+                      className="accent-primary"
+                    />
+                    Inactive
+                  </label>
+                </div>
               </div>
 
               {/* Image Upload */}

@@ -58,6 +58,7 @@ model Category {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   categoryId   Int?      // ID Magento
   nameCategory String
+  isActive     Boolean?  @default(true)
   image        String?             
   createdAt    DateTime?           @default(now())
   updatedAt    DateTime?           @updatedAt
@@ -80,7 +81,7 @@ model Warehouse {
 }
 model Product {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  product_id     Int      @unique // ID Magento
+  product_id     Int?      @unique // ID Magento
   sku            String   @unique
   name           String
   price          Float
@@ -91,8 +92,8 @@ model Product {
   website_ids    Int[]    @db.Int// IDs Magento des entrepôts
   image          String?
   url_key        String?
-  created_at     String  @map("created_at")
-  updated_at     String
+  created_at     String?  @map("created_at")
+  updated_at     String?
   stock_item     StockItem?
 
 
@@ -123,6 +124,9 @@ model Product {
   
   relatedProducts      RelatedProduct[] @relation("ProductToRelatedProduct")
   relatedTo            RelatedProduct[] @relation("RelatedProductToProduct")
+
+  createdAt       DateTime?       @default(now())
+  updatedAt       DateTime?       @updatedAt
 
   productSubCategories       ProductSubCategory[]
   favoriteProducts FavoriteProduct[]
@@ -470,6 +474,7 @@ model ProductSubCategory {
 model SubCategory {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String
+  isActive    Boolean?  @default(true)
   image       String?       
   categoryId  String    @db.ObjectId
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)

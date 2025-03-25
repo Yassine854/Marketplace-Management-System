@@ -62,6 +62,8 @@ export async function PATCH(
     const { id } = params;
     const formData = await req.formData();
     const nameCategory = formData.get("nameCategory") as string;
+    const isActive = formData.get("isActive") === "true";
+
     const imageFile = formData.get("image") as File | null;
 
     // Find the existing category
@@ -121,6 +123,7 @@ export async function PATCH(
       where: { id },
       data: {
         nameCategory,
+        isActive,
         image: imageUrl,
       },
     });

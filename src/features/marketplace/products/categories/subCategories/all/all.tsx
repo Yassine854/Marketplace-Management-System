@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 type Subcategory = {
   id: string;
   name: string;
+  isActive: boolean;
   image: string | null;
   createdAt: string;
   updatedAt: string;
@@ -93,11 +94,22 @@ const SubcategoryList = () => {
   );
 
   const sortedData = [...filteredData].sort((a, b) => {
-    const aValue = a[sortBy] ?? "";
-    const bValue = b[sortBy] ?? "";
-    return sortOrder === "asc"
-      ? aValue.localeCompare(bValue)
-      : bValue.localeCompare(aValue);
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+
+    if (typeof aValue === "string" && typeof bValue === "string") {
+      return sortOrder === "asc"
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    }
+
+    if (typeof aValue === "boolean" && typeof bValue === "boolean") {
+      return sortOrder === "asc"
+        ? Number(aValue) - Number(bValue)
+        : Number(bValue) - Number(aValue);
+    }
+
+    return 0;
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -250,6 +262,8 @@ const SubcategoryList = () => {
                     </svg>
                   </div>
                 </td>
+                <td className="p-5">Active</td>
+
                 <td className="p-5 text-center">Action</td>
               </tr>
             </thead>
@@ -286,6 +300,15 @@ const SubcategoryList = () => {
                       )}
                     </td>
                     <td className="px-3 py-2">{sub.name}</td>
+                    <td className="px-3 py-2">
+                      <span
+                        className={`badge ${
+                          sub.isActive ? "bg-success" : "bg-danger"
+                        }`}
+                      >
+                        {sub.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
                     <td className="py-2">
                       <div className="flex justify-center">
                         <div className="relative">
