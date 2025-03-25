@@ -15,9 +15,9 @@ const TaxManagementPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [totalTaxes, setTotalTaxes] = useState(0); // State to hold total taxes
-  const [deleteTaxId, setDeleteTaxId] = useState<string | null>(null); // State for the tax ID to delete
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  const [totalTaxes, setTotalTaxes] = useState(0);
+  const [deleteTaxId, setDeleteTaxId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const pageSize = 10;
   const router = useRouter();
 
@@ -35,7 +35,7 @@ const TaxManagementPage = () => {
         }
 
         setTaxes(data.taxes || []);
-        setTotalTaxes(data.total || 0);
+        setTotalTaxes(data.totalTaxes || 0);
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "An unknown error occurred",
@@ -51,6 +51,7 @@ const TaxManagementPage = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1);
     }, 500);
 
     return () => clearTimeout(handler);

@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 
 export async function GET(req: Request) {
   try {
-    // Authenticate user
     const session = await auth();
 
     if (!session?.user) {
@@ -14,9 +13,9 @@ export async function GET(req: Request) {
     }
 
     const url = new URL(req.url);
-    const page = parseInt(url.searchParams.get("page") || "1", 10); // Default to page 1
-    const size = parseInt(url.searchParams.get("size") || "10", 10); // Default to 10 items per page
-    const searchTerm = url.searchParams.get("search") || ""; // Optional search term
+    const page = parseInt(url.searchParams.get("page") || "1", 10);
+    const size = parseInt(url.searchParams.get("size") || "10", 10);
+    const searchTerm = url.searchParams.get("search") || "";
 
     const filterConditions: any = {};
 
@@ -26,8 +25,8 @@ export async function GET(req: Request) {
         filterConditions.value = parsedSearchTerm;
       } else {
         filterConditions.name = {
-          contains: searchTerm, // Assuming the search term might match a 'name' field
-          mode: "insensitive", // Case insensitive search
+          contains: searchTerm,
+          mode: "insensitive",
         };
       }
     }
@@ -37,7 +36,7 @@ export async function GET(req: Request) {
     const taxes = await prisma.tax.findMany({
       where: filterConditions,
       skip,
-      take: size, // Limit number of records per page
+      take: size,
     });
 
     const totalTaxes = await prisma.tax.count({
@@ -57,7 +56,7 @@ export async function GET(req: Request) {
         taxes,
         totalTaxes,
         currentPage: page,
-        totalPages: Math.ceil(totalTaxes / size), // Calculate total pages based on the total count
+        totalPages: Math.ceil(totalTaxes / size),
       },
       { status: 200 },
     );
