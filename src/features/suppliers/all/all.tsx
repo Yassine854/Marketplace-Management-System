@@ -3,8 +3,6 @@ import PurchaseTable from "../components/PurchaseTable/PurchaseTable";
 import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersAll";
 import { useRouter } from "next/navigation";
-//import Pagination from "@mui/material/Pagination";
-import styles from "../styles/pagination.module.css";
 import Pagination from "@/features/shared/elements/Pagination/Pagination";
 const SupplierPurchasesPage = () => {
   const { purchases, loading, error, fetchPurchases, total } =
@@ -23,7 +21,7 @@ const SupplierPurchasesPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await fetchPurchases(currentPage, pageSize, {
+        await fetchPurchases(currentPage, itemsPerPage, {
           search: debouncedSearchTerm,
           ...activeFilters,
         });
@@ -33,8 +31,7 @@ const SupplierPurchasesPage = () => {
     };
 
     fetchData();
-  }, [currentPage, debouncedSearchTerm, activeFilters]);
-
+  }, [currentPage, itemsPerPage, debouncedSearchTerm, activeFilters]);
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -68,6 +65,7 @@ const SupplierPurchasesPage = () => {
         flexDirection: "column",
         padding: "16px",
         boxSizing: "border-box",
+        marginLeft: "50px",
       }}
     >
       <div

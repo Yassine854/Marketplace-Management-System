@@ -20,4 +20,26 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {};
+export const Primary: Story = {
+  args: {
+    orders: [
+      {
+        status: "pending",
+        id: "1",
+        kamiounId: "k1",
+        state: "new",
+        total: 100,
+        createdAt: Date.now(),
+        customerId: "c1",
+        customerFirstname: "John",
+        customerLastname: "Doe",
+        deliveryAgentId: "d1",
+        items: [],
+        deliveryAgentName: "Agent Name",
+        deliveryDate: Date.now(),
+        deliveryStatus: "in transit",
+        source: "online",
+      },
+    ],
+  },
+};

@@ -26,9 +26,14 @@ const handlePDFGeneration = async (orderId: string) => {
   }
 };
 
-const OrdersTable = () => {
+import { Order } from "@/types/order";
+
+interface OrdersTableProps {
+  orders: Order[];
+}
+
+const OrdersTable = ({ orders }: OrdersTableProps) => {
   const {
-    orders,
     isLoading,
     selectOrder,
     selectAllOrders,

@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   try {
     const supplierIdString = supplierId.toString();
 
-    const products = await prisma.products.findMany({
+    const products = await prisma.product.findMany({
       where: {
         manufacturer: supplierIdString,
       },

@@ -8,8 +8,9 @@ import {
   IconList,
   IconShoppingCart,
   IconDeviceAnalytics,
+  IconBox,
 } from "@tabler/icons-react";
-
+import { FaBoxOpen } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 import { statuses } from "./statuses";
@@ -96,6 +97,20 @@ const Sidebar = ({
               pathname?.includes("order") && !pathname?.includes("audit-trail")
             }
           />
+          <Divider />
+
+          <SidebarSubMenu
+            icon={<IconBox className="text-lg text-primary" />}
+            name=" Order"
+            onClick={() => push("/order/state")}
+            isActive={pathname?.includes("state")}
+            items={[
+              { name: "State", path: "/order/state" },
+              { name: "Status", path: "/order/state" },
+            ]}
+          />
+
+          <Divider />
           <Divider />
           <SidebarSubMenu
             icon={<IconMap2 />}

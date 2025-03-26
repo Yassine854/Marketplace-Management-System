@@ -12,7 +12,13 @@ const OrdersPage = () => {
   const { orders } = useOrdersData();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Calcul du nombre total de pages
   const totalPages = Math.ceil(orders.length / itemsPerPage);
+
+  // Pagination des commandes
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedOrders = orders.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="flex h-full w-full flex-grow flex-col justify-between    ">
@@ -21,7 +27,7 @@ const OrdersPage = () => {
       </div>
       <Divider />
       <div className="    relative  flex w-full  flex-grow flex-col overflow-y-scroll  bg-n10 px-3">
-        <OrdersTable />
+        <OrdersTable orders={paginatedOrders} />
         {orders?.length == 0 && <AnyMatchingResults />}
       </div>
       <Divider />

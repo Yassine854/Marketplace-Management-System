@@ -12,33 +12,50 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
+    // 🟢 Handle FormData instead of req.json()
+    const formData = await req.formData();
+
+    const timestamp = Date.now();
+    const randomComponent = Math.floor(Math.random() * 1000000);
+    const uniqueProductId = parseInt(`${timestamp}${randomComponent}`);
 
     const newProduct = await prisma.product.create({
       data: {
-        product_id: body.product_id,
-        sku: body.sku,
-        name: body.name,
-        price: body.price,
-        special_price: body.special_price,
-        cost: body.cost,
-        manufacturer: body.manufacturer,
-        category_ids: body.category_ids,
-        website_ids: body.website_ids,
-        image: body.image,
-        url_key: body.url_key,
-        created_at: body.created_at,
-        updated_at: body.updated_at,
-        stock: body.stock,
-        promo: body.promo,
-        minimumQte: body.minimumQte,
-        maximumQte: body.maximumQte,
-        typePcbId: body.typePcbId,
-        productTypeId: body.productTypeId,
-        productStatusId: body.productStatusId,
-        supplierId: body.supplierId,
-        taxId: body.taxId,
-        promotionId: body.promotionId,
+        product_id: uniqueProductId,
+        name: formData.get("name") as string,
+        sku: formData.get("sku") as string,
+        skuPartner: formData.get("skuPartner") as string,
+        price: parseFloat(formData.get("price") as string),
+        cost: formData.get("cost")
+          ? parseFloat(formData.get("cost") as string)
+          : null,
+        stock: parseInt(formData.get("stock") as string),
+        promo: formData.get("promo") === "true",
+        minimumQte: formData.get("minimumQte")
+          ? parseInt(formData.get("minimumQte") as string)
+          : null,
+        maximumQte: formData.get("maximumQte")
+          ? parseInt(formData.get("maximumQte") as string)
+          : null,
+        sealableAlertQte: formData.get("sealableAlertQte")
+          ? parseInt(formData.get("sealableAlertQte") as string)
+          : null,
+        pcb: formData.get("pcb") as string,
+        weight: formData.get("weight")
+          ? parseFloat(formData.get("weight") as string)
+          : null,
+        description: formData.get("description")
+          ? (formData.get("description") as string)
+          : null,
+        typePcbId: formData.get("typePcbId") as string,
+        productTypeId: formData.get("productTypeId") as string,
+        productStatusId: formData.get("productStatusId") as string,
+        supplierId: formData.get("supplierId") as string,
+        taxId: formData.get("taxId") as string,
+        promotionId:
+          formData.get("promo") === "true" && formData.get("promotionId")
+            ? (formData.get("promotionId") as string)
+            : null, // Set to null if promo is not checked
       },
     });
 

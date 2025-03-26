@@ -56,15 +56,18 @@ model Log {
 
 model Category {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  categoryId   Int      @unique // ID Magento
+  categoryId   Int?      // ID Magento
   nameCategory String
+  isActive     Boolean?  @default(true)
   image        String?             
   createdAt    DateTime?           @default(now())
   updatedAt    DateTime?           @updatedAt
 
-  productCategories    ProductCategory[]  
+  supplierCategories    SupplierCategory[]  
   subCategories  SubCategory[]
 }
+
+
 
 model Warehouse {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -78,7 +81,7 @@ model Warehouse {
 }
 model Product {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  product_id     Int      @unique // ID Magento
+  product_id     Int?      @unique // ID Magento
   sku            String   @unique
   name           String
   price          Float
@@ -89,8 +92,8 @@ model Product {
   website_ids    Int[]    @db.Int// IDs Magento des entrepôts
   image          String?
   url_key        String?
-  created_at     String  @map("created_at")
-  updated_at     String
+  created_at     String?  @map("created_at")
+  updated_at     String?
   stock_item     StockItem?
 
 
@@ -122,7 +125,10 @@ model Product {
   relatedProducts      RelatedProduct[] @relation("ProductToRelatedProduct")
   relatedTo            RelatedProduct[] @relation("RelatedProductToProduct")
 
-  productCategories       ProductCategory[]
+  createdAt       DateTime?       @default(now())
+  updatedAt       DateTime?       @updatedAt
+
+  productSubCategories       ProductSubCategory[]
   favoriteProducts FavoriteProduct[]
   favoritePartners FavoritePartner[]
   orderItems OrderItem[]
@@ -168,6 +174,7 @@ model Manufacturer {
   updatedAt            DateTime @updatedAt
 
   products Product[]  
+  supplierCategories    SupplierCategory[]  
   @@map("manufacturers")
 }
 model Payment {
@@ -442,27 +449,38 @@ model RelatedProduct {
   @@map("related_products")
 }
 
-
-
-model ProductCategory {
+model SupplierCategory {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  productId  String    @db.ObjectId
+  supplierId String    @db.ObjectId
   categoryId String    @db.ObjectId
 
-  product    Product   @relation(fields: [productId], references: [id])
+  supplier   Manufacturer   @relation(fields: [supplierId], references: [id])
   category   Category  @relation(fields: [categoryId], references: [id])
 
-  // Remove the unique constraint to allow multiple entries for the same productId and categoryId
-  // @@unique([productId, categoryId])  
+  // @@unique([supplierId, categoryId])  
+}
+
+
+model ProductSubCategory {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  productId  String    @db.ObjectId
+  subcategoryId String    @db.ObjectId  
+
+  product    Product   @relation(fields: [productId], references: [id])
+  subcategory SubCategory  @relation(fields: [subcategoryId], references: [id])  
+  @@unique([productId, subcategoryId])
 }
 
 model SubCategory {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String
+  isActive    Boolean?  @default(true)
+  image       String?       
   categoryId  String    @db.ObjectId
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  productSubCategories       ProductSubCategory[]
 
   @@unique([name, categoryId]) 
 }
