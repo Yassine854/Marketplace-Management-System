@@ -100,6 +100,7 @@ const Sidebar = ({
               pathname?.includes("order") && !pathname?.includes("audit-trail")
             }
           />
+
           <Divider />
           <SidebarSubMenu
             icon={<IconMap2 />}

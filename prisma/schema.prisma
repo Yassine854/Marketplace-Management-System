@@ -677,7 +677,7 @@ model ReservationItem {
   discountedPrice Float
   weight         Float
   sku            String
-  taxId           String?   @db.ObjectId
+  taxId          String?   @db.ObjectId
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

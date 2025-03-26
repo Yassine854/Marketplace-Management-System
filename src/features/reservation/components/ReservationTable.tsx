@@ -1,58 +1,39 @@
 import { useEffect, useState } from "react";
-import PromoTableHead from "./ReservationTableHead";
-import PromoTableRow from "./ReservationTableRow";
-import PromoTableSkeleton from "./ReservationTableSkeleton";
-import { Promotion } from "../types/promo";
+import ReservationTableHead from "./ReservationTableHead";
+import ReservationTableRow from "./ReservationTableRow";
+import ReservationTableSkeleton from "./ReservationTableSkeleton";
+import { Reservation } from "../types/reservation";
 
-interface PromoTableProps {
-  data: Promotion[];
+interface ReservationTableProps {
+  data: Reservation[];
   loading: boolean;
-  onUpdate: (updatedPromo: Promotion) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
-  onEdit: (promotion: Promotion) => void;
 }
 
-const PromoTable = ({
+const ReservationTable = ({
   data,
   loading,
-  onUpdate,
   onDelete,
-  onEdit,
-}: PromoTableProps) => {
-  const [promotions, setPromotions] = useState<Promotion[]>(data);
+}: ReservationTableProps) => {
+  const [reservations, setReservations] = useState<Reservation[]>(data);
 
   useEffect(() => {
-    setPromotions(data);
+    setReservations(data);
   }, [data]);
-
-  const handleUpdatePromo = async (updatedPromo: Promotion) => {
-    try {
-      await onUpdate(updatedPromo);
-      setPromotions((prevPromotions) =>
-        prevPromotions.map((promo) =>
-          promo.id === updatedPromo.id ? updatedPromo : promo,
-        ),
-      );
-    } catch (error) {
-      console.error("Failed to update promotion:", error);
-    }
-  };
 
   return (
     <div className="w-full overflow-x-auto">
       <table className="w-full">
-        <PromoTableHead />
+        <ReservationTableHead />
         <tbody className="divide-y divide-gray-100">
           {loading ? (
-            <PromoTableSkeleton />
+            <ReservationTableSkeleton />
           ) : (
-            promotions.map((promotion) => (
-              <PromoTableRow
-                key={promotion.id}
-                promotion={promotion}
-                onUpdate={handleUpdatePromo}
+            reservations.map((reservation) => (
+              <ReservationTableRow
+                key={reservation.id}
+                reservation={reservation}
                 onDelete={onDelete}
-                onEdit={onEdit}
               />
             ))
           )}
@@ -62,4 +43,4 @@ const PromoTable = ({
   );
 };
 
-export default PromoTable;
+export default ReservationTable;

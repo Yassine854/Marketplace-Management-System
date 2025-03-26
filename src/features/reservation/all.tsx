@@ -1,49 +1,51 @@
 import { useEffect, useState } from "react";
-import PromotionTable from "./components/ReservationTable";
-import { useRouter } from "next/navigation";
+import ReservationTable from "./components/ReservationTable";
 import Pagination from "../shared/elements/pagination/pagination";
-import { Promotion } from "./types/promo";
+import { Reservation } from "./types/reservation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
 
-const PromotionManagementPage = () => {
-  const [promotions, setPromotions] = useState<Promotion[]>([]);
+const ReservationManagementPage = () => {
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [totalPromotions, setTotalPromotions] = useState(0);
-  const [deletePromotionId, setDeletePromotionId] = useState<string | null>(
+  const [totalReservations, setTotalReservations] = useState(0);
+  const [deleteReservationId, setDeleteReservationId] = useState<string | null>(
     null,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(
-    null,
-  );
-  const [showFilters, setShowFilters] = useState(false);
-  const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
-    {},
-  );
   const [itemsPerPage, setItemsPerPage] = useState(25);
-  const router = useRouter();
 
   useEffect(() => {
-    const fetchPromotions = async () => {
+    const fetchReservations = async () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `/api/marketplace/promotion/getAll?page=${currentPage}&limit=${itemsPerPage}&search=${debouncedSearchTerm}&startDate=${activeFilters.startDate}&endDate=${activeFilters.endDate}`,
+          `/api/marketplace/reservation/getAll?page=${currentPage}&limit=${itemsPerPage}&search=${debouncedSearchTerm}`,
         );
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch promotions");
+          throw new Error(data.message || "Failed to fetch reservations");
         }
 
-        setPromotions(data.promotions || []);
-        setTotalPromotions(data.totalPromotions || 0);
+        const transformedReservations = data.reservations.map(
+          (reservation: any) => ({
+            ...reservation,
+            reservationItems: reservation.reservationItems.map((item: any) => ({
+              ...item,
+              productName: item.product?.name ?? "N/A",
+              taxValue: item.tax?.value ?? 0,
+            })),
+          }),
+        );
+
+        setReservations(transformedReservations || []);
+        setTotalReservations(data.totalReservations || 0);
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "An unknown error occurred",
@@ -53,8 +55,8 @@ const PromotionManagementPage = () => {
       }
     };
 
-    fetchPromotions();
-  }, [currentPage, debouncedSearchTerm, activeFilters, itemsPerPage]);
+    fetchReservations();
+  }, [currentPage, debouncedSearchTerm, itemsPerPage]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -73,54 +75,19 @@ const PromotionManagementPage = () => {
     );
   }
 
-  const totalPages = Math.ceil(totalPromotions / itemsPerPage);
-
-  const handleUpdate = async (updatedPromotion: Promotion) => {
-    try {
-      const response = await fetch(
-        `/api/marketplace/promotion/${updatedPromotion.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            promoPrice: updatedPromotion.promoPrice,
-            startDate: updatedPromotion.startDate.toISOString(),
-            endDate: updatedPromotion.endDate.toISOString(),
-          }),
-        },
-      );
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Failed to update promotion");
-      }
-
-      setPromotions((prevPromotions) =>
-        prevPromotions.map((promotion) =>
-          promotion.id === updatedPromotion.id ? updatedPromotion : promotion,
-        ),
-      );
-
-      toast.success("Promotion updated successfully!");
-    } catch (error) {
-      toast.error(`Error: ${(error as Error).message}`);
-    }
-  };
+  const totalPages = Math.ceil(totalReservations / itemsPerPage);
 
   const handleDelete = async (id: string) => {
-    setDeletePromotionId(id);
+    setDeleteReservationId(id);
     setIsModalOpen(true);
   };
 
   const confirmDelete = async () => {
-    if (!deletePromotionId) return;
+    if (!deleteReservationId) return;
 
     try {
       const response = await fetch(
-        `/api/marketplace/promotion/${deletePromotionId}`,
+        `/api/marketplace/reservation/${deleteReservationId}`,
         {
           method: "DELETE",
         },
@@ -129,31 +96,22 @@ const PromotionManagementPage = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || "Failed to delete promotion");
+        throw new Error(result.message || "Failed to delete reservation");
       }
 
-      setPromotions((prevPromotions) =>
-        prevPromotions.filter(
-          (promotion) => promotion.id !== deletePromotionId,
+      setReservations((prevReservations) =>
+        prevReservations.filter(
+          (reservation) => reservation.id !== deleteReservationId,
         ),
       );
 
-      toast.success("Promotion deleted successfully!");
+      toast.success("Reservation deleted successfully!");
     } catch (error) {
       toast.error(`Error: ${(error as Error).message}`);
     } finally {
       setIsModalOpen(false);
-      setDeletePromotionId(null);
+      setDeleteReservationId(null);
     }
-  };
-
-  const handleEdit = (promotion: Promotion) => {
-    console.log(promotion);
-    setEditingPromotion(promotion);
-  };
-
-  const handleCloseEdit = () => {
-    setEditingPromotion(null);
   };
 
   return (
@@ -179,7 +137,7 @@ const PromotionManagementPage = () => {
         <div className="relative grid h-full w-full items-center justify-center gap-4">
           <div className="box w-full min-w-[800px] xl:p-8">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
-              <p className="ml-4 mt-6 text-xl font-bold">Reservation</p>
+              <p className="ml-4 mt-6 text-xl font-bold">Reservations</p>
             </div>
 
             <div className="mb-5 space-y-4">
@@ -194,26 +152,6 @@ const PromotionManagementPage = () => {
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                   🔍
                 </span>
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="rounded bg-gray-200 px-4 py-2"
-                >
-                  {showFilters ? "Hide Filters" : "Filters"}
-                </button>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(activeFilters).map(
-                  ([key, value]) =>
-                    value && (
-                      <span
-                        key={key}
-                        className="rounded-full bg-gray-100 px-2 py-1 text-sm"
-                      >
-                        {key}: {value}
-                      </span>
-                    ),
-                )}
               </div>
             </div>
 
@@ -221,12 +159,10 @@ const PromotionManagementPage = () => {
               className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
               style={{ maxHeight: "600px", width: "100%" }}
             >
-              <PromotionTable
-                data={promotions}
+              <ReservationTable
+                data={reservations}
                 loading={loading}
-                onUpdate={handleUpdate}
                 onDelete={handleDelete}
-                onEdit={handleEdit}
               />
             </div>
             <div>
@@ -252,4 +188,4 @@ const PromotionManagementPage = () => {
   );
 };
 
-export default PromotionManagementPage;
+export default ReservationManagementPage;

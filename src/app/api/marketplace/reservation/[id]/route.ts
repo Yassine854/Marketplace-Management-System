@@ -93,7 +93,9 @@ export async function DELETE(
     }
 
     const { id } = params;
-
+    await prisma.reservationItem.deleteMany({
+      where: { reservationId: id },
+    });
     await prisma.reservation.delete({ where: { id } });
 
     return NextResponse.json(

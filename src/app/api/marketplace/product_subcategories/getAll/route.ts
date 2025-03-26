@@ -1,4 +1,4 @@
-// app/api/productCategories/route.ts
+// app/api/productSubCategory/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
@@ -14,24 +14,25 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const productCategories = await prisma.productCategory.findMany({
+    // Fetch all product categories with product and subcategory data
+    const productSubCategory = await prisma.productSubCategory.findMany({
       include: {
         product: true, // Include related product details
-        category: true, // Include related category details
+        subcategory: true, // Include related subcategory details
       },
     });
 
     return NextResponse.json(
       {
-        message: "ProductCategories retrieved successfully",
-        productCategories,
+        message: "productSubCategory retrieved successfully",
+        productSubCategory,
       },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching productCategories:", error);
+    console.error("Error fetching productSubCategory:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve productCategories" },
+      { error: "Failed to retrieve productSubCategory" },
       { status: 500 },
     );
   }

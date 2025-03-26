@@ -32,30 +32,32 @@ const ManufacturerTableRow = ({
     <>
       <tr className="transition-colors duration-150 hover:bg-gray-50">
         <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-          {manufacturer.manufacturerId}
+          {manufacturer.manufacturerId ?? "undefined"}
         </td>
         <td className="px-6 py-4 text-sm text-gray-900">{manufacturer.code}</td>
         <td className="px-6 py-4 text-sm font-medium text-gray-900">
-          {manufacturer.companyName}
+          {manufacturer.companyName ?? "undefined"}
         </td>
         <td className="px-6 py-4 text-sm text-gray-900">
-          {manufacturer.contactName}
+          {manufacturer.contactName ?? "undefined"}
         </td>
         <td className="px-6 py-4 text-sm text-gray-900">
-          {manufacturer.phoneNumber}
+          {manufacturer.phoneNumber ?? "undefined"}
         </td>
         <td className="px-6 py-4 text-sm text-gray-900">
-          {manufacturer.email}
+          {manufacturer.email ?? "undefined"}
         </td>
         <td className="px-6 py-4 text-sm text-gray-900">
-          {manufacturer.address}
-        </td>
-        <td className="px-6 py-4 text-sm text-gray-900">{manufacturer.city}</td>
-        <td className="px-6 py-4 text-sm text-gray-900">
-          {manufacturer.country}
+          {manufacturer.address ?? "undefined"}
         </td>
         <td className="px-6 py-4 text-sm text-gray-900">
-          {manufacturer.capital}
+          {manufacturer.city ?? "undefined"}
+        </td>
+        <td className="px-6 py-4 text-sm text-gray-900">
+          {manufacturer.country ?? "undefined"}
+        </td>
+        <td className="px-6 py-4 text-sm text-gray-900">
+          {manufacturer.capital ?? "undefined"}
         </td>
         <td className="px-6 py-4 text-sm text-gray-900">
           {manufacturer.supplierCategories?.length
