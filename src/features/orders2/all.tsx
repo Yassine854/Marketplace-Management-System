@@ -1,51 +1,45 @@
 import { useEffect, useState } from "react";
-import PromotionTable from "./components/PromotionTable";
+import OrderTable from "./components/Order2Table"; // Update the import to your OrderTable component
 import { useRouter } from "next/navigation";
 import Pagination from "../shared/elements/pagination/pagination";
-import { Promotion } from "./types/promo";
+import { OrderWithRelations } from "./types/order"; // Update the import to your Order type
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
-import EditPromoForm from "./components/EditPromoForm";
-import AdvancedFilters from "./components/AdvancedFilters";
-
-const PromotionManagementPage = () => {
-  const [promotions, setPromotions] = useState<Promotion[]>([]);
+import EditOrderForm from "./components/EditOrderForm"; // Update the import to your EditOrderForm component
+import { downloadOrderPDF } from "./utils/pdfUtils";
+const OrderManagementPage = () => {
+  const [orders, setOrders] = useState<OrderWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [totalPromotions, setTotalPromotions] = useState(0);
-  const [deletePromotionId, setDeletePromotionId] = useState<string | null>(
-    null,
-  );
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [deleteOrderId, setDeleteOrderId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(
+  const [editingOrder, setEditingOrder] = useState<OrderWithRelations | null>(
     null,
-  );
-  const [showFilters, setShowFilters] = useState(false);
-  const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
-    {},
   );
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchPromotions = async () => {
+    const fetchOrders = async () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `/api/marketplace/promotion/getAll?page=${currentPage}&limit=${itemsPerPage}&search=${debouncedSearchTerm}&startDate=${activeFilters.startDate}&endDate=${activeFilters.endDate}`,
+          `/api/marketplace/orders/getAll?page=${currentPage}&limit=${itemsPerPage}&search=${debouncedSearchTerm}`,
         );
+
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch promotions");
+          throw new Error(data.message || "Failed to fetch orders");
         }
 
-        setPromotions(data.promotions || []);
-        setTotalPromotions(data.totalPromotions || 0);
+        setOrders(data.orders || []);
+        setTotalOrders(data.totalOrders || 0);
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "An unknown error occurred",
@@ -55,8 +49,8 @@ const PromotionManagementPage = () => {
       }
     };
 
-    fetchPromotions();
-  }, [currentPage, debouncedSearchTerm, activeFilters, itemsPerPage]);
+    fetchOrders();
+  }, [currentPage, debouncedSearchTerm, itemsPerPage]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -75,87 +69,87 @@ const PromotionManagementPage = () => {
     );
   }
 
-  const totalPages = Math.ceil(totalPromotions / itemsPerPage);
+  const totalPages = Math.ceil(totalOrders / itemsPerPage);
 
-  const handleUpdate = async (updatedPromotion: Promotion) => {
+  const handleUpdate = async (updatedOrder: OrderWithRelations) => {
     try {
       const response = await fetch(
-        `/api/marketplace/promotion/${updatedPromotion.id}`,
+        `/api/marketplace/orders/${updatedOrder.id}`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            promoPrice: updatedPromotion.promoPrice,
-            startDate: updatedPromotion.startDate.toISOString(),
-            endDate: updatedPromotion.endDate.toISOString(),
-          }),
+          body: JSON.stringify(updatedOrder),
         },
       );
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || "Failed to update promotion");
+        throw new Error(result.message || "Failed to update order");
       }
 
-      setPromotions((prevPromotions) =>
-        prevPromotions.map((promotion) =>
-          promotion.id === updatedPromotion.id ? updatedPromotion : promotion,
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === updatedOrder.id ? updatedOrder : order,
         ),
       );
 
-      toast.success("Promotion updated successfully!");
+      toast.success("Order updated successfully!");
     } catch (error) {
       toast.error(`Error: ${(error as Error).message}`);
     }
   };
 
   const handleDelete = async (id: string) => {
-    setDeletePromotionId(id);
+    setDeleteOrderId(id);
     setIsModalOpen(true);
   };
 
   const confirmDelete = async () => {
-    if (!deletePromotionId) return;
+    if (!deleteOrderId) return;
 
     try {
-      const response = await fetch(
-        `/api/marketplace/promotion/${deletePromotionId}`,
-        {
-          method: "DELETE",
-        },
-      );
+      const response = await fetch(`/api/marketplace/orders/${deleteOrderId}`, {
+        method: "DELETE",
+      });
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || "Failed to delete promotion");
+        throw new Error(result.message || "Failed to delete order");
       }
 
-      setPromotions((prevPromotions) =>
-        prevPromotions.filter(
-          (promotion) => promotion.id !== deletePromotionId,
-        ),
+      setOrders((prevOrders) =>
+        prevOrders.filter((order) => order.id !== deleteOrderId),
       );
 
-      toast.success("Promotion deleted successfully!");
+      toast.success("Order deleted successfully!");
     } catch (error) {
       toast.error(`Error: ${(error as Error).message}`);
     } finally {
       setIsModalOpen(false);
-      setDeletePromotionId(null);
+      setDeleteOrderId(null);
     }
   };
 
-  const handleEdit = (promotion: Promotion) => {
-    console.log(promotion);
-    setEditingPromotion(promotion);
+  const handleEdit = (order: OrderWithRelations) => {
+    setEditingOrder(order);
   };
+  const handleDownload = async (orderId: string): Promise<void> => {
+    const orderToDownload = orders.find((order) => order.id === orderId);
 
+    if (orderToDownload) {
+      try {
+        downloadOrderPDF(orderToDownload);
+      } catch (error) {
+        toast.error(`Error downloading order: ${(error as Error).message}`);
+      }
+    }
+  };
   const handleCloseEdit = () => {
-    setEditingPromotion(null);
+    setEditingOrder(null);
   };
 
   return (
@@ -176,23 +170,22 @@ const PromotionManagementPage = () => {
           backgroundColor: "white",
           padding: "16px",
           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+          marginLeft: "20px",
         }}
       >
         <div className="relative grid h-full w-full items-center justify-center gap-4">
-          <div className="box w-full min-w-[800px] xl:p-8">
+          <div className="box w-full min-w-[800px] xl:p-14">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
-              <p className="ml-4 mt-6 text-xl font-bold">
-                Promotion Management
-              </p>
-              <div className="flex h-16 w-56  items-center justify-center  ">
+              <p className="ml-4 mt-6 text-xl font-bold">Order Management</p>
+              <div className="flex h-12 items-center justify-center">
                 <button
-                  onClick={() => router.push("/promotion/new")}
-                  className="btn"
-                  title="New Promotion"
+                  onClick={() => router.push("/orders2/new")}
+                  className="btn flex items-center gap-2 px-3 py-2.5 text-sm"
+                  title="New Order"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
+                    className="h-4 w-4"
                     viewBox="0 0 24 24"
                     strokeWidth="2"
                     stroke="currentColor"
@@ -204,7 +197,7 @@ const PromotionManagementPage = () => {
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  <span className="hidden md:inline">New Promotion</span>
+                  <span className="md:inline">New Order</span>
                 </button>
               </div>
             </div>
@@ -213,7 +206,7 @@ const PromotionManagementPage = () => {
               <div className="relative flex w-full gap-2 sm:w-auto sm:min-w-[200px] sm:flex-1">
                 <input
                   type="text"
-                  placeholder="Search Promotions..."
+                  placeholder="Search Orders..."
                   className="w-[400px] rounded-lg border p-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -221,35 +214,6 @@ const PromotionManagementPage = () => {
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                   🔍
                 </span>
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="rounded bg-gray-200 px-4 py-2"
-                >
-                  {showFilters ? "Hide Filters" : "Filters"}
-                </button>
-              </div>
-
-              {showFilters && (
-                <AdvancedFilters
-                  onApply={(filters) => {
-                    setActiveFilters(filters);
-                    setCurrentPage(1);
-                  }}
-                />
-              )}
-
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(activeFilters).map(
-                  ([key, value]) =>
-                    value && (
-                      <span
-                        key={key}
-                        className="rounded-full bg-gray-100 px-2 py-1 text-sm"
-                      >
-                        {key}: {value}
-                      </span>
-                    ),
-                )}
               </div>
             </div>
 
@@ -257,14 +221,16 @@ const PromotionManagementPage = () => {
               className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
               style={{ maxHeight: "600px", width: "100%" }}
             >
-              <PromotionTable
-                data={promotions}
+              <OrderTable
+                data={orders}
                 loading={loading}
                 onUpdate={handleUpdate}
                 onDelete={handleDelete}
                 onEdit={handleEdit}
+                onDownload={handleDownload}
               />
             </div>
+
             <div>
               <Pagination
                 currentPage={currentPage}
@@ -279,9 +245,9 @@ const PromotionManagementPage = () => {
       </div>
       <ToastContainer />
 
-      {editingPromotion && (
-        <EditPromoForm
-          promotion={editingPromotion}
+      {editingOrder && (
+        <EditOrderForm
+          order={editingOrder}
           onClose={handleCloseEdit}
           onUpdate={handleUpdate}
         />
@@ -296,4 +262,4 @@ const PromotionManagementPage = () => {
   );
 };
 
-export default PromotionManagementPage;
+export default OrderManagementPage;

@@ -12,6 +12,7 @@ import {
   IconDiscount,
   IconBuildingFactory2,
   IconClipboardCheck,
+  IconPackage,
 } from "@tabler/icons-react";
 
 import Link from "next/link";
@@ -99,6 +100,13 @@ const Sidebar = ({
             isActive={
               pathname?.includes("order") && !pathname?.includes("audit-trail")
             }
+          />
+          <Divider />
+          <SidebarSubMenu
+            name={"Orders2"}
+            onClick={() => push("/orders2/all")}
+            isActive={pathname?.includes("orders2")}
+            items={[{ name: "All", path: "/orders2/all" }]}
           />
 
           <Divider />

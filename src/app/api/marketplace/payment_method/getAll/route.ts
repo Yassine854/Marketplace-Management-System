@@ -7,10 +7,10 @@ const prisma = new PrismaClient();
 // 🟢 GET: Retrieve all order payment methods
 export async function GET(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // const session = await auth();
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
     const orderPayments = await prisma.orderPayment.findMany({
       include: {

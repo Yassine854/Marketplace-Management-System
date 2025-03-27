@@ -8,11 +8,11 @@ const prisma = new PrismaClient();
 // GET: Retrieve all statuses
 export async function GET(req: Request) {
   try {
-    const session = await auth(); // Get user session
+    // const session = await auth(); // Get user session
 
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
     const statuses = await prisma.status.findMany({
       include: {

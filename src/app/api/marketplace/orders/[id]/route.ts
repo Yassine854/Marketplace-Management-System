@@ -4,7 +4,6 @@ import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve an order by ID
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
@@ -48,7 +47,6 @@ export async function GET(
   }
 }
 
-// 🟡 PATCH: Update an order by ID
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -80,7 +78,6 @@ export async function PATCH(
   }
 }
 
-// 🔴 DELETE: Remove an order by ID
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },

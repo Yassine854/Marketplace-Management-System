@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import ManufacturerTable from "./components/ManufacturerTable";
 import { useRouter } from "next/navigation";
 import Pagination from "../shared/elements/pagination/pagination";
-import styles from "../suppliers/styles/pagination.module.css";
 import { Manufacturer } from "./types/manufacturer";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

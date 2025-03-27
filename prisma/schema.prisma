@@ -576,22 +576,22 @@ model Order {
   state               State    @relation(fields: [stateId], references: [id]) 
 
   customerId          String   @db.ObjectId
-  customer            Customer @relation(fields: [customerId], references: [id]) 
+  customer          Customer @relation(fields: [customerId], references: [id]) 
 
-  agentId             String?  @db.ObjectId
-  agent               Agent?   @relation(fields: [agentId], references: [id]) 
+  agentId           String?  @db.ObjectId
+  agent             Agent?   @relation(fields: [agentId], references: [id]) 
 
-  reservationId       String?  @db.ObjectId @unique
-  reservation         Reservation? @relation
+  reservationId     String?  @db.ObjectId @unique
+  reservation       Reservation? @relation
 
-   mainOrderId   String?   @db.ObjectId
-  mainOrder     MainOrder? @relation(fields: [mainOrderId], references: [id])
+  mainOrderId       String?   @db.ObjectId
+  mainOrder         MainOrder? @relation(fields: [mainOrderId], references: [id])
 
 
-  partnerId           String   @db.ObjectId
-  partner            Partner   @relation(fields: [partnerId], references: [id]) 
-  orderItems OrderItem[]
-  loyaltyPoints LoyaltyPoints[]
+  partnerId         String   @db.ObjectId
+  partner           Partner   @relation(fields: [partnerId], references: [id]) 
+  orderItems        OrderItem[]
+  loyaltyPoints     LoyaltyPoints[]
   paymentMethodId   String       @db.ObjectId
   paymentMethod     OrderPayment @relation(fields: [paymentMethodId], references: [id]) // Each Order has 1 PaymentMethod
 

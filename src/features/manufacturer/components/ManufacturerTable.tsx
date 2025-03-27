@@ -3,7 +3,7 @@ import ManufacturerTableHead from "./ManufacturerTableHead";
 import ManufacturerTableRow from "./ManufacturerTableRow";
 import ManufacturerTableSkeleton from "./ManufacturerTableSkeleton";
 import { Manufacturer } from "../types/manufacturer";
-import { Category } from "../types/Category"; // Importez votre type Category si nécessaire
+import { Category } from "../types/Category";
 interface ManufacturerTableProps {
   data: Manufacturer[];
   categories: Category[];
@@ -15,7 +15,6 @@ interface ManufacturerTableProps {
 
 const ManufacturerTable = ({
   data,
-  categories,
   loading,
   onUpdate,
   onDelete,
