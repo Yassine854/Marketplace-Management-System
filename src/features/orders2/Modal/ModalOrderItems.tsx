@@ -6,6 +6,7 @@ interface ModalOrderItemsProps {
   isOpen: boolean;
   onClose: () => void;
   orderItems: OrderItemWithRelations[];
+  onUpdate?: (updatedItems: OrderItemWithRelations[]) => void;
 }
 
 const ModalOrderItems: React.FC<ModalOrderItemsProps> = ({

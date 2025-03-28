@@ -23,6 +23,7 @@ export type OrderItemWithRelations = OrderItem & {
   discountedPrice: number;
   weight: number;
   sku: string;
+  orderId: string;
 };
 
 export type OrderWithRelations = PrismaOrder & {

@@ -17,7 +17,6 @@ interface OrderTableRowProps {
 
 const OrderTableRow = ({
   order,
-  onUpdate,
   onDelete,
   onEdit,
   onDownload,
