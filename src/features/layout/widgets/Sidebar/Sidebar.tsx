@@ -101,13 +101,6 @@ const Sidebar = ({
               pathname?.includes("order") && !pathname?.includes("audit-trail")
             }
           />
-          <Divider />
-          <SidebarSubMenu
-            name={"Orders2"}
-            onClick={() => push("/orders2/all")}
-            isActive={pathname?.includes("orders2")}
-            items={[{ name: "All", path: "/orders2/all" }]}
-          />
 
           <Divider />
           <SidebarSubMenu
@@ -161,6 +154,15 @@ const Sidebar = ({
             onClick={() => push("/manufacturer/all")}
             isActive={pathname?.includes("manufacturer")}
             items={[{ name: "All", path: "/manufacturer/all" }]}
+          />
+
+          <Divider />
+          <SidebarSubMenu
+            icon={<IconShoppingCart />}
+            name="Orders2"
+            onClick={() => push("/orders2/all")}
+            isActive={pathname?.includes("orders2")}
+            items={[{ name: "All", path: "/orders2/all" }]}
           />
           <Divider />
           <SidebarSubMenu

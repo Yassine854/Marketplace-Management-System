@@ -36,6 +36,9 @@ const OrderTableHead = () => {
           Loyalty Points Value
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+          Is Active
+        </th>
+        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
           From Mobile
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">

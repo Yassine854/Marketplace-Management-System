@@ -2,7 +2,13 @@ import { useState, useEffect } from "react";
 import { OrderWithRelations, OrderItemWithRelations } from "../types/order";
 import { Status, State, Customer, Agent, Partner } from "@prisma/client";
 import ModalOrderItems from "../Modal/EditOrderItems";
-
+import { XCircleIcon } from "@heroicons/react/24/outline";
+import {
+  XMarkIcon,
+  PencilSquareIcon,
+  CheckIcon,
+  ArrowPathIcon,
+} from "@heroicons/react/24/outline";
 const EditOrderForm = ({
   order,
   onClose,
@@ -144,7 +150,21 @@ const EditOrderForm = ({
 
     fetchOptions();
   }, []);
+  const validateAmounts = (order: OrderWithRelations): boolean => {
+    const amountsToCheck = [
+      order.amountExclTaxe,
+      order.amountTTC,
+      order.amountBeforePromo,
+      order.amountAfterPromo,
+      order.amountRefunded,
+      order.amountCanceled,
+      order.amountOrdered,
+      order.amountShipped,
+      order.loyaltyPtsValue,
+    ];
 
+    return amountsToCheck.every((amount) => amount >= 0);
+  };
   const handleChange = (field: string, value: any) => {
     setUpdatedOrder((prev) => {
       if (
@@ -160,11 +180,20 @@ const EditOrderForm = ({
       return { ...prev, [field]: value };
     });
   };
+  const handleAmountChange = (field: string, value: string) => {
+    const numValue = Number(value);
+    if (numValue < 0) {
+      setError(`${field} must be non-negative`);
+      return;
+    }
+    setError("");
+    handleChange(field, numValue);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (updatedOrder.amountExclTaxe < 0 || updatedOrder.amountTTC < 0) {
-      setError("Amounts must be non-negative");
+    if (!validateAmounts(updatedOrder)) {
+      setError("All amounts must be non-negative numbers");
       return;
     }
 
@@ -185,17 +214,23 @@ const EditOrderForm = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-6 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4 backdrop-blur-sm">
       <form
         onSubmit={handleSubmit}
-        className="relative max-h-[80vh] w-full max-w-4xl space-y-5 overflow-y-auto rounded-xl border border-gray-300 bg-white p-10 shadow-lg"
+        className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-xl border border-gray-200 bg-white p-8 shadow-xl"
       >
-        <h2 className="mb-6 text-center text-3xl font-semibold text-gray-900">
-          Edit Order
-        </h2>
+        <div className="mb-6 flex items-start justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">Edit Order</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full p-1 text-gray-400 hover:text-gray-500 focus:outline-none"
+          >
+            <XMarkIcon className="h-6 w-6" />
+          </button>
+        </div>
 
         <div className="grid grid-cols-2 gap-6">
-          {/* Amount Excl. Tax */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Amount Excl. Tax
@@ -204,14 +239,14 @@ const EditOrderForm = ({
               type="number"
               value={updatedOrder.amountExclTaxe}
               onChange={(e) =>
-                handleChange("amountExclTaxe", Number(e.target.value))
+                handleAmountChange("amountExclTaxe", e.target.value)
               }
+              min="0"
               className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter amount excl. tax"
             />
           </div>
 
-          {/* Amount TTC */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Amount TTC
@@ -219,15 +254,13 @@ const EditOrderForm = ({
             <input
               type="number"
               value={updatedOrder.amountTTC}
-              onChange={(e) =>
-                handleChange("amountTTC", Number(e.target.value))
-              }
+              onChange={(e) => handleAmountChange("amountTTC", e.target.value)}
+              min="0"
               className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter amount TTC"
             />
           </div>
 
-          {/* Amount Before Promo */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Amount Before Promo
@@ -236,14 +269,14 @@ const EditOrderForm = ({
               type="number"
               value={updatedOrder.amountBeforePromo}
               onChange={(e) =>
-                handleChange("amountBeforePromo", Number(e.target.value))
+                handleAmountChange("amountBeforePromo", e.target.value)
               }
+              min="0"
               className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter amount before promo"
             />
           </div>
 
-          {/* Amount After Promo */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Amount After Promo
@@ -252,14 +285,13 @@ const EditOrderForm = ({
               type="number"
               value={updatedOrder.amountAfterPromo}
               onChange={(e) =>
-                handleChange("amountAfterPromo", Number(e.target.value))
+                handleAmountChange("amountAfterPromo", e.target.value)
               }
+              min="0"
               className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter amount after promo"
             />
           </div>
-
-          {/* Amount Refunded */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Amount Refunded
@@ -268,13 +300,13 @@ const EditOrderForm = ({
               type="number"
               value={updatedOrder.amountRefunded}
               onChange={(e) =>
-                handleChange("amountRefunded", Number(e.target.value))
+                handleAmountChange("amountRefunded", e.target.value)
               }
+              min="0"
               className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter amount refunded"
             />
           </div>
-          {/* Amount Ordered */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Amount Ordered
@@ -283,14 +315,13 @@ const EditOrderForm = ({
               type="number"
               value={updatedOrder.amountOrdered}
               onChange={(e) =>
-                handleChange("amountOrdered", Number(e.target.value))
+                handleAmountChange("amountOrdered", e.target.value)
               }
+              min="0"
               className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter amount ordered"
             />
           </div>
-
-          {/* Amount Shipped */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Amount Shipped
@@ -299,14 +330,13 @@ const EditOrderForm = ({
               type="number"
               value={updatedOrder.amountShipped}
               onChange={(e) =>
-                handleChange("amountShipped", Number(e.target.value))
+                handleAmountChange("amountShipped", e.target.value)
               }
+              min="0"
               className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter amount shipped"
             />
           </div>
-
-          {/* Amount Canceled */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Amount Canceled
@@ -315,13 +345,13 @@ const EditOrderForm = ({
               type="number"
               value={updatedOrder.amountCanceled}
               onChange={(e) =>
-                handleChange("amountCanceled", Number(e.target.value))
+                handleAmountChange("amountCanceled", e.target.value)
               }
+              min="0"
               className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter amount canceled"
             />
           </div>
-          {/* Shipping Method */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Shipping Method
@@ -334,8 +364,6 @@ const EditOrderForm = ({
               placeholder="Enter shipping method"
             />
           </div>
-
-          {/* Loyalty Points Value */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Loyalty Points Value
@@ -344,8 +372,9 @@ const EditOrderForm = ({
               type="number"
               value={updatedOrder.loyaltyPtsValue || 0}
               onChange={(e) =>
-                handleChange("loyaltyPtsValue", Number(e.target.value))
+                handleAmountChange("loyaltyPtsValue", e.target.value)
               }
+              min="0"
               className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter loyalty points value"
             />
@@ -364,7 +393,6 @@ const EditOrderForm = ({
             />
           </div>
 
-          {/* From Mobile */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               From Mobile
@@ -396,8 +424,6 @@ const EditOrderForm = ({
               </label>
             </div>
           </div>
-
-          {/* Weight */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Weight
@@ -410,8 +436,6 @@ const EditOrderForm = ({
               placeholder="Enter weight"
             />
           </div>
-
-          {/* State Dropdown */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               State
@@ -433,8 +457,6 @@ const EditOrderForm = ({
               </select>
             )}
           </div>
-
-          {/* Status Dropdown */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Status
@@ -456,8 +478,6 @@ const EditOrderForm = ({
               </select>
             )}
           </div>
-
-          {/* Customer Dropdown */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Customer
@@ -479,8 +499,6 @@ const EditOrderForm = ({
               </select>
             )}
           </div>
-
-          {/* Agent Dropdown */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Agent
@@ -502,8 +520,6 @@ const EditOrderForm = ({
               </select>
             )}
           </div>
-
-          {/* Partner Dropdown */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Partner
@@ -526,50 +542,60 @@ const EditOrderForm = ({
             )}
           </div>
         </div>
-
-        {/* Edit Order Items Button */}
         <button
           type="button"
           onClick={handleEditOrderItems}
-          className="mt-6 w-full rounded-md bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700"
+          className="mt-6 w-full rounded-md bg-blue-600 py-3 font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
-          Edit Order Items
+          <div className="flex items-center justify-center">
+            <PencilSquareIcon className="mr-2 h-5 w-5" />
+            Edit Order Items
+          </div>
         </button>
 
-        {/* Error Message */}
         {error && (
           <div className="mt-4 text-sm text-red-600">
             <p>{error}</p>
           </div>
         )}
 
-        {/* Submit Button */}
-        <div className="mt-8 flex justify-between">
+        <div className="flex justify-end gap-4 border-t border-gray-200 pt-4">
           <button
             type="button"
             onClick={onClose}
-            className="text-sm font-medium text-gray-600 hover:text-gray-900"
+            className="rounded-md bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            className={`rounded-md px-6 py-3 text-sm font-semibold focus:outline-none ${
-              isLoading
-                ? "cursor-not-allowed bg-gray-400"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
+            className="flex items-center gap-x-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isLoading ? "Updating..." : "Update Order"}
           </button>
         </div>
       </form>
+      {error && (
+        <div className="mt-4 rounded-md bg-red-50 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <XCircleIcon
+                className="h-5 w-5 text-red-400"
+                aria-hidden="true"
+              />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">{error}</h3>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showOrderItemsModal && (
         <ModalOrderItems
           isOpen={showOrderItemsModal}
-          orderItems={updatedOrder.orderItems || []} // `updatedOrder.orderItems` should be an array of OrderItemWithRelations
+          orderItems={updatedOrder.orderItems || []}
           onClose={() => setShowOrderItemsModal(false)}
           onUpdate={(updatedItems: OrderItemWithRelations[]) => {
             setUpdatedOrder((prevOrder) => ({

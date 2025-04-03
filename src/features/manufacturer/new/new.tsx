@@ -345,10 +345,13 @@ const NewManufacturerPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="btn flex flex-1 items-center justify-center rounded-lg"
+              className="flex flex-1 items-center justify-center rounded-lg bg-blue-600 px-4 py-3 font-medium text-white shadow-md transition duration-300 hover:bg-blue-700 hover:shadow-lg disabled:bg-gray-400 disabled:hover:shadow-md"
             >
               {loading ? (
-                <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                <>
+                  <span className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                  Saving...
+                </>
               ) : (
                 "Save"
               )}

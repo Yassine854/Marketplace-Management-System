@@ -11,6 +11,7 @@ interface OrderTableProps {
   onDelete: (id: string) => Promise<void>;
   onEdit: (order: OrderWithRelations) => void;
   onDownload: (orderId: string) => Promise<void>;
+  noOrdersMessage?: string;
 }
 
 const OrderTable = ({
@@ -20,12 +21,17 @@ const OrderTable = ({
   onDelete,
   onEdit,
   onDownload,
+  noOrdersMessage = "No orders found",
 }: OrderTableProps) => {
   const [orders, setOrders] = useState<OrderWithRelations[]>(data);
 
   useEffect(() => {
     setOrders(data);
   }, [data]);
+
+  if (data.length === 0 && !loading) {
+    return <div className="text-center text-gray-500">{noOrdersMessage}</div>;
+  }
 
   const handleUpdateOrder = async (updatedOrder: OrderWithRelations) => {
     try {

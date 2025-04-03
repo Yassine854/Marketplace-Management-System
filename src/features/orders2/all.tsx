@@ -1,13 +1,22 @@
 import { useEffect, useState } from "react";
-import OrderTable from "./components/Order2Table"; // Update the import to your OrderTable component
+import OrderTable from "./components/Order2Table";
 import { useRouter } from "next/navigation";
 import Pagination from "../shared/elements/pagination/pagination";
-import { OrderWithRelations } from "./types/order"; // Update the import to your Order type
+import { OrderWithRelations } from "./types/order";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
-import EditOrderForm from "./components/EditOrderForm"; // Update the import to your EditOrderForm component
+import EditOrderForm from "./components/EditOrderForm";
 import { downloadOrderPDF } from "./utils/pdfUtils";
+import AdvancedFilter from "./components/AdvancedFilter";
+import {
+  Agent,
+  OrderPayment,
+  Partner,
+  State,
+  Status,
+  Customer,
+} from "@prisma/client";
 const OrderManagementPage = () => {
   const [orders, setOrders] = useState<OrderWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,35 +31,161 @@ const OrderManagementPage = () => {
     null,
   );
   const [itemsPerPage, setItemsPerPage] = useState(25);
+  const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
+  const [filters, setFilters] = useState({
+    statusId: "",
+    stateId: "",
+    customerId: "",
+    agentId: "",
+    partnerId: "",
+    paymentMethodId: "",
+    fromMobile: "",
+    isActive: "",
+    minAmountExclTax: "",
+    maxAmountExclTax: "",
+    minAmountTTC: "",
+    maxAmountTTC: "",
+    minAmountBeforePromo: "",
+    maxAmountBeforePromo: "",
+    minAmountAfterPromo: "",
+    maxAmountAfterPromo: "",
+    minAmountRefunded: "",
+    maxAmountRefunded: "",
+    minAmountCanceled: "",
+    maxAmountCanceled: "",
+    minAmountOrdered: "",
+    maxAmountOrdered: "",
+    minAmountShipped: "",
+    maxAmountShipped: "",
+    minLoyaltyPtsValue: "",
+    maxLoyaltyPtsValue: "",
+    minAmount: "",
+    maxAmount: "",
+    minWeight: "",
+    maxWeight: "",
+    dateFrom: "",
+    dateTo: "",
+    shippingMethod: "",
+  });
+
+  const [statuses, setStatuses] = useState<Status[]>([]);
+  const [states, setStates] = useState<State[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<OrderPayment[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const router = useRouter();
+  const loadFilterData = async () => {
+    try {
+      const endpoints = [
+        {
+          url: "/api/marketplace/status/getAll",
+          setter: setStatuses,
+          dataKey: "statuses",
+        },
+        {
+          url: "/api/marketplace/state/getAll",
+          setter: setStates,
+          dataKey: "states",
+        },
+        {
+          url: "/api/marketplace/agents/getAll",
+          setter: setAgents,
+          dataKey: "agents",
+        },
+        {
+          url: "/api/marketplace/partners/getAll",
+          setter: setPartners,
+          dataKey: "partners",
+        },
+        {
+          url: "/api/marketplace/payment_method/getAll",
+          setter: setPaymentMethods,
+          dataKey: "orderPayments",
+        }, // Notez le dataKey différent ici
+        {
+          url: "/api/marketplace/customers/getAll",
+          setter: setCustomers,
+          dataKey: "customers",
+        },
+      ];
+
+      const results = await Promise.allSettled(
+        endpoints.map(async ({ url }) => {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`Failed to fetch ${url}`);
+          return res.json();
+        }),
+      );
+
+      results.forEach((result, index) => {
+        if (result.status === "fulfilled") {
+          const { dataKey, setter } = endpoints[index];
+          const dataArray = result.value[dataKey] || [];
+          setter(dataArray);
+        } else {
+          console.error(
+            `Error loading ${endpoints[index].url}:`,
+            result.reason,
+          );
+        }
+      });
+    } catch (error) {
+      console.error("Failed to load filter data:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `/api/marketplace/orders/getAll?page=${currentPage}&limit=${itemsPerPage}&search=${debouncedSearchTerm}`,
-        );
+    loadFilterData();
+  }, []);
+  useEffect(() => {
+    console.log("Statuses:", statuses);
+    console.log("States:", states);
+    console.log("Agents:", agents);
+    console.log("Partners:", partners);
+    console.log("Payment Methods:", paymentMethods);
+    console.log("Customers:", customers);
+  }, [statuses, states, agents, partners, paymentMethods, customers]);
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const url = new URL(
+        "/api/marketplace/orders/getAll",
+        window.location.origin,
+      );
+      url.searchParams.append("page", currentPage.toString());
+      url.searchParams.append("limit", itemsPerPage.toString());
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch orders");
-        }
-
-        setOrders(data.orders || []);
-        setTotalOrders(data.totalOrders || 0);
-      } catch (error) {
-        setError(
-          error instanceof Error ? error.message : "An unknown error occurred",
-        );
-      } finally {
-        setLoading(false);
+      if (debouncedSearchTerm) {
+        url.searchParams.append("searchById", debouncedSearchTerm);
       }
-    };
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) {
+          url.searchParams.append(key, value);
+        }
+      });
 
+      const response = await fetch(url.toString());
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch orders");
+      }
+
+      setOrders(data.orders || []);
+      setTotalOrders(data.totalOrders || 0);
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "An unknown error occurred",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchOrders();
-  }, [currentPage, debouncedSearchTerm, itemsPerPage]);
+  }, [currentPage, debouncedSearchTerm, itemsPerPage, filters]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -206,7 +341,7 @@ const OrderManagementPage = () => {
               <div className="relative flex w-full gap-2 sm:w-auto sm:min-w-[200px] sm:flex-1">
                 <input
                   type="text"
-                  placeholder="Search Orders..."
+                  placeholder="Search by Order ID..."
                   className="w-[400px] rounded-lg border p-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -214,8 +349,81 @@ const OrderManagementPage = () => {
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                   🔍
                 </span>
+                <button
+                  onClick={() => setShowAdvancedFilter(!showAdvancedFilter)}
+                  className="flex items-center gap-2 rounded-lg border bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Advanced Filter
+                </button>
               </div>
             </div>
+            {showAdvancedFilter && (
+              <AdvancedFilter
+                statuses={statuses}
+                states={states}
+                agents={agents}
+                partners={partners}
+                customers={customers}
+                paymentMethods={paymentMethods}
+                filters={filters}
+                onFilterChange={(newFilters) => setFilters(newFilters)}
+                onReset={() => {
+                  setFilters({
+                    statusId: "",
+                    stateId: "",
+                    customerId: "",
+                    agentId: "",
+                    partnerId: "",
+                    paymentMethodId: "",
+                    fromMobile: "",
+                    isActive: "",
+                    minAmount: "",
+                    maxAmount: "",
+                    minAmountExclTax: "",
+                    maxAmountExclTax: "",
+                    minAmountTTC: "",
+                    maxAmountTTC: "",
+                    minAmountBeforePromo: "",
+                    maxAmountBeforePromo: "",
+                    minAmountAfterPromo: "",
+                    maxAmountAfterPromo: "",
+                    minAmountRefunded: "",
+                    maxAmountRefunded: "",
+                    minAmountCanceled: "",
+                    maxAmountCanceled: "",
+                    minAmountOrdered: "",
+                    maxAmountOrdered: "",
+                    minAmountShipped: "",
+                    maxAmountShipped: "",
+                    minLoyaltyPtsValue: "",
+                    maxLoyaltyPtsValue: "",
+                    minWeight: "",
+                    maxWeight: "",
+                    dateFrom: "",
+                    dateTo: "",
+                    shippingMethod: "",
+                  });
+                  setShowAdvancedFilter(false);
+                }}
+                onApply={() => {
+                  setShowAdvancedFilter(false);
+                  setCurrentPage(1);
+                  fetchOrders();
+                }}
+              />
+            )}
 
             <div
               className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"

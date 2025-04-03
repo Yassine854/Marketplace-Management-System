@@ -37,6 +37,7 @@ export type OrderWithRelations = PrismaOrder & {
   amountShipped: number;
   shippingMethod: string;
   loyaltyPtsValue: number;
+  isActive: boolean;
   fromMobile: boolean;
   weight: number;
   createdAt: Date;

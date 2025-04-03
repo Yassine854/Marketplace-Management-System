@@ -19,7 +19,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, reservation }) => {
   if (!isOpen || !reservation) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md transition-opacity duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300">
       <div className="relative w-10/12 max-w-2xl scale-100 transform rounded-xl bg-white p-5 shadow-lg transition-all hover:scale-[1.02]">
         <div className="mb-3 flex items-center justify-between border-b pb-2">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-800">

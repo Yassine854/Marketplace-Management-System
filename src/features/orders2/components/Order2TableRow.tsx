@@ -37,6 +37,7 @@ const OrderTableRow = ({
         <td className="px-6 py-4">{order.amountShipped}</td>
         <td className="px-6 py-4">{order.shippingMethod}</td>
         <td className="px-6 py-4">{order.loyaltyPtsValue}</td>
+        <td className="px-6 py-4">{order.isActive ? "Yes" : "No"}</td>
         <td className="px-6 py-4">{order.fromMobile ? "Yes" : "No"}</td>
         <td className="px-6 py-4">{order.weight}</td>
         <td className="px-6 py-4">

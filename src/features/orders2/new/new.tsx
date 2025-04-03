@@ -9,6 +9,17 @@ const NewOrderPage = () => {
   const [stateId, setStateId] = useState("");
   const [customerId, setCustomerId] = useState("");
   const [paymentMethodId, setPaymentMethodId] = useState("");
+  const [amountBeforePromo, setAmountBeforePromo] = useState<number | string>(
+    "",
+  );
+  const [amountAfterPromo, setAmountAfterPromo] = useState<number | string>("");
+  const [amountRefunded, setAmountRefunded] = useState<number | string>("");
+  const [amountCanceled, setAmountCanceled] = useState<number | string>("");
+  const [amountOrdered, setAmountOrdered] = useState<number | string>("");
+  const [amountShipped, setAmountShipped] = useState<number | string>("");
+  const [weight, setWeight] = useState<number | string>("");
+  const [loyaltyPtsValue, setLoyaltyPtsValue] = useState<number | string>("");
+  const [fromMobile, setFromMobile] = useState<boolean>(false);
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
   const [states, setStates] = useState<any[]>([]);
   const [statuses, setStatuses] = useState<any[]>([]);
@@ -36,8 +47,6 @@ const NewOrderPage = () => {
 
         const statesRes = await fetch("/api/marketplace/state/getAll");
         const statesData = await statesRes.json();
-        console.log("States data:", statesData);
-
         if (statesData && Array.isArray(statesData.states)) {
           setStates(statesData.states);
         } else {
@@ -83,7 +92,15 @@ const NewOrderPage = () => {
       !statusId ||
       !stateId ||
       !customerId ||
-      !paymentMethodId
+      !paymentMethodId ||
+      !amountBeforePromo ||
+      !amountAfterPromo ||
+      !amountRefunded ||
+      !amountCanceled ||
+      !amountOrdered ||
+      !amountShipped ||
+      !weight ||
+      !loyaltyPtsValue
     ) {
       setError("Required fields are missing.");
       setLoading(false);
@@ -104,6 +121,15 @@ const NewOrderPage = () => {
           stateId,
           customerId,
           paymentMethodId,
+          amountBeforePromo,
+          amountAfterPromo,
+          amountRefunded,
+          amountCanceled,
+          amountOrdered,
+          amountShipped,
+          weight,
+          loyaltyPtsValue,
+          fromMobile,
         }),
       });
 
@@ -122,11 +148,10 @@ const NewOrderPage = () => {
       setLoading(false);
     }
   };
-
   return (
-    <div className="mt-20 flex h-screen w-full flex-col items-center justify-center bg-gray-100 p-6">
-      <div className="mt-36 w-full max-w-4xl rounded-2xl bg-white p-8 shadow-lg">
-        <h1 className="mb-6 text-center text-3xl font-bold text-gray-800">
+    <div className="mt-56 flex min-h-screen w-full items-center justify-center bg-gray-100 p-6">
+      <div className="w-full max-w-4xl transform rounded-2xl bg-white p-8 shadow-lg transition-transform hover:scale-105">
+        <h1 className="mb-6 text-center text-4xl font-bold text-gray-800">
           New Order
         </h1>
         {error && (
@@ -140,7 +165,7 @@ const NewOrderPage = () => {
           </p>
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <label
                 htmlFor="amountExclTaxe"
@@ -153,11 +178,10 @@ const NewOrderPage = () => {
                 value={amountExclTaxe}
                 onChange={(e) => setAmountExclTaxe(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Amount Excl. Tax"
               />
             </div>
-
             <div>
               <label
                 htmlFor="amountTTC"
@@ -170,11 +194,10 @@ const NewOrderPage = () => {
                 value={amountTTC}
                 onChange={(e) => setAmountTTC(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Amount TTC"
               />
             </div>
-
             <div>
               <label
                 htmlFor="shippingMethod"
@@ -187,12 +210,10 @@ const NewOrderPage = () => {
                 value={shippingMethod}
                 onChange={(e) => setShippingMethod(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Shipping Method"
               />
             </div>
-
-            {/* Status Dropdown */}
             <div>
               <label
                 htmlFor="statusId"
@@ -204,7 +225,7 @@ const NewOrderPage = () => {
                 value={statusId}
                 onChange={(e) => setStatusId(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Status</option>
                 {statuses.map((status) => (
@@ -214,8 +235,6 @@ const NewOrderPage = () => {
                 ))}
               </select>
             </div>
-
-            {/* State Dropdown */}
             <div>
               <label
                 htmlFor="stateId"
@@ -227,7 +246,7 @@ const NewOrderPage = () => {
                 value={stateId}
                 onChange={(e) => setStateId(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select State</option>
                 {states.map((state) => (
@@ -237,11 +256,9 @@ const NewOrderPage = () => {
                 ))}
               </select>
             </div>
-
-            {/* Customer Dropdown */}
             <div>
               <label
-                htmlFor="customerId"
+                htmlFor="customerId "
                 className="block font-medium text-gray-700"
               >
                 Customer
@@ -250,7 +267,7 @@ const NewOrderPage = () => {
                 value={customerId}
                 onChange={(e) => setCustomerId(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Customer</option>
                 {customers.map((customer) => (
@@ -260,8 +277,6 @@ const NewOrderPage = () => {
                 ))}
               </select>
             </div>
-
-            {/* Payment Method Dropdown */}
             <div>
               <label
                 htmlFor="paymentMethodId"
@@ -273,7 +288,7 @@ const NewOrderPage = () => {
                 value={paymentMethodId}
                 onChange={(e) => setPaymentMethodId(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Payment Method</option>
                 {paymentMethods.map((method) => (
@@ -282,6 +297,148 @@ const NewOrderPage = () => {
                   </option>
                 ))}
               </select>
+            </div>
+            <div>
+              <label
+                htmlFor="amountBeforePromo"
+                className="block font-medium text-gray-700"
+              >
+                Amount Before Promo
+              </label>
+              <input
+                type="number"
+                value={amountBeforePromo}
+                onChange={(e) => setAmountBeforePromo(e.target.value)}
+                required
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Amount Before Promo"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="amountAfterPromo"
+                className="block font-medium text-gray-700"
+              >
+                Amount After Promo
+              </label>
+              <input
+                type="number"
+                value={amountAfterPromo}
+                onChange={(e) => setAmountAfterPromo(e.target.value)}
+                required
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Amount After Promo"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="amountRefunded"
+                className="block font-medium text-gray-700"
+              >
+                Amount Refunded
+              </label>
+              <input
+                type="number"
+                value={amountRefunded}
+                onChange={(e) => setAmountRefunded(e.target.value)}
+                required
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Amount Refunded"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="amountCanceled"
+                className="block font-medium text-gray-700"
+              >
+                Amount Canceled
+              </label>
+              <input
+                type="number"
+                value={amountCanceled}
+                onChange={(e) => setAmountCanceled(e.target.value)}
+                required
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Amount Canceled"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="amountOrdered"
+                className="block font-medium text-gray-700"
+              >
+                Amount Ordered
+              </label>
+              <input
+                type="number"
+                value={amountOrdered}
+                onChange={(e) => setAmountOrdered(e.target.value)}
+                required
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Amount Ordered"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="amountShipped"
+                className="block font-medium text-gray-700"
+              >
+                Amount Shipped
+              </label>
+              <input
+                type="number"
+                value={amountShipped}
+                onChange={(e) => setAmountShipped(e.target.value)}
+                required
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Amount Shipped"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="weight"
+                className="block font-medium text-gray-700"
+              >
+                Weight
+              </label>
+              <input
+                type="number"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                required
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Weight"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="loyaltyPtsValue"
+                className="block font-medium text-gray-700"
+              >
+                Loyalty Points Value
+              </label>
+              <input
+                type="number"
+                value={loyaltyPtsValue}
+                onChange={(e) => setLoyaltyPtsValue(e.target.value)}
+                required
+                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Loyalty Points Value"
+              />
+            </div>
+            <div className="mt-4 flex items-center">
+              <input
+                type="checkbox"
+                checked={fromMobile}
+                onChange={(e) => setFromMobile(e.target.checked)}
+                className="h-5 w-5 rounded border-gray-300 text-blue-600 transition duration-200 focus:ring-blue-500"
+              />
+              <label className="ml-2 text-lg font-medium text-gray-700">
+                From Mobile
+              </label>
+              <span className="ml-2 text-sm text-gray-500">
+                (Check if the order is placed from a mobile device)
+              </span>
             </div>
           </div>
 
@@ -293,7 +450,6 @@ const NewOrderPage = () => {
             >
               Cancel
             </button>
-
             <button
               type="submit"
               disabled={loading}
@@ -307,5 +463,4 @@ const NewOrderPage = () => {
     </div>
   );
 };
-
 export default NewOrderPage;
