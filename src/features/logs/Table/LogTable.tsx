@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ContextModal from "../components/ContextModal";
 import { MilkRunUpdatedModal } from "../components/MilkRunUpdated";
 import { OrderEditedModal } from "../components/OrderEditedModal";
@@ -11,7 +11,10 @@ interface LogTableProps {
   error: string | null;
   refetch: () => void;
   isSidebarOpen: boolean;
+  onClearSelection: () => void;
   onLogSelection: (id: string) => void;
+  selectedLogs: any[];
+  setSelectedLogs: (logs: any[]) => void;
 }
 
 export default function LogTable({
@@ -21,6 +24,9 @@ export default function LogTable({
   refetch,
   isSidebarOpen,
   onLogSelection,
+  onClearSelection,
+  selectedLogs,
+  setSelectedLogs,
 }: LogTableProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContext, setSelectedContext] = useState<any>(null);
@@ -32,13 +38,15 @@ export default function LogTable({
 
   const [isAllSelected, setIsAllSelected] = useState(false);
 
+  const filteredLogs = logs; // Define filteredLogs as the full logs array or apply filtering logic if needed.
+
   const toggleSelectAll = () => {
     if (isAllSelected) {
-      setSelectedRows(new Set());
+      setSelectedRows(new Set()); // Désélectionner tous les logs
     } else {
-      setSelectedRows(new Set(logs.map((log) => log.id)));
+      setSelectedRows(new Set(filteredLogs.map((log) => log.id))); // Sélectionner tous les logs visibles
     }
-    setIsAllSelected(!isAllSelected);
+    setIsAllSelected(!isAllSelected); // Inverser l'état de "Sélectionner tout"
   };
 
   const toggleRowSelection = (id: string) => {
@@ -83,7 +91,7 @@ export default function LogTable({
   };
   const safeDataDisplay = (data: any) => {
     if (data === "error") {
-      return "error";
+      return "Erreur système";
     }
 
     if (typeof data === "object" && data !== null) {
@@ -93,30 +101,53 @@ export default function LogTable({
     return data && data !== "" ? data : "";
   };
 
-  const parseJsonSafely = (data: any) => {
-    if (typeof data === "string") {
-      try {
-        return JSON.parse(data);
-      } catch (error) {
-        console.error("Erreur de parsing JSON :", error);
-        return null;
-      }
+  const parseJsonSafely = (data: any): any | null => {
+    if (typeof data === "object") {
+      return data;
     }
-    return data;
+
+    if (data === "error") {
+      console.error("Erreur reçue : message d'erreur du serveur.");
+      return null;
+    }
+
+    try {
+      return JSON.parse(data);
+    } catch (error) {
+      console.error("Erreur lors de la lecture du JSON:", error);
+      return null;
+    }
   };
+  useEffect(() => {
+    if (selectedLogs.length === 0) {
+      setSelectedRows(new Set());
+      setIsAllSelected(false);
+    }
+  }, [selectedLogs]);
+
   return (
     <div style={{ overflowX: "auto" }}>
       <div
-        className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
-        style={{ maxHeight: "600px" }}
+        className="box mb-5 mt-5 flex w-full justify-between  rounded-lg bg-primary/5 p-0 dark:bg-bg3 "
+        style={{ maxHeight: "600px", overflowY: "auto", position: "relative" }}
       >
         <table
           border={0}
           cellPadding={0}
           cellSpacing={0}
-          style={{ width: "100%" }}
+          style={{ width: "100%", borderSpacing: 0 }}
         >
-          <thead className="border-b border-gray-100 bg-gray-50">
+          <thead
+            className="border-b border-gray-100 bg-gray-50"
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 0,
+              backgroundColor: "#fff",
+              padding: 0,
+              margin: 0,
+            }}
+          >
             <tr>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                 <input
@@ -146,7 +177,7 @@ export default function LogTable({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="pt-100 divide-y divide-gray-200 overflow-y-auto">
             {isLoading && (
               <tr>
                 <td className="px-4 py-4 text-center text-gray-600" colSpan={6}>
@@ -192,7 +223,7 @@ export default function LogTable({
                 return (
                   <tr
                     key={log.id}
-                    className="transition-colors duration-150 hover:bg-gray-50"
+                    className="transition-colors duration-150 hover:bg-gray-50 "
                   >
                     <td className="px-6 py-4 text-center text-sm font-semibold text-gray-900">
                       <input

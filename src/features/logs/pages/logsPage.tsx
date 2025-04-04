@@ -32,9 +32,13 @@ export default function LogsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [selectedLogs, setSelectedLogs] = useState<any[]>([]);
+  const [isAllSelected, setIsAllSelected] = useState(false);
+  const onClearSelection = () => setSelectedLogs([]);
 
-  const handleRefresh = () => {
-    refetch();
+  const refetchLogs = async () => {
+    await refetch();
+    onClearSelection();
+    setCurrentPage(1);
   };
 
   const parseJsonSafely = (data: any) => {
@@ -58,6 +62,10 @@ export default function LogsPage() {
   };
 
   const filteredLogs = useMemo(() => {
+    if (error) {
+      console.error("Erreur du serveur :", error);
+      return [];
+    }
     return logs
       .filter((log) => {
         const context = parseJsonSafely(log.context);
@@ -262,8 +270,10 @@ export default function LogsPage() {
             </button>
           ))}
           <button
-            onClick={handleRefresh}
-            className="rounded-t-lg bg-gray-100 px-4 py-2 hover:bg-gray-200"
+            onClick={() => {
+              refetchLogs();
+            }}
+            className="rounded-t bg-gray-100 px-4 py-2 hover:bg-gray-200"
           >
             <FaRedo className="mr-2" />
           </button>
@@ -276,7 +286,10 @@ export default function LogsPage() {
           isLoading={isLoading}
           error={error}
           refetch={refetch}
+          selectedLogs={selectedLogs}
+          setSelectedLogs={setSelectedLogs}
           isSidebarOpen={isSidebarOpen}
+          onClearSelection={onClearSelection}
           onLogSelection={(logId) => {
             const log = logs.find((l) => l.id === logId);
             if (log) {

@@ -11,7 +11,7 @@ import { useState } from "react";
 const OrdersPage = () => {
   const { orders } = useOrdersData();
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
 
   // Calcul du nombre total de pages
   const totalPages = Math.ceil(orders.length / itemsPerPage);
@@ -21,14 +21,33 @@ const OrdersPage = () => {
   const paginatedOrders = orders.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="flex h-full w-full flex-grow flex-col justify-between    ">
-      <div className=" mt-[4.8rem]  flex  w-full items-center justify-center   ">
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        padding: "16px",
+        paddingTop: "100px",
+        boxSizing: "border-box",
+      }}
+    >
+      <div
+        style={{
+          flexShrink: 0,
+          backgroundColor: "white",
+          padding: "16px",
+          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        }}
+      >
         <OrdersToolBar />
       </div>
       <Divider />
-      <div className="    relative  flex w-full  flex-grow flex-col overflow-y-scroll  bg-n10 px-3">
-        <OrdersTable orders={paginatedOrders} />
-        {orders?.length == 0 && <AnyMatchingResults />}
+      <div className="    relative  flex w-full  flex-grow flex-col overflow-hidden  bg-n10 px-3">
+        <div style={{ flexGrow: 1, margin: "16px 0", maxHeight: "600px" }}>
+          <OrdersTable orders={paginatedOrders} />
+          {orders?.length == 0 && <AnyMatchingResults />}
+        </div>
       </div>
       <Divider />
       <div>

@@ -45,7 +45,7 @@ export default function StatusTable({
   return (
     <div style={{ overflowX: "auto" }}>
       <div
-        className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+        className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3"
         style={{ maxHeight: "600px" }}
       >
         <table

@@ -9,7 +9,7 @@ const SupplierPurchasesPage = () => {
     usePurchaseStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
@@ -154,7 +154,7 @@ const SupplierPurchasesPage = () => {
             </div>
 
             <div
-              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3"
               style={{ maxHeight: "600px" }}
             >
               <PurchaseTable data={purchases} loading={loading} />
