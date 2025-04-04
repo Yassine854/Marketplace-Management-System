@@ -24,6 +24,13 @@ const NewOrderPage = () => {
   const [states, setStates] = useState<any[]>([]);
   const [statuses, setStatuses] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
+  const [agentId, setAgentId] = useState("");
+  const [agents, setAgents] = useState<any[]>([]);
+  const [reservationId, setReservationId] = useState("");
+  const [reservations, setReservations] = useState<any[]>([]);
+  const [reservationItems, setReservationItems] = useState<any[]>([]);
+  const [selectedItems, setSelectedItems] = useState<any[]>([]);
+  const [filteredStatuses, setFilteredStatuses] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -63,6 +70,7 @@ const NewOrderPage = () => {
 
         const customersRes = await fetch("/api/marketplace/customers/getAll");
         const customersData = await customersRes.json();
+
         if (customersData && Array.isArray(customersData.customers)) {
           const validCustomers = customersData.customers.filter(
             (customer: any) => customer.firstName && customer.lastName,
@@ -71,6 +79,24 @@ const NewOrderPage = () => {
         } else {
           setError("Invalid customers data format");
         }
+
+        const agentsRes = await fetch("/api/marketplace/agents/getAll");
+        const agentsData = await agentsRes.json();
+        if (agentsData && Array.isArray(agentsData.agents)) {
+          setAgents(agentsData.agents);
+        } else {
+          setError("Invalid agents data format");
+        }
+        const reservationsRes = await fetch(
+          "/api/marketplace/reservation/getAll",
+        );
+        const reservationsData = await reservationsRes.json();
+        console.log("API Response:", reservationsData);
+        if (reservationsData && Array.isArray(reservationsData.reservations)) {
+          setReservations(reservationsData.reservations);
+        } else {
+          setError("Invalid reservations data format");
+        }
       } catch (error) {
         setError("Error fetching data");
       }
@@ -78,6 +104,17 @@ const NewOrderPage = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (stateId) {
+      const filtered = statuses.filter((status) => status.stateId === stateId);
+      setFilteredStatuses(filtered);
+      setStatusId("");
+    } else {
+      setFilteredStatuses([]);
+      setStatusId("");
+    }
+  }, [stateId, statuses]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +129,7 @@ const NewOrderPage = () => {
       !statusId ||
       !stateId ||
       !customerId ||
+      !agentId ||
       !paymentMethodId ||
       !amountBeforePromo ||
       !amountAfterPromo ||
@@ -100,7 +138,8 @@ const NewOrderPage = () => {
       !amountOrdered ||
       !amountShipped ||
       !weight ||
-      !loyaltyPtsValue
+      !reservationId ||
+      selectedItems.length === 0
     ) {
       setError("Required fields are missing.");
       setLoading(false);
@@ -120,6 +159,7 @@ const NewOrderPage = () => {
           statusId,
           stateId,
           customerId,
+          agentId,
           paymentMethodId,
           amountBeforePromo,
           amountAfterPromo,
@@ -130,6 +170,13 @@ const NewOrderPage = () => {
           weight,
           loyaltyPtsValue,
           fromMobile,
+          reservationId,
+          orderItems: selectedItems.map((item) => ({
+            productId: item.productId,
+            qteOrdered: item.qteOrdered,
+            discountedPrice: item.discountedPrice,
+            weight: item.weight,
+          })),
         }),
       });
 
@@ -149,8 +196,8 @@ const NewOrderPage = () => {
     }
   };
   return (
-    <div className="mt-56 flex min-h-screen w-full items-center justify-center bg-gray-100 p-6">
-      <div className="w-full max-w-4xl transform rounded-2xl bg-white p-8 shadow-lg transition-transform hover:scale-105">
+    <div className="mt-60 flex min-h-screen w-full items-center justify-center bg-gray-100 p-6">
+      <div className="w-full max-w-6xl transform rounded-2xl bg-white p-8 shadow-lg">
         <h1 className="mb-6 text-center text-4xl font-bold text-gray-800">
           New Order
         </h1>
@@ -164,13 +211,11 @@ const NewOrderPage = () => {
             {success}
           </p>
         )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label
-                htmlFor="amountExclTaxe"
-                className="block font-medium text-gray-700"
-              >
+              <label className="block font-medium text-gray-700">
                 Amount Excl. Tax
               </label>
               <input
@@ -178,15 +223,12 @@ const NewOrderPage = () => {
                 value={amountExclTaxe}
                 onChange={(e) => setAmountExclTaxe(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Amount Excl. Tax"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div>
-              <label
-                htmlFor="amountTTC"
-                className="block font-medium text-gray-700"
-              >
+              <label className="block font-medium text-gray-700">
                 Amount TTC
               </label>
               <input
@@ -194,15 +236,14 @@ const NewOrderPage = () => {
                 value={amountTTC}
                 onChange={(e) => setAmountTTC(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Amount TTC"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label
-                htmlFor="shippingMethod"
-                className="block font-medium text-gray-700"
-              >
+              <label className="block font-medium text-gray-700">
                 Shipping Method
               </label>
               <input
@@ -210,43 +251,17 @@ const NewOrderPage = () => {
                 value={shippingMethod}
                 onChange={(e) => setShippingMethod(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Shipping Method"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div>
-              <label
-                htmlFor="statusId"
-                className="block font-medium text-gray-700"
-              >
-                Status
-              </label>
-              <select
-                value={statusId}
-                onChange={(e) => setStatusId(e.target.value)}
-                required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Status</option>
-                {statuses.map((status) => (
-                  <option key={status.id} value={status.id}>
-                    {status.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label
-                htmlFor="stateId"
-                className="block font-medium text-gray-700"
-              >
-                State
-              </label>
+              <label className="block font-medium text-gray-700">State</label>
               <select
                 value={stateId}
                 onChange={(e) => setStateId(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select State</option>
                 {states.map((state) => (
@@ -256,18 +271,38 @@ const NewOrderPage = () => {
                 ))}
               </select>
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label
-                htmlFor="customerId "
-                className="block font-medium text-gray-700"
+              <label className="block font-medium text-gray-700">Status</label>
+              <select
+                value={statusId}
+                onChange={(e) => setStatusId(e.target.value)}
+                required
+                disabled={!stateId}
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
               >
+                <option value="">
+                  {stateId ? "Select Status" : "Select State first"}
+                </option>
+                {filteredStatuses.map((status) => (
+                  <option key={status.id} value={status.id}>
+                    {status.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block font-medium text-gray-700">
                 Customer
               </label>
               <select
                 value={customerId}
                 onChange={(e) => setCustomerId(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Customer</option>
                 {customers.map((customer) => (
@@ -277,18 +312,34 @@ const NewOrderPage = () => {
                 ))}
               </select>
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label
-                htmlFor="paymentMethodId"
-                className="block font-medium text-gray-700"
+              <label className="block font-medium text-gray-700">Agent</label>
+              <select
+                value={agentId}
+                onChange={(e) => setAgentId(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
+                <option value="">Select Agent</option>
+                {agents.map((agent) => (
+                  <option key={agent.id} value={agent.id}>
+                    {agent.firstName} {agent.lastName}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block font-medium text-gray-700">
                 Payment Method
               </label>
               <select
                 value={paymentMethodId}
                 onChange={(e) => setPaymentMethodId(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Payment Method</option>
                 {paymentMethods.map((method) => (
@@ -298,11 +349,11 @@ const NewOrderPage = () => {
                 ))}
               </select>
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label
-                htmlFor="amountBeforePromo"
-                className="block font-medium text-gray-700"
-              >
+              <label className="block font-medium text-gray-700">
                 Amount Before Promo
               </label>
               <input
@@ -310,15 +361,12 @@ const NewOrderPage = () => {
                 value={amountBeforePromo}
                 onChange={(e) => setAmountBeforePromo(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Amount Before Promo"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div>
-              <label
-                htmlFor="amountAfterPromo"
-                className="block font-medium text-gray-700"
-              >
+              <label className="block font-medium text-gray-700">
                 Amount After Promo
               </label>
               <input
@@ -326,15 +374,14 @@ const NewOrderPage = () => {
                 value={amountAfterPromo}
                 onChange={(e) => setAmountAfterPromo(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Amount After Promo"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label
-                htmlFor="amountRefunded"
-                className="block font-medium text-gray-700"
-              >
+              <label className="block font-medium text-gray-700">
                 Amount Refunded
               </label>
               <input
@@ -342,15 +389,12 @@ const NewOrderPage = () => {
                 value={amountRefunded}
                 onChange={(e) => setAmountRefunded(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Amount Refunded"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div>
-              <label
-                htmlFor="amountCanceled"
-                className="block font-medium text-gray-700"
-              >
+              <label className="block font-medium text-gray-700">
                 Amount Canceled
               </label>
               <input
@@ -358,15 +402,14 @@ const NewOrderPage = () => {
                 value={amountCanceled}
                 onChange={(e) => setAmountCanceled(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Amount Canceled"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label
-                htmlFor="amountOrdered"
-                className="block font-medium text-gray-700"
-              >
+              <label className="block font-medium text-gray-700">
                 Amount Ordered
               </label>
               <input
@@ -374,15 +417,12 @@ const NewOrderPage = () => {
                 value={amountOrdered}
                 onChange={(e) => setAmountOrdered(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Amount Ordered"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div>
-              <label
-                htmlFor="amountShipped"
-                className="block font-medium text-gray-700"
-              >
+              <label className="block font-medium text-gray-700">
                 Amount Shipped
               </label>
               <input
@@ -390,31 +430,25 @@ const NewOrderPage = () => {
                 value={amountShipped}
                 onChange={(e) => setAmountShipped(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Amount Shipped"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label
-                htmlFor="weight"
-                className="block font-medium text-gray-700"
-              >
-                Weight
-              </label>
+              <label className="block font-medium text-gray-700">Weight</label>
               <input
                 type="number"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Weight"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div>
-              <label
-                htmlFor="loyaltyPtsValue"
-                className="block font-medium text-gray-700"
-              >
+              <label className="block font-medium text-gray-700">
                 Loyalty Points Value
               </label>
               <input
@@ -422,38 +456,140 @@ const NewOrderPage = () => {
                 value={loyaltyPtsValue}
                 onChange={(e) => setLoyaltyPtsValue(e.target.value)}
                 required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Loyalty Points Value"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
-            <div className="mt-4 flex items-center">
-              <input
-                type="checkbox"
-                checked={fromMobile}
-                onChange={(e) => setFromMobile(e.target.checked)}
-                className="h-5 w-5 rounded border-gray-300 text-blue-600 transition duration-200 focus:ring-blue-500"
-              />
-              <label className="ml-2 text-lg font-medium text-gray-700">
-                From Mobile
-              </label>
-              <span className="ml-2 text-sm text-gray-500">
-                (Check if the order is placed from a mobile device)
-              </span>
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex items-center pt-2">
+            <input
+              type="checkbox"
+              checked={fromMobile}
+              onChange={(e) => setFromMobile(e.target.checked)}
+              className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <label className="ml-2 text-gray-700">
+              From Mobile{" "}
+              <span className="text-sm text-gray-500">(mobile device)</span>
+            </label>
+          </div>
+
+          {/* Réservation */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="col-span-2">
+              <label className="block font-medium text-gray-700">
+                Reservation
+              </label>
+              <select
+                value={reservationId}
+                onChange={async (e) => {
+                  setReservationId(e.target.value);
+                  if (e.target.value) {
+                    try {
+                      const response = await fetch(
+                        `/api/marketplace/reservation_items/getAll?reservationId=${e.target.value}`,
+                      );
+                      const data = await response.json();
+                      setReservationItems(data.items || []);
+                    } catch (error) {
+                      setError("Failed to load reservation items");
+                    }
+                  } else {
+                    setReservationItems([]);
+                  }
+                  setSelectedItems([]);
+                }}
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Reservation</option>
+                {reservations.map((reservation) => (
+                  <option key={reservation.id} value={reservation.id}>
+                    Reservation #{reservation.id}
+                    {reservation.customer &&
+                      ` - ${reservation.customer.firstName} ${reservation.customer.lastName}`}
+                    {reservation.createdAt &&
+                      ` - ${new Date(
+                        reservation.createdAt,
+                      ).toLocaleDateString()}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Reservation Items */}
+          {reservationItems.length > 0 && (
+            <div className="col-span-2">
+              <h3 className="mb-2 text-lg font-medium text-gray-700">
+                Reservation Items
+              </h3>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                {reservationItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`flex items-center justify-between rounded-lg border p-3 ${
+                      selectedItems.some((selected) => selected.id === item.id)
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200"
+                    }`}
+                  >
+                    <div className="flex-1">
+                      <p className="font-medium">
+                        {item.product?.name || "Unknown Product"}
+                      </p>
+                      <div className="mt-1 grid grid-cols-3 gap-2 text-sm text-gray-600">
+                        <p>SKU: {item.sku}</p>
+                        <p>Qty: {item.qteOrdered}</p>
+                        <p>Price: {item.discountedPrice} DH</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (
+                          selectedItems.some(
+                            (selected) => selected.id === item.id,
+                          )
+                        ) {
+                          setSelectedItems(
+                            selectedItems.filter(
+                              (selected) => selected.id !== item.id,
+                            ),
+                          );
+                        } else {
+                          setSelectedItems([...selectedItems, item]);
+                        }
+                      }}
+                      className={`ml-3 rounded px-2 py-1 text-xs font-medium ${
+                        selectedItems.some(
+                          (selected) => selected.id === item.id,
+                        )
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {selectedItems.some((selected) => selected.id === item.id)
+                        ? "Selected"
+                        : "Select"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-4 pt-6">
             <button
               type="button"
               onClick={() => router.push("/orders2/all")}
-              className="flex flex-1 items-center justify-center rounded-lg bg-gray-300 px-4 py-3 font-medium text-gray-700 shadow-md transition duration-300 hover:bg-gray-400 hover:text-gray-900 hover:shadow-lg"
+              className="flex-1 rounded-lg bg-gray-300 px-4 py-2 font-medium text-gray-700 hover:bg-gray-400"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex flex-1 items-center justify-center rounded-lg bg-blue-600 px-4 py-3 font-medium text-white shadow-md transition duration-300 hover:bg-blue-700 hover:shadow-lg disabled:bg-gray-400"
+              className="flex-1 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:bg-gray-400"
             >
               {loading ? "Creating Order..." : "Create Order"}
             </button>
