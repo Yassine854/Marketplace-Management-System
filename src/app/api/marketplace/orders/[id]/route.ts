@@ -139,11 +139,18 @@ export async function DELETE(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    await prisma.orderItem.deleteMany({
+      where: { orderId: params.id },
+    });
 
-    await prisma.order.delete({ where: { id } });
+    const deletedOrder = await prisma.order.delete({
+      where: { id: params.id },
+    });
 
-    return NextResponse.json({ message: "Order deleted" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Order deleted successfully", order: deletedOrder },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Error deleting order:", error);
     return NextResponse.json(

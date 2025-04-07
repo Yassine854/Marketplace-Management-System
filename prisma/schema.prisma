@@ -593,7 +593,7 @@ model Order {
   orderItems        OrderItem[]
   loyaltyPoints     LoyaltyPoints[]
   paymentMethodId   String       @db.ObjectId
-  paymentMethod     OrderPayment @relation(fields: [paymentMethodId], references: [id]) // Each Order has 1 PaymentMethod
+  paymentMethod     OrderPayment @relation(fields: [paymentMethodId], references: [id]) 
 
 }
 
@@ -643,7 +643,7 @@ model Reservation {
   amountOrdered       Float
   amountShipped       Float
   shippingMethod      String
-  state               Boolean  @default(false)
+  isActive            Boolean  @default(false)
   loyaltyPtsValue     Int      @default(0)
   fromMobile          Boolean  @default(false)
   weight              Float
@@ -673,13 +673,12 @@ model Reservation {
 model ReservationItem {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   qteReserved    Int
-  qteCanceled    Int
   discountedPrice Float
   weight         Float
-  sku            String
+  sku            String    @unique 
   taxId          String?   @db.ObjectId
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   // Relationships
   reservationId  String   @db.ObjectId

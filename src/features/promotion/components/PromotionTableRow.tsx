@@ -8,7 +8,6 @@ import { downloadPromoPDF } from "../utils/pdfUtils";
 
 const PromoTableRow = ({
   promotion,
-  onUpdate,
   onDelete,
   onEdit,
 }: {

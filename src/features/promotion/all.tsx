@@ -184,29 +184,6 @@ const PromotionManagementPage = () => {
               <p className="ml-4 mt-6 text-xl font-bold">
                 Promotion Management
               </p>
-              <div className="flex h-16 w-56  items-center justify-center  ">
-                <button
-                  onClick={() => router.push("/promotion/new")}
-                  className="btn"
-                  title="New Promotion"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M12 5l0 14" />
-                    <path d="M5 12l14 0" />
-                  </svg>
-                  <span className="hidden md:inline">New Promotion</span>
-                </button>
-              </div>
             </div>
 
             <div className="mb-5 space-y-4">

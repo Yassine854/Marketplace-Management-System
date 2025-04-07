@@ -86,9 +86,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, reservation }) => {
                       <strong>Reserved:</strong> {item.qteReserved}
                     </p>
                     <p>
-                      <strong>Canceled:</strong> {item.qteCanceled}
-                    </p>
-                    <p>
                       <strong>Price:</strong> {item.discountedPrice} DT
                     </p>
                     <p>

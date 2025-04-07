@@ -83,13 +83,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, items }) => {
                         </span>
                       </div>
                       <div className="flex items-center text-gray-600">
-                        <Info className="mr-2 h-4 w-4 text-indigo-500" />
-                        <span>
-                          <span className="font-medium">Canceled:</span>{" "}
-                          {item.qteCanceled}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-gray-600">
                         <Scale className="mr-2 h-4 w-4 text-indigo-500" />
                         <span>
                           <span className="font-medium">Weight:</span>{" "}

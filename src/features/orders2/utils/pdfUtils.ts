@@ -168,7 +168,6 @@ export const downloadOrderPDF = (order: OrderWithRelations) => {
       (item) => [
         item.sku,
         item.qteReserved,
-        item.qteCanceled,
         item.discountedPrice,
         item.weight,
         item.product?.name || "N/A",

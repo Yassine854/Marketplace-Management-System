@@ -44,6 +44,18 @@ const ReservationTableHead = () => {
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
           Weight
         </th>
+        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+          Customer
+        </th>
+        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+          Agent
+        </th>
+        <th className="px-8 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+          Partner
+        </th>
+        <th className="px-8 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+          Payment Method
+        </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
           Created At
         </th>

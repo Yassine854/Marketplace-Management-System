@@ -22,7 +22,7 @@ export const downloadReservationPDF = (reservations: Reservation[]) => {
         reservation.amountOrdered,
         reservation.amountShipped,
         reservation.shippingMethod,
-        reservation.state ? "Active" : "Inactive",
+        reservation.isActive ? "Active" : "Inactive",
         reservation.loyaltyPtsValue,
         reservation.fromMobile ? "Yes" : "No",
         reservation.weight,
@@ -103,7 +103,6 @@ export const downloadReservationPDF = (reservations: Reservation[]) => {
       const itemTableData = reservation.reservationItems.map((item) => [
         item.sku,
         item.qteReserved,
-        item.qteCanceled,
         `${item.discountedPrice} DT`,
         `${item.weight} kg`,
         item.productName || "N/A",

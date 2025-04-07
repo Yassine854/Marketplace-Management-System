@@ -4,7 +4,6 @@ import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 POST: Create a new order
 export async function POST(req: Request) {
   try {
     const session = await auth();
@@ -14,6 +13,46 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
+    const reservation = await prisma.reservation.findUnique({
+      where: { id: body.reservationId },
+      include: { reservationItems: true },
+    });
+
+    if (!reservation) {
+      return NextResponse.json(
+        { error: `Reservation with ID ${body.reservationId} not found.` },
+        { status: 404 },
+      );
+    }
+
+    const stateName = body.isActive ? "Active" : "Inactive";
+    const state = await prisma.state.findUnique({
+      where: {
+        name: stateName,
+      },
+    });
+
+    if (!state) {
+      return NextResponse.json(
+        { error: `State with name ${stateName} not found.` },
+        { status: 400 },
+      );
+    }
+
+    let status = await prisma.status.findUnique({
+      where: {
+        name: "opened",
+      },
+    });
+
+    if (!status) {
+      status = await prisma.status.create({
+        data: {
+          name: "opened",
+          stateId: state.id,
+        },
+      });
+    }
     const newOrder = await prisma.order.create({
       data: {
         amountExclTaxe: body.amountExclTaxe,
@@ -28,18 +67,34 @@ export async function POST(req: Request) {
         loyaltyPtsValue: body.loyaltyPtsValue,
         fromMobile: body.fromMobile,
         weight: body.weight,
-        statusId: body.statusId,
-        stateId: body.stateId,
+        statusId: status.id,
+        stateId: state.id,
         customerId: body.customerId,
         agentId: body.agentId,
         reservationId: body.reservationId,
         partnerId: body.partnerId,
         paymentMethodId: body.paymentMethodId,
+        orderItems: {
+          create: reservation.reservationItems.map((item) => ({
+            qteOrdered: item.qteReserved,
+            qteRefunded: 0,
+            qteShipped: 0,
+            qteCanceled: 0,
+            discountedPrice: item.discountedPrice,
+            weight: item.weight,
+            sku: item.sku,
+            taxId: item.taxId,
+            productId: item.productId,
+          })),
+        },
+      },
+      include: {
+        orderItems: true,
       },
     });
 
     return NextResponse.json(
-      { message: "Order created", order: newOrder },
+      { message: "Order created with items", order: newOrder },
       { status: 201 },
     );
   } catch (error) {
