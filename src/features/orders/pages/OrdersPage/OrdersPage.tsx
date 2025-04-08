@@ -6,19 +6,24 @@ import { useOrdersData } from "../../hooks/queries/useOrdersData";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import Pagination from "@/features/shared/elements/Pagination/Pagination";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 const OrdersPage = () => {
-  const { orders } = useOrdersData();
+  const { orders, totalOrders, isLoading } = useOrdersData();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
 
-  // Calcul du nombre total de pages
-  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const totalPages = Math.ceil(totalOrders / itemsPerPage); // Calcul du nombre total de pages
 
   // Pagination des commandes
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedOrders = orders.slice(startIndex, startIndex + itemsPerPage);
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages); // Réinitialiser la page si elle dépasse le nombre total de pages
+    }
+  }, [totalPages, currentPage]);
 
   return (
     <div

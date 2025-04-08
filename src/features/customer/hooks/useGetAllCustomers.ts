@@ -1,24 +1,24 @@
 import { useState, useEffect } from "react";
 import { axios } from "@/libs/axios";
-import { State } from "@/types/state";
+import { Customer } from "@/types/customer";
 
-export const useGetAllStates = () => {
-  const [state, setState] = useState<State[]>([]);
+export const useGetAllCustomers = () => {
+  const [customer, setCustomer] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchStates = async () => {
+  const fetchCustomers = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const { data } = await axios.servicesClient.get<{ states: State[] }>(
-        "/api/marketplace/state/getAll",
-      );
-      console.log("received response ", data);
-      setState(data.states || []);
+      const { data } = await axios.servicesClient.get<{
+        customers: Customer[];
+      }>("/api/marketplace/customers/getAll");
+
+      setCustomer(data.customers || []);
     } catch (err) {
-      let errorMessage = "Failed to fetch states";
+      let errorMessage = "Failed to fetch customers";
 
       if (err instanceof Error) {
         errorMessage = err.message;
@@ -29,20 +29,20 @@ export const useGetAllStates = () => {
       }
 
       setError(errorMessage);
-      setState([]);
+      setCustomer([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchStates();
+    fetchCustomers();
   }, []);
   return {
-    state,
+    customer,
     isLoading,
     error,
-    refetch: fetchStates,
-    isEmpty: !isLoading && !error && state.length === 0,
+    refetch: fetchCustomers,
+    isEmpty: !isLoading && !error && customer.length === 0,
   };
 };

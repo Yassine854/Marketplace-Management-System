@@ -1,24 +1,24 @@
 import { useState, useEffect } from "react";
 import { axios } from "@/libs/axios";
-import { State } from "@/types/state";
+import { Agent } from "@/types/agent";
 
-export const useGetAllStates = () => {
-  const [state, setState] = useState<State[]>([]);
+export const useGetAllMethods = () => {
+  const [agent, setAgent] = useState<Agent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchStates = async () => {
+  const fetchAgent = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const { data } = await axios.servicesClient.get<{ states: State[] }>(
-        "/api/marketplace/state/getAll",
+      const { data } = await axios.servicesClient.get<{ agents: Agent[] }>(
+        "/api/marketplace/agents/getAll",
       );
-      console.log("received response ", data);
-      setState(data.states || []);
+
+      setAgent(data.agents || []);
     } catch (err) {
-      let errorMessage = "Failed to fetch states";
+      let errorMessage = "Failed to fetch agents";
 
       if (err instanceof Error) {
         errorMessage = err.message;
@@ -29,20 +29,20 @@ export const useGetAllStates = () => {
       }
 
       setError(errorMessage);
-      setState([]);
+      setAgent([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchStates();
+    fetchAgent();
   }, []);
   return {
-    state,
+    agent,
     isLoading,
     error,
-    refetch: fetchStates,
-    isEmpty: !isLoading && !error && state.length === 0,
+    refetch: fetchAgent,
+    isEmpty: !isLoading && !error && agent.length === 0,
   };
 };

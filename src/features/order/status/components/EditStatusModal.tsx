@@ -15,7 +15,12 @@ interface EditStatusModalProps {
   onSave: (updatedStatus: Status) => void;
 }
 
-const EditStatusModal = ({ isOpen, onClose, status }: EditStatusModalProps) => {
+const EditStatusModal = ({
+  isOpen,
+  onClose,
+  status,
+  onSave,
+}: EditStatusModalProps) => {
   const [name, setName] = useState("");
   const [stateId, setStateId] = useState("");
   const { editStatus, isLoading } = useStatusActions();
@@ -48,8 +53,10 @@ const EditStatusModal = ({ isOpen, onClose, status }: EditStatusModalProps) => {
 
   const handleUpdate = async () => {
     if (!name.trim() || !stateId) return;
-    await editStatus(status.id, { id: status.id, name: name.trim(), stateId });
-    onClose();
+    const updatedStatus = { id: status.id, name: name.trim(), stateId };
+    await editStatus(status.id, updatedStatus); // Mise à jour du statut
+    onSave(updatedStatus); // Appel de la fonction onSave pour rafraîchir la liste des statuts
+    onClose(); // Fermer la modal après modification
   };
 
   return (
