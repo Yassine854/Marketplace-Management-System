@@ -4,10 +4,8 @@ import { getAllLogs } from "@/services/logs/getAllLogs";
 import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async (request: NextRequest) => {
-  console.log("aaaaaaaaaa", request.method);
   try {
     const logs = await getAllLogs();
-    console.log("Fetched Logs:", logs);
 
     return NextResponse.json(
       {

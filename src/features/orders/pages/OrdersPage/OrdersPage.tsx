@@ -55,14 +55,8 @@ const OrdersPage = () => {
         </div>
       </div>
       <Divider />
-      <div>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={setItemsPerPage}
-        />
+      <div className=" flex  w-full items-center justify-center bg-n0 ">
+        <OrdersPagination />
       </div>
     </div>
   );

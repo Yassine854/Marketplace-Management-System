@@ -31,6 +31,17 @@ const ItemsPerPageSelector = () => {
         <IconChevronDown
           size={20}
           className={`duration-300 ${open && "rotate-180"}`}
+          style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            border: "1px solid #ccc",
+
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            transition: "background-color 0.3s, color 0.3s",
+          }}
         />
       </div>
       <ul className={tailwind.list(open)}>

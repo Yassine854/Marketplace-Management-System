@@ -50,7 +50,6 @@ export default function LogsPage() {
         try {
           return JSON.parse(data);
         } catch (error) {
-          console.error("Erreur de parsing JSON :", error);
           return data;
         }
       }
@@ -63,7 +62,6 @@ export default function LogsPage() {
 
   const filteredLogs = useMemo(() => {
     if (error) {
-      console.error("Erreur du serveur :", error);
       return [];
     }
     return logs

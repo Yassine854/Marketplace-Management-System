@@ -125,9 +125,7 @@ const Pagination: React.FC<PaginationProps> = ({
             height: "40px",
             borderRadius: "50%",
             border: "1px solid #ccc",
-            backgroundColor: currentPage === totalPages ? "#f0f0f0" : "white",
-            color: currentPage === totalPages ? "#ccc" : "black",
-            cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+
             display: "flex",
             justifyContent: "center",
             alignItems: "center",

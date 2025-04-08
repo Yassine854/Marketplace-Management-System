@@ -57,13 +57,12 @@ const Pagination: React.FC<PaginationProps> = ({
         </select>
       </div>
 
-      {/* Pagination à droite */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: "8px",
-          marginLeft: "auto", // Pousse la pagination vers la droite
+          marginLeft: "auto",
         }}
       >
         <button
