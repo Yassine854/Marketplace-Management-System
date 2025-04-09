@@ -1,14 +1,24 @@
 import { z } from "zod";
 
-export const ImageFormSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
-  images: z
-    .any()
-    .refine((files) => files && files.length > 0, "Image is required"),
-  startDate: z.string(),
-  endDate: z.string(),
-});
+export const ImageFormSchema = z
+  .object({
+    title: z.string().min(1, "Title is required"),
+    description: z.string().min(1, "Description is required"),
+    images: z
+      .instanceof(FileList)
+      .refine((files) => files.length > 0, "Image is required"),
+    startDate: z.string().min(1, "Start date is required"),
+    endDate: z.string().min(1, "End date is required"),
+  })
+  .refine(
+    (data) => {
+      return new Date(data.endDate) > new Date(data.startDate);
+    },
+    {
+      message: "End date must be after start date",
+      path: ["endDate"],
+    },
+  );
 
 export type ImageFormValues = z.infer<typeof ImageFormSchema>;
 export const CarouselFormSchema = z.object({
