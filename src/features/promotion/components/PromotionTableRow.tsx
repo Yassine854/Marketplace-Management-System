@@ -31,9 +31,11 @@ const PromoTableRow = ({
           {promotion.id}
         </td>
 
-        <td className="px-6 py-4">
-          <div className="text-sm font-medium text-gray-900">
-            {promotion.promoPrice} DT
+        <td className="min-w-[120px] px-6 py-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-900">
+              {promotion.promoPrice} DT
+            </span>
           </div>
         </td>
 
