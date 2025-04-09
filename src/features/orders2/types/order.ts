@@ -51,7 +51,7 @@ export type OrderWithRelations = PrismaOrder & {
     agent?: Agent;
     partner: Partner;
     customer: Customer;
-    paymentMethod: OrderPayment;
+    paymentMethod: OrderPayment | null;
     reservationItems: (ReservationItem & {
       product: Product & {
         name: string;
@@ -64,5 +64,6 @@ export type OrderWithRelations = PrismaOrder & {
   partner: Partner;
   orderItems: OrderItemWithRelations[];
   loyaltyPoints: LoyaltyPoints[];
-  paymentMethod: OrderPayment;
+  paymentMethod: OrderPayment | null;
+  paymentMethodId: string | null;
 };

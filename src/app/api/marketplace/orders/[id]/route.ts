@@ -92,8 +92,10 @@ export async function PATCH(
     if (body.partner) {
       data.partner = { connect: { id: body.partner.id } };
     }
-    if (body.paymentMethod) {
-      data.paymentMethod = { connect: { id: body.paymentMethod.id } };
+    if (body.paymentMethodId) {
+      data.paymentMethod = {
+        connect: { id: body.paymentMethodId },
+      };
     }
     if (body.orderItems) {
       data.orderItems = {

@@ -29,10 +29,10 @@ const OrderTableHead = () => {
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
           Amount Shipped
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
           Shipping Method
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="w-[150px] min-w-[150px] px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
           Loyalty Points Value
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -56,22 +56,22 @@ const OrderTableHead = () => {
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
           State
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
           Customer
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
           Agent
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
           Reservation
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="text-lcenter px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
           Partner
         </th>
-        <th className="px-8 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-8 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
           Order Items
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
           Payment Method
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">

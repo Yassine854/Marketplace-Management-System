@@ -1,14 +1,40 @@
 import { useState, useEffect } from "react";
 import { OrderWithRelations, OrderItemWithRelations } from "../types/order";
-import { Status, State, Customer, Agent, Partner } from "@prisma/client";
-import ModalOrderItems from "../Modal/EditOrderItems";
-import { XCircleIcon } from "@heroicons/react/24/outline";
 import {
+  Status,
+  State,
+  Customer,
+  Agent,
+  Partner,
+  OrderPayment,
+} from "@prisma/client";
+import ModalOrderItems from "../Modal/EditOrderItems";
+import {
+  XCircleIcon,
   XMarkIcon,
   PencilSquareIcon,
   CheckIcon,
   ArrowPathIcon,
+  CalculatorIcon,
+  ClipboardDocumentIcon,
+  CurrencyDollarIcon,
+  StarIcon,
+  TruckIcon,
+  CreditCardIcon,
+  ScaleIcon,
+  DevicePhoneMobileIcon,
+  CheckBadgeIcon,
+  UserCircleIcon,
+  IdentificationIcon,
+  HandRaisedIcon,
 } from "@heroicons/react/24/outline";
+
+interface AmountField {
+  label: string;
+  field: keyof OrderWithRelations;
+  icon: any;
+}
+
 const EditOrderForm = ({
   order,
   onClose,
@@ -18,9 +44,7 @@ const EditOrderForm = ({
   onClose: () => void;
   onUpdate: (updatedOrder: OrderWithRelations) => void;
 }) => {
-  const [updatedOrder, setUpdatedOrder] = useState<OrderWithRelations>({
-    ...order,
-  });
+  const [updatedOrder, setUpdatedOrder] = useState<OrderWithRelations>(order);
   const [error, setError] = useState("");
   const [showOrderItemsModal, setShowOrderItemsModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,129 +53,124 @@ const EditOrderForm = ({
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [paymentMethods, setPaymentMethods] = useState<OrderPayment[]>([]);
+  const amountFields: AmountField[] = [
+    {
+      label: "Amount Excl. Tax",
+      field: "amountExclTaxe",
+      icon: CurrencyDollarIcon,
+    },
+    { label: "Amount TTC", field: "amountTTC", icon: CurrencyDollarIcon },
+    {
+      label: "Amount Before Promo",
+      field: "amountBeforePromo",
+      icon: CurrencyDollarIcon,
+    },
+    {
+      label: "Amount After Promo",
+      field: "amountAfterPromo",
+      icon: CurrencyDollarIcon,
+    },
+    {
+      label: "Amount Refunded",
+      field: "amountRefunded",
+      icon: CurrencyDollarIcon,
+    },
+    {
+      label: "Amount Ordered",
+      field: "amountOrdered",
+      icon: CurrencyDollarIcon,
+    },
+    {
+      label: "Amount Shipped",
+      field: "amountShipped",
+      icon: CurrencyDollarIcon,
+    },
+    {
+      label: "Amount Canceled",
+      field: "amountCanceled",
+      icon: CurrencyDollarIcon,
+    },
+    { label: "Loyalty Points Value", field: "loyaltyPtsValue", icon: StarIcon },
+  ];
 
   useEffect(() => {
     const fetchOptions = async () => {
       try {
-        const stateData = await fetch("/api/marketplace/state/getAll").then(
-          (res) => res.json(),
+        const [
+          stateData,
+          statusData,
+          customerData,
+          agentData,
+          partnerData,
+          paymentMethodData,
+        ] = await Promise.all([
+          fetch("/api/marketplace/state/getAll").then((res) => res.json()),
+          fetch("/api/marketplace/status/getAll").then((res) => res.json()),
+          fetch("/api/marketplace/customers/getAll").then((res) => res.json()),
+          fetch("/api/marketplace/agents/getAll").then((res) => res.json()),
+          fetch("/api/marketplace/partners/getAll").then((res) => res.json()),
+          fetch("/api/marketplace/payment_method/getAll").then((res) =>
+            res.json(),
+          ),
+        ]);
+
+        const validPaymentMethods =
+          paymentMethodData?.orderPayments?.filter(
+            (method: OrderPayment) => method.id && method.name,
+          ) || [];
+        setPaymentMethods(validPaymentMethods);
+
+        setStates(
+          (stateData?.states || stateData).filter(
+            (state: State) => state.id && state.name,
+          ),
         );
-        const statusData = await fetch("/api/marketplace/status/getAll").then(
-          (res) => res.json(),
+        setStatuses(
+          (statusData?.statuses || statusData).filter(
+            (status: Status) => status.id && status.name,
+          ),
         );
-        const customerData = await fetch(
-          "/api/marketplace/customers/getAll",
-        ).then((res) => res.json());
-        const agentData = await fetch("/api/marketplace/agents/getAll").then(
-          (res) => res.json(),
+        setCustomers(
+          (customerData?.customers || customerData).filter(
+            (customer: Customer) =>
+              customer.id && customer.firstName && customer.lastName,
+          ),
         );
-        const partnerData = await fetch(
-          "/api/marketplace/partners/getAll",
-        ).then((res) => res.json());
-
-        if (Array.isArray(stateData)) {
-          setStates(
-            stateData.filter(
-              (state: State) => state.id != null && state.name != null,
-            ),
-          );
-        } else if (stateData?.states && Array.isArray(stateData.states)) {
-          setStates(
-            stateData.states.filter(
-              (state: State) => state.id != null && state.name != null,
-            ),
-          );
-        } else {
-          setError("Invalid data format for states.");
-        }
-
-        if (Array.isArray(statusData)) {
-          setStatuses(
-            statusData.filter(
-              (status: Status) => status.id != null && status.name != null,
-            ),
-          );
-        } else if (statusData?.statuses && Array.isArray(statusData.statuses)) {
-          setStatuses(
-            statusData.statuses.filter(
-              (status: Status) => status.id != null && status.name != null,
-            ),
-          );
-        } else {
-          setError("Invalid data format for statuses.");
-        }
-
-        if (Array.isArray(customerData)) {
-          setCustomers(
-            customerData.filter(
-              (customer: Customer) =>
-                customer.id != null &&
-                customer.firstName != null &&
-                customer.lastName != null,
-            ),
-          );
-        } else if (
-          customerData?.customers &&
-          Array.isArray(customerData.customers)
-        ) {
-          setCustomers(
-            customerData.customers.filter(
-              (customer: Customer) =>
-                customer.id != null &&
-                customer.firstName != null &&
-                customer.lastName != null,
-            ),
-          );
-        } else {
-          setError("Invalid data format for customers.");
-        }
-
-        if (Array.isArray(agentData)) {
-          setAgents(
-            agentData.filter(
-              (agent: Agent) =>
-                agent.id != null &&
-                agent.firstName != null &&
-                agent.lastName != null,
-            ),
-          );
-        } else if (agentData?.agents && Array.isArray(agentData.agents)) {
-          setAgents(
-            agentData.agents.filter(
-              (agent: Agent) =>
-                agent.id != null &&
-                agent.firstName != null &&
-                agent.lastName != null,
-            ),
-          );
-        } else {
-          setError("Invalid data format for agents.");
-        }
-
-        if (Array.isArray(partnerData?.partners)) {
-          setPartners(
-            partnerData.partners.filter(
-              (partner: Partner) =>
-                partner.id != null &&
-                partner.firstName != null &&
-                partner.lastName != null,
-            ),
-          );
-        } else {
-          setError("Invalid data format for partners.");
-        }
+        setAgents(
+          (agentData?.agents || agentData).filter(
+            (agent: Agent) => agent.id && agent.firstName && agent.lastName,
+          ),
+        );
+        setPartners(
+          (partnerData?.partners || []).filter(
+            (partner: Partner) =>
+              partner.id && partner.firstName && partner.lastName,
+          ),
+        );
       } catch (error) {
-        setError("Failed to fetch data.");
-      } finally {
-        setLoading(false);
+        setError("Failed to fetch data");
       }
     };
 
     fetchOptions();
   }, []);
+
+  useEffect(() => {
+    if (paymentMethods.length > 0 && order.paymentMethodId) {
+      const initialPaymentMethod = paymentMethods.find(
+        (m) => m.id === order.paymentMethodId,
+      );
+      setUpdatedOrder((prev) => ({
+        ...prev,
+        paymentMethod: initialPaymentMethod || null,
+        paymentMethodId: order.paymentMethodId || "",
+      }));
+    }
+  }, [order.paymentMethodId, paymentMethods]);
+
   const validateAmounts = (order: OrderWithRelations): boolean => {
-    const amountsToCheck = [
+    const amounts = [
       order.amountExclTaxe,
       order.amountTTC,
       order.amountBeforePromo,
@@ -162,28 +181,37 @@ const EditOrderForm = ({
       order.amountShipped,
       order.loyaltyPtsValue,
     ];
-
-    return amountsToCheck.every((amount) => amount >= 0);
+    return amounts.every((amount) => amount >= 0);
   };
-  const handleChange = (field: string, value: any) => {
+
+  const handleChange = (field: keyof OrderWithRelations, value: any) => {
     setUpdatedOrder((prev) => {
-      if (
-        field === "status" ||
-        field === "state" ||
-        field === "customer" ||
-        field === "agent" ||
-        field === "partner" ||
-        field === "paymentMethod"
-      ) {
+      if (field === "paymentMethodId") {
+        const selectedPaymentMethod = paymentMethods.find(
+          (m) => m.id === value,
+        );
+        return {
+          ...prev,
+          paymentMethod: selectedPaymentMethod || null,
+          paymentMethodId: value,
+        };
+      }
+
+      if (["status", "state", "customer", "agent", "partner"].includes(field)) {
         return { ...prev, [field]: { id: value } };
       }
+
       return { ...prev, [field]: value };
     });
   };
-  const handleAmountChange = (field: string, value: string) => {
+
+  const handleAmountChange = (
+    field: keyof OrderWithRelations,
+    value: string,
+  ) => {
     const numValue = Number(value);
     if (numValue < 0) {
-      setError(`${field} must be non-negative`);
+      setError(`${field.toString()} must be non-negative`);
       return;
     }
     setError("");
@@ -203,7 +231,7 @@ const EditOrderForm = ({
       onUpdate({ ...updatedOrder, updatedAt: new Date() });
       onClose();
     } catch (error) {
-      setError("An error occurred while updating the order.");
+      setError("An error occurred while updating the order");
     } finally {
       setIsLoading(false);
     }
@@ -214,392 +242,288 @@ const EditOrderForm = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
       <form
         onSubmit={handleSubmit}
-        className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-xl border border-gray-200 bg-white p-8 shadow-xl"
+        className="relative max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-xl bg-white shadow-2xl"
       >
-        <div className="mb-6 flex items-start justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Edit Order</h2>
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white p-6">
+          <h2 className="text-2xl font-bold text-gray-800">
+            Edit Order Details
+          </h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-1 text-gray-400 hover:text-gray-500 focus:outline-none"
+            className="rounded-lg p-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Amount Excl. Tax
-            </label>
-            <input
-              type="number"
-              value={updatedOrder.amountExclTaxe}
-              onChange={(e) =>
-                handleAmountChange("amountExclTaxe", e.target.value)
-              }
-              min="0"
-              className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter amount excl. tax"
-            />
-          </div>
+        <div className="space-y-6 p-6">
+          {error && (
+            <div className="rounded-lg bg-red-50 p-4">
+              <div className="flex items-center">
+                <XCircleIcon className="mr-2 h-5 w-5 text-red-500" />
+                <p className="text-sm font-medium text-red-700">{error}</p>
+              </div>
+            </div>
+          )}
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-6">
+            <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-800">
+              <CalculatorIcon className="mr-2 h-5 w-5" />
+              Amounts
+            </h3>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {amountFields.map(({ label, field, icon: Icon }) => (
+                <div className="space-y-1" key={field}>
+                  <label className="flex items-center text-sm font-medium text-gray-700">
+                    <Icon className="mr-1 h-4 w-4" />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Amount TTC
-            </label>
-            <input
-              type="number"
-              value={updatedOrder.amountTTC}
-              onChange={(e) => handleAmountChange("amountTTC", e.target.value)}
-              min="0"
-              className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter amount TTC"
-            />
-          </div>
+                    {label}
+                  </label>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Amount Before Promo
-            </label>
-            <input
-              type="number"
-              value={updatedOrder.amountBeforePromo}
-              onChange={(e) =>
-                handleAmountChange("amountBeforePromo", e.target.value)
-              }
-              min="0"
-              className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter amount before promo"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Amount After Promo
-            </label>
-            <input
-              type="number"
-              value={updatedOrder.amountAfterPromo}
-              onChange={(e) =>
-                handleAmountChange("amountAfterPromo", e.target.value)
-              }
-              min="0"
-              className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter amount after promo"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Amount Refunded
-            </label>
-            <input
-              type="number"
-              value={updatedOrder.amountRefunded}
-              onChange={(e) =>
-                handleAmountChange("amountRefunded", e.target.value)
-              }
-              min="0"
-              className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter amount refunded"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Amount Ordered
-            </label>
-            <input
-              type="number"
-              value={updatedOrder.amountOrdered}
-              onChange={(e) =>
-                handleAmountChange("amountOrdered", e.target.value)
-              }
-              min="0"
-              className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter amount ordered"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Amount Shipped
-            </label>
-            <input
-              type="number"
-              value={updatedOrder.amountShipped}
-              onChange={(e) =>
-                handleAmountChange("amountShipped", e.target.value)
-              }
-              min="0"
-              className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter amount shipped"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Amount Canceled
-            </label>
-            <input
-              type="number"
-              value={updatedOrder.amountCanceled}
-              onChange={(e) =>
-                handleAmountChange("amountCanceled", e.target.value)
-              }
-              min="0"
-              className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter amount canceled"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Shipping Method
-            </label>
-            <input
-              type="text"
-              value={updatedOrder.shippingMethod || ""}
-              onChange={(e) => handleChange("shippingMethod", e.target.value)}
-              className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter shipping method"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Loyalty Points Value
-            </label>
-            <input
-              type="number"
-              value={updatedOrder.loyaltyPtsValue || 0}
-              onChange={(e) =>
-                handleAmountChange("loyaltyPtsValue", e.target.value)
-              }
-              min="0"
-              className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter loyalty points value"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Payment Method
-            </label>
-            <input
-              type="text"
-              value={updatedOrder.paymentMethod.name}
-              onChange={(e) => handleChange("paymentMethod", e.target.value)}
-              className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter payment method"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              From Mobile
-            </label>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                Is this order from a mobile device?
-              </span>
-              <label className="inline-flex cursor-pointer items-center">
-                <span className="mr-2 text-sm text-gray-600">No</span>
-                <input
-                  type="checkbox"
-                  checked={updatedOrder.fromMobile || false}
-                  onChange={(e) => handleChange("fromMobile", e.target.checked)}
-                  className="toggle-checkbox hidden"
-                />
-                <span
-                  className={`toggle-slider relative inline-block h-6 w-12 rounded-full transition-all duration-300 ease-in-out ${
-                    updatedOrder.fromMobile ? "bg-blue-500" : "bg-gray-200"
-                  }`}
-                >
-                  <span
-                    className={`dot absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-all duration-300 ease-in-out ${
-                      updatedOrder.fromMobile ? "translate-x-6 transform" : ""
-                    }`}
-                  ></span>
-                </span>
-                <span className="ml-2 text-sm text-gray-600">Yes</span>
-              </label>
+                  <input
+                    type="number"
+                    value={Number(updatedOrder[field]) || 0}
+                    onChange={(e) => handleAmountChange(field, e.target.value)}
+                    min="0"
+                    className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+              ))}
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Weight
-            </label>
-            <input
-              type="number"
-              value={updatedOrder.weight || 0}
-              onChange={(e) => handleChange("weight", Number(e.target.value))}
-              className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter weight"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              State
-            </label>
-            {loading ? (
-              <p>Loading states...</p>
-            ) : (
-              <select
-                value={updatedOrder.state?.id || ""}
-                onChange={(e) => handleChange("state", e.target.value)}
-                className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select State</option>
-                {states.map((state) => (
-                  <option key={state.id} value={state.id}>
-                    {state.name}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Status
-            </label>
-            {loading ? (
-              <p>Loading statuses...</p>
-            ) : (
-              <select
-                value={updatedOrder.status?.id || ""}
-                onChange={(e) => handleChange("status", e.target.value)}
-                className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Status</option>
-                {statuses.map((status) => (
-                  <option key={status.id} value={status.id}>
-                    {status.name}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Customer
-            </label>
-            {loading ? (
-              <p>Loading customers...</p>
-            ) : (
-              <select
-                value={updatedOrder.customer?.id || ""}
-                onChange={(e) => handleChange("customer", e.target.value)}
-                className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Customer</option>
-                {customers.map((customer) => (
-                  <option key={customer.id} value={customer.id}>
-                    {customer.firstName} {customer.lastName}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Agent
-            </label>
-            {loading ? (
-              <p>Loading agents...</p>
-            ) : (
-              <select
-                value={updatedOrder.agent?.id || ""}
-                onChange={(e) => handleChange("agent", e.target.value)}
-                className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Agent</option>
-                {agents.map((agent) => (
-                  <option key={agent.id} value={agent.id}>
-                    {agent.firstName} {agent.lastName}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Partner
-            </label>
-            {loading ? (
-              <p>Loading partners...</p>
-            ) : (
-              <select
-                value={updatedOrder.partner?.id || ""}
-                onChange={(e) => handleChange("partner", e.target.value)}
-                className="w-full rounded-md border px-4 py-3 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Partner</option>
-                {partners.map((partner) => (
-                  <option key={partner.id} value={partner.id}>
-                    {partner.firstName} {partner.lastName}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={handleEditOrderItems}
-          className="mt-6 w-full rounded-md bg-blue-600 py-3 font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          <div className="flex items-center justify-center">
-            <PencilSquareIcon className="mr-2 h-5 w-5" />
-            Edit Order Items
-          </div>
-        </button>
 
-        {error && (
-          <div className="mt-4 text-sm text-red-600">
-            <p>{error}</p>
-          </div>
-        )}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="rounded-xl border border-gray-100 bg-gray-50 p-6">
+              <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-800">
+                <ClipboardDocumentIcon className="mr-2 h-5 w-5" />
+                Order Details
+              </h3>
+              <div className="space-y-4">
+                {[
+                  {
+                    label: "State",
+                    field: "state" as const,
+                    icon: CheckBadgeIcon,
+                    options: states,
+                  },
+                  {
+                    label: "Status",
+                    field: "status" as const,
+                    icon: CheckBadgeIcon,
+                    options: statuses,
+                  },
+                ].map(({ label, field, icon: Icon, options }) => (
+                  <div className="space-y-1" key={field}>
+                    <label className="flex items-center text-sm font-medium text-gray-700">
+                      <Icon className="mr-1 h-4 w-4" />
+                      {label}
+                    </label>
+                    <select
+                      value={updatedOrder[field]?.id || ""}
+                      onChange={(e) => handleChange(field, e.target.value)}
+                      className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                      <option value="">Select {label}</option>
+                      {options.map((option: any) => (
+                        <option key={option.id} value={option.id}>
+                          {option.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
 
-        <div className="flex justify-end gap-4 border-t border-gray-200 pt-4">
+                <div className="space-y-1">
+                  <label className="flex items-center text-sm font-medium text-gray-700">
+                    <TruckIcon className="mr-1 h-4 w-4" />
+                    Shipping Method
+                  </label>
+                  <input
+                    type="text"
+                    value={updatedOrder.shippingMethod || ""}
+                    onChange={(e) =>
+                      handleChange(
+                        "shippingMethod" as keyof OrderWithRelations,
+                        e.target.value,
+                      )
+                    }
+                    className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="flex items-center text-sm font-medium text-gray-700">
+                    <CreditCardIcon className="mr-1 h-4 w-4" />
+                    Payment Method
+                  </label>
+                  <select
+                    value={updatedOrder.paymentMethodId || ""}
+                    onChange={(e) =>
+                      handleChange(
+                        "paymentMethodId" as keyof OrderWithRelations,
+                        e.target.value,
+                      )
+                    }
+                    className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    <option value="">Select Payment Method</option>
+                    {paymentMethods.map((method) => (
+                      <option key={method.id} value={method.id}>
+                        {method.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="flex items-center text-sm font-medium text-gray-700">
+                    <ScaleIcon className="mr-1 h-4 w-4" />
+                    Weight
+                  </label>
+                  <input
+                    type="number"
+                    value={updatedOrder.weight || 0}
+                    onChange={(e) =>
+                      handleChange(
+                        "weight" as keyof OrderWithRelations,
+                        Number(e.target.value),
+                      )
+                    }
+                    className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <span className="flex items-center text-sm font-medium text-gray-700">
+                    <DevicePhoneMobileIcon className="mr-1 h-4 w-4" />
+                    From Mobile
+                  </span>
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      checked={updatedOrder.fromMobile || false}
+                      onChange={(e) =>
+                        handleChange(
+                          "fromMobile" as keyof OrderWithRelations,
+                          e.target.checked,
+                        )
+                      }
+                      className="peer sr-only"
+                    />
+                    <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300"></div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-gray-100 bg-gray-50 p-6">
+              <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-800">
+                <UserCircleIcon className="mr-2 h-5 w-5" />
+                Associations
+              </h3>
+              <div className="space-y-4">
+                {[
+                  {
+                    label: "Customer",
+                    field: "customer" as const,
+                    icon: UserCircleIcon,
+                    options: customers,
+                  },
+                  {
+                    label: "Agent",
+                    field: "agent" as const,
+                    icon: IdentificationIcon,
+                    options: agents,
+                  },
+                  {
+                    label: "Partner",
+                    field: "partner" as const,
+                    icon: HandRaisedIcon,
+                    options: partners,
+                  },
+                ].map(({ label, field, icon: Icon, options }) => (
+                  <div className="space-y-1" key={field}>
+                    <label className="flex items-center text-sm font-medium text-gray-700">
+                      <Icon className="mr-1 h-4 w-4" />
+                      {label}
+                    </label>
+                    <select
+                      value={updatedOrder[field]?.id || ""}
+                      onChange={(e) => handleChange(field, e.target.value)}
+                      className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                      <option value="">Select {label}</option>
+                      {options.map((option: any) => (
+                        <option key={option.id} value={option.id}>
+                          {option.firstName} {option.lastName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <button
             type="button"
-            onClick={onClose}
-            className="rounded-md bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
+            onClick={handleEditOrderItems}
+            className="flex w-full transform items-center justify-center gap-x-2 rounded-lg bg-blue-600 px-4 py-3 font-medium text-white shadow-md transition-colors duration-200 ease-in-out hover:scale-105 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             disabled={isLoading}
-            className="flex items-center gap-x-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isLoading ? "Updating..." : "Update Order"}
+            {isLoading ? (
+              <>
+                <ArrowPathIcon className="h-5 w-5 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              <>
+                <PencilSquareIcon className="h-5 w-5" />
+                Edit Order Items
+              </>
+            )}
           </button>
         </div>
-      </form>
-      {error && (
-        <div className="mt-4 rounded-md bg-red-50 p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <XCircleIcon
-                className="h-5 w-5 text-red-400"
-                aria-hidden="true"
-              />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">{error}</h3>
-            </div>
+        <div className="sticky bottom-0 border-t border-gray-100 bg-white p-4">
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="flex items-center gap-x-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70"
+            >
+              {isLoading ? (
+                <>
+                  <ArrowPathIcon className="h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                <>
+                  <CheckIcon className="h-4 w-4" />
+                  Update Order
+                </>
+              )}
+            </button>
           </div>
         </div>
-      )}
-
+      </form>
       {showOrderItemsModal && (
         <ModalOrderItems
           isOpen={showOrderItemsModal}
           orderItems={updatedOrder.orderItems || []}
           onClose={() => setShowOrderItemsModal(false)}
           onUpdate={(updatedItems: OrderItemWithRelations[]) => {
-            setUpdatedOrder((prevOrder) => ({
-              ...prevOrder,
+            setUpdatedOrder((prev) => ({
+              ...prev,
               orderItems: updatedItems,
             }));
             setShowOrderItemsModal(false);

@@ -93,6 +93,12 @@ export async function POST(req: Request) {
       },
     });
 
+    await prisma.reservation.update({
+      where: { id: body.reservationId },
+
+      data: { orderId: newOrder.id },
+    });
+
     return NextResponse.json(
       { message: "Order created with items", order: newOrder },
       { status: 201 },

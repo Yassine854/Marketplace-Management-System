@@ -17,7 +17,6 @@ export async function POST(req: Request) {
     const newReservationItem = await prisma.reservationItem.create({
       data: {
         qteReserved: body.qteReserved,
-        qteCanceled: body.qteCanceled || 0,
         discountedPrice: body.discountedPrice,
         weight: body.weight,
         sku: body.sku,
