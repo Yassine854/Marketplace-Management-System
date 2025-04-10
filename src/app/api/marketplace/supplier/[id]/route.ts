@@ -49,8 +49,9 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
+    const session = await auth();
 
+    // Check if the user is authenticated
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -58,23 +59,58 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    const updatedManufacturer = await prisma.manufacturer.update({
-      where: { id },
-      data: {
-        manufacturerId: body.manufacturerId,
-        code: body.code,
-        companyName: body.companyName,
-        contactName: body.contactName,
-        phoneNumber: body.phoneNumber,
-        postalCode: body.postalCode,
-        city: body.city,
-        country: body.country,
-        capital: body.capital,
-        email: body.email,
-        address: body.address,
-      },
+    // Update transaction to ensure data integrity
+    const updatedManufacturer = await prisma.$transaction(async (prisma) => {
+      // 1. Update basic manufacturer information
+      const manufacturer = await prisma.manufacturer.update({
+        where: { id },
+        data: {
+          manufacturerId: body.manufacturerId,
+          code: body.code,
+          companyName: body.companyName,
+          contactName: body.contactName,
+          phoneNumber: body.phoneNumber,
+          postalCode: body.postalCode,
+          city: body.city,
+          country: body.country,
+          capital: body.capital,
+          email: body.email,
+          address: body.address,
+        },
+      });
+
+      // 2. Handle categories
+      if (body.categories) {
+        // Delete existing categories
+        await prisma.supplierCategory.deleteMany({
+          where: { supplierId: id },
+        });
+
+        // Create new categories if provided
+        if (body.categories.length > 0) {
+          await prisma.supplierCategory.createMany({
+            data: body.categories.map((categoryId: string) => ({
+              supplierId: id,
+              categoryId,
+            })),
+          });
+        }
+      }
+
+      // 3. Fetch the updated manufacturer with categories
+      return prisma.manufacturer.findUnique({
+        where: { id },
+        include: {
+          supplierCategories: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      });
     });
 
+    // Return the updated manufacturer
     return NextResponse.json(
       {
         message: "Manufacturer updated successfully",
@@ -85,7 +121,10 @@ export async function PATCH(
   } catch (error) {
     console.error("Error updating manufacturer:", error);
     return NextResponse.json(
-      { error: "Failed to update manufacturer" },
+      {
+        error: "Failed to update manufacturer",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 },
     );
   }

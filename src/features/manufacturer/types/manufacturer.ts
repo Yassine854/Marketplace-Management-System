@@ -1,4 +1,19 @@
-// types/manufacturer.ts
+export interface Category {
+  id: string;
+  categoryId?: number;
+  nameCategory: string;
+  image?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface SupplierCategory {
+  id: string;
+  supplierId: string;
+  categoryId: string;
+  category?: Category;
+}
+
 export interface Manufacturer {
   id: string;
   manufacturerId: number;
@@ -12,13 +27,7 @@ export interface Manufacturer {
   capital?: string;
   email?: string;
   address?: string;
-  supplierCategories?: SupplierCategory[];
   createdAt: Date;
   updatedAt: Date;
-}
-export interface SupplierCategory {
-  categoryId: string;
-  category?: {
-    nameCategory: string;
-  };
+  supplierCategories?: SupplierCategory[];
 }

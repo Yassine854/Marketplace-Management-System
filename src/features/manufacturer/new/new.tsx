@@ -1,25 +1,31 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+type Category = {
+  id: string;
+  nameCategory: string;
+};
+
 const NewManufacturerPage = () => {
-  const [manufacturerId, setManufacturerId] = useState<number | string>("");
-  const [code, setCode] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [contactName, setContactName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [country, setCountry] = useState("");
-  const [capital, setCapital] = useState("");
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    manufacturerId: "",
+    code: "",
+    companyName: "",
+    contactName: "",
+    phoneNumber: "",
+    email: "",
+    address: "",
+    city: "",
+    country: "",
+    capital: "",
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -31,8 +37,7 @@ const NewManufacturerPage = () => {
           throw new Error(data.message || "Failed to fetch categories");
         }
 
-        setCategories(data.categories);
-        console.log("catgories", data.categories);
+        setCategories(Array.isArray(data) ? data : data.categories || []);
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "An unknown error occurred",
@@ -42,6 +47,12 @@ const NewManufacturerPage = () => {
 
     fetchCategories();
   }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOptions = Array.from(
       e.target.selectedOptions,
@@ -52,40 +63,43 @@ const NewManufacturerPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
 
-    const parsedManufacturerId = parseInt(manufacturerId as string, 10);
+    setLoading(true);
+
+    setError(null);
+
+    setSuccess(null);
+    const parsedManufacturerId = parseInt(formData.manufacturerId, 10);
+
     if (isNaN(parsedManufacturerId)) {
       setError("Manufacturer ID must be a valid number.");
+
       setLoading(false);
+
       return;
     }
-    if (!code || !companyName) {
+    if (!formData.code || !formData.companyName) {
       setError("Code and Company Name are required.");
+
       setLoading(false);
+
       return;
     }
-    console.log("Selected categories:", selectedCategories);
 
     try {
+      const { manufacturerId, ...formDataWithoutId } = formData;
       const response = await fetch("/api/marketplace/supplier/create", {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
           manufacturerId: parsedManufacturerId,
-          code,
-          companyName,
-          contactName,
-          phoneNumber,
-          email,
-          address,
-          city,
-          country,
-          capital,
+
+          ...formDataWithoutId,
+
           categories: selectedCategories,
         }),
       });
@@ -97,16 +111,18 @@ const NewManufacturerPage = () => {
       }
 
       setSuccess("Manufacturer created successfully!");
-      setManufacturerId("");
-      setCode("");
-      setCompanyName("");
-      setContactName("");
-      setPhoneNumber("");
-      setEmail("");
-      setAddress("");
-      setCity("");
-      setCountry("");
-      setCapital("");
+      setFormData({
+        manufacturerId: "",
+        code: "",
+        companyName: "",
+        contactName: "",
+        phoneNumber: "",
+        email: "",
+        address: "",
+        city: "",
+        country: "",
+        capital: "",
+      });
       setSelectedCategories([]);
 
       setTimeout(() => {
@@ -121,187 +137,76 @@ const NewManufacturerPage = () => {
     }
   };
 
+  const formFields = [
+    {
+      name: "manufacturerId",
+      label: "Manufacturer ID",
+      type: "number",
+      required: true,
+    },
+    { name: "code", label: "Code", type: "text", required: true },
+    {
+      name: "companyName",
+      label: "Company Name",
+      type: "text",
+      required: true,
+    },
+    {
+      name: "contactName",
+      label: "Contact Name",
+      type: "text",
+      required: true,
+    },
+    { name: "phoneNumber", label: "Phone Number", type: "tel", required: true },
+    { name: "email", label: "Email", type: "email", required: true },
+    { name: "address", label: "Address", type: "text", required: true },
+    { name: "city", label: "City", type: "text", required: true },
+    { name: "country", label: "Country", type: "text", required: true },
+    { name: "capital", label: "Capital", type: "text", required: true },
+  ];
+
   return (
-    <div className="mt-20 flex h-screen w-full flex-col items-center justify-center bg-gray-100 p-6">
+    <div className="mt-20 flex min-h-screen w-full flex-col items-center justify-center bg-gray-100 p-6">
       <div className="mt-36 w-full max-w-4xl rounded-2xl bg-white p-8 shadow-lg">
         <h1 className="mb-6 text-center text-3xl font-bold text-gray-800">
           New Manufacturer
         </h1>
+
         {error && (
-          <p className="mb-4 rounded-lg bg-red-100 p-2 text-sm text-red-600">
+          <div className="mb-4 rounded-lg bg-red-100 p-2 text-sm text-red-600">
             {error}
-          </p>
+          </div>
         )}
+
         {success && (
-          <p className="mb-4 rounded-lg bg-green-100 p-2 text-sm text-green-600">
+          <div className="mb-4 rounded-lg bg-green-100 p-2 text-sm text-green-600">
             {success}
-          </p>
+          </div>
         )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label
-                htmlFor="manufacturerId"
-                className="block font-medium text-gray-700"
-              >
-                Manufacturer ID
-              </label>
-              <input
-                type="number"
-                value={manufacturerId}
-                onChange={(e) => setManufacturerId(e.target.value)}
-                required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Manufacturer ID"
-              />
-            </div>
+            {formFields.map((field) => (
+              <div key={field.name}>
+                <label
+                  htmlFor={field.name}
+                  className="block font-medium text-gray-700"
+                >
+                  {field.label}
+                </label>
+                <input
+                  type={field.type}
+                  id={field.name}
+                  name={field.name}
+                  value={formData[field.name as keyof typeof formData]}
+                  onChange={handleInputChange}
+                  required={field.required}
+                  className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder={field.label}
+                />
+              </div>
+            ))}
 
-            <div>
-              <label htmlFor="code" className="block font-medium text-gray-700">
-                Code
-              </label>
-              <input
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Code"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="companyName"
-                className="block font-medium text-gray-700"
-              >
-                Company Name
-              </label>
-              <input
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Company Name"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="contactName"
-                className="block font-medium text-gray-700"
-              >
-                Contact Name
-              </label>
-              <input
-                type="text"
-                value={contactName}
-                onChange={(e) => setContactName(e.target.value)}
-                required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Contact Name"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="phoneNumber"
-                className="block font-medium text-gray-700"
-              >
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Phone Number"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="email"
-                className="block font-medium text-gray-700"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Email"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="address"
-                className="block font-medium text-gray-700"
-              >
-                Address
-              </label>
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Address"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="city" className="block font-medium text-gray-700">
-                City
-              </label>
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="City"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="country"
-                className="block font-medium text-gray-700"
-              >
-                Country
-              </label>
-              <input
-                type="text"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Country"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="capital"
-                className="block font-medium text-gray-700"
-              >
-                Capital
-              </label>
-              <input
-                type="text"
-                value={capital}
-                onChange={(e) => setCapital(e.target.value)}
-                required
-                className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Capital"
-              />
-            </div>
             <div>
               <label
                 htmlFor="category"
@@ -318,14 +223,12 @@ const NewManufacturerPage = () => {
                 className="mt-2 w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Categories</option>
-                {Array.isArray(categories) && categories.length > 0 ? (
-                  categories.map(
-                    (category: { id: string; nameCategory: string }) => (
-                      <option key={category.id} value={category.id}>
-                        {category.nameCategory}
-                      </option>
-                    ),
-                  )
+                {categories.length > 0 ? (
+                  categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.nameCategory}
+                    </option>
+                  ))
                 ) : (
                   <option disabled>No categories available</option>
                 )}

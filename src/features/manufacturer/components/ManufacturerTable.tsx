@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import ManufacturerTableHead from "./ManufacturerTableHead";
 import ManufacturerTableRow from "./ManufacturerTableRow";
 import ManufacturerTableSkeleton from "./ManufacturerTableSkeleton";
-import { Manufacturer } from "../types/manufacturer";
-import { Category } from "../types/Category";
+import { Manufacturer, Category } from "../types/manufacturer";
 interface ManufacturerTableProps {
   data: Manufacturer[];
   categories: Category[];
@@ -15,6 +14,7 @@ interface ManufacturerTableProps {
 
 const ManufacturerTable = ({
   data,
+  categories,
   loading,
   onUpdate,
   onDelete,
@@ -58,7 +58,7 @@ const ManufacturerTable = ({
                 onUpdate={handleUpdateManufacturer}
                 onDelete={onDelete}
                 onEdit={onEdit}
-                categories={[]}
+                categories={categories}
               />
             ))
           )}

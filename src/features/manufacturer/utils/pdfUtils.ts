@@ -5,7 +5,7 @@ import { Manufacturer } from "../types/manufacturer";
 export const downloadManufacturerPDF = (manufacturers: Manufacturer[]) => {
   const doc = new jsPDF({ orientation: "landscape" });
   doc.setFontSize(18);
-  doc.text("Manufacturers List", 14, 15);
+  doc.text("Manufacturer List", 14, 15);
 
   const tableData = manufacturers.map((manufacturer) => [
     manufacturer.manufacturerId,

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ManufacturerTable from "./components/ManufacturerTable";
 import { useRouter } from "next/navigation";
 import Pagination from "../shared/elements/pagination/pagination";
-import { Manufacturer } from "./types/manufacturer";
+import { Manufacturer, Category } from "./types/manufacturer";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
@@ -23,6 +23,7 @@ const ManufacturerManagementPage = () => {
   const [editingManufacturer, setEditingManufacturer] =
     useState<Manufacturer | null>(null);
   const [itemsPerPage, setItemsPerPage] = useState(25);
+  const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -52,7 +53,28 @@ const ManufacturerManagementPage = () => {
 
     fetchManufacturers();
   }, [currentPage, debouncedSearchTerm, itemsPerPage]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api/marketplace/category/getAll");
 
+        if (!response.ok) throw new Error("Failed to fetch categories");
+        const data = await response.json();
+        console.log("API Response:", data);
+        if (!Array.isArray(data)) {
+          throw new Error("Invalid categories data format");
+        }
+
+        setCategories(data);
+      } catch (error) {
+        console.error("Error loading categories:", error);
+
+        setCategories([]);
+      }
+    };
+
+    fetchCategories();
+  }, []);
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -76,12 +98,21 @@ const ManufacturerManagementPage = () => {
     try {
       const response = await fetch(
         `/api/marketplace/supplier/${updatedManufacturer.id}`,
+
         {
           method: "PATCH",
+
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(updatedManufacturer),
+
+          body: JSON.stringify({
+            ...updatedManufacturer,
+
+            categories: updatedManufacturer.supplierCategories?.map(
+              (sc) => sc.categoryId,
+            ),
+          }),
         },
       );
 
@@ -91,11 +122,9 @@ const ManufacturerManagementPage = () => {
         throw new Error(result.message || "Failed to update manufacturer");
       }
 
-      setManufacturers((prevManufacturers) =>
-        prevManufacturers.map((manufacturer) =>
-          manufacturer.id === updatedManufacturer.id
-            ? updatedManufacturer
-            : manufacturer,
+      setManufacturers((prev) =>
+        prev.map((m) =>
+          m.id === result.manufacturer.id ? result.manufacturer : m,
         ),
       );
 
@@ -227,7 +256,7 @@ const ManufacturerManagementPage = () => {
                 onUpdate={handleUpdate}
                 onDelete={handleDelete}
                 onEdit={handleEdit}
-                categories={[]}
+                categories={categories}
               />
             </div>
 
@@ -250,7 +279,7 @@ const ManufacturerManagementPage = () => {
           manufacturer={editingManufacturer}
           onClose={handleCloseEdit}
           onUpdate={handleUpdate}
-          categories={[]}
+          categories={categories}
         />
       )}
 

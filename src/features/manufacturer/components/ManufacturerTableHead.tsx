@@ -8,7 +8,7 @@ const ManufacturerTableHead = () => {
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
           Code
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="min-w-[150px] whitespace-nowrap px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
           Company Name
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
