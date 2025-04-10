@@ -10,7 +10,8 @@ export const getGmvByDay = async (
     if (month < 1 || month > 12) {
       throw new Error("Invalid month parameter");
     }
-    const startOfDay = new Date(year, month - 1, day).getTime() + (1 * 60 * 60 * 1000);
+    const startOfDay =
+      new Date(year, month - 1, day).getTime() + 1 * 60 * 60 * 1000;
     const endOfDay = new Date(year, month - 1, day, 24, 59, 59, 999).getTime();
     const startTimestamp = Math.floor(startOfDay);
     const endTimestamp = Math.floor(endOfDay);
@@ -43,16 +44,15 @@ export const getGmvByDay = async (
     totalGMV += allOrders.reduce((sum: number, order: any) => {
       const total = order.document.total;
       if (typeof total === "number") {
-      //  if(order.document.id ==79559 )  console.log(order.document);
-       //// if(order.document.id >=79437 && order.document.id <=79498  )
-       // console.log(`Order ID: ${order.document.id}, Total: ${total}`);
+        //  if(order.document.id ==79559 )
+        //// if(order.document.id >=79437 && order.document.id <=79498  )
+        //
 
         return sum + total;
-
       }
       return sum;
     }, 0);
-     return (totalGMV);
+    return totalGMV;
   } catch (error) {
     logError(error);
   }

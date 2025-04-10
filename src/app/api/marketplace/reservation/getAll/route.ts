@@ -20,7 +20,6 @@ export async function GET(req: Request) {
         order: true,
         paymentMethod: true,
         reservationItems: true,
-        loyaltyPoints: true,
       },
     });
 

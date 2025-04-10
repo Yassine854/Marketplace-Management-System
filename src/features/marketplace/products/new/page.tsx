@@ -173,7 +173,6 @@ const ProductForm = () => {
     formData.append("promotionId", promotionId);
 
     try {
-      // Step 1: Create product
       const productResponse = await fetch("/api/marketplace/products/create", {
         method: "POST",
         body: formData,
@@ -337,6 +336,27 @@ const ProductForm = () => {
               value={maximumQte}
               onChange={(e) => setMaximumQte(e.target.value)}
               required
+              className="w-full rounded-lg border p-2"
+            />
+          </div>
+
+          <div className="col-span-2 md:col-span-1">
+            <label className="mb-2 block font-medium">PCB</label>
+            <input
+              type="text"
+              value={pcb}
+              onChange={(e) => setPcb(e.target.value)}
+              className="w-full rounded-lg border p-2"
+            />
+          </div>
+
+          <div className="col-span-2 md:col-span-1">
+            <label className="mb-2 block font-medium">Weight </label>
+            <input
+              type="number"
+              step="0.1"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
               className="w-full rounded-lg border p-2"
             />
           </div>

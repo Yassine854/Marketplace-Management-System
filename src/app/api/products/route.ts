@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export async function GET() {
   try {
     const products = await prisma.products.findMany();
-    console.log(products);
+
     return NextResponse.json(
       products.map(
         (p: {

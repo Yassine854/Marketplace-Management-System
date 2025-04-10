@@ -40,11 +40,9 @@ export async function GET() {
     }
     for (let storeView of storeViews) {
       if (storeView.id === 0) {
-        console.log("Ignorer le warehouse avec id 0", storeView);
         continue;
       }
 
-      console.log("Warehouse à insérer:", storeView);
       const insertedWarehouse = await prisma.warehouse.upsert({
         where: { warehouseId: storeView.id },
         update: {},
@@ -55,8 +53,6 @@ export async function GET() {
           code: storeView.code,
         },
       });
-
-      console.log("Warehouse inséré:", insertedWarehouse);
     }
 
     return NextResponse.json(

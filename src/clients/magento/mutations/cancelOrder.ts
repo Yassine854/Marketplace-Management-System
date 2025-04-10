@@ -35,7 +35,7 @@ export const cancelOrder = async (
 
     const orderIdsString = orderIdsArray.join(",");
 
-    //console.log('Sending payload:', JSON.stringify({ orderIds: orderIdsString }));
+    //);
 
     const res = await axios.magentoClient.put(`orders/cancel`, {
       orderIds: orderIdsString,

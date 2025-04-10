@@ -29,6 +29,7 @@ export async function GET(
         favoriteProducts: true,
         favoritePartners: true,
         relatedProducts: { include: { relatedProduct: true } },
+        skuPartners: true,
       },
     });
 
@@ -53,6 +54,7 @@ export async function GET(
 }
 
 // 🟡 PATCH: Update a product by ID
+
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -66,24 +68,114 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
+    // Separate relationships and non-prisma fields from main product data
+    const {
+      subCategories,
+      relatedProducts,
+      images, // Remove images from update payload
+      ...productData
+    } = body;
+
+    // Validate required fields
+    if (!productData.name || !productData.sku || !productData.price) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 },
+      );
+    }
+
+    // Convert numeric fields
+    const numericFields = {
+      price: Number(productData.price),
+      cost: productData.cost ? Number(productData.cost) : undefined,
+      stock: productData.stock ? Number(productData.stock) : undefined,
+      weight: productData.weight ? Number(productData.weight) : undefined,
+      minimumQte: productData.minimumQte
+        ? Number(productData.minimumQte)
+        : undefined,
+      maximumQte: productData.maximumQte
+        ? Number(productData.maximumQte)
+        : undefined,
+      sealable: productData.sealable ? Number(productData.sealable) : undefined,
+      alertQte: productData.alertQte ? Number(productData.alertQte) : undefined,
+      loyaltyPoints: productData.loyaltyPoints
+        ? Number(productData.loyaltyPoints)
+        : undefined,
+      loyaltyPointsAmount: productData.loyaltyPointsAmount
+        ? Number(productData.loyaltyPointsAmount)
+        : undefined,
+    };
+
+    // Update main product data
     const updatedProduct = await prisma.product.update({
       where: { id },
-      data: body,
+      data: {
+        ...productData,
+        ...numericFields,
+        // Handle images separately if needed
+      },
+    });
+
+    // Update relationships in transaction
+    await prisma.$transaction(async (tx) => {
+      if (subCategories) {
+        await tx.productSubCategory.deleteMany({
+          where: { productId: id },
+        });
+
+        if (subCategories.length > 0) {
+          await tx.productSubCategory.createMany({
+            data: subCategories.map((sc: string) => ({
+              productId: id,
+              subcategoryId: sc,
+            })),
+          });
+        }
+      }
+
+      if (relatedProducts) {
+        await tx.relatedProduct.deleteMany({
+          where: { productId: id },
+        });
+
+        if (relatedProducts.length > 0) {
+          await tx.relatedProduct.createMany({
+            data: relatedProducts.map((rp: string) => ({
+              productId: id,
+              relatedProductId: rp,
+            })),
+          });
+        }
+      }
+    });
+
+    // Get updated product with relationships
+    const fullProduct = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        productSubCategories: true,
+        relatedProducts: true,
+      },
     });
 
     return NextResponse.json(
-      { message: "Product updated", product: updatedProduct },
+      { message: "Product updated", product: fullProduct },
       { status: 200 },
     );
   } catch (error) {
     console.error("Error updating product:", error);
-    return NextResponse.json(
-      { error: "Failed to update product" },
-      { status: 500 },
-    );
+
+    // Handle Prisma errors
+    let errorMessage = "Failed to update product";
+    if (error instanceof Error) {
+      errorMessage = error.message.includes("prisma")
+        ? "Database error occurred"
+        : error.message;
+    }
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
-
 // 🔴 DELETE: Remove a product by ID
 export async function DELETE(
   req: Request,

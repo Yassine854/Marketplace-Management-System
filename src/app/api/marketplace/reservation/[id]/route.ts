@@ -25,7 +25,6 @@ export async function GET(
         order: true,
         paymentMethod: true,
         reservationItems: true,
-        loyaltyPoints: true,
       },
     });
 

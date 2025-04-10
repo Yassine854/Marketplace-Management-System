@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         amountOrdered: body.amountOrdered,
         amountShipped: body.amountShipped,
         shippingMethod: body.shippingMethod,
-        state: body.state || false,
+        isActive: body.state || false,
         loyaltyPtsValue: body.loyaltyPtsValue || 0,
         fromMobile: body.fromMobile || false,
         weight: body.weight,

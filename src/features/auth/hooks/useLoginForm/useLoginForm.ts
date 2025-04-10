@@ -72,7 +72,6 @@ export const useLoginForm = () => {
     if (apiResponse.token) {
       localStorage.setItem("authToken", apiResponse.token);
     }
-    console.log(apiResponse);
 
     //End Supplier Access //
     setIsLoading(false);

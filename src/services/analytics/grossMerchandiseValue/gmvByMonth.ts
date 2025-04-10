@@ -3,7 +3,13 @@ import { logError } from "@/utils/logError";
 import { axios } from "@/libs/axios";
 
 // Helper function to generate an array of days in a given month of a given year
-function generateMonthDaysObject({ year, month }: { year: number; month: number }): number[] {
+function generateMonthDaysObject({
+  year,
+  month,
+}: {
+  year: number;
+  month: number;
+}): number[] {
   const lastDay = new Date(year, month, 0).getDate(); // Get the last day of the month
   const daysArray = Array.from({ length: lastDay }, (_, i) => i + 1); // Create an array of days
   return daysArray;
@@ -14,11 +20,11 @@ function getCurrentDayId(): string {
   const currentDate = new Date();
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1; // Remove padStart to get the month without leading zero
-  const day = currentDate.getDate().toString().padStart(2, '0'); // Keep padStart for day to ensure 2 digits
+  const day = currentDate.getDate().toString().padStart(2, "0"); // Keep padStart for day to ensure 2 digits
   return `${year}-${month}-${day}`;
 }
 
-//console.log(getCurrentDayId());
+//);
 
 // Define the type for the document in the hits array
 interface GmvDocument {
@@ -57,7 +63,8 @@ export const gmvByMonth = async (year: number, month: number) => {
       .documents()
       .search(searchParams);
 
-    const hits: SearchResponseHit<GmvDocument>[] = searchResults.hits as SearchResponseHit<GmvDocument>[];
+    const hits: SearchResponseHit<GmvDocument>[] =
+      searchResults.hits as SearchResponseHit<GmvDocument>[];
 
     // Get the current day ID
     const currentDayId = getCurrentDayId();
@@ -68,25 +75,27 @@ export const gmvByMonth = async (year: number, month: number) => {
         let currentDate = new Date();
         currentDate.setDate(currentDate.getDate() - 90); // Set to 90 days ago
         const year = currentDate.getFullYear();
-        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Ensure 2 digits for month
-        const day = currentDate.getDate().toString().padStart(2, '0'); // Ensure 2 digits for day
-    
+        const month = (currentDate.getMonth() + 1).toString().padStart(2, "0"); // Ensure 2 digits for month
+        const day = currentDate.getDate().toString().padStart(2, "0"); // Ensure 2 digits for day
+
         // Format the current date as dd/mm/yyyy
         const fromDate = `${day}/${month}/${year}`;
-    
+
         // Get today's date
         currentDate = new Date();
-        currentDate.setDate(currentDate.getDate() +1);
-        const nextDay = currentDate.getDate().toString().padStart(2, '0');
-        const nextMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        currentDate.setDate(currentDate.getDate() + 1);
+        const nextDay = currentDate.getDate().toString().padStart(2, "0");
+        const nextMonth = (currentDate.getMonth() + 1)
+          .toString()
+          .padStart(2, "0");
         const nextYear = currentDate.getFullYear();
-        
+
         // Format tomorrow's date as dd/mm/yyyy
         const toDate = `${nextDay}/${nextMonth}/${nextYear}`;
-    
+
         // Make the API request
         const res = await axios.magentoClient.get(
-          `/analytics/get_base_total_by_date_range?from=${fromDate}&to=${toDate}`
+          `/analytics/get_base_total_by_date_range?from=${fromDate}&to=${toDate}`,
         );
 
         // Check if data exists and has the expected structure
@@ -114,11 +123,14 @@ export const gmvByMonth = async (year: number, month: number) => {
     let modifiedHits = hits.map((hit) => {
       const document = hit.document;
       const documentId = document.id; // `yyyy-m-d` format
-      const [year, month, day] = document.id.split('-');
-      const documentDate = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`; // Ensure dd-mm-yyyy
+      const [year, month, day] = document.id.split("-");
+      const documentDate = `${day.padStart(2, "0")}-${month.padStart(
+        2,
+        "0",
+      )}-${year}`; // Ensure dd-mm-yyyy
       // Find matching external data based on the formatted documentDate
       const matchingExternalData = last90Days.find(
-        (data: { key: string; }) => data.key === documentDate
+        (data: { key: string }) => data.key === documentDate,
       );
 
       if (matchingExternalData) {

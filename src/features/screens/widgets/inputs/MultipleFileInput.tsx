@@ -20,9 +20,8 @@ const MultipleFileInput: React.FC<MultipleFileInputProps> = ({
   onChange,
   previewUrls = [],
 }) => {
-  console.log("🚀 ~ previewUrls:", previewUrls);
   const [newPreviewUrls, setNewPreviewUrls] = useState<string[]>([]);
-  console.log("🚀 ~ newPreviewUrls:", newPreviewUrls);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {

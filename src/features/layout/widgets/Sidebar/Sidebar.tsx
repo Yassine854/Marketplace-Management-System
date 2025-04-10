@@ -8,6 +8,7 @@ import {
   IconList,
   IconShoppingCart,
   IconDeviceAnalytics,
+  IconBox,
 } from "@tabler/icons-react";
 
 import Link from "next/link";
@@ -91,7 +92,7 @@ const Sidebar = ({
             isActive={pathname?.includes("products")}
             items={[
               { name: "All", path: "/marketplace/products/all" },
-              { name: "New Product", path: "/marketplace/products/add" },
+              { name: "New Product", path: "/marketplace/products/new" },
               {
                 name: "Categories",
                 path: "/marketplace/products/categories/all",
@@ -116,6 +117,35 @@ const Sidebar = ({
               },
             ]}
           />
+
+          <Divider />
+          <SidebarSubMenu
+            icon={<IconUsers className="text-lg text-primary" />}
+            name=" Partners"
+            onClick={() => push("/marketplace/partners/all")}
+            isActive={pathname?.includes("partners")}
+            items={[
+              { name: "All partners", path: "/marketplace/partners/all" },
+              { name: "New Partner", path: "/marketplace/partners/new" },
+              {
+                name: "Partner Types",
+                path: "/marketplace/partners/type_partners",
+              },
+            ]}
+          />
+
+          <Divider />
+          <SidebarSubMenu
+            icon={<IconBox className="text-lg text-primary" />}
+            name=" Order"
+            onClick={() => push("/marketplace/order/state")}
+            isActive={pathname?.includes("state")}
+            items={[
+              { name: "State", path: "/marketplace/order/state" },
+              { name: "Status", path: "/marketplace/order/status" },
+            ]}
+          />
+
           <Divider />
           <SidebarOrdersSubMenu
             onClick={() => push("/orders")}

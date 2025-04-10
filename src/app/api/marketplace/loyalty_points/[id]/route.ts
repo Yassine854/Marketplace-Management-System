@@ -21,10 +21,7 @@ export async function GET(
     const loyaltyPoint = await prisma.loyaltyPoints.findUnique({
       where: { id },
       include: {
-        product: true,
-        partner: true,
         order: true,
-        reservation: true,
       },
     });
 
@@ -69,10 +66,7 @@ export async function PATCH(
         ptsNumber: body.ptsNumber,
         ptsValue: body.ptsValue,
         minAmount: body.minAmount,
-        productId: body.productId,
-        partnerId: body.partnerId,
         orderId: body.orderId,
-        reservationId: body.reservationId,
       },
     });
 

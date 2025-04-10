@@ -167,7 +167,6 @@ export default function EditOrderForm({
             products: data.products,
           });
           setSelectedSupplier(data.manufacturer);
-          console.log("id", data.manufacturer.manufacturerId);
 
           if (data.manufacturer.manufacturerId) {
             const supplierId = data.manufacturer.manufacturerId.toString();

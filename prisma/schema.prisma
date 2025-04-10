@@ -102,10 +102,12 @@ model Product {
   description          String?  
   stock                Int?     
   promo                Boolean  @default(false)  
-  skuPartner           String?  
   minimumQte           Int?     
-  maximumQte           Int?     
-  sealableAlertQte     Int?     
+  maximumQte           Int?  
+  sealable             Float?
+  alertQte             Int?
+  loyaltyPoints        Float?
+  loyaltyPointsAmount  Float?    
 
   typePcbId            String?  @db.ObjectId 
   typePcb              TypePcb? @relation(fields: [typePcbId], references: [id]) 
@@ -133,7 +135,8 @@ model Product {
   favoritePartners FavoritePartner[]
   orderItems OrderItem[]
   reservationItems    ReservationItem[]
-  loyaltyPoints LoyaltyPoints[]
+  skuPartners SkuPartner[]
+  
   @@index([category_ids])
   @@map("products")
 }
@@ -273,7 +276,7 @@ model ProductOrdered {
   quantity       Int
   priceExclTax   Float
   total          Float 
-  sku            String?
+  sku            String? 
   purchaseOrder  PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id])
   purchaseOrderId String?
   @@map("productOrdered")
@@ -284,7 +287,8 @@ model TypePartner {
   id   String  @id @default(auto()) @map("_id") @db.ObjectId
   name String  @unique
   partners Partner[]
-  
+  createdAt       DateTime?       @default(now())
+  updatedAt       DateTime?       @updatedAt
   @@map("type_partners")
 }
 
@@ -314,7 +318,8 @@ model Partner {
   favoritePartners FavoritePartner[]
   orders   Order[]
   reservations Reservation[]
-  loyaltyPoints LoyaltyPoints[]
+  skuPartners SkuPartner[]
+  settings Settings[]
   @@map("partners")
 }
 
@@ -416,7 +421,7 @@ model Image {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   url        String   
   altText    String?  
-  product    Product  @relation(fields: [productId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId  String   @db.ObjectId
 
   @@map("images")
@@ -442,8 +447,8 @@ model RelatedProduct {
   relatedProductId  String   @db.ObjectId
 
 
-  product          Product  @relation("ProductToRelatedProduct", fields: [productId], references: [id])
-  relatedProduct   Product  @relation("RelatedProductToProduct", fields: [relatedProductId], references: [id])
+  product          Product  @relation("ProductToRelatedProduct", fields: [productId], references: [id], onDelete: Cascade)
+  relatedProduct   Product  @relation("RelatedProductToProduct", fields: [relatedProductId], references: [id], onDelete: Cascade)
 
   @@unique([productId, relatedProductId])  
   @@map("related_products")
@@ -466,8 +471,8 @@ model ProductSubCategory {
   productId  String    @db.ObjectId
   subcategoryId String    @db.ObjectId  
 
-  product    Product   @relation(fields: [productId], references: [id])
-  subcategory SubCategory  @relation(fields: [subcategoryId], references: [id])  
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  subcategory SubCategory  @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)  
   @@unique([productId, subcategoryId])
 }
 
@@ -569,7 +574,7 @@ model Order {
   reservationId       String?  @db.ObjectId @unique
   reservation         Reservation? @relation
 
-   mainOrderId   String?   @db.ObjectId
+  mainOrderId   String?   @db.ObjectId
   mainOrder     MainOrder? @relation(fields: [mainOrderId], references: [id])
 
 
@@ -628,7 +633,7 @@ model Reservation {
   amountOrdered       Float
   amountShipped       Float
   shippingMethod      String
-  state               Boolean  @default(false)
+  isActive            Boolean  @default(false)
   loyaltyPtsValue     Int      @default(0)
   fromMobile          Boolean  @default(false)
   weight              Float
@@ -649,7 +654,6 @@ model Reservation {
   order               Order?   @relation(fields: [orderId], references: [id])
 
   reservationItems    ReservationItem[]
-  loyaltyPoints       LoyaltyPoints[]
 
   paymentMethodId     String   @db.ObjectId
   paymentMethod       OrderPayment @relation(fields: [paymentMethodId], references: [id]) 
@@ -661,7 +665,7 @@ model ReservationItem {
   qteCanceled    Int
   discountedPrice Float
   weight         Float
-  sku            String
+  sku            String @unique
   taxId           String   @db.ObjectId
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -684,17 +688,11 @@ model LoyaltyPoints {
   updatedAt    DateTime @updatedAt
 
   // Relationships
-  productId    String?   @db.ObjectId
-  product      Product?  @relation(fields: [productId], references: [id]) 
-
-  partnerId    String?   @db.ObjectId
-  partner      Partner?  @relation(fields: [partnerId], references: [id]) 
 
   orderId      String?   @db.ObjectId
   order        Order?    @relation(fields: [orderId], references: [id]) 
 
-  reservationId String?  @db.ObjectId
-  reservation  Reservation? @relation(fields: [reservationId], references: [id]) 
+
 }
 
 
@@ -707,4 +705,34 @@ model MainOrder {
 
   // One-to-many relationship with Order
   orders    Order[]
+}
+
+model SkuPartner {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId   String   @db.ObjectId
+  partnerId   String   @db.ObjectId
+  skuPartner  String   @unique
+  skuProduct  String
+
+  product     Product  @relation(fields: [productId], references: [id])
+  partner     Partner  @relation(fields: [partnerId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([productId, partnerId, skuPartner])
+  @@map("sku_partners")
+}
+
+model Settings {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  deliveryType      String
+  deliveryTypeAmount      String
+  freeDeliveryAmount     String 
+  loyaltyPointsAmount     String   
+  loyaltyPointsUnique    String  
+  partnerId    String?   @db.ObjectId
+  partner      Partner?  @relation(fields: [partnerId], references: [id]) 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

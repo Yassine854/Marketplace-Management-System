@@ -30,7 +30,7 @@ export const changeOrderStatus = async ({
       };
 
       response = await axios.magentoClient.post("orders/manage/complete", data);
-      //console.log("Response from orders/manage/complete:", response.data);
+      //
     } else {
       const data = {
         orders: [
@@ -43,7 +43,7 @@ export const changeOrderStatus = async ({
       };
 
       response = await axios.magentoClient.put("orders/status_change", data);
-      //console.log("Response from :najeh ", response);
+      //
     }
     return response.data;
 

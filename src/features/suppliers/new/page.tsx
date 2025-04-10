@@ -211,7 +211,6 @@ const SupplierForm = () => {
       });
 
       const data = await response.json();
-      console.log("Response from API:", data);
 
       if (response.ok) {
         setUploadedFiles((prev) => [...prev, { id: data.fileId }]);
@@ -327,8 +326,6 @@ const SupplierForm = () => {
         files: uploadedFiles.map((file) => ({ id: file.id })),
       };
 
-      console.log("Données de la commande avant envoi:", orderData);
-
       const response = await fetch("/api/purchase", {
         method: "POST",
         headers: {
@@ -343,7 +340,7 @@ const SupplierForm = () => {
       }
 
       const result = await response.json();
-      console.log("Purchase Order Saved:", result);
+
       toast.success("Purchase order saved successfully!");
 
       return result;
@@ -362,8 +359,6 @@ const SupplierForm = () => {
         (product) =>
           product.manufacturer === selectedSupplier?.manufacturer_id.toString(),
       );
-
-      console.log("Filtered Products:", filteredProducts);
 
       const updatedProducts = filteredProducts
         .map((product) => {

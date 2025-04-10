@@ -24,7 +24,6 @@ export async function POST(req: Request) {
         product_id: uniqueProductId,
         name: formData.get("name") as string,
         sku: formData.get("sku") as string,
-        skuPartner: formData.get("skuPartner") as string,
         price: parseFloat(formData.get("price") as string),
         cost: formData.get("cost")
           ? parseFloat(formData.get("cost") as string)
@@ -37,8 +36,18 @@ export async function POST(req: Request) {
         maximumQte: formData.get("maximumQte")
           ? parseInt(formData.get("maximumQte") as string)
           : null,
-        sealableAlertQte: formData.get("sealableAlertQte")
-          ? parseInt(formData.get("sealableAlertQte") as string)
+        sealable: formData.get("sealable")
+          ? parseInt(formData.get("sealable") as string)
+          : null,
+
+        alertQte: formData.get("alertQte")
+          ? parseInt(formData.get("alertQte") as string)
+          : null,
+        loyaltyPoints: formData.get("loyaltyPoints")
+          ? parseFloat(formData.get("loyaltyPoints") as string)
+          : null,
+        loyaltyPointsAmount: formData.get("loyaltyPointsAmount")
+          ? parseFloat(formData.get("loyaltyPointsAmount") as string)
           : null,
         pcb: formData.get("pcb") as string,
         weight: formData.get("weight")
@@ -55,7 +64,7 @@ export async function POST(req: Request) {
         promotionId:
           formData.get("promo") === "true" && formData.get("promotionId")
             ? (formData.get("promotionId") as string)
-            : null, // Set to null if promo is not checked
+            : null,
       },
     });
 

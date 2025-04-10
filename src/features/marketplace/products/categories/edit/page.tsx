@@ -1,7 +1,7 @@
 import { useEffect, useState, FormEvent } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "@/libs/next-intl/i18nNavigation";
-import { useParams } from "next/navigation"; // Assuming you are using next navigation
+import { useParams } from "next/navigation";
 
 const EditCategoryPage = () => {
   const { id } = useParams<{ id: string }>(); // Retrieve the category ID from URL

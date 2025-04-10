@@ -15,9 +15,8 @@ export const useGetAllLogs = () => {
       const { data } = await axios.servicesClient.get<{ logs: Log[] }>(
         "/api/log",
       );
-      console.log("received response ", data);
+
       setLogs(data.logs || []);
-      console.log("data.logs", data.logs);
     } catch (err) {
       let errorMessage = "Failed to fetch logs";
 

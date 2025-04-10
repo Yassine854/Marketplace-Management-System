@@ -59,7 +59,6 @@ const useAxios = <T>(): UseAxiosProps<T> => {
         setResponse(result);
         return result;
       } catch (err) {
-        console.log("🚀 ~ err:", err);
         if (axios.isAxiosError(err)) {
           setError(err);
         } else {

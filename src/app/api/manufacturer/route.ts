@@ -47,7 +47,6 @@ async function main() {
         address: supplier.address,
       },
     });
-    console.log(`Supplier ${supplier.code} imported`);
   }
 }
 
