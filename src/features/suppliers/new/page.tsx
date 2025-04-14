@@ -1,6 +1,12 @@
 import { useState, useEffect, useReducer } from "react";
 import toast from "react-hot-toast";
-import { Supplier, Product, Warehouse, PaymentType } from "./utils/types";
+import {
+  Supplier,
+  Product,
+  Warehouse,
+  PaymentType,
+  SimplifiedProduct,
+} from "./utils/types";
 import { generateOrderPDF } from "./utils/generatePdf";
 import "@/features/suppliers/styles/NeonButton.css";
 import jsPDF from "jspdf";
@@ -9,7 +15,6 @@ import { useSession } from "next-auth/react";
 import { sendOrderEmail } from "./utils/emailService";
 const SupplierForm = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState<string>("");
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
     null,
@@ -51,6 +56,7 @@ const SupplierForm = () => {
       total: number;
     }[]
   >([]);
+  const [products, setProducts] = useState<SimplifiedProduct[]>([]);
   const totalPercentage = paymentTypes.reduce(
     (acc, payment) => acc + (parseFloat(payment.percentage) || 0),
     0,
@@ -80,37 +86,62 @@ const SupplierForm = () => {
 
         const warehousesData = await warehousesRes.json();
         const validatedWarehouses = warehousesData.map((w: any) => ({
-          warehouse_id: w.warehouseId ?? w.warehouse_id,
+          warehouseId: w.warehouseId || w.warehouse_id,
           name: w.warehouseName || w.name,
           location: w.location,
           capacity: w.capacity,
           manager: w.manager,
         }));
         setWarehouses(validatedWarehouses);
+        const productsResponse = await productsRes.json();
+        if (!Array.isArray(productsResponse.products)) {
+          throw new Error(
+            "Format de données de produit invalide: " +
+              JSON.stringify(productsResponse),
+          );
+        }
 
-        const productsData = await productsRes.json();
-        const validatedProducts = productsData.map((p: any) => ({
-          id: p.product_id,
-          sku: p.sku,
-          name: p.name,
-          price: p.price,
-          website_ids: p.website_ids?.map(Number) || [],
-          manufacturer: p.manufacturer,
-        }));
+        const productsData = productsResponse.products;
+        const validatedProducts: SimplifiedProduct[] = productsData.map(
+          (p: any) => ({
+            id: String(p.id),
+
+            product_id: Number(p.product_id),
+
+            sku: String(p.sku),
+
+            name: String(p.name),
+
+            price: Number(p.price),
+
+            cost: p.cost ? Number(p.cost) : null,
+
+            website_ids: Array.isArray(p.website_ids)
+              ? p.website_ids.map(Number)
+              : [],
+
+            manufacturer: p.manufacturer ? Number(p.manufacturer) : null,
+
+            supplierId: p.supplierId ? String(p.supplierId) : null,
+          }),
+        );
+
         setProducts(validatedProducts);
 
         const suppliersData = await suppliersRes.json();
-        const validatedSuppliers = suppliersData.map((s: any) => ({
-          manufacturer_id: s.manufacturerId ?? s.manufacturer_id,
-          companyName: s.companyName || s.company_name,
-          contact_name: s.contactName || s.contact_name,
-          email: s.email,
-          phone_number: s.phoneNumber ?? s.phone_number,
-          postal_code: s.postalCode ?? s.postal_code,
-          city: s.city,
-          country: s.country,
-          capital: s.capital,
-        }));
+        const validatedSuppliers = suppliersData
+          .map((s: any) => ({
+            manufacturer_id: s.manufacturerId || s.id || s.manufacturer_id,
+            companyName: s.companyName || s.company_name,
+            contact_name: s.contactName || s.contact_name,
+            email: s.email,
+            phone_number: s.phoneNumber || s.phone_number,
+            postal_code: s.postalCode || s.postal_code,
+            city: s.city,
+            country: s.country,
+            capital: s.capital,
+          }))
+          .filter((s: { manufacturer_id: any }) => s.manufacturer_id);
         setSuppliers(validatedSuppliers);
       } catch (error) {
         console.error("Data loading error::", error);
@@ -125,11 +156,6 @@ const SupplierForm = () => {
   }, [paymentTypes, totalPercentage, totalAmount]);
 
   useEffect(() => {
-    if (remainingAmount === 0 && paymentTypes.length > 1) {
-      setPaymentTypes((prevState) => prevState.slice(0, prevState.length - 1));
-    }
-  }, [remainingAmount, paymentTypes.length]);
-  useEffect(() => {
     if (
       newPaymentType &&
       paymentPercentage &&
@@ -143,13 +169,13 @@ const SupplierForm = () => {
   useEffect(() => {
     const totalAllocated = paymentTypes.reduce(
       (acc, payment) => acc + (parseFloat(payment.amount || "0") || 0),
+
       0,
     );
 
     const remaining = totalAmount - totalAllocated;
-    const roundedRemaining = Math.round(remaining * 100) / 100;
 
-    setRemainingAmount(roundedRemaining);
+    setRemainingAmount(Math.round(remaining * 100) / 100);
   }, [paymentTypes, totalAmount]);
 
   const handlePaymentTypeChange = (index: number, type: string) => {
@@ -160,35 +186,34 @@ const SupplierForm = () => {
   };
   const handlePaymentPercentageChange = (index: number, value: string) => {
     const newPercentage = Math.min(parseFloat(value) || 0, 100);
+
     const updatedPayments = [...paymentTypes];
 
     updatedPayments[index] = {
       ...updatedPayments[index],
+
       percentage: newPercentage.toString(),
-      amount: ((totalAmount * newPercentage) / 100).toString(),
+
+      amount: ((totalAmount * newPercentage) / 100).toFixed(2),
     };
 
     const totalAllocated = updatedPayments.reduce(
       (acc, payment) => acc + (parseFloat(payment.percentage || "0") || 0),
+
       0,
     );
 
-    const remainingPercentage = 100 - totalAllocated;
-
-    if (remainingPercentage > 0 && index === updatedPayments.length - 1) {
+    if (totalAllocated < 100 && index === updatedPayments.length - 1) {
       updatedPayments.push({
         type: "",
-        percentage: remainingPercentage.toFixed(2),
+
+        percentage: "",
+
         amount: "",
+
         date: new Date(),
       });
     }
-
-    updatedPayments.forEach((payment, i) => {
-      if (i !== index && i !== updatedPayments.length - 1) {
-        payment.percentage = payment.percentage;
-      }
-    });
 
     setPaymentTypes(updatedPayments);
   };
@@ -301,7 +326,7 @@ const SupplierForm = () => {
       const orderData = {
         orderNumber: `PO-${Date.now()}`,
         manufacturerId: Number(selectedSupplier.manufacturer_id) || 0,
-        warehouseId: Number(selectedWarehouse.warehouse_id) || 0,
+        warehouseId: Number(selectedWarehouse?.warehouseId) || 0,
         deliveryDate: new Date(deliveryDate).toISOString(),
         totalAmount: totalAmount,
         status: selectedState,
@@ -327,8 +352,6 @@ const SupplierForm = () => {
         files: uploadedFiles.map((file) => ({ id: file.id })),
       };
 
-      console.log("Données de la commande avant envoi:", orderData);
-
       const response = await fetch("/api/purchase", {
         method: "POST",
         headers: {
@@ -343,7 +366,6 @@ const SupplierForm = () => {
       }
 
       const result = await response.json();
-      console.log("Purchase Order Saved:", result);
       toast.success("Purchase order saved successfully!");
 
       return result;
@@ -354,36 +376,53 @@ const SupplierForm = () => {
 
   const handleSelectWarehouse = (warehouseName: string): void => {
     const warehouse = warehouses.find((w) => w.name === warehouseName);
-
-    if (warehouse) {
+    if (warehouse && selectedSupplier) {
       setSelectedWarehouse(warehouse);
 
-      const filteredProducts = products.filter(
-        (product) =>
-          product.manufacturer === selectedSupplier?.manufacturer_id.toString(),
-      );
-
-      console.log("Filtered Products:", filteredProducts);
+      const filteredProducts = products.filter((product) => {
+        if (!product.manufacturer) return false;
+        const productManufacturerId = Number(product.manufacturer);
+        const supplierId = Number(selectedSupplier.manufacturer_id);
+        return productManufacturerId === supplierId;
+      });
 
       const updatedProducts = filteredProducts
         .map((product) => {
-          if (!product || !product.id) {
-            console.error("Product is undefined or missing id:", product);
-            return null;
-          }
+          const productData: Product = {
+            id: product.id,
+            product_id: product.product_id,
+            sku: product.sku,
+            name: product.name,
+            price: product.price,
+            cost: product.cost ?? null,
+            website_ids: product.website_ids,
+            manufacturer: product.manufacturer || null,
+            description: null,
+            image: null,
+            url_key: null,
+            created_at: null,
+            updated_at: null,
+            supplierId: null,
+            pcb: null,
+            weight: null,
+            stock: null,
+            promo: false,
+            skuPartner: null,
+            minimumQte: null,
+            maximumQte: null,
+            sealableAlertQte: null,
+            typePcbId: null,
+            productTypeId: null,
+            productStatusId: null,
+            taxId: null,
+            promotionId: null,
+          };
+
           return {
-            product: {
-              id: product.id.toString(),
-              product_id: product.product_id,
-              sku: product.sku,
-              name: product.name,
-              price: product.price,
-              website_ids: product.website_ids,
-              manufacturer: product.manufacturer,
-            },
+            product: productData,
             quantity: 0,
             sku: product.sku,
-            id: product.id.toString(),
+            id: product.id,
             priceExclTax: product.price || 0,
             total: 0,
           };
@@ -391,9 +430,10 @@ const SupplierForm = () => {
         .filter(
           (product): product is NonNullable<typeof product> => product !== null,
         );
+
       setProductsWithQuantities(updatedProducts);
     } else {
-      console.error("Warehouse not found:", warehouseName);
+      console.error("Warehouse not found or supplier not selected");
     }
   };
   const resetFormFields = (): void => {
@@ -417,44 +457,45 @@ const SupplierForm = () => {
         totalAmount,
         comment,
       });
-
-      toast.success("Email sent successfully!");
     } catch (error) {
       toast.error("Failed to send email. Please try again.");
     }
   };
   const handlePaymentAmountChange = (index: number, value: string) => {
-    const newAmount = Math.min(parseFloat(value) || 0, totalAmount);
-    const updatedPaymentTypes = [...paymentTypes];
-    const newPercentage =
-      totalAmount !== 0 ? (newAmount / totalAmount) * 100 : 0;
+    const numericValue = value === "" ? "" : parseFloat(value);
+    if (numericValue !== "" && isNaN(numericValue)) return;
 
-    updatedPaymentTypes[index] = {
-      ...updatedPaymentTypes[index],
-      amount: newAmount.toString(),
-      percentage: newPercentage.toFixed(2),
+    const updatedPayments = [...paymentTypes];
+
+    updatedPayments[index] = {
+      ...updatedPayments[index],
+      amount: value,
+      percentage:
+        totalAmount !== 0
+          ? (
+              ((numericValue === "" ? 0 : numericValue) / totalAmount) *
+              100
+            ).toFixed(2)
+          : "0",
     };
 
-    const totalAllocated = updatedPaymentTypes.reduce(
+    const totalAllocated = updatedPayments.reduce(
       (acc, payment) => acc + (parseFloat(payment.amount || "0") || 0),
       0,
     );
 
-    if (
-      totalAllocated < totalAmount &&
-      index === updatedPaymentTypes.length - 1
-    ) {
-      updatedPaymentTypes.push({
+    if (index === updatedPayments.length - 1 && totalAllocated < totalAmount) {
+      updatedPayments.push({
         type: "",
-        percentage: newPercentage.toFixed(2),
+        percentage: "",
         amount: "",
         date: new Date(),
       });
     }
 
-    setPaymentTypes(updatedPaymentTypes);
-    setRemainingAmount(totalAmount - totalAllocated);
+    setPaymentTypes(updatedPayments);
   };
+
   const handleDownloadPDF = () => {
     if (productsWithQuantities.length === 0) {
       toast.error("Please add products before generating the PDF");
@@ -528,8 +569,16 @@ const SupplierForm = () => {
         productId: selectedProduct.id,
         sku: selectedProduct.sku,
         priceExclTax: selectedProduct.priceExclTax,
-        total: updatedRows[index].quantity * selectedProduct.priceExclTax,
+        quantity: 1,
+        total: 1 * selectedProduct.priceExclTax,
       };
+
+      const updatedProducts = productsWithQuantities.map((item) =>
+        item.id === selectedProduct.id
+          ? { ...item, quantity: 1, total: selectedProduct.priceExclTax }
+          : item,
+      );
+      setProductsWithQuantities(updatedProducts);
 
       if (index === updatedRows.length - 1) {
         updatedRows.push({
@@ -542,23 +591,10 @@ const SupplierForm = () => {
       }
 
       setProductRows(updatedRows);
-
-      const newTotalAmount = updatedRows.reduce((acc, row) => {
-        const product = productsWithQuantities.find(
-          (p) => p.id === row.productId,
-        );
-        if (product) {
-          return acc + row.quantity * product.priceExclTax;
-        }
-        return acc;
-      }, 0);
-
-      setTotalAmount(newTotalAmount);
-    } else {
-      console.error("Produit non trouvé pour l'ID:", productId);
     }
   };
   const handleQuantityChange = (index: number, quantity: number) => {
+    const qty = Math.max(quantity, 1);
     const updatedRows = [...productRows];
     updatedRows[index].quantity = quantity;
 
@@ -596,8 +632,6 @@ const SupplierForm = () => {
     }
 
     setProductRows(updatedRows);
-
-    // Recalculer le totalAmount
     const newTotalAmount = updatedRows.reduce((acc, row) => {
       const product = productsWithQuantities.find(
         (p) => p.id === row.productId,
@@ -672,9 +706,9 @@ const SupplierForm = () => {
   }
   const userName = session.user?.name || "Guest";
   return (
-    <div className="flex h-full flex-grow">
+    <div className="mt-7 flex h-full flex-grow">
       <div className="h-full w-full rounded-lg bg-[url(/images/login-bg.png)] bg-cover">
-        <div className="relative grid h-full w-full items-center justify-center gap-4">
+        <div className="relative mt-8 grid h-full w-full items-center justify-center gap-4">
           <div className="box w-full min-w-[800px] xl:p-8">
             <div className="rounded-lg border-2 border-gray-300 bg-white p-8 shadow-lg">
               <div className="bb-dashed mb-6 mt-9 flex items-center pb-6">
@@ -712,7 +746,7 @@ const SupplierForm = () => {
                         )
                         .map((supplier) => (
                           <li
-                            key={supplier.manufacturer_id}
+                            key={supplier.manufacturerId}
                             onClick={() => handleSelectSupplier(supplier)}
                             className="cursor-pointer px-4 py-2 hover:bg-gray-100"
                           >
@@ -934,7 +968,7 @@ const SupplierForm = () => {
                           Payment date
                         </span>
                         <span className="text-sm font-medium text-gray-700">
-                          Remaining Amount
+                          Remaining
                         </span>
                       </div>
                     )}
@@ -956,12 +990,6 @@ const SupplierForm = () => {
                           <input
                             type="number"
                             value={payment.percentage}
-                            onBlur={() =>
-                              handlePaymentPercentageChange(
-                                index,
-                                payment.percentage,
-                              )
-                            }
                             onChange={(e) => {
                               const value = e.target.value;
                               setPaymentTypes((prev) => {
@@ -970,8 +998,17 @@ const SupplierForm = () => {
                                 return updatedPayments;
                               });
                             }}
+                            onBlur={() =>
+                              handlePaymentPercentageChange(
+                                index,
+                                payment.percentage,
+                              )
+                            }
                             className="rounded-md border border-gray-300 p-3"
                             placeholder="Percentage"
+                            min="0"
+                            max="100"
+                            step="any"
                           />
                         )}
                         {payment.type && (
@@ -983,6 +1020,8 @@ const SupplierForm = () => {
                             }
                             className="rounded-md border border-gray-300 p-3"
                             placeholder="Amount"
+                            step="any"
+                            min="0"
                           />
                         )}
                         {payment.type && (

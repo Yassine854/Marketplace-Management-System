@@ -1,23 +1,38 @@
-export type Warehouse = {
-  warehouse_id: any;
-  name: string;
-  quantity: number;
+import {
+  Product as PrismaProduct,
+  Manufacturer as PrismaSupplier,
+  Warehouse as PrismaWarehouse,
+} from "@prisma/client";
+
+export type Warehouse = PrismaWarehouse & {
   products: Product[];
 };
 
 export type Supplier = {
   manufacturer_id: number;
+  manufacturerId?: number;
   companyName: string;
   contact_name: string;
   email: string;
-  phone_number?: string;
-  postal_code?: string;
-  city?: string;
-  country?: string;
-  capital?: string;
+  phone_number: string;
+  postal_code: string | null;
+  city: string;
+  country: string;
+  capital: string;
+};
+export type Product = Partial<PrismaProduct> & {
+  website_ids: number[];
 };
 
-export type Product = {
+export interface ProductWithQuantities {
+  product: Product;
+  quantity: number;
+  sku: string;
+  id: string;
+  priceExclTax: number;
+  total: number;
+}
+export type SimplifiedProduct = {
   id: string;
 
   product_id: number;
@@ -28,31 +43,16 @@ export type Product = {
 
   price: number;
 
+  cost: number | null;
+
   website_ids: number[];
 
-  manufacturer: string;
+  manufacturer: string | null;
 };
-
-export interface ProductWithQuantities {
-  product: Product;
-
-  quantity: number;
-
-  sku: string;
-
-  id: string;
-
-  priceExclTax: number;
-
-  total: number;
-}
 
 export type PaymentType = {
   type: string;
-
   percentage: string;
-
   amount: string;
-
   date: Date;
 };

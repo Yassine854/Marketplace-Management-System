@@ -3,49 +3,30 @@ const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const products = await prisma.products.findMany();
-    console.log(products);
+    const products = await prisma.product.findMany({
+      include: {
+        productType: true,
+        productStatus: true,
+        supplier: true,
+        tax: true,
+        promotion: true,
+        images: true,
+        productSubCategories: { include: { subcategory: true } },
+        favoriteProducts: true,
+        favoritePartners: true,
+        relatedProducts: { include: { relatedProduct: true } },
+      },
+    });
     return NextResponse.json(
-      products.map(
-        (p: {
-          id: string;
-          product_id: number;
-          sku: string;
-          name: string;
-          price: number;
-          special_price: number | null;
-          cost: number | null;
-          manufacturer: string | null;
-          category_ids: number[];
-          website_ids: number[];
-          image: string | null;
-          url_key: string | null;
-          created_at: string;
-          updated_at: string;
-        }) => ({
-          id: p.id,
-          product_id: p.product_id,
-          sku: p.sku,
-          name: p.name,
-          price: p.price,
-          special_price: p.special_price || null,
-          cost: p.cost || null,
-          manufacturer: p.manufacturer || null,
-          category_ids: p.category_ids,
-          website_ids: p.website_ids,
-          image: p.image || null,
-          url_key: p.url_key || null,
-          created_at: p.created_at,
-          updated_at: p.updated_at,
-        }),
-      ),
+      { message: "Products retrieved", products },
+      { status: 200 },
     );
   } catch (error) {
-    console.error("Erreur API products:", error);
+    console.error("Error fetching products:", error);
     return NextResponse.json(
-      { error: "Échec de la récupération des produits" },
+      { error: "Failed to retrieve products" },
       { status: 500 },
     );
   }

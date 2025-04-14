@@ -128,8 +128,10 @@ export const generateOrderPDF = (
       const startY = yOffset;
 
       let maxHeight = lineHeight;
-      const productLines = doc.splitTextToSize(item.product.name, 60);
-
+      const productLines = doc.splitTextToSize(
+        item.product.name || "Nom inconnu",
+        60,
+      );
       productLines.forEach((line: string, i: number) => {
         doc.text(line, margin, yOffset + i * lineHeight);
       });

@@ -17,19 +17,37 @@ export async function POST(req: Request) {
       files,
       products,
     } = await req.json();
+    console.log("Données de la requête:", {
+      manufacturerId,
+      warehouseId,
+      deliveryDate,
+      totalAmount,
+      status,
+      comments,
+      payments,
+      files,
+      products,
+    });
 
-    if (!manufacturerId || !warehouseId) {
+    const parsedManufacturerId = Number(manufacturerId);
+    const parsedWarehouseId = Number(warehouseId);
+
+    if (isNaN(parsedManufacturerId) || parsedManufacturerId <= 0) {
       return NextResponse.json(
-        { error: "Données manquantes" },
+        { error: "Manufacturier invalide" },
         { status: 400 },
       );
+    }
+
+    if (isNaN(parsedWarehouseId) || parsedWarehouseId <= 0) {
+      return NextResponse.json({ error: "Entrepôt invalide" }, { status: 400 });
     }
 
     const order = await prisma.purchaseOrder.create({
       data: {
         orderNumber: `PO-${Date.now()}`,
-        manufacturer: { connect: { manufacturerId: parseInt(manufacturerId) } },
-        warehouse: { connect: { warehouseId: parseInt(warehouseId) } },
+        manufacturer: { connect: { manufacturerId: parsedManufacturerId } },
+        warehouse: { connect: { warehouseId: parsedWarehouseId } },
         deliveryDate: new Date(deliveryDate),
         totalAmount: parseFloat(totalAmount),
         status: status as OrderState,
@@ -66,7 +84,7 @@ export async function POST(req: Request) {
                     amount: parseFloat(payment.amount),
                     paymentMethod: payment.paymentMethod.toUpperCase(),
                     percentage: parseFloat(payment.percentage) || 0,
-                    manufacturerId: Number(manufacturerId) || 0,
+                    manufacturerId: parsedManufacturerId, // Utilisez l'ID validé
                     paymentDate: new Date(payment.date),
                   })),
               }
