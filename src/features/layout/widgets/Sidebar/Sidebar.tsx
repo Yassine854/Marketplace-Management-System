@@ -173,8 +173,8 @@ const Sidebar = ({
           <SidebarButton
             name="Delivery Agent"
             icon={<IconTruck />}
-            onClick={() => push("/delivery-agent")}
-            isActive={pathname?.includes("delivery-agent")}
+            onClick={() => push("/deliveryAgent")}
+            isActive={pathname?.includes("deliveryAgent")}
           />
 
           <Divider />

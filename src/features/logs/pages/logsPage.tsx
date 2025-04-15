@@ -22,11 +22,15 @@ export default function LogsPage() {
     orderId: "",
     username: "",
     product: "",
+    sku: "", // Nouveau filtre SKU
+    timestamp: { start: "", end: "" },
   });
   const [tempFilters, setTempFilters] = useState({
     orderId: "",
     username: "",
     product: "",
+    sku: "", // Nouveau filtre SKU
+    timestamp: { start: "", end: "" },
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -117,12 +121,52 @@ export default function LogsPage() {
             );
           });
 
+        const matchesSku =
+          !filters.sku ||
+          [dataBefore, dataAfter].some((data) => {
+            return (
+              data &&
+              typeof data === "object" &&
+              "items" in data &&
+              Array.isArray(data.items?.updatedItems) &&
+              data.items.updatedItems.some((item: any) => {
+                return (
+                  item.sku &&
+                  item.sku.toLowerCase() === filters.sku.toLowerCase()
+                );
+              })
+            );
+          });
+        const logDate = new Date(log.timestamp);
+        const startDate = filters.timestamp.start
+          ? new Date(filters.timestamp.start)
+          : null;
+        const endDate = filters.timestamp.end
+          ? new Date(filters.timestamp.end)
+          : null;
+        const isDateInRange = (logDate: Date, start: string, end: string) => {
+          const logTime = logDate.getTime();
+          const startTime = start ? new Date(start).getTime() : -Infinity;
+          const endTime = end
+            ? new Date(end + "T23:59:59").getTime()
+            : Infinity; // Inclure toute la journée
+
+          return logTime >= startTime && logTime <= endTime;
+        };
+        const matchesDate = isDateInRange(
+          new Date(log.timestamp),
+          filters.timestamp.start,
+          filters.timestamp.end,
+        );
+
         return (
           matchesSearch &&
           matchesTab &&
           matchesOrderId &&
           matchesUsername &&
-          matchesProduct
+          matchesProduct &&
+          matchesSku &&
+          matchesDate
         );
       })
       .sort((a, b) => {
@@ -242,8 +286,20 @@ export default function LogsPage() {
             <button
               className={`rounded-md bg-gray-500 px-4 py-2 text-white transition-colors duration-300`}
               onClick={() => {
-                setFilters({ orderId: "", username: "", product: "" });
-                setTempFilters({ orderId: "", username: "", product: "" });
+                setFilters({
+                  orderId: "",
+                  username: "",
+                  product: "",
+                  sku: "",
+                  timestamp: { start: "", end: "" },
+                });
+                setTempFilters({
+                  orderId: "",
+                  username: "",
+                  product: "",
+                  sku: "",
+                  timestamp: { start: "", end: "" },
+                });
               }}
             >
               Reset
@@ -354,6 +410,52 @@ export default function LogsPage() {
                   setTempFilters({ ...tempFilters, product: e.target.value })
                 }
               />
+              <input
+                type="text"
+                placeholder="SKU"
+                className="rounded-lg border p-2"
+                value={tempFilters.sku}
+                onChange={(e) =>
+                  setTempFilters({ ...tempFilters, sku: e.target.value })
+                }
+              />
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Date Range</label>
+                <input
+                  type="date"
+                  className="rounded-lg border p-2"
+                  max={tempFilters.timestamp.end || undefined}
+                  value={tempFilters.timestamp.start}
+                  onChange={(e) => {
+                    const newStart = e.target.value;
+                    const currentEnd = tempFilters.timestamp.end;
+                    if (!newStart || !currentEnd || newStart <= currentEnd) {
+                      setTempFilters({
+                        ...tempFilters,
+                        timestamp: {
+                          ...tempFilters.timestamp,
+                          start: newStart,
+                        },
+                      });
+                    }
+                  }}
+                />
+                <span className="text-center">to</span>
+                <input
+                  type="date"
+                  className="rounded-lg border p-2"
+                  value={tempFilters.timestamp.end}
+                  onChange={(e) =>
+                    setTempFilters({
+                      ...tempFilters,
+                      timestamp: {
+                        ...tempFilters.timestamp,
+                        end: e.target.value,
+                      },
+                    })
+                  }
+                />
+              </div>
             </div>
             <div className="mt-4 flex justify-end gap-2">
               <button

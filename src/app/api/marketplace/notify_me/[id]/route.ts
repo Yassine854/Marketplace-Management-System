@@ -22,7 +22,7 @@ export async function GET(
       where: { id },
       include: {
         product: true,
-        customer: true,
+        customers: true,
       },
     });
 

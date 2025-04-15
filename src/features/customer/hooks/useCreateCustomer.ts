@@ -6,26 +6,32 @@ export function useCreateCustomer() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createCustomer = async (
-    customerData: Omit<Customer, "id">,
-    onSuccess?: () => void,
-  ) => {
+  const createCustomer = async (customerData: Omit<Customer, "id">) => {
     setIsLoading(true);
     setError(null);
 
     try {
+      const formData = new FormData();
+      Object.entries(customerData).forEach(([key, value]) => {
+        formData.append(key, value.toString());
+      });
+
       const response = await axios.post(
         "/api/marketplace/customers/create",
-        customerData,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
       );
+
       if (response.status === 201) {
-        onSuccess?.();
+        return response.data.customer;
       }
-      return response.data; // Return the created customer
     } catch (err: any) {
-      setError(err.response?.data?.message || "Error creating customer");
-      console.error("Error:", err);
-      throw err; // Re-throw the error for handling in the component
+      setError(err.response?.data?.error || "Failed to create customer");
+      throw err;
     } finally {
       setIsLoading(false);
     }

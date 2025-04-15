@@ -14,7 +14,13 @@ const ItemsPerPageSelector = () => {
 
   const { open, ref, toggleOpen } = useDropdown();
 
-  const { setItemsPerPage } = useOrdersTableStore();
+  // const { setItemsPerPage } = useOrdersTableStore();
+  const { itemsPerPage, setItemsPerPage } = useOrdersTableStore();
+  const { setCurrentPage } = useOrdersTableStore();
+  const handleSelect = (newValue: number) => {
+    setItemsPerPage(newValue);
+    setCurrentPage(1); // 👈 Reset à la première page quand on change le nombre d'items
+  };
 
   useEffect(() => {
     setSelected(25);

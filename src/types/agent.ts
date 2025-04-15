@@ -1,13 +1,14 @@
 export interface Agent {
   id: string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  telephone?: string;
-  address?: string;
-  password?: string;
+  firstName: string;
+  lastName: string;
+  username?: string;
+  email: string;
+  telephone: string;
+  address: string;
+  password: string;
+  retailer_profile?: any;
   roleId?: string;
-  isActive?: boolean;
-  created_at?: Date;
-  updated_at?: Date;
+  created_at?: string;
+  isActive: boolean;
 }

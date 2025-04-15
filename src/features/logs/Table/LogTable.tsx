@@ -70,7 +70,8 @@ export default function LogTable({
 
     if (
       message.includes("order status changed") ||
-      message.includes("order changed")
+      message.includes("order changed") ||
+      message.includes("Order status changed")
     ) {
       setModalType("statusChanged");
     } else if (message.includes("Order edited")) {

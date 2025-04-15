@@ -14,7 +14,7 @@ export async function GET(req: Request) {
 
     const reservations = await prisma.reservation.findMany({
       include: {
-        customer: true,
+        customers: true,
         agent: true,
         partner: true,
         order: true,

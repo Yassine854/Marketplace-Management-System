@@ -8,6 +8,7 @@ import { prisma } from "@/clients/prisma";
 import { getOrder } from "@/services/orders/getOrder";
 import { createLog } from "@/clients/prisma/getLogs";
 import { auth } from "../../../../services/auth";
+import { id } from "date-fns/locale";
 
 export const POST = async (request: NextRequest) => {
   let storeId: string = "";
@@ -46,13 +47,14 @@ export const POST = async (request: NextRequest) => {
 
     for (let id of orderIds) {
       try {
-        const orderBefor = await getOrder(orderId);
+        const orderBefor = await getOrder(id);
         const storeId = orderBefor.storeId;
         const orderBefore = {
-          orderId: orderBefor.orderId,
+          orderId: orderBefor.id,
           state: orderBefor.state,
           status: orderBefor.status,
         };
+        await magento.mutations.cancelOrder(id);
         await typesense.orders.cancelOne(id);
 
         await createLog({

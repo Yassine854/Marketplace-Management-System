@@ -1,57 +1,65 @@
 import { useState } from "react";
-import { Customer } from "@/types/customer";
+import { Agent } from "@/types/agent";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 
-interface CreateCustomerModalProps {
+interface CreateAgentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (customer: Omit<Customer, "id">) => Promise<void>;
+  onCreate: (agent: Omit<Agent, "id">) => Promise<void>;
   isLoading?: boolean;
   error?: string | null;
 }
 
-const CreateCustomerModal = ({
+const CreateAgentModal = ({
   isOpen,
   onClose,
   onCreate,
   isLoading,
   error,
-}: CreateCustomerModalProps) => {
-  const [form, setForm] = useState<Omit<Customer, "id">>({
+}: CreateAgentModalProps) => {
+  const [form, setForm] = useState<Partial<Agent>>({
     firstName: "",
     lastName: "",
+    username: "",
     email: "",
     telephone: "",
     address: "",
     password: "",
-    governorate: "",
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   });
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+
+  if (!isOpen) return null;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Basic validation
+    if (!form.firstName || !form.lastName || !form.email) {
+      alert("Please fill all required fields");
+      return;
+    }
+
+    // Password confirmation validation (only if password is changed)
+    if (form.password && form.password !== passwordConfirmation) {
+      alert("Passwords don't match");
+      return;
+    }
+
     try {
-      await onCreate(form);
+      await onCreate(form as Omit<Agent, "id">);
       onClose();
     } catch (err) {
-      console.error("Error:", err);
+      console.error("Error creating agent:", err);
     }
   };
-
-  if (!isOpen) return null;
 
   return (
     <motion.div
@@ -70,9 +78,7 @@ const CreateCustomerModal = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Create New Customer
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800">Create Agent</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
@@ -89,57 +95,72 @@ const CreateCustomerModal = ({
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
+            type="text"
             name="firstName"
             placeholder="First Name"
-            value={form.firstName}
+            value={form.firstName || ""}
             onChange={handleChange}
             className="w-full rounded-xl border p-3"
             required
           />
           <input
+            type="text"
             name="lastName"
             placeholder="Last Name"
-            value={form.lastName}
+            value={form.lastName || ""}
             onChange={handleChange}
             className="w-full rounded-xl border p-3"
             required
           />
           <input
-            name="email"
             type="email"
+            name="email"
             placeholder="Email"
-            value={form.email}
+            value={form.email || ""}
             onChange={handleChange}
             className="w-full rounded-xl border p-3"
             required
           />
           <input
+            type="tel"
             name="telephone"
             placeholder="Phone"
-            value={form.telephone}
+            value={form.telephone || ""}
             onChange={handleChange}
             className="w-full rounded-xl border p-3"
           />
           <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={form.username || ""}
+            onChange={handleChange}
+            className="w-full rounded-xl border p-3"
+            required
+          />
+          <input
+            type="text"
             name="address"
             placeholder="Address"
-            value={form.address}
+            value={form.address || ""}
             onChange={handleChange}
             className="w-full rounded-xl border p-3"
           />
           <input
-            name="governorate"
-            placeholder="Governorate"
-            value={form.governorate}
-            onChange={handleChange}
-            className="w-full rounded-xl border p-3"
-          />
-          <input
-            name="password"
             type="password"
+            name="password"
             placeholder="Password"
-            value={form.password}
+            value={form.password || ""}
             onChange={handleChange}
+            className="w-full rounded-xl border p-3"
+            required
+          />
+          <input
+            type="password"
+            name="passwordConfirmation"
+            placeholder="Confirm Password"
+            value={passwordConfirmation}
+            onChange={(e) => setPasswordConfirmation(e.target.value)}
             className="w-full rounded-xl border p-3"
             required
           />
@@ -157,7 +178,7 @@ const CreateCustomerModal = ({
               disabled={isLoading}
               className="rounded-xl bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:bg-green-400"
             >
-              {isLoading ? "Creating..." : "Create Customer"}
+              {isLoading ? "Creating..." : "Create Agent"}
             </button>
           </div>
         </form>
@@ -166,4 +187,4 @@ const CreateCustomerModal = ({
   );
 };
 
-export default CreateCustomerModal;
+export default CreateAgentModal;

@@ -1,60 +1,46 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs"; // Import bcryptjs for password hashing
-import { auth } from "../../../../../services/auth"; // Import authentication service
+import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-// 🟢 POST: Create a new customer
 export async function POST(req: Request) {
   try {
-    const session = await auth(); // Get user session
+    const formData = await req.formData();
 
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    const customerData = {
+      firstName: formData.get("firstName") as string,
+      lastName: formData.get("lastName") as string,
+      email: formData.get("email") as string,
+      telephone: formData.get("telephone") as string,
+      address: formData.get("address") as string,
+      governorate: formData.get("governorate") as string,
+      gender: formData.get("gender")
+        ? (formData.get("gender") as string)
+        : null,
+      password: await hash(formData.get("password") as string, 10),
+    };
 
-    const body = await req.json();
-
-    // Check if the customer already exists by email or telephone
-    const existingCustomer = await prisma.customer.findFirst({
-      where: {
-        OR: [{ email: body.email }, { telephone: body.telephone }],
-      },
+    const existingCustomer = await prisma.customers.findFirst({
+      where: { email: customerData.email },
     });
 
     if (existingCustomer) {
       return NextResponse.json(
-        { message: "Customer with this email or telephone already exists" },
+        { error: "Email already exists" },
         { status: 409 },
       );
     }
 
-    // Hash the password before storing it
-    const hashedPassword = await hash(body.password, 10);
-
-    // Create the customer in the database
-    const newCustomer = await prisma.customer.create({
-      data: {
-        firstName: body.firstName,
-        lastName: body.lastName,
-        email: body.email,
-        telephone: body.telephone,
-        address: body.address,
-        password: hashedPassword, // Store hashed password
-        roleId: body.roleId,
-        isActive: body.isActive ?? true, // Default to true if not provided
-      },
+    const newCustomer = await prisma.customers.create({
+      data: customerData,
     });
 
-    return NextResponse.json(
-      { message: "Customer created successfully", customer: newCustomer },
-      { status: 201 },
-    );
+    return NextResponse.json({ customer: newCustomer }, { status: 201 });
   } catch (error) {
-    console.error("Error creating customer:", error);
+    console.error("Creation error:", error);
     return NextResponse.json(
-      { error: "Failed to create customer" },
+      { error: "Internal server error" },
       { status: 500 },
     );
   }

@@ -16,7 +16,7 @@ export async function GET(req: Request) {
       include: {
         status: true,
         state: true,
-        customer: true,
+        customers: true,
         agent: true,
         reservation: true,
         partner: true,

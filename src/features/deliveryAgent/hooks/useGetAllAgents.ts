@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { axios } from "@/libs/axios";
 import { Agent } from "@/types/agent";
 
-export const useGetAllMethods = () => {
+export const useGetAllAgents = () => {
   const [agent, setAgent] = useState<Agent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -1,98 +1,91 @@
-import CustomerTable from "../table/CustomerTable";
+import AgentTable from "../table/AgentTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import { useState, useEffect, useMemo } from "react";
-import { useGetAllCustomers } from "../hooks/useGetAllCustomers";
-import { Customer } from "@/types/customer";
-import { useCustomersActions } from "../hooks/useCustomersActions";
-import { useCreateCustomer } from "../hooks/useCreateCustomer";
-import CreateCustomerModal from "../components/CreateCustomerModel";
-import EditCustomerModal from "../components/EditCustomerModel";
+import { useGetAllAgents } from "../hooks/useGetAllAgents";
+import { Agent } from "@/types/agent";
+import { useAgentsActions } from "../hooks/useAgentsActions";
+import { useCreateAgent } from "../hooks/useCreateAgent";
+import CreateAgentModal from "../components/CreateAgentModal";
+import EditAgentModal from "../components/EditAgentModal";
 
-const CustomerPage = () => {
+const AgentPage = () => {
+  const { agent: agents, isLoading, error, refetch } = useGetAllAgents();
   const {
-    customer: customers,
-    isLoading,
-    error,
-    refetch,
-  } = useGetAllCustomers();
-  const {
-    editCustomer,
-    deleteCustomer,
+    editAgent,
+    deleteAgent,
     isLoading: isActionLoading,
     error: actionError,
-  } = useCustomersActions();
+  } = useAgentsActions();
   const {
-    createCustomer,
+    createAgent,
     isLoading: isCreating,
     error: createError,
-  } = useCreateCustomer();
+  } = useCreateAgent();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortState, setSortState] = useState<"newest" | "oldest">("newest");
+  const [sortAgent, setSortAgent] = useState<"newest" | "oldest">("newest");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null,
-  );
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
 
-  const filteredCustomers = useMemo(() => {
-    let result = customers.filter((customer) => {
+  const filteredAgents = useMemo(() => {
+    let result = agents.filter((agent) => {
       const searchContent =
-        `${customer.id} ${customer.firstName} ${customer.lastName} ${customer.email} ${customer.telephone} ${customer.address}`.toLowerCase();
+        `${agent.id} ${agent.firstName} ${agent.lastName} ${agent.email} ${agent.telephone} ${agent.address}`.toLowerCase();
       return searchContent.includes(searchTerm.toLowerCase());
     });
 
     // Add sorting
     result = result.sort((a, b) => {
-      if (sortState === "newest") {
+      if (sortAgent === "newest") {
         return (
-          new Date(b.createdAt || 0).getTime() -
-          new Date(a.createdAt || 0).getTime()
+          new Date(b.created_at || 0).getTime() -
+          new Date(a.created_at || 0).getTime()
         );
       } else {
         return (
-          new Date(a.createdAt || 0).getTime() -
-          new Date(b.createdAt || 0).getTime()
+          new Date(a.created_at || 0).getTime() -
+          new Date(b.created_at || 0).getTime()
         );
       }
     });
 
     return result;
-  }, [customers, searchTerm, sortState]);
+  }, [agents, searchTerm, sortAgent]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [itemsPerPage, searchTerm]);
 
-  const handleEdit = async (id: string, updatedCustomer: Customer) => {
+  const handleEdit = async (id: string, updatedAgent: Agent) => {
     try {
-      const result = await editCustomer(id, updatedCustomer);
+      const result = await editAgent(id, updatedAgent);
       if (result) {
-        await refetch();
+        refetch();
         setIsEditModalOpen(false);
       }
     } catch (err) {
-      console.error("Error editing customer:", err);
+      console.error("Error editing agent:", err);
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
-      const result = await deleteCustomer(id);
+      const result = await deleteAgent(id);
       if (result) {
         refetch();
       }
     } catch (err) {
-      console.error("Error deleting customer:", err);
+      console.error("Error deleting agent:", err);
     }
   };
 
-  const handleCreate = async (customerData: Omit<Customer, "id">) => {
+  const handleCreate = async (agentData: Omit<Agent, "id">) => {
     try {
-      const result = await createCustomer(customerData);
+      const result = await createAgent(agentData);
       if (result) {
         refetch();
         setIsModalOpen(false);
@@ -102,15 +95,15 @@ const CustomerPage = () => {
     }
   };
 
-  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredAgents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedCustomers = filteredCustomers.slice(
+  const paginatedAgents = filteredAgents.slice(
     startIndex,
     startIndex + itemsPerPage,
   );
 
-  const openEditModal = (customer: Customer) => {
-    setSelectedCustomer(customer);
+  const openEditModal = (agent: Agent) => {
+    setSelectedAgent(agent);
     setIsEditModalOpen(true);
   };
 
@@ -135,7 +128,7 @@ const CustomerPage = () => {
         }}
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xl font-bold capitalize">Customers</p>
+          <p className="text-xl font-bold capitalize">Delivery Agent</p>
 
           <div className="flex flex-wrap gap-2 sm:items-center sm:justify-end sm:justify-between">
             <div className="relative m-4 w-full sm:w-auto sm:min-w-[200px] sm:flex-1">
@@ -157,9 +150,9 @@ const CustomerPage = () => {
             <select
               id="sort"
               className="rounded-lg border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={sortState}
+              value={sortAgent}
               onChange={(e) =>
-                setSortState(e.target.value as "newest" | "oldest")
+                setSortAgent(e.target.value as "newest" | "oldest")
               }
             >
               <option value="newest">Newest</option>
@@ -169,7 +162,7 @@ const CustomerPage = () => {
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="btn"
-                title="New Customer"
+                title="New Agent"
                 disabled={isCreating}
               >
                 <svg
@@ -186,7 +179,7 @@ const CustomerPage = () => {
                   <path d="M12 5l0 14" />
                   <path d="M5 12l14 0" />
                 </svg>
-                <span className="hidden md:inline">New Customer</span>
+                <span className="hidden md:inline">New Agent</span>
               </button>
             </div>
           </div>
@@ -194,15 +187,15 @@ const CustomerPage = () => {
       </div>
       <Divider />
       <div className="relative flex w-full flex-grow flex-col overflow-y-scroll bg-n10 px-3">
-        <CustomerTable
-          customer={paginatedCustomers}
+        <AgentTable
+          agent={paginatedAgents}
           isLoading={isLoading || isActionLoading}
           error={error || actionError}
           refetch={refetch}
           isSidebarOpen={false}
           onEdit={(id: string) => {
-            const customer = customers.find((c) => c.id === id);
-            if (customer) openEditModal(customer);
+            const agent = agents.find((c) => c.id === id);
+            if (agent) openEditModal(agent);
           }}
           onDelete={handleDelete}
         />
@@ -216,23 +209,23 @@ const CustomerPage = () => {
           onPageChange={setCurrentPage}
           onItemsPerPageChange={setItemsPerPage}
         />
-        <CreateCustomerModal
+        <CreateAgentModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onCreate={handleCreate}
           isLoading={isCreating}
           error={createError}
         />
-        {isEditModalOpen && selectedCustomer && (
-          <EditCustomerModal
+        {isEditModalOpen && selectedAgent && (
+          <EditAgentModal
             isOpen={isEditModalOpen}
             onClose={() => setIsEditModalOpen(false)}
             onEdit={async (id, updatedCustomer) => {
               await handleEdit(id, updatedCustomer);
             }}
-            customer={selectedCustomer}
-            isLoading={isLoading}
-            error={error}
+            agent={selectedAgent}
+            isLoading={isActionLoading} // Utiliser le bon état de chargement
+            error={actionError} // Utiliser l'erreur des actions
           />
         )}
       </div>
@@ -240,4 +233,4 @@ const CustomerPage = () => {
   );
 };
 
-export default CustomerPage;
+export default AgentPage;

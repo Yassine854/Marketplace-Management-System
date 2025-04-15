@@ -1,36 +1,38 @@
 import { useState, useEffect } from "react";
-import { Customer } from "@/types/customer";
+import { Agent } from "@/types/agent";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
-interface EditCustomerModalProps {
+interface EditAgentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onEdit: (id: string, updatedCustomer: Customer) => Promise<void>;
-  customer: Customer | null;
+  onEdit: (id: string, updatedAgent: Agent) => Promise<void>;
+  agent: Agent | null;
   isLoading: boolean;
   error: string | null;
 }
 
-const EditCustomerModal = ({
+const EditAgentModal = ({
   isOpen,
-  customer,
+  agent,
   onClose,
   onEdit,
   isLoading,
   error,
-}: EditCustomerModalProps) => {
-  const [form, setForm] = useState<Partial<Customer> | null>(null);
+}: EditAgentModalProps) => {
+  const [form, setForm] = useState<Partial<Agent> | null>(null);
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
   useEffect(() => {
-    if (customer) {
-      setForm({ ...customer, password: "" });
+    if (agent) {
+      setForm({ ...agent, password: "" });
       setPasswordConfirmation("");
     }
-  }, [customer]);
+  }, [agent]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev!, [name]: value }));
   };
@@ -53,11 +55,11 @@ const EditCustomerModal = ({
         ? form
         : { ...form, password: undefined };
       if (form.id) {
-        await onEdit(form.id, dataToSend as Customer);
+        await onEdit(form.id, dataToSend as Agent);
         onClose();
       }
     } catch (err) {
-      console.error("Error updating customer:", err);
+      console.error("Error updating agent:", err);
     }
   };
 
@@ -80,9 +82,7 @@ const EditCustomerModal = ({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-800">
-                Edit Customer
-              </h2>
+              <h2 className="text-2xl font-bold text-gray-800">Edit Agent</h2>
               <button
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600"
@@ -131,16 +131,17 @@ const EditCustomerModal = ({
                 className="w-full rounded-xl border p-3"
               />
               <input
+                name="username"
+                placeholder="Username"
+                value={form?.username || ""}
+                onChange={handleChange}
+                className="w-full rounded-xl border p-3"
+                required
+              />
+              <input
                 name="address"
                 placeholder="Address"
                 value={form?.address || ""}
-                onChange={handleChange}
-                className="w-full rounded-xl border p-3"
-              />
-              <input
-                name="governorate"
-                placeholder="Governorate"
-                value={form?.governorate || ""}
                 onChange={handleChange}
                 className="w-full rounded-xl border p-3"
               />
@@ -186,4 +187,4 @@ const EditCustomerModal = ({
   );
 };
 
-export default EditCustomerModal;
+export default EditAgentModal;
