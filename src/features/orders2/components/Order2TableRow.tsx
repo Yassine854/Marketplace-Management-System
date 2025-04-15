@@ -62,8 +62,8 @@ const OrderTableRow = ({
         <td className="px-6 py-4">
           {new Date(order.updatedAt).toLocaleString()}
         </td>
-        <td className="px-6 py-4">{order.status.name}</td>
-        <td className="px-6 py-4">{order.state.name}</td>
+        <td className="px-6 py-4">{order.status?.name}</td>
+        <td className="px-6 py-4">{order.state?.name}</td>
         <td className="whitespace-nowrap px-6 py-4">
           {order.customer ? (
             <div

@@ -78,7 +78,7 @@ export async function PATCH(
     } = body;
 
     if (body.status) {
-      data.status = { connect: { id: body.status.id } }; // Use relation field
+      data.status = { connect: { id: body.status.id } };
     }
     if (body.state) {
       data.state = { connect: { id: body.state.id } };

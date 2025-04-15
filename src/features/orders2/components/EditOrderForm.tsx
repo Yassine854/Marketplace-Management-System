@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import { OrderWithRelations, OrderItemWithRelations } from "../types/order";
 import {
@@ -31,7 +32,8 @@ import {
 
 interface AmountField {
   label: string;
-  field: keyof OrderWithRelations;
+  value: number;
+  setter: (value: number) => void;
   icon: any;
 }
 
@@ -44,7 +46,35 @@ const EditOrderForm = ({
   onClose: () => void;
   onUpdate: (updatedOrder: OrderWithRelations) => void;
 }) => {
-  const [updatedOrder, setUpdatedOrder] = useState<OrderWithRelations>(order);
+  const [amountExclTaxe, setAmountExclTaxe] = useState(order.amountExclTaxe);
+  const [amountTTC, setAmountTTC] = useState(order.amountTTC);
+  const [amountBeforePromo, setAmountBeforePromo] = useState(
+    order.amountBeforePromo,
+  );
+  const [amountAfterPromo, setAmountAfterPromo] = useState(
+    order.amountAfterPromo,
+  );
+  const [amountRefunded, setAmountRefunded] = useState(order.amountRefunded);
+  const [amountOrdered, setAmountOrdered] = useState(order.amountOrdered);
+  const [amountShipped, setAmountShipped] = useState(order.amountShipped);
+  const [amountCanceled, setAmountCanceled] = useState(order.amountCanceled);
+  const [loyaltyPtsValue, setLoyaltyPtsValue] = useState(order.loyaltyPtsValue);
+  const [shippingMethod, setShippingMethod] = useState(
+    order.shippingMethod || "",
+  );
+  const [weight, setWeight] = useState(order.weight || 0);
+  const [fromMobile, setFromMobile] = useState(order.fromMobile || false);
+  const [stateId, setStateId] = useState(order.state?.id || "");
+  const [statusId, setStatusId] = useState(order.status?.id || "");
+  const [customerId, setCustomerId] = useState(order.customer?.id || "");
+  const [agentId, setAgentId] = useState(order.agent?.id || "");
+  const [partnerId, setPartnerId] = useState(order.partner?.id || "");
+  const [paymentMethodId, setPaymentMethodId] = useState(
+    order.paymentMethod?.id || "",
+  );
+  const [orderItems, setOrderItems] = useState<OrderItemWithRelations[]>(
+    order.orderItems || [],
+  );
   const [error, setError] = useState("");
   const [showOrderItemsModal, setShowOrderItemsModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,44 +84,62 @@ const EditOrderForm = ({
   const [agents, setAgents] = useState<Agent[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<OrderPayment[]>([]);
+
   const amountFields: AmountField[] = [
     {
       label: "Amount Excl. Tax",
-      field: "amountExclTaxe",
+      value: amountExclTaxe,
+      setter: setAmountExclTaxe,
       icon: CurrencyDollarIcon,
     },
-    { label: "Amount TTC", field: "amountTTC", icon: CurrencyDollarIcon },
+    {
+      label: "Amount TTC",
+      value: amountTTC,
+      setter: setAmountTTC,
+      icon: CurrencyDollarIcon,
+    },
     {
       label: "Amount Before Promo",
-      field: "amountBeforePromo",
+      value: amountBeforePromo,
+      setter: setAmountBeforePromo,
       icon: CurrencyDollarIcon,
     },
     {
       label: "Amount After Promo",
-      field: "amountAfterPromo",
+      value: amountAfterPromo,
+      setter: setAmountAfterPromo,
       icon: CurrencyDollarIcon,
     },
     {
       label: "Amount Refunded",
-      field: "amountRefunded",
+      value: amountRefunded,
+      setter: setAmountRefunded,
       icon: CurrencyDollarIcon,
     },
     {
       label: "Amount Ordered",
-      field: "amountOrdered",
+      value: amountOrdered,
+      setter: setAmountOrdered,
       icon: CurrencyDollarIcon,
     },
     {
       label: "Amount Shipped",
-      field: "amountShipped",
+      value: amountShipped,
+      setter: setAmountShipped,
       icon: CurrencyDollarIcon,
     },
     {
       label: "Amount Canceled",
-      field: "amountCanceled",
+      value: amountCanceled,
+      setter: setAmountCanceled,
       icon: CurrencyDollarIcon,
     },
-    { label: "Loyalty Points Value", field: "loyaltyPtsValue", icon: StarIcon },
+    {
+      label: "Loyalty Points Value",
+      value: loyaltyPtsValue,
+      setter: setLoyaltyPtsValue,
+      icon: StarIcon,
+    },
   ];
 
   useEffect(() => {
@@ -156,79 +204,65 @@ const EditOrderForm = ({
     fetchOptions();
   }, []);
 
-  useEffect(() => {
-    if (paymentMethods.length > 0 && order.paymentMethodId) {
-      const initialPaymentMethod = paymentMethods.find(
-        (m) => m.id === order.paymentMethodId,
-      );
-      setUpdatedOrder((prev) => ({
-        ...prev,
-        paymentMethod: initialPaymentMethod || null,
-        paymentMethodId: order.paymentMethodId || "",
-      }));
-    }
-  }, [order.paymentMethodId, paymentMethods]);
-
-  const validateAmounts = (order: OrderWithRelations): boolean => {
+  const validateAmounts = (): boolean => {
     const amounts = [
-      order.amountExclTaxe,
-      order.amountTTC,
-      order.amountBeforePromo,
-      order.amountAfterPromo,
-      order.amountRefunded,
-      order.amountCanceled,
-      order.amountOrdered,
-      order.amountShipped,
-      order.loyaltyPtsValue,
+      amountExclTaxe,
+      amountTTC,
+      amountBeforePromo,
+      amountAfterPromo,
+      amountRefunded,
+      amountCanceled,
+      amountOrdered,
+      amountShipped,
+      loyaltyPtsValue,
     ];
     return amounts.every((amount) => amount >= 0);
   };
-
-  const handleChange = (field: keyof OrderWithRelations, value: any) => {
-    setUpdatedOrder((prev) => {
-      if (field === "paymentMethodId") {
-        const selectedPaymentMethod = paymentMethods.find(
-          (m) => m.id === value,
-        );
-        return {
-          ...prev,
-          paymentMethod: selectedPaymentMethod || null,
-          paymentMethodId: value,
-        };
-      }
-
-      if (["status", "state", "customer", "agent", "partner"].includes(field)) {
-        return { ...prev, [field]: { id: value } };
-      }
-
-      return { ...prev, [field]: value };
-    });
+  const handleUpdateOrderItems = (updatedItems: OrderItemWithRelations[]) => {
+    setOrderItems(updatedItems);
+    setShowOrderItemsModal(false);
   };
-
-  const handleAmountChange = (
-    field: keyof OrderWithRelations,
-    value: string,
-  ) => {
-    const numValue = Number(value);
-    if (numValue < 0) {
-      setError(`${field.toString()} must be non-negative`);
-      return;
-    }
-    setError("");
-    handleChange(field, numValue);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateAmounts(updatedOrder)) {
+    if (!validateAmounts()) {
       setError("All amounts must be non-negative numbers");
       return;
     }
 
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      onUpdate({ ...updatedOrder, updatedAt: new Date() });
+      const updatedOrder: OrderWithRelations = {
+        ...order,
+        amountExclTaxe,
+        amountTTC,
+        amountBeforePromo,
+        amountAfterPromo,
+        amountRefunded,
+        amountOrdered,
+        amountShipped,
+        amountCanceled,
+        loyaltyPtsValue,
+        shippingMethod,
+        weight,
+        fromMobile,
+        stateId,
+        statusId,
+        customerId,
+        agentId,
+        partnerId,
+        paymentMethodId,
+        orderItems,
+        updatedAt: new Date(),
+        state: states.find((s) => s.id === stateId) || null,
+        status: statuses.find((s) => s.id === statusId) || null,
+        customer: customers.find((c) => c.id === customerId) || null,
+        agent: agents.find((a) => a.id === agentId) || null,
+        partner: partners.find((p) => p.id === partnerId) || null,
+        paymentMethod:
+          paymentMethods.find((p) => p.id === paymentMethodId) || null,
+      };
+
+      onUpdate(updatedOrder);
       onClose();
     } catch (error) {
       setError("An error occurred while updating the order");
@@ -269,24 +303,26 @@ const EditOrderForm = ({
               </div>
             </div>
           )}
+
           <div className="rounded-xl border border-gray-100 bg-gray-50 p-6">
             <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-800">
               <CalculatorIcon className="mr-2 h-5 w-5" />
               Amounts
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {amountFields.map(({ label, field, icon: Icon }) => (
-                <div className="space-y-1" key={field}>
+              {amountFields.map(({ label, value, setter, icon: Icon }) => (
+                <div className="space-y-1" key={label}>
                   <label className="flex items-center text-sm font-medium text-gray-700">
                     <Icon className="mr-1 h-4 w-4" />
-
                     {label}
                   </label>
-
                   <input
                     type="number"
-                    value={Number(updatedOrder[field]) || 0}
-                    onChange={(e) => handleAmountChange(field, e.target.value)}
+                    value={value}
+                    onChange={(e) => {
+                      const numValue = Number(e.target.value);
+                      if (numValue >= 0) setter(numValue);
+                    }}
                     min="0"
                     className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />
@@ -302,39 +338,43 @@ const EditOrderForm = ({
                 Order Details
               </h3>
               <div className="space-y-4">
-                {[
-                  {
-                    label: "State",
-                    field: "state" as const,
-                    icon: CheckBadgeIcon,
-                    options: states,
-                  },
-                  {
-                    label: "Status",
-                    field: "status" as const,
-                    icon: CheckBadgeIcon,
-                    options: statuses,
-                  },
-                ].map(({ label, field, icon: Icon, options }) => (
-                  <div className="space-y-1" key={field}>
-                    <label className="flex items-center text-sm font-medium text-gray-700">
-                      <Icon className="mr-1 h-4 w-4" />
-                      {label}
-                    </label>
-                    <select
-                      value={updatedOrder[field]?.id || ""}
-                      onChange={(e) => handleChange(field, e.target.value)}
-                      className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    >
-                      <option value="">Select {label}</option>
-                      {options.map((option: any) => (
-                        <option key={option.id} value={option.id}>
-                          {option.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
+                <div className="space-y-1">
+                  <label className="flex items-center text-sm font-medium text-gray-700">
+                    <CheckBadgeIcon className="mr-1 h-4 w-4" />
+                    State
+                  </label>
+                  <select
+                    value={stateId}
+                    onChange={(e) => setStateId(e.target.value)}
+                    className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    <option value="">Select State</option>
+                    {states.map((state) => (
+                      <option key={state.id} value={state.id}>
+                        {state.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="flex items-center text-sm font-medium text-gray-700">
+                    <CheckBadgeIcon className="mr-1 h-4 w-4" />
+                    Status
+                  </label>
+                  <select
+                    value={statusId}
+                    onChange={(e) => setStatusId(e.target.value)}
+                    className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    <option value="">Select Status</option>
+                    {statuses.map((status) => (
+                      <option key={status.id} value={status.id}>
+                        {status.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 <div className="space-y-1">
                   <label className="flex items-center text-sm font-medium text-gray-700">
@@ -343,13 +383,8 @@ const EditOrderForm = ({
                   </label>
                   <input
                     type="text"
-                    value={updatedOrder.shippingMethod || ""}
-                    onChange={(e) =>
-                      handleChange(
-                        "shippingMethod" as keyof OrderWithRelations,
-                        e.target.value,
-                      )
-                    }
+                    value={shippingMethod}
+                    onChange={(e) => setShippingMethod(e.target.value)}
                     className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />
                 </div>
@@ -360,13 +395,8 @@ const EditOrderForm = ({
                     Payment Method
                   </label>
                   <select
-                    value={updatedOrder.paymentMethodId || ""}
-                    onChange={(e) =>
-                      handleChange(
-                        "paymentMethodId" as keyof OrderWithRelations,
-                        e.target.value,
-                      )
-                    }
+                    value={paymentMethodId}
+                    onChange={(e) => setPaymentMethodId(e.target.value)}
                     className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   >
                     <option value="">Select Payment Method</option>
@@ -385,13 +415,8 @@ const EditOrderForm = ({
                   </label>
                   <input
                     type="number"
-                    value={updatedOrder.weight || 0}
-                    onChange={(e) =>
-                      handleChange(
-                        "weight" as keyof OrderWithRelations,
-                        Number(e.target.value),
-                      )
-                    }
+                    value={weight}
+                    onChange={(e) => setWeight(Number(e.target.value))}
                     className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />
                 </div>
@@ -404,13 +429,8 @@ const EditOrderForm = ({
                   <label className="relative inline-flex cursor-pointer items-center">
                     <input
                       type="checkbox"
-                      checked={updatedOrder.fromMobile || false}
-                      onChange={(e) =>
-                        handleChange(
-                          "fromMobile" as keyof OrderWithRelations,
-                          e.target.checked,
-                        )
-                      }
+                      checked={fromMobile}
+                      onChange={(e) => setFromMobile(e.target.checked)}
                       className="peer sr-only"
                     />
                     <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300"></div>
@@ -425,45 +445,62 @@ const EditOrderForm = ({
                 Associations
               </h3>
               <div className="space-y-4">
-                {[
-                  {
-                    label: "Customer",
-                    field: "customer" as const,
-                    icon: UserCircleIcon,
-                    options: customers,
-                  },
-                  {
-                    label: "Agent",
-                    field: "agent" as const,
-                    icon: IdentificationIcon,
-                    options: agents,
-                  },
-                  {
-                    label: "Partner",
-                    field: "partner" as const,
-                    icon: HandRaisedIcon,
-                    options: partners,
-                  },
-                ].map(({ label, field, icon: Icon, options }) => (
-                  <div className="space-y-1" key={field}>
-                    <label className="flex items-center text-sm font-medium text-gray-700">
-                      <Icon className="mr-1 h-4 w-4" />
-                      {label}
-                    </label>
-                    <select
-                      value={updatedOrder[field]?.id || ""}
-                      onChange={(e) => handleChange(field, e.target.value)}
-                      className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    >
-                      <option value="">Select {label}</option>
-                      {options.map((option: any) => (
-                        <option key={option.id} value={option.id}>
-                          {option.firstName} {option.lastName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
+                <div className="space-y-1">
+                  <label className="flex items-center text-sm font-medium text-gray-700">
+                    <UserCircleIcon className="mr-1 h-4 w-4" />
+                    Customer
+                  </label>
+                  <select
+                    value={customerId}
+                    onChange={(e) => setCustomerId(e.target.value)}
+                    className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    <option value="">Select Customer</option>
+                    {customers.map((customer) => (
+                      <option key={customer.id} value={customer.id}>
+                        {customer.firstName} {customer.lastName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="flex items-center text-sm font-medium text-gray-700">
+                    <IdentificationIcon className="mr-1 h-4 w-4" />
+                    Agent
+                  </label>
+                  <select
+                    value={agentId}
+                    onChange={(e) => setAgentId(e.target.value)}
+                    className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    <option value="">Select Agent</option>
+                    {agents.map((agent) => (
+                      <option key={agent.id} value={agent.id}>
+                        {agent.firstName} {agent.lastName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="flex items-center text-sm font-medium text-gray-700">
+                    <HandRaisedIcon className="mr-1 h-4 w-4" />
+                    Partner
+                  </label>
+                  <select
+                    value={partnerId}
+                    onChange={(e) => setPartnerId(e.target.value)}
+                    className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    <option value="">Select Partner</option>
+                    {partners.map((partner) => (
+                      <option key={partner.id} value={partner.id}>
+                        {partner.firstName} {partner.lastName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -474,19 +511,11 @@ const EditOrderForm = ({
             className="flex w-full transform items-center justify-center gap-x-2 rounded-lg bg-blue-600 px-4 py-3 font-medium text-white shadow-md transition-colors duration-200 ease-in-out hover:scale-105 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             disabled={isLoading}
           >
-            {isLoading ? (
-              <>
-                <ArrowPathIcon className="h-5 w-5 animate-spin" />
-                Loading...
-              </>
-            ) : (
-              <>
-                <PencilSquareIcon className="h-5 w-5" />
-                Edit Order Items
-              </>
-            )}
+            <PencilSquareIcon className="h-5 w-5" />
+            Edit Order Items
           </button>
         </div>
+
         <div className="sticky bottom-0 border-t border-gray-100 bg-white p-4">
           <div className="flex justify-end gap-3">
             <button
@@ -516,18 +545,13 @@ const EditOrderForm = ({
           </div>
         </div>
       </form>
+
       {showOrderItemsModal && (
         <ModalOrderItems
           isOpen={showOrderItemsModal}
-          orderItems={updatedOrder.orderItems || []}
+          orderItems={order.orderItems || []}
           onClose={() => setShowOrderItemsModal(false)}
-          onUpdate={(updatedItems: OrderItemWithRelations[]) => {
-            setUpdatedOrder((prev) => ({
-              ...prev,
-              orderItems: updatedItems,
-            }));
-            setShowOrderItemsModal(false);
-          }}
+          onUpdate={handleUpdateOrderItems}
         />
       )}
     </div>

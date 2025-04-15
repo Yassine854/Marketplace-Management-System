@@ -5,41 +5,45 @@ const prisma = new PrismaClient();
 
 export async function PUT(
   req: NextRequest,
+
   { params }: { params: { id: string } },
 ) {
   try {
     const orderId = params.id;
+
     const body = await req.json();
 
     if (!body || Object.keys(body).length === 0) {
       return NextResponse.json(
         { error: "Données de mise à jour manquantes" },
+
         { status: 400 },
       );
     }
 
     const updateData: any = {
       deliveryDate: body.deliveryDate,
-      totalAmount: body.totalAmount,
-      status: body.status,
-      comments: body.comment
-        ? {
-            deleteMany: {},
 
-            create: { content: body.comment },
-          }
-        : undefined,
+      totalAmount: body.totalAmount,
+
+      status: body.status,
     };
+
+    if (body.comment) {
+      updateData.comments = {
+        deleteMany: {},
+
+        create: { content: body.comment },
+      };
+    }
 
     if (body.warehouseId) {
       updateData.warehouse = { connect: { warehouseId: body.warehouseId } };
     }
 
     if (body.supplierId) {
-      const manufacturerId = body.supplierId;
-
       updateData.manufacturer = {
-        connect: { manufacturerId: manufacturerId },
+        connect: { manufacturerId: body.supplierId },
       };
     }
 
@@ -48,25 +52,33 @@ export async function PUT(
         where: { orderId: orderId },
       });
 
-      await prisma.file.createMany({
-        data: body.files.map((file: any) => ({
-          name: file.name,
+      if (body.files.length > 0) {
+        await prisma.file.createMany({
+          data: body.files.map((file: any) => ({
+            name: file.name,
 
-          url: file.url,
+            url: file.url,
 
-          orderId: orderId,
-        })),
-      });
+            orderId: orderId,
+          })),
+        });
+      }
     }
 
     const updatedOrder = await prisma.purchaseOrder.update({
       where: { id: orderId },
+
       data: updateData,
+
       include: {
         manufacturer: true,
+
         warehouse: true,
+
         payments: true,
+
         comments: true,
+
         files: true,
       },
     });

@@ -43,14 +43,14 @@ export type OrderWithRelations = PrismaOrder & {
   createdAt: Date;
   updatedAt: Date;
 
-  status: Status;
-  state: State;
-  customer: Customer;
-  agent?: Agent;
+  status?: Status | null;
+  state?: State | null;
+  customer?: Customer | null;
+  agent?: Agent | null;
   reservation?: Reservation & {
-    agent?: Agent;
-    partner: Partner;
-    customer: Customer;
+    agent?: Agent | null;
+    partner?: Partner | null;
+    customer?: Customer | null;
     paymentMethod: OrderPayment | null;
     reservationItems: (ReservationItem & {
       product: Product & {
@@ -61,7 +61,7 @@ export type OrderWithRelations = PrismaOrder & {
       };
     })[];
   };
-  partner: Partner;
+  partner?: Partner | null;
   orderItems: OrderItemWithRelations[];
   loyaltyPoints: LoyaltyPoints[];
   paymentMethod: OrderPayment | null;

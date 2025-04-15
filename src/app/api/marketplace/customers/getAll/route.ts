@@ -19,7 +19,7 @@ export async function GET(req: Request) {
         favoritePartners: true,
         orders: true,
         reservations: true,
-        notifications: true, // If you want to include notifications as well
+        notifications: true,
       },
     });
 

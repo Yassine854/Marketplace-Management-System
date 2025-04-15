@@ -354,7 +354,7 @@ model Agent {
   telephone String
   address   String
   password  String
-  roleId    String
+  roleId    String?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -575,8 +575,8 @@ model Order {
   stateId             String   @db.ObjectId
   state               State    @relation(fields: [stateId], references: [id]) 
 
-  customerId          String   @db.ObjectId
-  customer          Customer @relation(fields: [customerId], references: [id]) 
+  customerId          String?   @db.ObjectId
+  customer           Customer? @relation(fields: [customerId], references: [id]) 
 
   agentId           String?  @db.ObjectId
   agent             Agent?   @relation(fields: [agentId], references: [id]) 
@@ -651,8 +651,8 @@ model Reservation {
   updatedAt           DateTime @updatedAt
 
   // Relationships
-  customerId          String   @db.ObjectId
-  customer            Customer @relation(fields: [customerId], references: [id]) 
+  customerId          String?   @db.ObjectId
+  customer            Customer? @relation(fields: [customerId], references: [id]) 
 
   agentId             String?  @db.ObjectId
   agent               Agent?   @relation(fields: [agentId], references: [id]) 

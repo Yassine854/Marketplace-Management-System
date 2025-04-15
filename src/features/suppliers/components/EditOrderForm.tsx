@@ -167,7 +167,6 @@ export default function EditOrderForm({
             products: data.products,
           });
           setSelectedSupplier(data.manufacturer);
-          console.log("id", data.manufacturer.manufacturerId);
 
           if (data.manufacturer.manufacturerId) {
             const supplierId = data.manufacturer.manufacturerId.toString();
@@ -250,7 +249,6 @@ export default function EditOrderForm({
           toast.error(data.error || "Failed to fetch purchase order");
         }
       } catch (error) {
-        console.error("Error fetching purchase order:", error);
         toast.error("Error fetching purchase order");
       }
     };
@@ -285,6 +283,7 @@ export default function EditOrderForm({
           amount: parseFloat(p.amount),
           paymentDate: p.paymentDate,
         }));
+      const filesToSend = fileList.length === 0 ? [] : fileList;
       const updatedOrder = await updatePurchaseOrder(order.id, {
         ...formData,
         supplierId: selectedSupplier?.manufacturer_id || 0,
@@ -303,14 +302,12 @@ export default function EditOrderForm({
           })),
         paymentTypes: convertedPaymentTypes,
         comment,
-        files: fileList,
+        files: filesToSend,
       });
       onUpdate(updatedOrder);
       toast.success("Order successfully updated!");
-      window.location.reload();
       onClose();
     } catch (error) {
-      console.error("Error updating order:", error);
       toast.error("Error updating the order.");
     }
   };
