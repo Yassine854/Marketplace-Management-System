@@ -15,6 +15,7 @@ export async function POST(req: Request) {
     }
 
     const formData = await req.formData();
+
     const nameCategory = formData.get("nameCategory") as string;
     const categoryId = formData.get("categoryId")
       ? Number(formData.get("categoryId"))
@@ -53,12 +54,14 @@ export async function POST(req: Request) {
       await writeFile(filePath, buffer);
       imageUrl = `/uploads/${fileName}`; // Public URL for the stored image
     }
+    const isActive = formData.get("isActive") === "true";
 
     const newCategory = await prisma.category.create({
       data: {
         nameCategory,
         categoryId,
         image: imageUrl,
+        isActive: isActive,
       },
     });
 

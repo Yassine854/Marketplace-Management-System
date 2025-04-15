@@ -302,7 +302,7 @@ model Partner {
   telephone       String
   address         String
   password        String
-  roleId          String
+  roleId          String   @default("2")
   isActive        Boolean  @default(true)
   logo            String?  
   patent          String?  

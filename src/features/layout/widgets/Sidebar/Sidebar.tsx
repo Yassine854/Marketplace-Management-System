@@ -88,14 +88,14 @@ const Sidebar = ({
           <SidebarSubMenu
             icon={<IconShoppingCart />}
             name="Products"
-            onClick={() => push("/marketplace/products/all")} // Update main click
+            onClick={() => push("/marketplace/products")} // Update main click
             isActive={pathname?.includes("products")}
             items={[
-              { name: "All", path: "/marketplace/products/all" },
-              { name: "New Product", path: "/marketplace/products/new" },
+              { name: "All", path: "/marketplace/products" },
+              // { name: "New Product", path: "/marketplace/products/new" },
               {
                 name: "Categories",
-                path: "/marketplace/products/categories/all",
+                path: "/marketplace/products/categories",
               },
               { name: "Suppliers", path: "/marketplace/manufacturer/all" },
               { name: "Tax", path: "/marketplace/products/taxe/all" },
@@ -105,15 +105,15 @@ const Sidebar = ({
               },
               {
                 name: "Product Type",
-                path: "/marketplace/products/ProductTypes/all",
+                path: "/marketplace/products/ProductTypes",
               },
               {
                 name: "Product Status",
-                path: "/marketplace/products/ProductStatus/all",
+                path: "/marketplace/products/ProductStatus",
               },
               {
                 name: "Type PCB",
-                path: "/marketplace/products/ProductPCBType/all",
+                path: "/marketplace/products/ProductPCBType",
               },
             ]}
           />
@@ -122,11 +122,10 @@ const Sidebar = ({
           <SidebarSubMenu
             icon={<IconUsers className="text-lg text-primary" />}
             name=" Partners"
-            onClick={() => push("/marketplace/partners/all")}
+            onClick={() => push("/marketplace/partners")}
             isActive={pathname?.includes("partners")}
             items={[
-              { name: "All partners", path: "/marketplace/partners/all" },
-              { name: "New Partner", path: "/marketplace/partners/new" },
+              { name: "All partners", path: "/marketplace/partners" },
               {
                 name: "Partner Types",
                 path: "/marketplace/partners/type_partners",

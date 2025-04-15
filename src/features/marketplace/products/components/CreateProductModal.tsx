@@ -230,7 +230,7 @@ const CreateProductModal = ({
             />
             <input
               type="number"
-              placeholder="Weight (kg)"
+              placeholder="Weight"
               value={formState.weight || ""}
               onChange={(e) => handleInputChange("weight", e.target.value)}
               className="w-full rounded-lg border p-3"

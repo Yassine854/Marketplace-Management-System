@@ -1,8 +1,3 @@
-export interface TypePartner {
-  id: string;
-  name: string;
-}
-
 export interface Partner {
   id: string;
   username: string;
@@ -14,14 +9,18 @@ export interface Partner {
   password: string;
   roleId: string;
   isActive: boolean;
-  logo?: string;
-  patent?: string;
+  logo?: any;
+  patent?: any;
   responsibleName: string;
   position: string;
   coverageArea: string;
   minimumAmount: number;
   typePartnerId: string;
-  typePartner: TypePartner;
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type PartnerInput = Omit<
+  Partner,
+  "id" | "createdAt" | "updatedAt" | "isActive"
+>;

@@ -73,11 +73,6 @@ export function useCreateProduct() {
       });
 
       await Promise.all([
-        axios.post("/api/marketplace/product_subcategories/create", {
-          productId,
-          subCategoryIds: productData.subCategories,
-        }),
-
         ...productData.subCategories.map((subcategoryId) =>
           axios.post("/api/marketplace/product_subcategories/create", {
             productId,
@@ -89,20 +84,6 @@ export function useCreateProduct() {
           axios.post("/api/marketplace/related_products/create", {
             productId,
             relatedProductId,
-          }),
-        ),
-
-        ...productData.relatedProducts.map((relatedProductId) =>
-          axios.post("/api/marketplace/related_products/create", {
-            productId,
-            relatedProductId,
-          }),
-        ),
-
-        ...images.map((image) =>
-          axios.post("/api/marketplace/related_products/create", {
-            productId,
-            image,
           }),
         ),
 

@@ -8,6 +8,11 @@ interface SkuPartner {
   partner?: { id: string; username: string };
 }
 
+interface ProductImage {
+  id: string;
+  url: string;
+}
+
 interface EditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -70,9 +75,12 @@ const EditProductModal = ({
 
   const [skuPartners, setSkuPartners] = useState<SkuPartner[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [existingImages, setExistingImages] = useState<ProductImage[]>([]);
 
   useEffect(() => {
     if (product && isOpen) {
+      setExistingImages(product.images || []);
+
       setFormState({
         name: product.name,
         sku: product.sku,
@@ -113,6 +121,48 @@ const EditProductModal = ({
       );
     }
   }, [product, isOpen, initialSkuPartners, partners]);
+
+  const handleDeleteImage = async (imageId: string) => {
+    try {
+      const response = await fetch(`/api/marketplace/image/${imageId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setExistingImages((prev) => prev.filter((img) => img.id !== imageId));
+        toast.success("Image deleted successfully");
+      } else {
+        toast.error("Failed to delete image");
+      }
+    } catch (error) {
+      toast.error("Error deleting image");
+      console.error("Delete image error:", error);
+    }
+  };
+
+  const handleImageUpload = async (files: File[]) => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("images", file)); // Use 'images' as field name
+    formData.append("productId", product?.id);
+
+    try {
+      const response = await fetch("/api/marketplace/image/create", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Image upload failed");
+      }
+
+      const data = await response.json();
+      return data.images; // Should return array of image objects with id/url
+    } catch (error) {
+      toast.error("impossible to upload image");
+      return [];
+    }
+  };
 
   const handleInputChange = (field: string, value: any) => {
     // Convert empty strings to null for relational fields
@@ -197,6 +247,11 @@ const EditProductModal = ({
 
     setIsLoading(true);
     try {
+      if (formState.images.length > 0) {
+        const newImages = await handleImageUpload(formState.images);
+        setExistingImages((prev) => [...prev, ...newImages]);
+      }
+
       const updatedProductData = {
         ...cleanedData,
         id: product?.id,
@@ -251,8 +306,14 @@ const EditProductModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4">
-      <div className="max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-2xl bg-white p-8 shadow-2xl">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4"
+      onClick={onClose}
+    >
+      <div
+        className="max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-2xl bg-white p-8 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2 className="mb-6 text-3xl font-bold text-gray-800">Edit Product</h2>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -262,28 +323,42 @@ const EditProductModal = ({
               Basic Information
             </h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <input
-                type="text"
-                placeholder="Product Name *"
-                value={formState.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
-                className="rounded-lg border p-3"
-              />
-              <input
-                type="text"
-                placeholder="SKU *"
-                value={formState.sku}
-                onChange={(e) => handleInputChange("sku", e.target.value)}
-                className="rounded-lg border p-3"
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Product Name *
+                </label>
+                <input
+                  type="text"
+                  value={formState.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  SKU *
+                </label>
+                <input
+                  type="text"
+                  value={formState.sku}
+                  onChange={(e) => handleInputChange("sku", e.target.value)}
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <textarea
+                value={formState.description}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
+                className="w-full rounded-lg border p-3"
+                rows={3}
               />
             </div>
-            <textarea
-              placeholder="Description"
-              value={formState.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              className="w-full rounded-lg border p-3"
-              rows={3}
-            />
           </div>
 
           {/* Specifications */}
@@ -291,48 +366,76 @@ const EditProductModal = ({
             <h3 className="text-xl font-semibold text-primary">
               Specifications
             </h3>
-            <input
-              type="text"
-              placeholder="PCB"
-              value={formState.pcb}
-              onChange={(e) => handleInputChange("pcb", e.target.value)}
-              className="w-full rounded-lg border p-3"
-            />
-            <input
-              type="number"
-              placeholder="Weight (kg)"
-              value={formState.weight || ""}
-              onChange={(e) => handleInputChange("weight", e.target.value)}
-              className="w-full rounded-lg border p-3"
-            />
-            <input
-              type="number"
-              placeholder="Min Quantity"
-              value={formState.minimumQte || ""}
-              onChange={(e) => handleInputChange("minimumQte", e.target.value)}
-              className="w-full rounded-lg border p-3"
-            />
-            <input
-              type="number"
-              placeholder="Max Quantity"
-              value={formState.maximumQte || ""}
-              onChange={(e) => handleInputChange("maximumQte", e.target.value)}
-              className="w-full rounded-lg border p-3"
-            />
-            <input
-              type="number"
-              placeholder="Sealable"
-              value={formState.sealable || ""}
-              onChange={(e) => handleInputChange("sealable", e.target.value)}
-              className="w-full rounded-lg border p-3"
-            />
-            <input
-              type="number"
-              placeholder="Alert Qte"
-              value={formState.alertQte || ""}
-              onChange={(e) => handleInputChange("alertQte", e.target.value)}
-              className="w-full rounded-lg border p-3"
-            />
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                PCB
+              </label>
+              <input
+                type="text"
+                value={formState.pcb}
+                onChange={(e) => handleInputChange("pcb", e.target.value)}
+                className="w-full rounded-lg border p-3"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Weight
+              </label>
+              <input
+                type="number"
+                value={formState.weight || ""}
+                onChange={(e) => handleInputChange("weight", e.target.value)}
+                className="w-full rounded-lg border p-3"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Min Quantity
+              </label>
+              <input
+                type="number"
+                value={formState.minimumQte || ""}
+                onChange={(e) =>
+                  handleInputChange("minimumQte", e.target.value)
+                }
+                className="w-full rounded-lg border p-3"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Max Quantity
+              </label>
+              <input
+                type="number"
+                value={formState.maximumQte || ""}
+                onChange={(e) =>
+                  handleInputChange("maximumQte", e.target.value)
+                }
+                className="w-full rounded-lg border p-3"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Sealable
+              </label>
+              <input
+                type="number"
+                value={formState.sealable || ""}
+                onChange={(e) => handleInputChange("sealable", e.target.value)}
+                className="w-full rounded-lg border p-3"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Alert Qte
+              </label>
+              <input
+                type="number"
+                value={formState.alertQte || ""}
+                onChange={(e) => handleInputChange("alertQte", e.target.value)}
+                className="w-full rounded-lg border p-3"
+              />
+            </div>
           </div>
 
           {/* Pricing & Stock */}
@@ -340,50 +443,70 @@ const EditProductModal = ({
             <h3 className="text-xl font-semibold text-primary">
               Pricing & Stock
             </h3>
-            <input
-              type="number"
-              placeholder="Price *"
-              value={formState.price}
-              onChange={(e) => handleInputChange("price", e.target.value)}
-              className="w-full rounded-lg border p-3"
-            />
-            <input
-              type="number"
-              placeholder="Cost"
-              value={formState.cost || ""}
-              onChange={(e) => handleInputChange("cost", e.target.value)}
-              className="w-full rounded-lg border p-3"
-            />
-            <input
-              type="number"
-              placeholder="Stock"
-              value={formState.stock || ""}
-              onChange={(e) => handleInputChange("stock", e.target.value)}
-              className="w-full rounded-lg border p-3"
-            />
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Price *
+              </label>
+              <input
+                type="number"
+                value={formState.price}
+                onChange={(e) => handleInputChange("price", e.target.value)}
+                className="w-full rounded-lg border p-3"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Cost
+              </label>
+              <input
+                type="number"
+                value={formState.cost || ""}
+                onChange={(e) => handleInputChange("cost", e.target.value)}
+                className="w-full rounded-lg border p-3"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Stock
+              </label>
+              <input
+                type="number"
+                value={formState.stock || ""}
+                onChange={(e) => handleInputChange("stock", e.target.value)}
+                className="w-full rounded-lg border p-3"
+              />
+            </div>
 
             <div className="space-y-4 pt-6">
               <h3 className="text-xl font-semibold text-primary">
                 Loyalty Program
               </h3>
-              <input
-                type="number"
-                placeholder="Loyalty Points"
-                value={formState.loyaltyPoints || ""}
-                onChange={(e) =>
-                  handleInputChange("loyaltyPoints", e.target.value)
-                }
-                className="w-full rounded-lg border p-3"
-              />
-              <input
-                type="number"
-                placeholder="Loyalty Points Amount"
-                value={formState.loyaltyPointsAmount || ""}
-                onChange={(e) =>
-                  handleInputChange("loyaltyPointsAmount", e.target.value)
-                }
-                className="w-full rounded-lg border p-3"
-              />
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Loyalty Points
+                </label>
+                <input
+                  type="number"
+                  value={formState.loyaltyPoints || ""}
+                  onChange={(e) =>
+                    handleInputChange("loyaltyPoints", e.target.value)
+                  }
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Loyalty Points Amount
+                </label>
+                <input
+                  type="number"
+                  value={formState.loyaltyPointsAmount || ""}
+                  onChange={(e) =>
+                    handleInputChange("loyaltyPointsAmount", e.target.value)
+                  }
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
             </div>
           </div>
           {/* Relationships */}
@@ -391,74 +514,122 @@ const EditProductModal = ({
             <h3 className="text-xl font-semibold text-primary">
               Relationships
             </h3>
-            <select
-              value={formState.supplierId}
-              onChange={(e) => handleInputChange("supplierId", e.target.value)}
-              className="w-full rounded-lg border p-3"
-            >
-              <option value="">Select Supplier</option>
-              {suppliers.map((supplier) => (
-                <option key={supplier.id} value={supplier.id}>
-                  {supplier.companyName}
-                </option>
-              ))}
-            </select>
 
-            <select
-              value={formState.productTypeId}
-              onChange={(e) =>
-                handleInputChange("productTypeId", e.target.value)
-              }
-              className="w-full rounded-lg border p-3"
-            >
-              <option value="">Product Type</option>
-              {productTypes.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.type}
-                </option>
-              ))}
-            </select>
+            <div className="space-y-2">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="supplier-select"
+              >
+                Supplier
+              </label>
+              <select
+                id="supplier-select"
+                value={formState.supplierId}
+                onChange={(e) =>
+                  handleInputChange("supplierId", e.target.value)
+                }
+                className="w-full rounded-lg border p-3"
+              >
+                <option value="">Select Supplier</option>
+                {suppliers.map((supplier) => (
+                  <option key={supplier.id} value={supplier.id}>
+                    {supplier.companyName}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <select
-              value={formState.typePcbId}
-              onChange={(e) => handleInputChange("typePcbId", e.target.value)}
-              className="w-full rounded-lg border p-3"
-            >
-              <option value="">PCB Type</option>
-              {typePcbs.map((pcb) => (
-                <option key={pcb.id} value={pcb.id}>
-                  {pcb.name}
-                </option>
-              ))}
-            </select>
+            <div className="space-y-2">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="product-type-select"
+              >
+                Product Type
+              </label>
+              <select
+                id="product-type-select"
+                value={formState.productTypeId}
+                onChange={(e) =>
+                  handleInputChange("productTypeId", e.target.value)
+                }
+                className="w-full rounded-lg border p-3"
+              >
+                <option value="">Product Type</option>
+                {productTypes.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.type}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <select
-              value={formState.productStatusId}
-              onChange={(e) =>
-                handleInputChange("productStatusId", e.target.value)
-              }
-              className="w-full rounded-lg border p-3"
-            >
-              <option value="">Product Status</option>
-              {productStatuses.map((status) => (
-                <option key={status.id} value={status.id}>
-                  {status.name}
-                </option>
-              ))}
-            </select>
+            <div className="space-y-2">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="pcb-type-select"
+              >
+                PCB Type
+              </label>
+              <select
+                id="pcb-type-select"
+                value={formState.typePcbId}
+                onChange={(e) => handleInputChange("typePcbId", e.target.value)}
+                className="w-full rounded-lg border p-3"
+              >
+                <option value="">PCB Type</option>
+                {typePcbs.map((pcb) => (
+                  <option key={pcb.id} value={pcb.id}>
+                    {pcb.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <select
-              value={formState.taxId}
-              onChange={(e) => handleInputChange("taxId", e.target.value)}
-              className="w-full rounded-lg border p-3"
-            >
-              <option value="">Select Tax</option>
-              {taxes.map((tax) => (
-                <option key={tax.id} value={tax.id}>
-                  {tax.value}
-                </option>
-              ))}
-            </select>
+            <div className="space-y-2">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="product-status-select"
+              >
+                Product Status
+              </label>
+              <select
+                id="product-status-select"
+                value={formState.productStatusId}
+                onChange={(e) =>
+                  handleInputChange("productStatusId", e.target.value)
+                }
+                className="w-full rounded-lg border p-3"
+              >
+                <option value="">Product Status</option>
+                {productStatuses.map((status) => (
+                  <option key={status.id} value={status.id}>
+                    {status.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="tax-select"
+              >
+                Tax
+              </label>
+              <select
+                id="tax-select"
+                value={formState.taxId}
+                onChange={(e) => handleInputChange("taxId", e.target.value)}
+                className="w-full rounded-lg border p-3"
+              >
+                <option value="">Select Tax</option>
+                {taxes.map((tax) => (
+                  <option key={tax.id} value={tax.id}>
+                    {tax.value}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Categories & Relations */}
@@ -536,13 +707,50 @@ const EditProductModal = ({
           {/* Images */}
           <div className="space-y-4 pt-6 md:col-span-2">
             <h3 className="text-xl font-semibold text-primary">Images</h3>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleFileChange}
-              className="w-full rounded-lg border p-3"
-            />
+
+            {/* Existing images */}
+            <div className="grid grid-cols-3 gap-4">
+              {existingImages.map((image) => (
+                <div key={image.id} className="group relative">
+                  <img
+                    src={image.url}
+                    alt="Product"
+                    className="h-32 w-full rounded-lg object-cover"
+                  />
+                  <button
+                    onClick={() => handleDeleteImage(image.id)}
+                    className="absolute right-1 top-1 rounded-full bg-red-500 p-1 text-white transition-colors hover:bg-red-600"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* New image upload */}
+            <div className="mt-4">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Upload New Images
+              </label>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full rounded-lg border p-3"
+              />
+            </div>
           </div>
 
           {/* SKU Partners Section */}

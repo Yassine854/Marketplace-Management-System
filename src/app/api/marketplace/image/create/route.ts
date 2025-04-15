@@ -39,6 +39,7 @@ export async function POST(req: Request) {
       "image/gif",
     ];
     let imageUrls: string[] = [];
+    const newImages = [];
 
     for (const imageFile of imageFiles) {
       if (!validMimeTypes.includes(imageFile.type)) {
@@ -64,6 +65,7 @@ export async function POST(req: Request) {
       });
 
       imageUrls.push(newImage.url);
+      newImages.push(newImage);
     }
 
     return NextResponse.json(
