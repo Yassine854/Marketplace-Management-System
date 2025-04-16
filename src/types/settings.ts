@@ -8,4 +8,6 @@ export interface Setting {
   partnerId?: string;
   createdAt?: string;
   updatedAt?: string;
+  schedules: { day: string; startTime: string; endTime: string }[];
+  partner?: any;
 }

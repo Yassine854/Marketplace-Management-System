@@ -733,6 +733,20 @@ model Settings {
   loyaltyPointsUnique    String  
   partnerId    String?   @db.ObjectId
   partner      Partner?  @relation(fields: [partnerId], references: [id]) 
+  schedules   SettingSchedule[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model SettingSchedule {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  day        String
+  startTime  String
+  endTime    String
+
+  settingId  String   @db.ObjectId
+  setting    Settings @relation(fields: [settingId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

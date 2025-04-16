@@ -1,11 +1,11 @@
-// app/api/settings/[id]/route.ts
+// app/api/settings-schedule/[id]/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// GET: Retrieve single Settings by ID
+// GET: Retrieve single SettingSchedule by ID
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
@@ -19,35 +19,34 @@ export async function GET(
 
     const { id } = params;
 
-    const settings = await prisma.settings.findUnique({
+    const schedule = await prisma.settingSchedule.findUnique({
       where: { id },
       include: {
-        partner: true,
-        schedules: true,
+        setting: true,
       },
     });
 
-    if (!settings) {
+    if (!schedule) {
       return NextResponse.json(
-        { message: "Settings not found" },
+        { message: "SettingSchedule not found" },
         { status: 404 },
       );
     }
 
     return NextResponse.json(
-      { message: "Settings retrieved successfully", settings },
+      { message: "SettingSchedule retrieved successfully", schedule },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching Settings:", error);
+    console.error("Error fetching SettingSchedule:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve Settings" },
+      { error: "Failed to retrieve SettingSchedule" },
       { status: 500 },
     );
   }
 }
 
-// PATCH: Update Settings
+// PATCH: Update SettingSchedule
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -62,35 +61,33 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    const updatedSettings = await prisma.settings.update({
+    const updatedSchedule = await prisma.settingSchedule.update({
       where: { id },
       data: {
-        deliveryType: body.deliveryType,
-        deliveryTypeAmount: body.deliveryTypeAmount,
-        freeDeliveryAmount: body.freeDeliveryAmount,
-        loyaltyPointsAmount: body.loyaltyPointsAmount,
-        loyaltyPointsUnique: body.loyaltyPointsUnique,
-        partnerId: body.partnerId,
+        day: body.day,
+        startTime: body.startTime,
+        endTime: body.endTime,
+        settingId: body.settingId,
       },
     });
 
     return NextResponse.json(
       {
-        message: "Settings updated successfully",
-        settings: updatedSettings,
+        message: "SettingSchedule updated successfully",
+        schedule: updatedSchedule,
       },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error updating Settings:", error);
+    console.error("Error updating SettingSchedule:", error);
     return NextResponse.json(
-      { error: "Failed to update Settings" },
+      { error: "Failed to update SettingSchedule" },
       { status: 500 },
     );
   }
 }
 
-// DELETE: Remove Settings
+// DELETE: Remove SettingSchedule
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
@@ -104,16 +101,16 @@ export async function DELETE(
 
     const { id } = params;
 
-    await prisma.settings.delete({ where: { id } });
+    await prisma.settingSchedule.delete({ where: { id } });
 
     return NextResponse.json(
-      { message: "Settings deleted successfully" },
+      { message: "SettingSchedule deleted successfully" },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error deleting Settings:", error);
+    console.error("Error deleting SettingSchedule:", error);
     return NextResponse.json(
-      { error: "Failed to delete Settings" },
+      { error: "Failed to delete SettingSchedule" },
       { status: 500 },
     );
   }

@@ -39,6 +39,9 @@ export default function SettingsTable({
                 ID
               </th>
               <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Partner
+              </th>
+              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
                 Delivery Type
               </th>
               <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -100,6 +103,9 @@ export default function SettingsTable({
                 >
                   <td className="px-4 py-2 text-center text-sm text-gray-900">
                     {setting.id}
+                  </td>
+                  <td className="px-4 py-2 text-center text-sm text-gray-900">
+                    {setting.partner.username}
                   </td>
                   <td className="px-4 py-2 text-center text-sm text-gray-900">
                     {setting.deliveryType}

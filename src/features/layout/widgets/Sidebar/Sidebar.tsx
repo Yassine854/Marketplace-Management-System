@@ -135,6 +135,15 @@ const Sidebar = ({
 
           <Divider />
           <SidebarSubMenu
+            icon={<IconUsers className="text-lg text-primary" />}
+            name=" Settings"
+            onClick={() => push("/marketplace/settings")}
+            isActive={pathname?.includes("partners")}
+            items={[{ name: "All settings", path: "/marketplace/settings" }]}
+          />
+
+          <Divider />
+          <SidebarSubMenu
             icon={<IconBox className="text-lg text-primary" />}
             name=" Order"
             onClick={() => push("/marketplace/order/state")}

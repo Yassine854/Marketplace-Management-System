@@ -45,9 +45,9 @@ const SettingsPage = () => {
 
   const handleEdit = async (updatedSetting: Setting) => {
     const result = await editSetting(updatedSetting.id, updatedSetting);
+    refetch();
     if (result) {
-      await refetch();
-
+      setIsEditModalOpen(false);
       const latest = settings.find((s) => s.id === updatedSetting.id);
       if (latest) {
         setSelectedSetting(latest);

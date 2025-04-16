@@ -11,16 +11,39 @@ export function useCreateSetting() {
     setError(null);
 
     try {
-      // Pass the entire `newSetting` object, not just the name
-      const response = await axios.post("/api/marketplace/settings/create", {
-        ...newSetting, // Spread the setting to send the full object
-      });
+      // 1. Create the main Setting
+      const settingResponse = await axios.post(
+        "/api/marketplace/settings/create",
+        {
+          deliveryType: newSetting.deliveryType,
+          deliveryTypeAmount: newSetting.deliveryTypeAmount,
+          freeDeliveryAmount: newSetting.freeDeliveryAmount,
+          loyaltyPointsAmount: newSetting.loyaltyPointsAmount,
+          loyaltyPointsUnique: newSetting.loyaltyPointsUnique,
+          partnerId: newSetting.partnerId || null,
+        },
+      );
 
-      if (response.status === 201) {
+      if (settingResponse.status === 201) {
+        const settingId = settingResponse.data.settings.id;
+
+        // 2. Create each schedule
+        const schedulePromises = newSetting.schedules.map((schedule) =>
+          axios.post("/api/marketplace/settings_schedule/create", {
+            day: schedule.day,
+            startTime: schedule.startTime,
+            endTime: schedule.endTime,
+            settingId: settingId,
+          }),
+        );
+
+        await Promise.all(schedulePromises);
         onSuccess?.();
       }
     } catch (err: any) {
-      setError("Error while creating the setting");
+      setError(
+        err.response?.data?.error || "Failed to create setting and schedules",
+      );
       console.error("Error:", err);
     } finally {
       setIsLoading(false);
