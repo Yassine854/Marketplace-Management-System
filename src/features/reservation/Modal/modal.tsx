@@ -1,6 +1,6 @@
 import React from "react";
 import { ReservationItem } from "../types/reservation";
-import { X, Package, Scale, Tag, Box, Percent, Info } from "lucide-react";
+import { X, Package, Scale, Tag, Box, Percent } from "lucide-react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -76,7 +76,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, items }) => {
                         </span>
                       </div>
                       <div className="flex items-center text-gray-600">
-                        <Percent className="mr-2 h-4 w-4 text-indigo-500" />
+                        <Package className="mr-2 h-4 w-4 text-indigo-500" />
                         <span>
                           <span className="font-medium">Reserved:</span>{" "}
                           {item.qteReserved}

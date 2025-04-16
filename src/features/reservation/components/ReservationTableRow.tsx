@@ -7,11 +7,11 @@ import EditReservationModal from "./EditReservationModal";
 import {
   TrashIcon,
   ArrowDownTrayIcon,
-  PencilIcon,
   CreditCardIcon,
   UserIcon,
   NoSymbolIcon,
   TruckIcon,
+  PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 type ReservationTableRowProps = {
   reservation: Reservation;
@@ -174,7 +174,7 @@ const ReservationTableRow = ({
         <td className="px-6 py-4">
           <div className="flex items-center gap-2">
             <ActionButton
-              icon={PencilIcon}
+              icon={PencilSquareIcon}
               onClick={() => setShowEditModal(true)}
               color="yellow"
               ariaLabel="Edit"

@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { Reservation, ReservationItem } from "../types/reservation";
-import { X, Package, Scale, Tag, Percent, CheckCircle } from "lucide-react";
+import {
+  X,
+  Package,
+  Scale,
+  Tag,
+  Percent,
+  CheckCircle,
+  Users,
+} from "lucide-react";
 interface EditReservationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -58,7 +66,7 @@ const ReservationItemCard = ({ item }: { item: ReservationItem }) => (
         <span>{item.discountedPrice} DT</span>
       </div>
       <div className="flex items-center space-x-2 text-gray-600">
-        <Percent className="h-4 w-4 text-blue-500" />
+        <Package className="h-4 w-4 text-blue-500" />
         <span>Qty: {item.qteReserved}</span>
       </div>
       <div className="flex items-center space-x-2 text-gray-600">
@@ -66,7 +74,7 @@ const ReservationItemCard = ({ item }: { item: ReservationItem }) => (
         <span>{item.weight}</span>
       </div>
       <div className="flex items-center space-x-2 text-gray-600">
-        <Scale className="h-4 w-4 text-blue-500" />
+        <Percent className="h-4 w-4 text-blue-500" />
         <span>Tax: {item.taxValue}%</span>
       </div>
     </div>
@@ -224,12 +232,16 @@ const EditReservationModal = ({
                     label="Loyalty Points Value"
                     value={editedReservation.loyaltyPtsValue || 0}
                   />
+                  <ReadOnlyField
+                    label="Weight"
+                    value={`${editedReservation.weight}`}
+                  />
                 </div>
               </div>
 
               {/* Additional Information Section */}
               <div className="rounded-xl bg-gray-50 p-6">
-                <SectionHeader icon={Scale} title="Additional Information" />
+                <SectionHeader icon={Users} title="Additional Information" />
                 <div className="space-y-4">
                   <ReadOnlyField
                     label="Customer"
@@ -246,6 +258,14 @@ const EditReservationModal = ({
                     }
                   />
                   <ReadOnlyField
+                    label="Partner"
+                    value={
+                      editedReservation.partner
+                        ? `${editedReservation.partner.firstName} ${editedReservation.partner.lastName}`
+                        : "—"
+                    }
+                  />
+                  <ReadOnlyField
                     label="Created At"
                     value={new Date(
                       editedReservation.createdAt,
@@ -256,10 +276,6 @@ const EditReservationModal = ({
                     value={new Date(
                       editedReservation.updatedAt,
                     ).toLocaleDateString("fr-FR")}
-                  />
-                  <ReadOnlyField
-                    label="Items Count"
-                    value={editedReservation.reservationItems.length}
                   />
                 </div>
               </div>

@@ -5,7 +5,7 @@ import Pagination from "../shared/elements/pagination/pagination";
 import { Tax } from "./types/tax";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ConfirmDeleteModal from "./components/ConfirmDeleteModal"; // Import the modal
+import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
 
 const TaxManagementPage = () => {
   const [taxes, setTaxes] = useState<Tax[]>([]);
