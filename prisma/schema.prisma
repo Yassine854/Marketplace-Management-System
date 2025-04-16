@@ -714,8 +714,8 @@ model SkuPartner {
   skuPartner  String   @unique
   skuProduct  String
 
-  product     Product  @relation(fields: [productId], references: [id])
-  partner     Partner  @relation(fields: [partnerId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

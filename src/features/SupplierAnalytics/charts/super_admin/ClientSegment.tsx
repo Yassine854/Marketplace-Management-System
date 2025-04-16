@@ -121,12 +121,7 @@ const ClientSegment: React.FC<ClientSegmentProps> = ({
               type: "pie",
               height: 400,
               events: {
-                dataPointSelection: (event, chartContext, config) => {
-                  console.log(
-                    "Selected segment:",
-                    segments[config.dataPointIndex],
-                  );
-                },
+                dataPointSelection: (event, chartContext, config) => {},
               },
             },
             colors: newColors,
