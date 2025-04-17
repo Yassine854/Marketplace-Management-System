@@ -188,7 +188,7 @@ const PromotionManagementPage = () => {
                 <button
                   onClick={() => router.push("/promotion/new")}
                   className="btn flex items-center gap-2 px-3 py-2.5 text-sm"
-                  title="New Manufacturer"
+                  title="New Promotion"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

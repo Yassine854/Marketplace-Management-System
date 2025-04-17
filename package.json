@@ -3,7 +3,8 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "pnpm clean:next && next dev",
+    "clean:next": "rimraf .next",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -187,6 +188,7 @@
     "lint-staged": "^15.4.3",
     "prettier": "3.0.0",
     "prettier-plugin-tailwindcss": "^0.5.14",
+    "rimraf": "^6.0.1",
     "storybook": "^8.5.3",
     "ts-node": "^10.9.2",
     "typescript": "5.3.3"

@@ -75,15 +75,15 @@ const SupplierPurchasesPage = () => {
           <div className="box w-full min-w-[800px] xl:p-8">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
               <p className="ml-4 mt-6 text-xl font-bold">Supplier Orders</p>
-              <div className="mt-6 flex items-center gap-4">
+              <div className="flex h-12 items-center justify-center">
                 <button
                   onClick={() => router.push("/suppliers/new")}
-                  className="mr-4 flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"
-                  title="New Order"
+                  className="btn flex items-center gap-2 px-3 py-2.5 text-sm"
+                  title="New supplier"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
+                    className="h-4 w-4"
                     viewBox="0 0 24 24"
                     strokeWidth="2"
                     stroke="currentColor"
@@ -95,7 +95,7 @@ const SupplierPurchasesPage = () => {
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  <span className="hidden md:inline">New Order</span>
+                  <span className="md:inline">New order</span>
                 </button>
               </div>
             </div>
