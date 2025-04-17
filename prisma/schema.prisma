@@ -14,7 +14,7 @@ model User {
   firstName String
   lastName  String
   password  String
-  roleId    String
+  Id    String
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -302,7 +302,6 @@ model Partner {
   telephone       String
   address         String
   password        String
-  roleId          String   @default("2")
   isActive        Boolean  @default(true)
   logo            String?  
   patent          String?  
@@ -312,6 +311,9 @@ model Partner {
   minimumAmount   Float    
   typePartner     TypePartner @relation(fields: [typePartnerId], references: [id])
   typePartnerId   String   @db.ObjectId   
+  roleId          String?
+  role            Role?     @relation(fields: [roleId], references: [id])
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -336,7 +338,7 @@ model Customer {
   telephone String?
   address   String?
   password  String?
-  roleId    String?
+  Id    String?
   isActive  Boolean?  @default(true)
   created_at DateTime? @default(now())
   updated_at DateTime? @updatedAt
@@ -359,7 +361,7 @@ model Agent {
   telephone String
   address   String
   password  String
-  roleId    String
+  Id    String
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -749,4 +751,28 @@ model SettingSchedule {
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+
+model Role {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  name        String         @unique
+  permissions RolePermission[]
+  partners    Partner[]
+}
+
+model Permission {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  resource  String  
+  action    String   
+  roles     RolePermission[]
+}
+
+model RolePermission {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id],onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id],onDelete: Cascade)
+  @@unique([roleId, permissionId])
 }
