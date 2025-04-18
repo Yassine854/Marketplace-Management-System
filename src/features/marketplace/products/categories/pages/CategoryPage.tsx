@@ -1,6 +1,6 @@
 import CategoryTable from "../table/CategoryTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/Pagination";
+import Pagination from "@/features/shared/elements/Pagination/pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllCategories } from "../hooks/useGetAllCategories";
 import { Category } from "@/types/category";
@@ -14,6 +14,8 @@ import { useRouter } from "@/libs/next-intl/i18nNavigation";
 
 const CategoryPage = () => {
   const { categories, isLoading, error, refetch } = useGetAllCategories();
+  console.log("Fetched categories:", categories);
+
   const {
     editCategory,
     deleteCategory,

@@ -8,19 +8,15 @@ import {
   IconList,
   IconShoppingCart,
   IconDeviceAnalytics,
-
   IconCurrencyDollar,
   IconDiscount,
   IconBuildingFactory2,
   IconClipboardCheck,
   IconPackage,
-
- 
   IconBox,
   IconCreditCard,
   IconUser,
   IconTruck,
-
 } from "@tabler/icons-react";
 import { FaBoxOpen } from "react-icons/fa";
 import Link from "next/link";
@@ -155,18 +151,6 @@ const Sidebar = ({
           />
 
           <Divider />
-          <SidebarSubMenu
-            icon={<IconBox className="text-lg text-primary" />}
-            name=" Order"
-            onClick={() => push("/marketplace/order/state")}
-            isActive={pathname?.includes("state")}
-            items={[
-              { name: "State", path: "/marketplace/order/state" },
-              { name: "Status", path: "/marketplace/order/status" },
-            ]}
-          />
-
-          <Divider />
           <SidebarOrdersSubMenu
             onClick={() => push("/orders")}
             items={statuses}
@@ -179,27 +163,6 @@ const Sidebar = ({
             isActive={
               pathname?.includes("order") && !pathname?.includes("audit-trail")
             }
-          />
-
-          <Divider />
-
-          <SidebarSubMenu
-            icon={<IconBox />}
-            name=" Order"
-            onClick={() => push("/order/state")}
-            isActive={pathname?.includes("state")}
-            items={[
-              { name: "State", path: "/order/state" },
-              { name: "Status", path: "/order/status" },
-            ]}
-          />
-
-          <Divider />
-          <SidebarButton
-            name="Payment Method"
-            icon={<IconCreditCard />}
-            onClick={() => push("/PaymentMethod")}
-            isActive={pathname?.includes("PaymentMethod")}
           />
 
           <Divider />
@@ -232,46 +195,29 @@ const Sidebar = ({
               { name: "Completed", path: "/suppliers/completedState" },
             ]}
           />
-          <Divider />
-          <SidebarSubMenu
-            icon={<IconCurrencyDollar />}
-            name="Taxe"
-            onClick={() => push("/taxe/all")}
-            isActive={pathname?.includes("taxe")}
-            items={[{ name: "All", path: "/taxe/all" }]}
-          />
-          <Divider />
-          <SidebarSubMenu
-            icon={<IconDiscount />}
-            name="Promotion"
-            onClick={() => push("/promotion/all")}
-            isActive={pathname?.includes("promotion")}
-            items={[{ name: "All", path: "/promotion/all" }]}
-          />
-          <Divider />
-          <SidebarSubMenu
-            icon={<IconBuildingFactory2 />}
-            name="Manufacturer"
-            onClick={() => push("/manufacturer/all")}
-            isActive={pathname?.includes("manufacturer")}
-            items={[{ name: "All", path: "/manufacturer/all" }]}
-          />
 
-          <Divider />
-          <SidebarSubMenu
-            icon={<IconShoppingCart />}
-            name="Orders2"
-            onClick={() => push("/orders2/all")}
-            isActive={pathname?.includes("orders2")}
-            items={[{ name: "All", path: "/orders2/all" }]}
-          />
           <Divider />
           <SidebarSubMenu
             icon={<IconClipboardCheck />}
             name="Reservation"
-            onClick={() => push("/reservation/all")}
+            onClick={() => push("/marketplace/reservation/all")}
             isActive={pathname?.includes("reservation")}
-            items={[{ name: "All", path: "/reservation/all" }]}
+            items={[{ name: "All", path: "/marketplace/reservation/all" }]}
+          />
+
+          <Divider />
+
+          <SidebarSubMenu
+            icon={<IconBox />}
+            name=" Order"
+            onClick={() => push("/marketplace/orders2/all")}
+            isActive={pathname?.includes("all")}
+            items={[
+              { name: "All", path: "/marketplace/orders2/all" },
+              { name: "State", path: "/marketplace/order/state" },
+              { name: "Status", path: "/marketplace/order/status" },
+              { name: "payment method", path: "/marketplace/PaymentMethod" },
+            ]}
           />
 
           <Divider />
@@ -296,7 +242,7 @@ const Sidebar = ({
           <SidebarButton
             name="Delivery Agent"
             icon={<IconTruck />}
-            onClick={() => push("/deliveryAgent")}
+            onClick={() => push("/marketplace/deliveryAgent")}
             isActive={pathname?.includes("deliveryAgent")}
           />
 
@@ -304,7 +250,7 @@ const Sidebar = ({
           <SidebarButton
             name="Customer"
             icon={<IconUser />}
-            onClick={() => push("/customer")}
+            onClick={() => push("/marketplace/customer")}
             isActive={pathname?.includes("customer")}
           />
           {isAdmin && (
@@ -317,6 +263,8 @@ const Sidebar = ({
                 items={[
                   { name: "Users", path: "/access/users" },
                   { name: "Roles", path: "/access/roles" },
+                  { name: "Permissions", path: "/marketplace/permissions" },
+
                   { name: "Logs", path: "/access/logs" },
                 ]}
               />

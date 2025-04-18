@@ -1,6 +1,6 @@
 import ProductTable from "../table/ProductTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/Pagination";
+import Pagination from "@/features/shared/elements/Pagination/pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllProducts } from "../hooks/useGetAllProducts";
 import { Product } from "@/types/product";

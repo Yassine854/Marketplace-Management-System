@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import PromotionTable from "./components/PromotionTable";
 import { useRouter } from "next/navigation";
-import Pagination from "@mui/material/Pagination";
-import styles from "../../../suppliers/styles/pagination.module.css";
+import Pagination from "../../../shared/elements/Pagination/pagination";
 import { Promotion } from "./types/promo";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
-import EditPromoForm from "./components/EditPromoForm"; // Import the EditPromoForm component
+import EditPromoForm from "./components/EditPromoForm";
+import AdvancedFilters from "./components/AdvancedFilters";
 
 const PromotionManagementPage = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -24,7 +24,11 @@ const PromotionManagementPage = () => {
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(
     null,
   );
-  const pageSize = 10;
+  const [showFilters, setShowFilters] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
+    {},
+  );
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const router = useRouter();
 
   useEffect(() => {
@@ -32,7 +36,7 @@ const PromotionManagementPage = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `/api/marketplace/promotion/getAll?page=${currentPage}&size=${pageSize}&search=${debouncedSearchTerm}`,
+          `/api/marketplace/promotion/getAll?page=${currentPage}&limit=${itemsPerPage}&search=${debouncedSearchTerm}&startDate=${activeFilters.startDate}&endDate=${activeFilters.endDate}`,
         );
         const data = await response.json();
 
@@ -52,7 +56,7 @@ const PromotionManagementPage = () => {
     };
 
     fetchPromotions();
-  }, [currentPage, debouncedSearchTerm]);
+  }, [currentPage, debouncedSearchTerm, activeFilters, itemsPerPage]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -71,7 +75,7 @@ const PromotionManagementPage = () => {
     );
   }
 
-  const totalPages = Math.ceil(totalPromotions / pageSize);
+  const totalPages = Math.ceil(totalPromotions / itemsPerPage);
 
   const handleUpdate = async (updatedPromotion: Promotion) => {
     try {
@@ -146,6 +150,7 @@ const PromotionManagementPage = () => {
   };
 
   const handleEdit = (promotion: Promotion) => {
+    console.log(promotion);
     setEditingPromotion(promotion);
   };
 
@@ -179,17 +184,15 @@ const PromotionManagementPage = () => {
               <p className="ml-4 mt-6 text-xl font-bold">
                 Promotion Management
               </p>
-              <div className="mt-6 flex items-center gap-4">
+              <div className="flex h-12 items-center justify-center">
                 <button
-                  onClick={() =>
-                    router.push("/marketplace/products/promotion/new")
-                  }
-                  className="mr-4 flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"
+                  onClick={() => router.push("/promotion/new")}
+                  className="btn flex items-center gap-2 px-3 py-2.5 text-sm"
                   title="New Promotion"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
+                    className="h-4 w-4"
                     viewBox="0 0 24 24"
                     strokeWidth="2"
                     stroke="currentColor"
@@ -201,7 +204,7 @@ const PromotionManagementPage = () => {
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  <span className="hidden md:inline">New Promotion</span>
+                  <span className="md:inline">New Promotion</span>
                 </button>
               </div>
             </div>
@@ -218,6 +221,35 @@ const PromotionManagementPage = () => {
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                   🔍
                 </span>
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="rounded bg-gray-200 px-4 py-2"
+                >
+                  {showFilters ? "Hide Filters" : "Filters"}
+                </button>
+              </div>
+
+              {showFilters && (
+                <AdvancedFilters
+                  onApply={(filters) => {
+                    setActiveFilters(filters);
+                    setCurrentPage(1);
+                  }}
+                />
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(activeFilters).map(
+                  ([key, value]) =>
+                    value && (
+                      <span
+                        key={key}
+                        className="rounded-full bg-gray-100 px-2 py-1 text-sm"
+                      >
+                        {key}: {value}
+                      </span>
+                    ),
+                )}
               </div>
             </div>
 
@@ -233,17 +265,13 @@ const PromotionManagementPage = () => {
                 onEdit={handleEdit}
               />
             </div>
-
-            <div className={styles.pagination}>
+            <div>
               <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={(event, value) => setCurrentPage(value)}
-                color="primary"
-                shape="rounded"
-                siblingCount={1}
-                boundaryCount={1}
-                className="pagination"
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
               />
             </div>
           </div>

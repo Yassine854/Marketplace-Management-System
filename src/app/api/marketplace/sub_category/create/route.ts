@@ -10,9 +10,9 @@ export async function POST(req: Request) {
   try {
     const session = await auth();
 
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
     const formData = await req.formData();
     const name = formData.get("name") as string;

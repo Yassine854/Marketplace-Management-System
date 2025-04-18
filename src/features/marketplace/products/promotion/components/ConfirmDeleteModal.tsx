@@ -17,7 +17,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="rounded-lg bg-white p-6 shadow-lg">
         <h2 className="text-lg font-bold">Confirm Delete</h2>
-        <p>Are you sure you want to delete this tax?</p>
+        <p>Are you sure you want to delete this promotion?</p>
         <div className="mt-4 flex justify-end">
           <button
             onClick={onClose}

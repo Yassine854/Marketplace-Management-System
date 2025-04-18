@@ -48,7 +48,7 @@ export async function GET(
   }
 }
 
-// PATCH - update permission resource and action
+// PATCH - update permission resource
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -61,23 +61,18 @@ export async function PATCH(
 
     const { id } = params;
     const body = await req.json();
-    const { resource, action } = body;
+    const { resource } = body;
 
-    if (
-      !resource ||
-      typeof resource !== "string" ||
-      !action ||
-      typeof action !== "string"
-    ) {
+    if (!resource || typeof resource !== "string") {
       return NextResponse.json(
-        { error: "Both 'resource' and 'action' must be valid strings." },
+        { error: "'resource' must be valid string." },
         { status: 400 },
       );
     }
 
     const updatedPermission = await prisma.permission.update({
       where: { id },
-      data: { resource, action },
+      data: { resource },
     });
 
     return NextResponse.json(

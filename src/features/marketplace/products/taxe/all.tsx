@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import TaxTable from "./components/TaxTable";
 import { useRouter } from "next/navigation";
-import Pagination from "@mui/material/Pagination";
-import styles from "../../../suppliers/styles/pagination.module.css";
+import Pagination from "../../../shared/elements/Pagination/pagination";
 import { Tax } from "./types/tax";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ConfirmDeleteModal from "./components/ConfirmDeleteModal"; // Import the modal
+import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
 
 const TaxManagementPage = () => {
   const [taxes, setTaxes] = useState<Tax[]>([]);
@@ -15,10 +14,10 @@ const TaxManagementPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [totalTaxes, setTotalTaxes] = useState(0); // State to hold total taxes
-  const [deleteTaxId, setDeleteTaxId] = useState<string | null>(null); // State for the tax ID to delete
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-  const pageSize = 10;
+  const [totalTaxes, setTotalTaxes] = useState(0);
+  const [deleteTaxId, setDeleteTaxId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const router = useRouter();
 
   useEffect(() => {
@@ -26,7 +25,7 @@ const TaxManagementPage = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `/api/marketplace/tax/getAll?page=${currentPage}&size=${pageSize}&search=${debouncedSearchTerm}`,
+          `/api/marketplace/tax/getAll?page=${currentPage}&limit=${itemsPerPage}&search=${debouncedSearchTerm}`,
         );
         const data = await response.json();
 
@@ -35,7 +34,7 @@ const TaxManagementPage = () => {
         }
 
         setTaxes(data.taxes || []);
-        setTotalTaxes(data.total || 0);
+        setTotalTaxes(data.totalTaxes || 0);
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "An unknown error occurred",
@@ -46,11 +45,12 @@ const TaxManagementPage = () => {
     };
 
     fetchTaxes();
-  }, [currentPage, debouncedSearchTerm]);
+  }, [currentPage, debouncedSearchTerm, itemsPerPage]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1);
     }, 500);
 
     return () => clearTimeout(handler);
@@ -65,7 +65,7 @@ const TaxManagementPage = () => {
     );
   }
 
-  const totalPages = Math.ceil(totalTaxes / pageSize);
+  const totalPages = Math.ceil(totalTaxes / itemsPerPage);
 
   const handleUpdate = async (updatedTax: Tax) => {
     try {
@@ -149,11 +149,11 @@ const TaxManagementPage = () => {
           <div className="box w-full min-w-[800px] xl:p-8">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
               <p className="ml-4 mt-6 text-xl font-bold">Tax Management</p>
-              <div className="mt-6 flex items-center gap-4">
+              <div className="flex h-16 w-56  items-center justify-center  ">
                 <button
                   onClick={() => router.push("/taxe/new")}
-                  className="mr-4 flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"
-                  title="New Tax"
+                  className="btn"
+                  title="New Taxe"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -169,7 +169,7 @@ const TaxManagementPage = () => {
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  <span className="hidden md:inline">New Tax</span>
+                  <span className="hidden md:inline">New Taxe</span>
                 </button>
               </div>
             </div>
@@ -178,7 +178,7 @@ const TaxManagementPage = () => {
               <div className="relative flex w-full gap-2 sm:w-auto sm:min-w-[200px] sm:flex-1">
                 <input
                   type="text"
-                  placeholder="Search Taxes..."
+                  placeholder="Search Taxes by value..."
                   className="w-[400px] rounded-lg border p-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -201,16 +201,13 @@ const TaxManagementPage = () => {
               />
             </div>
 
-            <div className={styles.pagination}>
+            <div>
               <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={(event, value) => setCurrentPage(value)}
-                color="primary"
-                shape="rounded"
-                siblingCount={1}
-                boundaryCount={1}
-                className="pagination"
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
               />
             </div>
           </div>

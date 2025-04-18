@@ -19,7 +19,7 @@ export async function GET(
     const reservation = await prisma.reservation.findUnique({
       where: { id },
       include: {
-        customers: true,
+        customer: true,
         agent: true,
         partner: true,
         order: true,

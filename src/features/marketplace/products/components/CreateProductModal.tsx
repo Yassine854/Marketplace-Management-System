@@ -398,7 +398,7 @@ const CreateProductModal = ({
           {/* Categories & Relations */}
           <div className="space-y-4 pt-6">
             <h3 className="text-xl font-semibold text-primary">
-              Categories & Related Products
+              Sub-Categories & Related Products
             </h3>
             <select
               multiple

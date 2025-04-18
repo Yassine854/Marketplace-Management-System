@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import SubCategoryTable from "../table/SubCategoryTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/Pagination";
+import Pagination from "@/features/shared/elements/Pagination/pagination";
 import { SubCategory } from "@/types/subCategory";
 import { useSubCategoryActions } from "../hooks/useSubCategoryActions";
 import { useRouter } from "@/libs/next-intl/i18nNavigation";

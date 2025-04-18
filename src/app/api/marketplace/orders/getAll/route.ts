@@ -129,7 +129,7 @@ export async function GET(req: Request) {
       include: {
         status: true,
         state: true,
-        customers: true,
+        customer: true,
         agent: true,
         reservation: {
           include: {

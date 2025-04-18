@@ -10,9 +10,9 @@ export async function GET() {
   try {
     const session = await auth(); // Get user session
 
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
     const subCategories = await prisma.subCategory.findMany({
       include: {

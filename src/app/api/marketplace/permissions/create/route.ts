@@ -12,20 +12,17 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { resource, action } = body;
+    const { resource } = body;
 
-    if (!resource || !action) {
+    if (!resource) {
       return NextResponse.json(
-        { error: "Both resource and action are required." },
+        { error: "resource is required." },
         { status: 400 },
       );
     }
 
     const newPermission = await prisma.permission.create({
-      data: {
-        resource,
-        action,
-      },
+      data: { resource },
     });
 
     return NextResponse.json(

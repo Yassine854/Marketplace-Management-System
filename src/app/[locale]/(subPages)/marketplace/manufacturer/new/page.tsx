@@ -1,2 +1,2 @@
 "use client";
-export { default } from "@/features/marketplace/manufacturer/new/new";
+export { default } from "@/features/marketplace/products/manufacturer/new/new";

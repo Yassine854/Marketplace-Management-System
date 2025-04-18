@@ -1,2 +1,2 @@
 "use client";
-export { default } from "@/features/marketplace/order/state/pages/statePage";
+export { default } from "@/features/marketplace/orders/state/pages/statePage";
