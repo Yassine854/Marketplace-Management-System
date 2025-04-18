@@ -362,7 +362,7 @@ model Agent {
   telephone String?
   address   String?
   password  String?
-  roleId    String?
+  Id    String?
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
