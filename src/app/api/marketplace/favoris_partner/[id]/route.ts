@@ -21,7 +21,7 @@ export async function GET(
     const favoritePartner = await prisma.favoritePartner.findUnique({
       where: { id },
       include: {
-        customers: true,
+        customer: true,
         product: true,
         partner: true,
       },

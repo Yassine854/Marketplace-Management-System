@@ -2,7 +2,7 @@ import {
   Order as PrismaOrder,
   Status,
   State,
-  Customer,
+  Customers,
   Agent,
   Reservation,
   Partner,
@@ -45,12 +45,12 @@ export type OrderWithRelations = PrismaOrder & {
 
   status?: Status | null;
   state?: State | null;
-  customer?: Customer | null;
+  customer?: Customers | null;
   agent?: Agent | null;
   reservation?: Reservation & {
     agent?: Agent | null;
     partner?: Partner | null;
-    customer?: Customer | null;
+    customer?: Customers | null;
     paymentMethod: OrderPayment | null;
     reservationItems: (ReservationItem & {
       product: Product & {

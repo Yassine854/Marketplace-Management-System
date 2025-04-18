@@ -77,7 +77,7 @@ export async function PATCH(
 
     const updatedPermission = await prisma.permission.update({
       where: { id },
-      data: { resource, action },
+      data: { resource },
     });
 
     return NextResponse.json(

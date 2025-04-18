@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PromotionTable from "./components/PromotionTable";
 import { useRouter } from "next/navigation";
-import Pagination from "../shared/elements/pagination/pagination";
+import Pagination from "../shared/elements/Pagination/Pagination";
 import { Promotion } from "./types/promo";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

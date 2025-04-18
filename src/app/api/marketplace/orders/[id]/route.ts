@@ -20,7 +20,7 @@ export async function GET(
       include: {
         status: true,
         state: true,
-        customers: true,
+        customer: true,
         agent: true,
         reservation: true,
         partner: true,

@@ -24,7 +24,6 @@ export async function POST(req: Request) {
     const newPermission = await prisma.permission.create({
       data: {
         resource,
-        action,
       },
     });
 

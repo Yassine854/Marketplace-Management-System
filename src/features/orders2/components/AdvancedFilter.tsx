@@ -4,7 +4,7 @@ import {
   Agent,
   Partner,
   OrderPayment,
-  Customer,
+  Customers,
 } from "@prisma/client";
 
 interface AdvancedFilterProps {
@@ -13,7 +13,7 @@ interface AdvancedFilterProps {
   agents: Agent[];
   partners: Partner[];
   paymentMethods: OrderPayment[];
-  customers: Customer[];
+  customers: Customers[];
   filters: {
     statusId: string;
     stateId: string;

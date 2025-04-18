@@ -4,7 +4,7 @@ import { OrderWithRelations, OrderItemWithRelations } from "../types/order";
 import {
   Status,
   State,
-  Customer,
+  Customers,
   Agent,
   Partner,
   OrderPayment,
@@ -80,7 +80,7 @@ const EditOrderForm = ({
   const [isLoading, setIsLoading] = useState(false);
   const [states, setStates] = useState<State[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<Customers[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<OrderPayment[]>([]);
@@ -181,7 +181,7 @@ const EditOrderForm = ({
         );
         setCustomers(
           (customerData?.customers || customerData).filter(
-            (customer: Customer) =>
+            (customer: Customers) =>
               customer.id && customer.firstName && customer.lastName,
           ),
         );

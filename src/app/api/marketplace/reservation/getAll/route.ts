@@ -38,7 +38,6 @@ export async function GET(req: Request) {
                 },
               },
             },
-            loyaltyPoints: true,
           },
         });
       } else {
@@ -65,7 +64,6 @@ export async function GET(req: Request) {
                 },
               },
             },
-            loyaltyPoints: true,
           },
         });
       }
@@ -93,22 +91,11 @@ export async function GET(req: Request) {
               },
             },
           },
-          loyaltyPoints: true,
         },
       });
     }
 
     const totalCount = await prisma.reservation.count();
-    const reservations = await prisma.reservation.findMany({
-      include: {
-        customers: true,
-        agent: true,
-        partner: true,
-        order: true,
-        paymentMethod: true,
-        reservationItems: true,
-      },
-    });
 
     return NextResponse.json(
       {

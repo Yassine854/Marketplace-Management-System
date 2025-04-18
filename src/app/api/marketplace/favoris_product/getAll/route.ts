@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 
     const favoriteProducts = await prisma.favoriteProduct.findMany({
       include: {
-        customers: true,
+        customer: true,
         product: true,
       },
     });

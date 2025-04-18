@@ -15,7 +15,7 @@ export async function GET(req: Request) {
     const notifications = await prisma.notifyMe.findMany({
       include: {
         product: true,
-        customers: true,
+        customer: true,
       },
     });
 

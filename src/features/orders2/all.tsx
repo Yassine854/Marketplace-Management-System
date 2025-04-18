@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import OrderTable from "./components/Order2Table";
-import Pagination from "../shared/elements/pagination/pagination";
+import Pagination from "../shared/elements/Pagination/Pagination";
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
 import EditOrderForm from "./components/EditOrderForm";
 import AdvancedFilter from "./components/AdvancedFilter";
@@ -15,7 +15,7 @@ import {
   Partner,
   State,
   Status,
-  Customer,
+  Customers,
 } from "@prisma/client";
 
 const OrderManagementPage = () => {
@@ -76,7 +76,7 @@ const OrderManagementPage = () => {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<OrderPayment[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<Customers[]>([]);
 
   const router = useRouter();
   const totalPages = Math.ceil(totalOrders / itemsPerPage);

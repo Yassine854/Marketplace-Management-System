@@ -409,7 +409,6 @@ const SupplierForm = () => {
             skuPartner: null,
             minimumQte: null,
             maximumQte: null,
-            sealableAlertQte: null,
             typePcbId: null,
             productTypeId: null,
             productStatusId: null,

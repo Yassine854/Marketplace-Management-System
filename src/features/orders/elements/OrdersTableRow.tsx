@@ -56,9 +56,9 @@ const OrdersTableRow = ({
         onClick={handleParentClick}
         className="px-6 py-4 text-sm font-semibold text-gray-900"
       >
-        <div className="flex h-full w-full items-center justify-center ">
+        <div className="flex h-full w-full items-center justify-center  whitespace-nowrap">
           <Checkbox
-            className="h-2 w-2 cursor-pointer appearance-none rounded-full border-2 border-gray-400 transition-colors checked:border-blue-500 checked:bg-blue-500 hover:border-blue-600 hover:bg-blue-200"
+            className="h-4 w-4 cursor-pointer rounded-full   transition-colors checked:border-blue-500 checked:bg-blue-500 hover:border-blue-600 hover:bg-blue-200"
             checkboxRef={checkboxRef}
             isChecked={order.isSelected}
             onClick={(isChecked: boolean) => {
@@ -82,8 +82,8 @@ const OrdersTableRow = ({
       </OrdersTableCell>
       <OrdersTableCell>{order?.deliveryAgentName || "***"}</OrdersTableCell>
       <OrdersTableCell>{order?.deliveryStatus || "***"}</OrdersTableCell>
-      <OrdersTableCell>
-        <div className=" flex justify-center">
+      <OrdersTableCell className="no-underline">
+        <div className=" flex justify-center no-underline">
           {isGenerateSummaryPending && (
             <div className="h-6 w-6">
               <Loading />
@@ -91,7 +91,7 @@ const OrdersTableRow = ({
           )}
           {!isGenerateSummaryPending && (
             <div
-              className="rounded-full p-2 hover:bg-n10"
+              className="rounded-full p-2 hover:bg-gray-100"
               onClick={(event: any) => {
                 event.stopPropagation();
                 onPDFIconClick(order.id);
