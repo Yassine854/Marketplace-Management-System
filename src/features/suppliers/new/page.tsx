@@ -365,10 +365,6 @@ const SupplierForm = () => {
       }
 
       const result = await response.json();
-<<<<<<< HEAD
-=======
-
->>>>>>> Yassine-v2
       toast.success("Purchase order saved successfully!");
 
       return result;

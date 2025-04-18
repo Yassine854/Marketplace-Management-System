@@ -327,12 +327,12 @@ model Partner {
 
 
 
-model Customer {
+model Customers {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   firstName String?
   lastName  String?
-  gender    Int?
   governorate String?
+  gender String?
   retailer_profile String?
   email     String?   
   telephone String?
@@ -352,19 +352,20 @@ model Customer {
 }
 
 
+
 model Agent {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  username  String   @unique
-  firstName String
-  lastName  String
-  email     String   @unique
-  telephone String
-  address   String
-  password  String
-  Id    String
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  username  String?   @unique
+  firstName String?
+  lastName  String?
+  email     String?   @unique
+  telephone String?
+  address   String?
+  password  String?
+  roleId    String?
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 
   orders   Order[]
   reservations Reservation[]
@@ -437,7 +438,7 @@ model NotifyMe {
   productSku  String
   customerId  String   @db.ObjectId
 
-  customer    Customer @relation(fields: [customerId], references: [id])
+  customers    Customers @relation(fields: [customerId], references: [id])
 
 
   @@map("notify_me")
@@ -473,8 +474,8 @@ model ProductSubCategory {
   productId  String    @db.ObjectId
   subcategoryId String    @db.ObjectId  
 
-  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  subcategory SubCategory  @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)  
+  product    Product   @relation(fields: [productId], references: [id])
+  subcategory SubCategory  @relation(fields: [subcategoryId], references: [id])  
   @@unique([productId, subcategoryId])
 }
 
@@ -498,7 +499,7 @@ model FavoriteProduct {
   customerId  String   @db.ObjectId
   productId   String   @db.ObjectId
 
-  customer    Customer @relation(fields: [customerId], references: [id])
+  customers    Customers @relation(fields: [customerId], references: [id])
   product     Product  @relation(fields: [productId], references: [id])
 
   @@unique([customerId, productId])
@@ -513,7 +514,7 @@ model FavoritePartner {
   productId   String   @db.ObjectId
   partnerId   String   @db.ObjectId
 
-  customer    Customer @relation(fields: [customerId], references: [id])
+  customers    Customers @relation(fields: [customerId], references: [id])
   product     Product  @relation(fields: [productId], references: [id])
   partner     Partner  @relation(fields: [partnerId], references: [id])
 
@@ -568,7 +569,7 @@ model Order {
   state               State    @relation(fields: [stateId], references: [id]) 
 
   customerId          String   @db.ObjectId
-  customer            Customer @relation(fields: [customerId], references: [id]) 
+  customers           Customers @relation(fields: [customerId], references: [id]) 
 
   agentId             String?  @db.ObjectId
   agent               Agent?   @relation(fields: [agentId], references: [id]) 
@@ -644,7 +645,7 @@ model Reservation {
 
   // Relationships
   customerId          String   @db.ObjectId
-  customer            Customer @relation(fields: [customerId], references: [id]) 
+  customers            Customers @relation(fields: [customerId], references: [id]) 
 
   agentId             String?  @db.ObjectId
   agent               Agent?   @relation(fields: [agentId], references: [id]) 

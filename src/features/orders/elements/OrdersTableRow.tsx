@@ -49,7 +49,7 @@ const OrdersTableRow = ({
 
   return (
     <tr
-      className=" transition-colors duration-150 hover:bg-gray-50"
+      className=" transition-colors duration-150 hover:bg-gray-50 "
       onClick={onClick}
     >
       <td

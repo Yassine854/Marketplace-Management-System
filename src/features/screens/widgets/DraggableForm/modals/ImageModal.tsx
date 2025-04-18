@@ -162,7 +162,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
             render={({ field }) => (
               <SingleFileInput
                 id="images"
-                label="Background Image"
+                label="Image"
                 accept="image/*"
                 previewUrls={previewUrls}
                 onChange={(files) => {

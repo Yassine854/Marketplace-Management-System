@@ -1,25 +1,28 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs"; // Install bcryptjs if not already installed
 import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve a single agent by ID
+// 🔵 GET: Retrieve an agent by ID
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
-
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = params;
-
-    const agent = await prisma.agent.findUnique({ where: { id } });
+    const agent = await prisma.agent.findUnique({
+      where: { id },
+      include: {
+        orders: true,
+        reservations: true,
+      },
+    });
 
     if (!agent) {
       return NextResponse.json({ message: "Agent not found" }, { status: 404 });
@@ -38,59 +41,105 @@ export async function GET(
   }
 }
 
-// 🟡 PATCH: Update an agent's details
+// 🟡 PATCH: Update agent details
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
-
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = params;
-    const body = await req.json();
+    const formData = await req.formData();
 
-    // Hash new password if provided
-    let updatedData = { ...body };
-    if (body.password) {
-      updatedData.password = await hash(body.password, 10);
+    const existingAgent = await prisma.agent.findUnique({ where: { id } });
+    if (!existingAgent) {
+      return NextResponse.json({ error: "Agent not found" }, { status: 404 });
+    }
+
+    const updateData: any = {};
+    const fields = [
+      "username",
+      "firstName",
+      "lastName",
+      "email",
+      "telephone",
+      "address",
+      "governate",
+      "gender",
+    ];
+
+    for (const field of fields) {
+      const value = formData.get(field);
+      if (value !== null && value !== "") {
+        updateData[field] = value;
+      }
+    }
+
+    // Gestion de isActive
+    const isActive = formData.get("isActive");
+    if (isActive !== null) {
+      updateData.isActive = isActive === "true";
+    }
+
+    // Vérifie doublons email / username uniquement si changement
+    if (updateData.username && updateData.username !== existingAgent.username) {
+      const userExists = await prisma.agent.findFirst({
+        where: { username: updateData.username },
+      });
+      if (userExists) {
+        return NextResponse.json(
+          { error: "Username already exists" },
+          { status: 409 },
+        );
+      }
+    }
+
+    if (updateData.email && updateData.email !== existingAgent.email) {
+      const emailExists = await prisma.agent.findFirst({
+        where: { email: updateData.email },
+      });
+      if (emailExists) {
+        return NextResponse.json(
+          { error: "Email already exists" },
+          { status: 409 },
+        );
+      }
     }
 
     const updatedAgent = await prisma.agent.update({
       where: { id },
-      data: updatedData,
+      data: updateData,
     });
 
     return NextResponse.json(
       { message: "Agent updated successfully", agent: updatedAgent },
       { status: 200 },
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating agent:", error);
     return NextResponse.json(
-      { error: "Failed to update agent" },
+      { error: "Failed to update agent", details: error.message },
       { status: 500 },
     );
   }
 }
 
-// 🔴 DELETE: Remove an agent by ID
+// 🔴 DELETE: Remove agent
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
-
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = params;
-
     await prisma.agent.delete({ where: { id } });
 
     return NextResponse.json(

@@ -8,17 +8,21 @@ import {
   IconList,
   IconShoppingCart,
   IconDeviceAnalytics,
-<<<<<<< HEAD
+
   IconCurrencyDollar,
   IconDiscount,
   IconBuildingFactory2,
   IconClipboardCheck,
   IconPackage,
-=======
-  IconBox,
->>>>>>> Yassine-v2
-} from "@tabler/icons-react";
 
+ 
+  IconBox,
+  IconCreditCard,
+  IconUser,
+  IconTruck,
+
+} from "@tabler/icons-react";
+import { FaBoxOpen } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 import { statuses } from "./statuses";
@@ -178,6 +182,27 @@ const Sidebar = ({
           />
 
           <Divider />
+
+          <SidebarSubMenu
+            icon={<IconBox />}
+            name=" Order"
+            onClick={() => push("/order/state")}
+            isActive={pathname?.includes("state")}
+            items={[
+              { name: "State", path: "/order/state" },
+              { name: "Status", path: "/order/status" },
+            ]}
+          />
+
+          <Divider />
+          <SidebarButton
+            name="Payment Method"
+            icon={<IconCreditCard />}
+            onClick={() => push("/PaymentMethod")}
+            isActive={pathname?.includes("PaymentMethod")}
+          />
+
+          <Divider />
           <SidebarSubMenu
             icon={<IconMap2 />}
             name={"Milk Run"}
@@ -266,6 +291,21 @@ const Sidebar = ({
             icon={<IconBell />}
             onClick={() => push("/notifications")}
             isActive={pathname?.includes("notifications")}
+          />
+          <Divider />
+          <SidebarButton
+            name="Delivery Agent"
+            icon={<IconTruck />}
+            onClick={() => push("/deliveryAgent")}
+            isActive={pathname?.includes("deliveryAgent")}
+          />
+
+          <Divider />
+          <SidebarButton
+            name="Customer"
+            icon={<IconUser />}
+            onClick={() => push("/customer")}
+            isActive={pathname?.includes("customer")}
           />
           {isAdmin && (
             <>

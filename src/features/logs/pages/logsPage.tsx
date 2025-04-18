@@ -3,11 +3,11 @@
 import LogTable from "../Table/LogTable";
 import { useGetAllLogs } from "../getLogs/useGetAllLogs";
 import { useMemo, useState, useEffect } from "react";
-//import Pagination from "../components/Pagination";
+import Pagination from "../components/Pagination";
 import ExcelJS from "exceljs";
 import FileSaver from "file-saver";
 import { FaRedo } from "react-icons/fa";
-import Pagination from "@mui/material/Pagination";
+//import Pagination from "@mui/material/Pagination";
 import styles from "../styles/pagination.module.css";
 
 export default function LogsPage() {
@@ -22,34 +22,52 @@ export default function LogsPage() {
     orderId: "",
     username: "",
     product: "",
+    sku: "", // Nouveau filtre SKU
+    timestamp: { start: "", end: "" },
   });
   const [tempFilters, setTempFilters] = useState({
     orderId: "",
     username: "",
     product: "",
+    sku: "", // Nouveau filtre SKU
+    timestamp: { start: "", end: "" },
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [selectedLogs, setSelectedLogs] = useState<any[]>([]);
+  const [isAllSelected, setIsAllSelected] = useState(false);
+  const onClearSelection = () => setSelectedLogs([]);
 
-  const handleRefresh = () => {
-    refetch();
+  const refetchLogs = async () => {
+    await refetch();
+    onClearSelection();
+    setCurrentPage(1);
   };
 
   const parseJsonSafely = (data: any) => {
     if (typeof data === "string") {
-      try {
-        return JSON.parse(data);
-      } catch (error) {
-        console.error("Erreur de parsing JSON :", error);
-        return null;
+      if (
+        (data.trim().startsWith("{") && data.trim().endsWith("}")) ||
+        (data.trim().startsWith("[") && data.trim().endsWith("]"))
+      ) {
+        try {
+          return JSON.parse(data);
+        } catch (error) {
+          return data;
+        }
       }
+
+      return data;
     }
+
     return data;
   };
 
   const filteredLogs = useMemo(() => {
+    if (error) {
+      return [];
+    }
     return logs
       .filter((log) => {
         const context = parseJsonSafely(log.context);
@@ -60,9 +78,9 @@ export default function LogsPage() {
           context ? JSON.stringify(context) : ""
         } ${dataBefore ? JSON.stringify(dataBefore) : ""} ${
           dataAfter ? JSON.stringify(dataAfter) : ""
-        }`
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
+        }`.toLowerCase();
+
+        const matchesSearch = searchContent.includes(searchTerm.toLowerCase());
 
         const matchesTab =
           activeTab === "all" ? true : log.type.toLowerCase() === activeTab;
@@ -85,36 +103,70 @@ export default function LogsPage() {
             "username" in context &&
             context.username.toLowerCase() === filters.username.toLowerCase());
 
-        // Filtre par product name
         const matchesProduct =
           !filters.product ||
-          (dataBefore &&
-            typeof dataBefore === "object" &&
-            "items" in dataBefore &&
-            Array.isArray(dataBefore.items) &&
-            dataBefore.items.some(
-              (item: any) =>
-                item.productName &&
-                item.productName.toLowerCase() ===
-                  filters.product.toLowerCase(),
-            )) ||
-          (dataAfter &&
-            typeof dataAfter === "object" &&
-            "items" in dataAfter &&
-            Array.isArray(dataAfter.items) &&
-            dataAfter.items.some(
-              (item: any) =>
-                item.productName &&
-                item.productName.toLowerCase() ===
-                  filters.product.toLowerCase(),
-            ));
+          [dataBefore, dataAfter].some((data) => {
+            return (
+              data &&
+              typeof data === "object" &&
+              "items" in data &&
+              Array.isArray(data.items.updatedItems) &&
+              data.items.updatedItems.some((item: any) => {
+                return (
+                  item.productName &&
+                  item.productName.toLowerCase() ===
+                    filters.product.toLowerCase()
+                );
+              })
+            );
+          });
+
+        const matchesSku =
+          !filters.sku ||
+          [dataBefore, dataAfter].some((data) => {
+            return (
+              data &&
+              typeof data === "object" &&
+              "items" in data &&
+              Array.isArray(data.items?.updatedItems) &&
+              data.items.updatedItems.some((item: any) => {
+                return (
+                  item.sku &&
+                  item.sku.toLowerCase() === filters.sku.toLowerCase()
+                );
+              })
+            );
+          });
+        const logDate = new Date(log.timestamp);
+        const startDate = filters.timestamp.start
+          ? new Date(filters.timestamp.start)
+          : null;
+        const endDate = filters.timestamp.end
+          ? new Date(filters.timestamp.end)
+          : null;
+        const isDateInRange = (logDate: Date, start: string, end: string) => {
+          const logTime = logDate.getTime();
+          const startTime = start ? new Date(start).getTime() : -Infinity;
+          const endTime = end
+            ? new Date(end + "T23:59:59").getTime()
+            : Infinity; // Inclure toute la journée
+
+          return logTime >= startTime && logTime <= endTime;
+        };
+        const matchesDate = isDateInRange(
+          new Date(log.timestamp),
+          filters.timestamp.start,
+          filters.timestamp.end,
+        );
 
         return (
-          searchContent &&
+          matchesSearch &&
           matchesTab &&
           matchesOrderId &&
           matchesUsername &&
-          matchesProduct
+          matchesProduct &&
+          matchesSku &&
+          matchesDate
         );
       })
       .sort((a, b) => {
@@ -192,42 +244,29 @@ export default function LogsPage() {
           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-          <div className="relative w-full sm:w-auto sm:min-w-[200px] sm:flex-1">
-            <input
-              type="text"
-              placeholder="Rechercher des logs..."
-              className="w-full rounded-lg border p-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-              🔍
-            </span>
-          </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xl font-bold capitalize">Logs</p>
 
-          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
-            <button
-              className="rounded bg-gray-200 px-4 py-2"
-              onClick={() => setIsFilterOpen(true)}
-            >
-              Filter
-            </button>
-            <button
-              className="rounded bg-gray-200 px-4 py-2"
-              onClick={() => {
-                setFilters({ orderId: "", username: "", product: "" });
-                setTempFilters({ orderId: "", username: "", product: "" });
-              }}
-            >
-              Reset Filters
-            </button>
-            <label htmlFor="sort" className="text-sm font-medium text-gray-700">
-              Sort by :
+          <div className="flex flex-wrap gap-2 sm:items-center sm:justify-end sm:justify-between">
+            <div className="relative m-4 w-full sm:w-auto sm:min-w-[200px] sm:flex-1">
+              <input
+                type="text"
+                placeholder="Rechercher..."
+                className="w-full rounded-lg border p-2 pl-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <span className="absolute inset-y-0 left-2 flex items-center">
+                🔍
+              </span>
+            </div>
+
+            <label htmlFor="sort" className="mr-2 whitespace-nowrap font-bold">
+              Sort by:
             </label>
             <select
               id="sort"
-              className="rounded-lg border p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-lg border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={sortLog}
               onChange={(e) =>
                 setSortLog(e.target.value as "newest" | "oldest")
@@ -236,6 +275,35 @@ export default function LogsPage() {
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
             </select>
+
+            <button
+              className="ml-5 rounded-md bg-blue-500 px-4 py-2 text-white transition-colors duration-300"
+              onClick={() => setIsFilterOpen(true)}
+            >
+              Filtrer
+            </button>
+
+            <button
+              className={`rounded-md bg-gray-500 px-4 py-2 text-white transition-colors duration-300`}
+              onClick={() => {
+                setFilters({
+                  orderId: "",
+                  username: "",
+                  product: "",
+                  sku: "",
+                  timestamp: { start: "", end: "" },
+                });
+                setTempFilters({
+                  orderId: "",
+                  username: "",
+                  product: "",
+                  sku: "",
+                  timestamp: { start: "", end: "" },
+                });
+              }}
+            >
+              Reset
+            </button>
           </div>
         </div>
 
@@ -256,8 +324,10 @@ export default function LogsPage() {
             </button>
           ))}
           <button
-            onClick={handleRefresh}
-            className="rounded-t-lg bg-gray-100 px-4 py-2 hover:bg-gray-200"
+            onClick={() => {
+              refetchLogs();
+            }}
+            className="rounded-t bg-gray-100 px-4 py-2 hover:bg-gray-200"
           >
             <FaRedo className="mr-2" />
           </button>
@@ -270,7 +340,10 @@ export default function LogsPage() {
           isLoading={isLoading}
           error={error}
           refetch={refetch}
+          selectedLogs={selectedLogs}
+          setSelectedLogs={setSelectedLogs}
           isSidebarOpen={isSidebarOpen}
+          onClearSelection={onClearSelection}
           onLogSelection={(logId) => {
             const log = logs.find((l) => l.id === logId);
             if (log) {
@@ -284,16 +357,13 @@ export default function LogsPage() {
         />
       </div>
 
-      <div className={styles.pagination}>
+      <div>
         <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={(event, value) => setCurrentPage(value)}
-          color="primary"
-          shape="rounded"
-          siblingCount={1}
-          boundaryCount={1}
-          className="pagination"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
         />
       </div>
 
@@ -340,6 +410,52 @@ export default function LogsPage() {
                   setTempFilters({ ...tempFilters, product: e.target.value })
                 }
               />
+              <input
+                type="text"
+                placeholder="SKU"
+                className="rounded-lg border p-2"
+                value={tempFilters.sku}
+                onChange={(e) =>
+                  setTempFilters({ ...tempFilters, sku: e.target.value })
+                }
+              />
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Date Range</label>
+                <input
+                  type="date"
+                  className="rounded-lg border p-2"
+                  max={tempFilters.timestamp.end || undefined}
+                  value={tempFilters.timestamp.start}
+                  onChange={(e) => {
+                    const newStart = e.target.value;
+                    const currentEnd = tempFilters.timestamp.end;
+                    if (!newStart || !currentEnd || newStart <= currentEnd) {
+                      setTempFilters({
+                        ...tempFilters,
+                        timestamp: {
+                          ...tempFilters.timestamp,
+                          start: newStart,
+                        },
+                      });
+                    }
+                  }}
+                />
+                <span className="text-center">to</span>
+                <input
+                  type="date"
+                  className="rounded-lg border p-2"
+                  value={tempFilters.timestamp.end}
+                  onChange={(e) =>
+                    setTempFilters({
+                      ...tempFilters,
+                      timestamp: {
+                        ...tempFilters.timestamp,
+                        end: e.target.value,
+                      },
+                    })
+                  }
+                />
+              </div>
             </div>
             <div className="mt-4 flex justify-end gap-2">
               <button

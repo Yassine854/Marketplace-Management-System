@@ -10,7 +10,6 @@ export const getAllLogs = async () => {
 
     return logs;
   } catch (err) {
-    console.error("Get Prisma All Logs Error: ", err);
     return [];
   }
 };

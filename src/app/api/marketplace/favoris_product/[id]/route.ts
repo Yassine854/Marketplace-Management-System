@@ -21,7 +21,7 @@ export async function GET(
     const favoriteProduct = await prisma.favoriteProduct.findUnique({
       where: { id },
       include: {
-        customer: true,
+        customers: true,
         product: true,
       },
     });

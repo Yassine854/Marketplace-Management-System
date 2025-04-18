@@ -26,9 +26,15 @@ const handlePDFGeneration = async (orderId: string) => {
   }
 };
 
-const OrdersTable = () => {
+import { Order } from "@/types/order";
+import { padding } from "@mui/system";
+
+interface OrdersTableProps {
+  orders: Order[];
+}
+
+const OrdersTable = ({ orders }: OrdersTableProps) => {
   const {
-    orders,
     isLoading,
     selectOrder,
     selectAllOrders,
@@ -53,7 +59,7 @@ const OrdersTable = () => {
 
   return (
     <div
-      className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+      className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3"
       style={{ maxHeight: "600px" }}
     >
       <table
@@ -62,13 +68,27 @@ const OrdersTable = () => {
         cellSpacing={0}
         style={{ width: "100%" }}
       >
-        <OrdersTableHead
-          onSelectAllClick={selectAllOrders}
-          changeSelectedSort={changeSelectedSort}
-          isAllOrdersSelected={isAllOrdersSelected}
-        />
+        <thead
+          className="border-b border-gray-100 bg-gray-50 "
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            backgroundColor: "#fff",
+            overflowX: "auto",
+          }}
+        >
+          <OrdersTableHead
+            onSelectAllClick={selectAllOrders}
+            changeSelectedSort={changeSelectedSort}
+            isAllOrdersSelected={isAllOrdersSelected}
+          />
+        </thead>
 
-        <tbody className="divide-y divide-gray-200">
+        <tbody
+          className="divide-y divide-gray-200"
+          style={{ maxHeight: "400px", overflowY: "auto" }}
+        >
           <>
             {isLoading && (
               <>

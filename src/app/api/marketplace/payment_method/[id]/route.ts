@@ -57,10 +57,11 @@ export async function PATCH(
 
     const { id } = params;
     const body = await req.json();
+    const { id: _, ...dataToUpdate } = body;
 
     const updatedOrderPayment = await prisma.orderPayment.update({
       where: { id },
-      data: body,
+      data: dataToUpdate,
     });
 
     return NextResponse.json(

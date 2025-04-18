@@ -14,37 +14,35 @@ const OrdersTableHead = ({
     useOrdersTableHead(changeSelectedSort);
   const { selectedOrders } = useOrdersStore();
   return (
-    <thead className="border-b border-gray-100 bg-gray-50">
-      <tr>
-        <OrdersTableHeadSmallCell>
-          <div className="relative px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-            {!!selectedOrders.length && (
-              <div className="absolute right-0">{selectedOrders.length}</div>
-            )}
+    <tr>
+      <OrdersTableHeadSmallCell>
+        <div className="relative px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+          {!!selectedOrders.length && (
+            <div className="absolute right-0">{selectedOrders.length}</div>
+          )}
 
-            <Checkbox
-              onClick={onSelectAllClick}
-              isChecked={isAllOrdersSelected}
-            />
-          </div>
-        </OrdersTableHeadSmallCell>
-        <OrdersTableHeadCell>ID</OrdersTableHeadCell>
-        <OrdersTableHeadCell onClick={onCustomerClick}>
-          Customer <IconSelector size={18} />
-        </OrdersTableHeadCell>
-        <OrdersTableHeadCell onClick={onTotalClick}>
-          Total
-          <IconSelector size={18} />
-        </OrdersTableHeadCell>
-        <OrdersTableHeadCell onClick={onDeliveryDateClick}>
-          Delivery Date <IconSelector size={18} />
-        </OrdersTableHeadCell>
-        <OrdersTableHeadCell>Delivery Agent</OrdersTableHeadCell>
-        <OrdersTableHeadCell>Delivery Status</OrdersTableHeadCell>
-        <OrdersTableHeadSmallCell>Summary</OrdersTableHeadSmallCell>
-        <OrdersTableHeadSmallCell>Actions</OrdersTableHeadSmallCell>
-      </tr>
-    </thead>
+          <Checkbox
+            onClick={onSelectAllClick}
+            isChecked={isAllOrdersSelected}
+          />
+        </div>
+      </OrdersTableHeadSmallCell>
+      <OrdersTableHeadCell>ID</OrdersTableHeadCell>
+      <OrdersTableHeadCell onClick={onCustomerClick}>
+        Customer <IconSelector size={18} />
+      </OrdersTableHeadCell>
+      <OrdersTableHeadCell onClick={onTotalClick}>
+        Total
+        <IconSelector size={18} />
+      </OrdersTableHeadCell>
+      <OrdersTableHeadCell onClick={onDeliveryDateClick}>
+        Delivery Date <IconSelector size={18} />
+      </OrdersTableHeadCell>
+      <OrdersTableHeadCell>Delivery Agent</OrdersTableHeadCell>
+      <OrdersTableHeadCell>Delivery Status</OrdersTableHeadCell>
+      <OrdersTableHeadSmallCell>Summary</OrdersTableHeadSmallCell>
+      <OrdersTableHeadSmallCell>Actions</OrdersTableHeadSmallCell>
+    </tr>
   );
 };
 

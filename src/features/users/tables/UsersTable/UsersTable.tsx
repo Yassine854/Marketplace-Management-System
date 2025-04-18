@@ -10,31 +10,43 @@ const UsersTable = ({
   isAllOrdersSelected,
 }: any) => {
   return (
-    <table border={0} cellPadding={0} cellSpacing={0}>
-      <UsersTableHead
-        changeSelectedSort={changeSelectedSort}
-        onSelectAllClick={onSelectAllClick}
-        isAllOrdersSelected={isAllOrdersSelected}
-      />
+    <div>
+      <div
+        className="box m-4 mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3"
+        style={{ maxHeight: "600px" }}
+      >
+        <table
+          border={0}
+          cellPadding={0}
+          cellSpacing={0}
+          style={{ width: "100%" }}
+        >
+          <UsersTableHead
+            changeSelectedSort={changeSelectedSort}
+            onSelectAllClick={onSelectAllClick}
+            isAllOrdersSelected={isAllOrdersSelected}
+          />
 
-      <tbody>
-        <>
-          {isLoading ? (
+          <tbody className="divide-y divide-gray-200">
             <>
-              {[...Array(8)].map((_, i) => (
-                <TableRowSkeleton key={i} number={4} />
-              ))}
+              {isLoading ? (
+                <>
+                  {[...Array(8)].map((_, i) => (
+                    <TableRowSkeleton key={i} number={4} />
+                  ))}
+                </>
+              ) : (
+                <>
+                  {users?.map((user: any) => (
+                    <UsersTableRow key={user?.id} user={user} />
+                  ))}
+                </>
+              )}
             </>
-          ) : (
-            <>
-              {users?.map((user: any) => (
-                <UsersTableRow key={user?.id} user={user} />
-              ))}
-            </>
-          )}
-        </>
-      </tbody>
-    </table>
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 

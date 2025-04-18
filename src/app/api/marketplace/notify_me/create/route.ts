@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     const productExists = await prisma.product.findUnique({
       where: { sku: body.productSku },
     });
-    const customerExists = await prisma.customer.findUnique({
+    const customerExists = await prisma.customers.findUnique({
       where: { id: body.customerId },
     });
 

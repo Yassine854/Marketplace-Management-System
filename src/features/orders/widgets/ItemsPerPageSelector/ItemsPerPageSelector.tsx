@@ -14,7 +14,13 @@ const ItemsPerPageSelector = () => {
 
   const { open, ref, toggleOpen } = useDropdown();
 
-  const { setItemsPerPage } = useOrdersTableStore();
+  // const { setItemsPerPage } = useOrdersTableStore();
+  const { itemsPerPage, setItemsPerPage } = useOrdersTableStore();
+  const { setCurrentPage } = useOrdersTableStore();
+  const handleSelect = (newValue: number) => {
+    setItemsPerPage(newValue);
+    setCurrentPage(1); // 👈 Reset à la première page quand on change le nombre d'items
+  };
 
   useEffect(() => {
     setSelected(25);
@@ -31,6 +37,17 @@ const ItemsPerPageSelector = () => {
         <IconChevronDown
           size={20}
           className={`duration-300 ${open && "rotate-180"}`}
+          style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            border: "1px solid #ccc",
+
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            transition: "background-color 0.3s, color 0.3s",
+          }}
         />
       </div>
       <ul className={tailwind.list(open)}>

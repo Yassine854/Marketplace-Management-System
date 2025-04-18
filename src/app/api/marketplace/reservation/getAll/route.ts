@@ -101,7 +101,7 @@ export async function GET(req: Request) {
     const totalCount = await prisma.reservation.count();
     const reservations = await prisma.reservation.findMany({
       include: {
-        customer: true,
+        customers: true,
         agent: true,
         partner: true,
         order: true,

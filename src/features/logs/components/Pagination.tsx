@@ -38,6 +38,7 @@ const Pagination: React.FC<PaginationProps> = ({
         borderTop: "1px solid #e0e0e0",
       }}
     >
+      {/* Items per page à gauche */}
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <span>Items per page:</span>
         <select
@@ -61,7 +62,7 @@ const Pagination: React.FC<PaginationProps> = ({
           display: "flex",
           alignItems: "center",
           gap: "8px",
-          marginBottom: "4px",
+          marginLeft: "auto",
         }}
       >
         <button

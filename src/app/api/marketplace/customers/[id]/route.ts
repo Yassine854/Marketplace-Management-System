@@ -1,36 +1,29 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs"; // Import bcryptjs for password hashing
-import { auth } from "../../../../../services/auth"; // Import authentication service
+import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-// 🟢 GET: Retrieve a customer by ID
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
-
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = params;
-
-    const customer = await prisma.customer.findUnique({
+    const customers = await prisma.customers.findUnique({
       where: { id },
       include: {
-        favoriteProducts: true,
-        favoritePartners: true,
         orders: true,
         reservations: true,
-        notifications: true, // Include notifications if needed
       },
     });
 
-    if (!customer) {
+    if (!customers) {
       return NextResponse.json(
         { message: "Customer not found" },
         { status: 404 },
@@ -38,7 +31,7 @@ export async function GET(
     }
 
     return NextResponse.json(
-      { message: "Customer retrieved successfully", customer },
+      { message: "Customer retrieved successfully", customers },
       { status: 200 },
     );
   } catch (error) {
@@ -50,60 +43,95 @@ export async function GET(
   }
 }
 
-// 🟡 PATCH: Update a customer's details
+// 🟡 PATCH: Update agent details
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
-
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = params;
-    const body = await req.json();
+    const formData = await req.formData();
 
-    // Hash new password if provided
-    let updatedData = { ...body };
-    if (body.password) {
-      updatedData.password = await hash(body.password, 10);
+    const existingCustomer = await prisma.customers.findUnique({
+      where: { id },
+    });
+    if (!existingCustomer) {
+      return NextResponse.json(
+        { error: "Customer not found" },
+        { status: 404 },
+      );
     }
 
-    const updatedCustomer = await prisma.customer.update({
+    const updateData: any = {};
+    const fields = [
+      "firstName",
+      "lastName",
+      "email",
+      "telephone",
+      "address",
+      "governorate",
+      "gender",
+    ];
+
+    for (const field of fields) {
+      const value = formData.get(field);
+      if (value !== null && value !== "") {
+        updateData[field] = value;
+      }
+    }
+
+    const isActive = formData.get("isActive");
+    if (isActive !== null) {
+      updateData.isActive = isActive === "true";
+    }
+
+    if (updateData.email && updateData.email !== existingCustomer.email) {
+      const emailExists = await prisma.agent.findFirst({
+        where: { email: updateData.email },
+      });
+      if (emailExists) {
+        return NextResponse.json(
+          { error: "Email already exists" },
+          { status: 409 },
+        );
+      }
+    }
+
+    const updatedCustomer = await prisma.customers.update({
       where: { id },
-      data: updatedData,
+      data: updateData,
     });
 
     return NextResponse.json(
-      { message: "Customer updated successfully", customer: updatedCustomer },
+      { message: "Agent updated successfully", agent: updatedCustomer },
       { status: 200 },
     );
-  } catch (error) {
-    console.error("Error updating customer:", error);
+  } catch (error: any) {
+    console.error("Error updating Customer:", error);
     return NextResponse.json(
-      { error: "Failed to update customer" },
+      { error: "Failed to update customer", details: error.message },
       { status: 500 },
     );
   }
 }
 
-// 🔴 DELETE: Remove a customer by ID
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
-
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = params;
-
-    await prisma.customer.delete({ where: { id } });
+    await prisma.customers.delete({ where: { id } });
 
     return NextResponse.json(
       { message: "Customer deleted successfully" },

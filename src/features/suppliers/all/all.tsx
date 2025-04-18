@@ -3,13 +3,13 @@ import PurchaseTable from "../components/PurchaseTable/PurchaseTable";
 import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersAll";
 import { useRouter } from "next/navigation";
-import Pagination from "@mui/material/Pagination";
-import styles from "../styles/pagination.module.css";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 const SupplierPurchasesPage = () => {
   const { purchases, loading, error, fetchPurchases, total } =
     usePurchaseStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
@@ -21,7 +21,7 @@ const SupplierPurchasesPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await fetchPurchases(currentPage, pageSize, {
+        await fetchPurchases(currentPage, itemsPerPage, {
           search: debouncedSearchTerm,
           ...activeFilters,
         });
@@ -31,8 +31,7 @@ const SupplierPurchasesPage = () => {
     };
 
     fetchData();
-  }, [currentPage, debouncedSearchTerm, activeFilters]);
-
+  }, [currentPage, itemsPerPage, debouncedSearchTerm, activeFilters]);
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -61,6 +60,7 @@ const SupplierPurchasesPage = () => {
         flexDirection: "column",
         padding: "16px",
         boxSizing: "border-box",
+        marginLeft: "50px",
       }}
     >
       <div
@@ -75,28 +75,32 @@ const SupplierPurchasesPage = () => {
           <div className="box w-full min-w-[800px] xl:p-8">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
               <p className="ml-4 mt-6 text-xl font-bold">Supplier Orders</p>
-              <div className="flex h-12 items-center justify-center">
-                <button
-                  onClick={() => router.push("/suppliers/new")}
-                  className="btn flex items-center gap-2 px-3 py-2.5 text-sm"
-                  title="New supplier"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M12 5l0 14" />
-                    <path d="M5 12l14 0" />
-                  </svg>
-                  <span className="md:inline">New order</span>
-                </button>
+              <div className="mt-6 flex items-center gap-4">
+                <div className="flex items-center gap-4 lg:gap-8 xl:gap-10">
+                  <div className="flex h-16 w-56  items-center justify-center  ">
+                    <button
+                      onClick={() => router.push("/suppliers/new")}
+                      className="btn"
+                      title="New Order"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5l0 14" />
+                        <path d="M5 12l14 0" />
+                      </svg>
+                      <span className="hidden md:inline">New Order</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -145,22 +149,19 @@ const SupplierPurchasesPage = () => {
             </div>
 
             <div
-              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3"
               style={{ maxHeight: "600px" }}
             >
               <PurchaseTable data={purchases} loading={loading} />
             </div>
 
-            <div className={styles.pagination}>
+            <div>
               <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={(event, value) => setCurrentPage(value)}
-                color="primary"
-                shape="rounded"
-                siblingCount={1}
-                boundaryCount={1}
-                className="pagination"
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
               />
             </div>
           </div>

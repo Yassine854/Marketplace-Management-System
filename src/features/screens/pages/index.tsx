@@ -70,7 +70,7 @@ const Screen: React.FC = () => {
   }
 
   return (
-    <div className="mt-[4.8rem] w-full bg-n20 p-4">
+    <div className="mt-[4.8rem] h-full w-full bg-n20 p-4">
       <div className="p-8">
         <h1 className="mb-6 text-2xl font-bold">Your screen</h1>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
