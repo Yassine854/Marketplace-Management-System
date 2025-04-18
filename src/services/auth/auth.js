@@ -31,7 +31,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
-      //console.log("jwt() - Before Update:", token);
+      // - Before Update:", token);
 
       if (user) {
         token.userId = user.id;
@@ -42,13 +42,13 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         token.isActive = user.isActive;
       }
 
-      //console.log("jwt() - After Update:", token);
+      // - After Update:", token);
       return token;
     },
 
     async session({ session, token }) {
-      // console.log("session() - Before Fix:", session);
-      // console.log("session() - Token Data:", token);
+      //  - Before Fix:", session);
+      //  - Token Data:", token);
 
       session.user = {
         id: token.userId,
@@ -60,7 +60,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         isActive: token.isActive,
       };
 
-      // console.log("session() - After Fix:", session);
+      //  - After Fix:", session);
       return session;
     },
   },

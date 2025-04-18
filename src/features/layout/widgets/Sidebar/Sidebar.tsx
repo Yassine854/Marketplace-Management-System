@@ -8,11 +8,15 @@ import {
   IconList,
   IconShoppingCart,
   IconDeviceAnalytics,
+<<<<<<< HEAD
   IconCurrencyDollar,
   IconDiscount,
   IconBuildingFactory2,
   IconClipboardCheck,
   IconPackage,
+=======
+  IconBox,
+>>>>>>> Yassine-v2
 } from "@tabler/icons-react";
 
 import Link from "next/link";
@@ -88,6 +92,77 @@ const Sidebar = ({
 
           <Divider />
 
+          <Divider />
+          <SidebarSubMenu
+            icon={<IconShoppingCart />}
+            name="Products"
+            onClick={() => push("/marketplace/products")} // Update main click
+            isActive={pathname?.includes("products")}
+            items={[
+              { name: "All", path: "/marketplace/products" },
+              // { name: "New Product", path: "/marketplace/products/new" },
+              {
+                name: "Categories",
+                path: "/marketplace/products/categories",
+              },
+              { name: "Suppliers", path: "/marketplace/manufacturer/all" },
+              { name: "Tax", path: "/marketplace/products/taxe/all" },
+              {
+                name: "Promotion",
+                path: "/marketplace/products/promotion/all",
+              },
+              {
+                name: "Product Type",
+                path: "/marketplace/products/ProductTypes",
+              },
+              {
+                name: "Product Status",
+                path: "/marketplace/products/ProductStatus",
+              },
+              {
+                name: "Type PCB",
+                path: "/marketplace/products/ProductPCBType",
+              },
+            ]}
+          />
+
+          <Divider />
+          <SidebarSubMenu
+            icon={<IconUsers className="text-lg text-primary" />}
+            name=" Partners"
+            onClick={() => push("/marketplace/partners")}
+            isActive={pathname?.includes("partners")}
+            items={[
+              { name: "All partners", path: "/marketplace/partners" },
+              {
+                name: "Partner Types",
+                path: "/marketplace/partners/type_partners",
+              },
+            ]}
+          />
+
+          <Divider />
+          <SidebarSubMenu
+            icon={<IconUsers className="text-lg text-primary" />}
+            name=" Settings"
+            onClick={() => push("/marketplace/settings")}
+            isActive={pathname?.includes("partners")}
+            items={[{ name: "All settings", path: "/marketplace/settings" }]}
+          />
+
+          <Divider />
+          <SidebarSubMenu
+            icon={<IconBox className="text-lg text-primary" />}
+            name=" Order"
+            onClick={() => push("/marketplace/order/state")}
+            isActive={pathname?.includes("state")}
+            items={[
+              { name: "State", path: "/marketplace/order/state" },
+              { name: "Status", path: "/marketplace/order/status" },
+            ]}
+          />
+
+          <Divider />
           <SidebarOrdersSubMenu
             onClick={() => push("/orders")}
             items={statuses}
@@ -117,6 +192,7 @@ const Sidebar = ({
                   ]
             }
           />
+
           <Divider />
           <SidebarSubMenu
             icon={<IconShoppingCart />}

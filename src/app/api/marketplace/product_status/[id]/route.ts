@@ -52,19 +52,30 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
+    const session = await auth();
 
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = params;
-    const body = await req.json();
+    const { name, actif } = await req.json(); // Only extract allowed fields
 
-    // Update the ProductStatus
+    // Validate required fields
+    if (!name || typeof actif === "undefined") {
+      return NextResponse.json(
+        { error: "Name and actif status are required" },
+        { status: 400 },
+      );
+    }
+
+    // Update only allowed fields
     const updatedProductStatus = await prisma.productStatus.update({
       where: { id },
-      data: body, // Update with the provided body fields
+      data: {
+        name,
+        actif,
+      },
     });
 
     return NextResponse.json(

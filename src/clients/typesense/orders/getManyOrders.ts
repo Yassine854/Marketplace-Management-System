@@ -5,7 +5,7 @@ import { logError } from "@/utils/logError";
 // Utility function to convert a date string (YYYY-MM-DD) to Unix timestamp (milliseconds)
 const convertDateToTimestamp = (dateStr: string): number => {
   const date = new Date(dateStr);
-  return date.getTime(); 
+  return date.getTime();
 };
 
 export const getManyOrders = async ({
@@ -16,51 +16,45 @@ export const getManyOrders = async ({
   filterBy,
 }: any): Promise<any> => {
   try {
-
     let searchQuery = search || "";
     let filterQuery = filterBy || "";
 
     let deliveryDateTimestamp: number | null = null;
 
-    if (searchQuery!="") {
-      
-      searchQuery = `"${searchQuery}"`; 
-       
+    if (searchQuery != "") {
+      searchQuery = `"${searchQuery}"`;
     }
-    const datePattern = /^\d{4}-\d{2}-\d{2}$/;  
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
     if (datePattern.test(search)) {
-    
-      deliveryDateTimestamp = convertDateToTimestamp(search) / 1000;  
-      searchQuery = ""; 
+      deliveryDateTimestamp = convertDateToTimestamp(search) / 1000;
+      searchQuery = "";
     }
 
     let finalFilterQuery = filterQuery;
 
     if (deliveryDateTimestamp !== null) {
-    
-      finalFilterQuery += (finalFilterQuery ? " && " : "") + `deliveryDate:=${deliveryDateTimestamp}`;
+      finalFilterQuery +=
+        (finalFilterQuery ? " && " : "") +
+        `deliveryDate:=${deliveryDateTimestamp}`;
     }
-    finalFilterQuery =  filterBy.replace(/, /g, " && ");
+    finalFilterQuery = filterBy.replace(/, /g, " && ");
     const searchParams = {
-      q: searchQuery, 
+      q: searchQuery,
       query_by:
-        "customerFirstname,customerLastname,kamiounId,orderId,incrementId,productsNames,items.sku,deliveryAgentName", 
+        "customerFirstname,customerLastname,kamiounId,orderId,incrementId,productsNames,items.sku,deliveryAgentName",
       page: page || 1,
       per_page: perPage || 250,
       sort_by: sortBy || "",
-      filter_by: finalFilterQuery || "", 
+      filter_by: finalFilterQuery || "",
     };
 
-//console.log("testtttt",finalFilterQuery);
+    //
     const typesenseResponse = await typesenseClient
       .collections("orders")
       .documents()
       .search(searchParams);
 
-
     const orders: Order[] = createOrdersList(typesenseResponse?.hits);
-
-  
 
     return {
       orders,

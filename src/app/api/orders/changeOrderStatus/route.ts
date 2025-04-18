@@ -13,7 +13,7 @@ export const POST = async (request: NextRequest) => {
   if (!session?.user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  console.log(session);
+
   const user = session.user as {
     id: string;
     roleId: string;
@@ -22,7 +22,7 @@ export const POST = async (request: NextRequest) => {
     lastName: string;
     isActive: boolean;
   };
-  console.log(user);
+
   let currentOrder;
   try {
     const { orderId, status, state } = await request.json();
@@ -42,8 +42,6 @@ export const POST = async (request: NextRequest) => {
       status,
       state,
     });
-
-    console.log(changeResponse);
 
     if (
       typeof changeResponse === "string" &&
@@ -70,8 +68,6 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    console.log("no error");
-
     await typesense.orders.updateOne({
       id: orderId,
       status,
@@ -84,8 +80,6 @@ export const POST = async (request: NextRequest) => {
       state: updatedOrder.state,
       status: updatedOrder.status,
     };
-
-    console.log("updated successfully");
 
     // const user = await prisma.getUser(username);
     // if (!user) return responses.invalidRequest("User not found");
@@ -103,8 +97,6 @@ export const POST = async (request: NextRequest) => {
       dataAfter: orderAfter,
       id: "",
     });
-
-    console.log(" created successfully");
 
     return NextResponse.json(
       {

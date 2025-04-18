@@ -14,7 +14,7 @@ model User {
   firstName String
   lastName  String
   password  String
-  roleId    String
+  Id    String
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -58,6 +58,7 @@ model Category {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   categoryId   Int?      // ID Magento
   nameCategory String
+  isActive     Boolean?  @default(true)
   image        String?             
   createdAt    DateTime?           @default(now())
   updatedAt    DateTime?           @updatedAt
@@ -80,7 +81,7 @@ model Warehouse {
 }
 model Product {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  product_id     Int      @unique // ID Magento
+  product_id     Int?      @unique // ID Magento
   sku            String   @unique
   name           String
   price          Float
@@ -91,7 +92,7 @@ model Product {
   website_ids    Int[]    @db.Int// IDs Magento des entrepôts
   image          String?
   url_key        String?
-  created_at     String?
+  created_at     String?  @map("created_at")
   updated_at     String?
   stock_item     StockItem?
 
@@ -101,10 +102,12 @@ model Product {
   description          String?  
   stock                Int?     
   promo                Boolean  @default(false)  
-  skuPartner           String?  
   minimumQte           Int?     
-  maximumQte           Int?     
-  sealableAlertQte     Int?     
+  maximumQte           Int?  
+  sealable             Float?
+  alertQte             Int?
+  loyaltyPoints        Float?
+  loyaltyPointsAmount  Float?    
 
   typePcbId            String?  @db.ObjectId 
   typePcb              TypePcb? @relation(fields: [typePcbId], references: [id]) 
@@ -124,14 +127,16 @@ model Product {
   relatedProducts      RelatedProduct[] @relation("ProductToRelatedProduct")
   relatedTo            RelatedProduct[] @relation("RelatedProductToProduct")
 
+  createdAt       DateTime?       @default(now())
+  updatedAt       DateTime?       @updatedAt
+
   productSubCategories       ProductSubCategory[]
   favoriteProducts FavoriteProduct[]
   favoritePartners FavoritePartner[]
   orderItems OrderItem[]
   reservationItems    ReservationItem[]
-  loyaltyPoints LoyaltyPoints[]
-  SkuPartner SkuPartner[]
-
+  skuPartners SkuPartner[]
+  
   @@index([category_ids])
   @@map("products")
 }
@@ -271,7 +276,7 @@ model ProductOrdered {
   quantity       Int
   priceExclTax   Float
   total          Float 
-  sku            String?
+  sku            String? 
   purchaseOrder  PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id])
   purchaseOrderId String? @db.ObjectId
   @@map("productOrdered")
@@ -282,7 +287,8 @@ model TypePartner {
   id   String  @id @default(auto()) @map("_id") @db.ObjectId
   name String  @unique
   partners Partner[]
-  
+  createdAt       DateTime?       @default(now())
+  updatedAt       DateTime?       @updatedAt
   @@map("type_partners")
 }
 
@@ -296,7 +302,6 @@ model Partner {
   telephone       String
   address         String
   password        String
-  roleId          String
   isActive        Boolean  @default(true)
   logo            String?  
   patent          String?  
@@ -306,15 +311,17 @@ model Partner {
   minimumAmount   Float    
   typePartner     TypePartner @relation(fields: [typePartnerId], references: [id])
   typePartnerId   String   @db.ObjectId   
+  roleId          String?
+  role            Role?     @relation(fields: [roleId], references: [id])
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   favoritePartners FavoritePartner[]
   orders   Order[]
   reservations Reservation[]
-  loyaltyPoints LoyaltyPoints[]
-  SkuPartner SkuPartner[]
-
+  skuPartners SkuPartner[]
+  settings Settings[]
   @@map("partners")
 }
 
@@ -331,7 +338,7 @@ model Customer {
   telephone String?
   address   String?
   password  String?
-  roleId    String?
+  Id    String?
   isActive  Boolean?  @default(true)
   created_at DateTime? @default(now())
   updated_at DateTime? @updatedAt
@@ -354,7 +361,7 @@ model Agent {
   telephone String
   address   String
   password  String
-  roleId    String?
+  Id    String
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -416,7 +423,7 @@ model Image {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   url        String   
   altText    String?  
-  product    Product  @relation(fields: [productId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId  String   @db.ObjectId
 
   @@map("images")
@@ -458,8 +465,8 @@ model RelatedProduct {
   relatedProductId  String   @db.ObjectId
 
 
-  product          Product  @relation("ProductToRelatedProduct", fields: [productId], references: [id])
-  relatedProduct   Product  @relation("RelatedProductToProduct", fields: [relatedProductId], references: [id])
+  product          Product  @relation("ProductToRelatedProduct", fields: [productId], references: [id], onDelete: Cascade)
+  relatedProduct   Product  @relation("RelatedProductToProduct", fields: [relatedProductId], references: [id], onDelete: Cascade)
 
   @@unique([productId, relatedProductId])  
   @@map("related_products")
@@ -482,14 +489,15 @@ model ProductSubCategory {
   productId  String    @db.ObjectId
   subcategoryId String    @db.ObjectId  
 
-  product    Product   @relation(fields: [productId], references: [id])
-  subcategory SubCategory  @relation(fields: [subcategoryId], references: [id])  
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  subcategory SubCategory  @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)  
   @@unique([productId, subcategoryId])
 }
 
 model SubCategory {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String
+  isActive    Boolean?  @default(true)
   image       String?       
   categoryId  String    @db.ObjectId
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -584,8 +592,8 @@ model Order {
   reservationId     String?  @db.ObjectId @unique
   reservation       Reservation? @relation
 
-  mainOrderId       String?   @db.ObjectId
-  mainOrder         MainOrder? @relation(fields: [mainOrderId], references: [id])
+  mainOrderId   String?   @db.ObjectId
+  mainOrder     MainOrder? @relation(fields: [mainOrderId], references: [id])
 
 
   partnerId         String   @db.ObjectId
@@ -664,7 +672,6 @@ model Reservation {
   order               Order?   @relation(fields: [orderId], references: [id])
 
   reservationItems    ReservationItem[]
-  loyaltyPoints       LoyaltyPoints[]
 
   paymentMethodId     String   @db.ObjectId
   paymentMethod       OrderPayment @relation(fields: [paymentMethodId], references: [id]) 
@@ -675,10 +682,10 @@ model ReservationItem {
   qteReserved    Int
   discountedPrice Float
   weight         Float
-  sku            String    @unique 
-  taxId          String?   @db.ObjectId
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  sku            String @unique
+  taxId           String   @db.ObjectId
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Relationships
   reservationId  String   @db.ObjectId
@@ -698,17 +705,11 @@ model LoyaltyPoints {
   updatedAt    DateTime @updatedAt
 
   // Relationships
-  productId    String?   @db.ObjectId
-  product      Product?  @relation(fields: [productId], references: [id]) 
-
-  partnerId    String?   @db.ObjectId
-  partner      Partner?  @relation(fields: [partnerId], references: [id]) 
 
   orderId      String?   @db.ObjectId
   order        Order?    @relation(fields: [orderId], references: [id]) 
 
-  reservationId String?  @db.ObjectId
-  reservation  Reservation? @relation(fields: [reservationId], references: [id]) 
+
 }
 
 
@@ -721,4 +722,72 @@ model MainOrder {
 
   // One-to-many relationship with Order
   orders    Order[]
+}
+
+model SkuPartner {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId   String   @db.ObjectId
+  partnerId   String   @db.ObjectId
+  skuPartner  String   @unique
+  skuProduct  String
+
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([productId, partnerId, skuPartner])
+  @@map("sku_partners")
+}
+
+model Settings {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  deliveryType      String
+  deliveryTypeAmount      String
+  freeDeliveryAmount     String 
+  loyaltyPointsAmount     String   
+  loyaltyPointsUnique    String  
+  partnerId    String?   @db.ObjectId
+  partner      Partner?  @relation(fields: [partnerId], references: [id]) 
+  schedules   SettingSchedule[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SettingSchedule {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  day        String
+  startTime  String
+  endTime    String
+
+  settingId  String   @db.ObjectId
+  setting    Settings @relation(fields: [settingId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+
+model Role {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  name        String         @unique
+  permissions RolePermission[]
+  partners    Partner[]
+}
+
+model Permission {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  resource  String  
+  action    String   
+  roles     RolePermission[]
+}
+
+model RolePermission {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id],onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id],onDelete: Cascade)
+  @@unique([roleId, permissionId])
 }

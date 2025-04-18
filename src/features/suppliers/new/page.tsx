@@ -236,7 +236,6 @@ const SupplierForm = () => {
       });
 
       const data = await response.json();
-      console.log("Response from API:", data);
 
       if (response.ok) {
         setUploadedFiles((prev) => [...prev, { id: data.fileId }]);
@@ -366,6 +365,10 @@ const SupplierForm = () => {
       }
 
       const result = await response.json();
+<<<<<<< HEAD
+=======
+
+>>>>>>> Yassine-v2
       toast.success("Purchase order saved successfully!");
 
       return result;

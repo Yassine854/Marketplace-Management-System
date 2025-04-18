@@ -55,15 +55,15 @@ export const GET = async (request: NextRequest) => {
       filterBy = `storeId:=${storeId}`;
     }
     const filterB = searchParams.get("filterBY"); // The filter string passed from the client
-    //console.log("eeeeee",filterB);
+    //
     if (filterB != null) filterBy = filterB;
-    //console.log("eeeeeesss",filterBy);
+    //
     const filters = searchParams.get("filters");
-    //console.log("rachwan",filters);
+    //
     if (filters !== "") filterBy = filterBy + " && " + filters;
     const query = filterBy.replace(/, /g, " && ");
 
-    //console.log("rachwancccc",query);
+    //
     //@ts-ignore
     const res = await getManyOrders({
       page,

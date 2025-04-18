@@ -15,10 +15,7 @@ export async function GET() {
 
     const loyaltyPoints = await prisma.loyaltyPoints.findMany({
       include: {
-        product: true,
-        partner: true,
         order: true,
-        reservation: true,
       },
     });
 

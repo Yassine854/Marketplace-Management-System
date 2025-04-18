@@ -18,7 +18,7 @@ export async function GET(req: Request) {
         favoritePartners: true,
         orders: true,
         reservations: true,
-        loyaltyPoints: true,
+        typePartner: true,
       },
     });
 

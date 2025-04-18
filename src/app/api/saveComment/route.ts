@@ -4,10 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    console.log("📥 Requête reçue");
-
     const { comment } = await req.json();
-    console.log("📝 Commentaire reçu:", comment);
 
     if (!comment) {
       console.error("⚠️ Aucun commentaire reçu !");
@@ -20,15 +17,11 @@ export async function POST(req: Request) {
     const dirPath = path.join(process.cwd(), "public/data");
     const filePath = path.join(dirPath, "comments.json");
 
-    console.log("📂 Vérification du dossier:", dirPath);
     if (!fs.existsSync(dirPath)) {
-      console.log("📂 Dossier introuvable, création...");
       fs.mkdirSync(dirPath, { recursive: true });
     }
 
-    console.log("📂 Chemin du fichier JSON:", filePath);
     if (!fs.existsSync(filePath)) {
-      console.log("❌ Fichier JSON introuvable, création...");
       fs.writeFileSync(filePath, JSON.stringify([])); // Créer un fichier JSON vide
     }
 
@@ -63,7 +56,6 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("✅ Commentaire enregistré avec succès !");
     return NextResponse.json(
       { message: "Comment saved!", comments },
       { status: 200 },

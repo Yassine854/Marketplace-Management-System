@@ -85,7 +85,6 @@ const SupplierDashboard = () => {
         );
         if (foundSupplier) {
           setSupplier(foundSupplier);
-          console.log(foundSupplier);
         } else {
           console.error("Supplier not found");
         }

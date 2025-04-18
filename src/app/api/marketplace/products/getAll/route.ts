@@ -24,6 +24,7 @@ export async function GET(req: Request) {
         favoriteProducts: true,
         favoritePartners: true,
         relatedProducts: { include: { relatedProduct: true } },
+        skuPartners: true,
       },
     });
 

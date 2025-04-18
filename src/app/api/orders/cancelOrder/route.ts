@@ -15,7 +15,7 @@ export const POST = async (request: NextRequest) => {
   if (!session?.user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  // console.log(session);
+  //
   const user = session.user as {
     id: string;
     roleId: string;
@@ -24,7 +24,7 @@ export const POST = async (request: NextRequest) => {
     lastName: string;
     isActive: boolean;
   };
-  // console.log(user);
+  //
   try {
     const { orderId, username } = await request.json();
 

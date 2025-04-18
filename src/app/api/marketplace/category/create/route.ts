@@ -49,14 +49,16 @@ export async function POST(req: Request) {
       const filePath = path.join(process.cwd(), "public/uploads", fileName);
 
       await writeFile(filePath, buffer);
-      imageUrl = `/uploads/${fileName}`;
+      imageUrl = `/uploads/${fileName}`; // Public URL for the stored image
     }
+    const isActive = formData.get("isActive") === "true";
 
     const newCategory = await prisma.category.create({
       data: {
         nameCategory,
         categoryId,
         image: imageUrl,
+        isActive: isActive,
       },
     });
 

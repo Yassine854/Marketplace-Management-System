@@ -20,10 +20,7 @@ export async function POST(req: Request) {
         ptsNumber: body.ptsNumber,
         ptsValue: body.ptsValue,
         minAmount: body.minAmount,
-        productId: body.productId,
-        partnerId: body.partnerId,
         orderId: body.orderId,
-        reservationId: body.reservationId,
       },
     });
 

@@ -99,6 +99,16 @@ export async function GET(req: Request) {
     }
 
     const totalCount = await prisma.reservation.count();
+    const reservations = await prisma.reservation.findMany({
+      include: {
+        customer: true,
+        agent: true,
+        partner: true,
+        order: true,
+        paymentMethod: true,
+        reservationItems: true,
+      },
+    });
 
     return NextResponse.json(
       {

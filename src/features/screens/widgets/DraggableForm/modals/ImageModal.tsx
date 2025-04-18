@@ -66,10 +66,6 @@ const ImageModal: React.FC<ImageModalProps> = ({
   }, [selectedElement, reset]);
 
   const onSubmit: SubmitHandler<ImageFormValues> = async (formData) => {
-    console.log(
-      "🚀 ~ constonSubmit:SubmitHandler<ImageFormValues>= ~ formData:",
-      formData,
-    );
     const data = new FormData();
     data.append("title", formData.title);
     data.append("description", formData.description);

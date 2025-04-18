@@ -7,8 +7,6 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const supplierId = searchParams.get("supplierId");
 
-  console.log("[API] Requête pour le fournisseur ID:", supplierId);
-
   if (!supplierId) {
     return NextResponse.json(
       { error: "Paramètre supplierId manquant" },
@@ -28,7 +26,6 @@ export async function GET(request: Request) {
       },
     });
 
-    console.log("[API] Produits trouvés:", products);
     return NextResponse.json(products);
   } catch (error) {
     console.error("[API] Erreur:", error);

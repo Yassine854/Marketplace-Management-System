@@ -172,12 +172,7 @@ const ClientSegment: React.FC<ClientSegmentProps> = ({
                   event: any,
                   chartContext: any,
                   config: any,
-                ) => {
-                  console.log(
-                    "Selected profile:",
-                    segments[config.dataPointIndex]?.label,
-                  );
-                },
+                ) => {},
               },
             },
             colors: newColors,

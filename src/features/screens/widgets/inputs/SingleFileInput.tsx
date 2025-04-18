@@ -20,7 +20,6 @@ const SingleFileInput: React.FC<SingleFileInputProps> = ({
   onChange,
   previewUrls = [],
 }) => {
-  console.log("🚀 ~ previewUrls:", previewUrls);
   const [newPreviewUrl, setNewPreviewUrl] = useState<string>("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
