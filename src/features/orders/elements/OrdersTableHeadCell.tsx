@@ -5,7 +5,7 @@ const OrdersTableHeadCell = ({ children, onClick }: any) => (
     } bg-primary text-white  `}
     onClick={onClick}
   >
-    <div className="flex items-center justify-center gap-2 whitespace-nowrap ">
+    <div className="flex items-center justify-center gap-2 whitespace-nowrap border-0 ">
       {children}
     </div>
   </td>
