@@ -15,6 +15,8 @@ model User {
   lastName  String
   password  String
   roleId    String
+  mRoleId    String?
+  role            Role?     @relation(fields: [mRoleId], references: [id])
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -96,7 +98,7 @@ model Product {
   updated_at     String?
   stock_item     StockItem?
 
-
+  barcode              String?  @unique
   pcb                  String?    
   weight               Float?   
   description          String?  
@@ -515,9 +517,9 @@ model FavoritePartner {
   productId   String   @db.ObjectId
   partnerId   String   @db.ObjectId
 
-  customer    Customers @relation(fields: [customerId], references: [id])
-  product     Product  @relation(fields: [productId], references: [id])
-  partner     Partner  @relation(fields: [partnerId], references: [id])
+  customer    Customers @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
   @@unique([customerId, productId, partnerId])
 
@@ -739,7 +741,7 @@ model Settings {
   loyaltyPointsAmount     String   
   loyaltyPointsUnique    String  
   partnerId    String?   @db.ObjectId
-  partner      Partner?  @relation(fields: [partnerId], references: [id]) 
+  partner      Partner?  @relation(fields: [partnerId], references: [id], onDelete: Cascade) 
   schedules   SettingSchedule[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -764,6 +766,8 @@ model Role {
   name        String         @unique
   permissions RolePermission[]
   partners    Partner[]
+  admins      User[]
+
 }
 
 model Permission {
@@ -776,6 +780,7 @@ model RolePermission {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
   roleId       String
   permissionId String
+  actions      String[]
   role         Role       @relation(fields: [roleId], references: [id],onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id],onDelete: Cascade)
   @@unique([roleId, permissionId])

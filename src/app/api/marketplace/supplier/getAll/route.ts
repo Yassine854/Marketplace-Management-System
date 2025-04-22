@@ -6,11 +6,11 @@ const prisma = new PrismaClient();
 
 export async function GET(req: Request) {
   try {
-    const session = await auth(); // Récupérer la session de l'utilisateur
+    // const session = await auth(); // Récupérer la session de l'utilisateur
 
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get("page") || "1", 10);

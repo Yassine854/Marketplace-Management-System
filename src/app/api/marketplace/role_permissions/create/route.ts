@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { roleId, permissionId } = await req.json();
+    const { roleId, permissionId, actions } = await req.json();
 
     if (!roleId || !permissionId) {
       return NextResponse.json(
@@ -20,8 +20,19 @@ export async function POST(req: Request) {
       );
     }
 
+    if (!actions || !Array.isArray(actions) || actions.length === 0) {
+      return NextResponse.json(
+        { error: "actions must be a non-empty array of strings." },
+        { status: 400 },
+      );
+    }
+
     const rolePermission = await prisma.rolePermission.create({
-      data: { roleId, permissionId },
+      data: {
+        roleId,
+        permissionId,
+        actions,
+      },
     });
 
     return NextResponse.json(

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Product } from "@/types/product"; // Assuming you have a Product type
+import toast from "react-hot-toast";
 
 export function useProductActions() {
   const [isLoading, setIsLoading] = useState(false);
@@ -12,18 +13,18 @@ export function useProductActions() {
     try {
       const { id: _, ...updateData } = updatedProduct;
 
-      const response = await fetch(`/api/marketplace/products/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updateData),
-      });
+      const response = await axios.patch(
+        `/api/marketplace/products/${id}`,
+        updateData,
+      );
 
       if (response.status === 200) {
+        toast.success("Product updated successfully!");
         return response;
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update product");
-      console.error("Error updating product:", err);
+      console.log(err);
+      toast.error(err.response?.data?.message || "Error creating product");
     } finally {
       setIsLoading(false);
     }
@@ -38,7 +39,7 @@ export function useProductActions() {
         return response.data.message;
       }
     } catch (err: any) {
-      setError("Failed to delete product");
+      toast.error(err.response?.data?.message || "Error creating product");
       console.error("Error deleting product:", err);
     } finally {
       setIsLoading(false);

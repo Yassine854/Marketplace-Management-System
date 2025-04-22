@@ -14,6 +14,19 @@ export async function POST(req: Request) {
 
     // 🟢 Handle FormData instead of req.json()
     const formData = await req.formData();
+    const barcode = formData.get("barcode") as string | null;
+    if (barcode) {
+      const existingProduct = await prisma.product.findUnique({
+        where: { barcode },
+      });
+
+      if (existingProduct) {
+        return NextResponse.json(
+          { message: "Barcode already exists" },
+          { status: 400 },
+        );
+      }
+    }
 
     const timestamp = Date.now();
     const randomComponent = Math.floor(Math.random() * 1000000);
@@ -23,6 +36,8 @@ export async function POST(req: Request) {
       data: {
         product_id: uniqueProductId,
         name: formData.get("name") as string,
+        barcode,
+
         sku: formData.get("sku") as string,
         price: parseFloat(formData.get("price") as string),
         cost: formData.get("cost")

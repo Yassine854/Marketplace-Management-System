@@ -22,6 +22,7 @@ interface CreatePartnerModalProps {
     typePartnerId: string;
   }) => void;
   typePartners: Array<{ id: string; name: string }>;
+  roles: Array<{ id: string; name: string }>;
 }
 
 const CreatePartnerModal = ({
@@ -29,6 +30,7 @@ const CreatePartnerModal = ({
   onClose,
   onCreate,
   typePartners,
+  roles,
 }: CreatePartnerModalProps) => {
   const [formData, setFormData] = useState({
     username: "",
@@ -38,7 +40,7 @@ const CreatePartnerModal = ({
     telephone: "",
     address: "",
     password: "",
-    roleId: "2",
+    roleId: "",
     logo: undefined as File | undefined, // Allow File or undefined
     patent: undefined as File | undefined, // Allow File or undefined
     responsibleName: "",
@@ -76,7 +78,7 @@ const CreatePartnerModal = ({
       telephone: "",
       address: "",
       password: "",
-      roleId: "2",
+      roleId: "",
       logo: undefined, // Reset to undefined
       patent: undefined, // Reset to undefined
       responsibleName: "",
@@ -331,6 +333,27 @@ const CreatePartnerModal = ({
                   {typePartners?.map((type) => (
                     <option key={type.id} value={type.id}>
                       {type.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Role *
+                </label>
+                <select
+                  value={formData.roleId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, roleId: e.target.value })
+                  }
+                  className="w-full rounded-lg border p-3"
+                  required
+                >
+                  <option value="">Select Role</option>
+                  {roles?.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
                     </option>
                   ))}
                 </select>

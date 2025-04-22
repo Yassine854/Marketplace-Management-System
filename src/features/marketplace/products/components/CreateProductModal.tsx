@@ -6,6 +6,7 @@ interface CreateProductModalProps {
   onClose: () => void;
   onCreate: (product: {
     name: string;
+    barcode: string;
     sku: string;
     price: number;
     cost?: number;
@@ -55,6 +56,7 @@ const CreateProductModal = ({
 }: CreateProductModalProps) => {
   const [formState, setFormState] = useState({
     name: "",
+    barcode: "",
     sku: "",
     price: 0,
     cost: undefined as number | undefined,
@@ -84,6 +86,7 @@ const CreateProductModal = ({
     if (!isOpen) {
       setFormState({
         name: "",
+        barcode: "",
         sku: "",
         price: 0,
         cost: undefined,
@@ -125,7 +128,12 @@ const CreateProductModal = ({
   };
 
   const handleSubmit = async () => {
-    if (!formState.name || !formState.sku || !formState.price) {
+    if (
+      !formState.name ||
+      !formState.barcode ||
+      !formState.sku ||
+      !formState.price
+    ) {
       toast.error("Please fill in required fields");
       return;
     }
@@ -162,7 +170,7 @@ const CreateProductModal = ({
       };
 
       const productResponse = await onCreate(payload);
-      toast.success("Product created successfully!");
+
       onClose();
     } catch (error) {
       toast.error(
@@ -192,12 +200,19 @@ const CreateProductModal = ({
             <h3 className="text-xl font-semibold text-primary">
               Basic Information
             </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <input
                 type="text"
                 placeholder="Product Name *"
                 value={formState.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
+                className="rounded-lg border p-3"
+              />
+              <input
+                type="text"
+                placeholder="Bar Code *"
+                value={formState.barcode}
+                onChange={(e) => handleInputChange("barcode", e.target.value)}
                 className="rounded-lg border p-3"
               />
               <input

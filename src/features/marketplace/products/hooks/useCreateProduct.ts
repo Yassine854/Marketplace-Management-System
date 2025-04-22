@@ -1,9 +1,11 @@
 // hooks/useCreateProduct.ts
 import { useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 interface CreateProductData {
   name: string;
+  barcode: string;
   sku: string;
   price: number;
   cost?: number;
@@ -64,6 +66,10 @@ export function useCreateProduct() {
         formData,
       );
 
+      if (response.status == 200) {
+        toast.success("Product created successfully!");
+      }
+
       const productId = response.data.product.id;
 
       const imageFormData = new FormData();
@@ -97,8 +103,7 @@ export function useCreateProduct() {
         return response.data.product;
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Error creating product");
-      console.error("Product creation error:", err);
+      toast.error(err.response?.data?.message || "Error creating product");
     } finally {
       setIsLoading(false);
     }

@@ -47,7 +47,7 @@ const ProductPage = () => {
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const searchContent =
-        `${product.id} ${product.name} ${product.sku}`.toLowerCase();
+        `${product.id} ${product.name} ${product.barcode} ${product.sku}`.toLowerCase();
       return searchContent.includes(searchTerm.toLowerCase());
     });
   }, [products, searchTerm]);

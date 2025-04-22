@@ -24,6 +24,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           lastName: user.lastName,
           status: user.status,
           roleId: user.roleId,
+          mRoleId: user.mRoleId,
           isActive: user.isActive,
         };
       },
@@ -36,6 +37,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       if (user) {
         token.userId = user.id;
         token.userRoleId = user.roleId;
+        token.mRoleId = user.mRoleId;
         token.username = user.username;
         token.userFirstName = user.firstName;
         token.userLastName = user.lastName;
@@ -53,6 +55,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       session.user = {
         id: token.userId,
         roleId: token.userRoleId,
+        mRoleId: token.mRoleId,
         username: token.username,
         name: `${token.userFirstName} ${token.userLastName}`,
         firstName: token.userFirstName,

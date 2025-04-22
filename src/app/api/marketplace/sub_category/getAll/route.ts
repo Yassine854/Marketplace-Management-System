@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 // 🟢 GET: Retrieve all subcategories
 export async function GET() {
   try {
-    const session = await auth(); // Get user session
+    // const session = await auth(); // Get user session
 
     // if (!session?.user) {
     //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

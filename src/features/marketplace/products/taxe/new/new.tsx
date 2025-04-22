@@ -36,7 +36,7 @@ const NewTaxPage = () => {
       setValue("");
 
       setTimeout(() => {
-        router.push("/taxe/all");
+        router.push("/marketplace/products/taxe/all");
       }, 1500);
     } catch (error) {
       setError(
@@ -100,7 +100,7 @@ const NewTaxPage = () => {
           <div className="flex gap-4">
             <button
               type="button"
-              onClick={() => router.push("/taxe/all")}
+              onClick={() => router.push("/marketplace/products/taxe/all")}
               className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               Cancel

@@ -19,6 +19,7 @@ export async function GET(req: Request) {
         orders: true,
         reservations: true,
         typePartner: true,
+        role: true,
       },
     });
 

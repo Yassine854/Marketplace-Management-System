@@ -36,7 +36,12 @@ export async function POST(req: Request) {
       data: customerData,
     });
 
-    return NextResponse.json({ customer: newCustomer }, { status: 201 });
+    return new NextResponse(JSON.stringify({ customer: newCustomer }), {
+      status: 201,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
   } catch (error) {
     console.error("Creation error:", error);
     return NextResponse.json(

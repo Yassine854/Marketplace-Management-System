@@ -4,7 +4,7 @@ import { hashPassword } from "@/utils/password";
 
 export const PUT = async (request: NextRequest) => {
   try {
-    const { username, firstName, lastName, roleId, newPassword } =
+    const { username, firstName, lastName, mRoleId, roleId, newPassword } =
       await request.json();
 
     const user = prisma.getUser(username);
@@ -13,7 +13,7 @@ export const PUT = async (request: NextRequest) => {
       return NextResponse.json({ message: "User not found" });
     }
 
-    await prisma.editUser(username, { firstName, lastName, roleId });
+    await prisma.editUser(username, { firstName, lastName, roleId, mRoleId });
     if (newPassword) {
       const hashedPassword = await hashPassword(newPassword);
       await prisma.editUser(username, { password: hashedPassword });

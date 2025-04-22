@@ -13,7 +13,7 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth();
+    // const session = await auth();
 
     // if (!session?.user) {
     //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

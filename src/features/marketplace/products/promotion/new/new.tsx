@@ -42,7 +42,7 @@ const NewPromotionPage = () => {
       setPromoPrice("");
 
       setTimeout(() => {
-        router.push("/promotion/all");
+        router.push("/marketplace/products/promotion/all");
       }, 1500);
     } catch (error) {
       setError(
@@ -144,7 +144,7 @@ const NewPromotionPage = () => {
           <div className="flex gap-4">
             <button
               type="button"
-              onClick={() => router.push("/promotion/all")}
+              onClick={() => router.push("/marketplace/products/promotion/all")}
               className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               Cancel

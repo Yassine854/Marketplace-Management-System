@@ -105,7 +105,10 @@ const Sidebar = ({
                 name: "Categories",
                 path: "/marketplace/products/categories",
               },
-              { name: "Suppliers", path: "/marketplace/manufacturer/all" },
+              {
+                name: "Suppliers",
+                path: "/marketplace/products/manufacturer/all",
+              },
               { name: "Tax", path: "/marketplace/products/taxe/all" },
               {
                 name: "Promotion",
@@ -146,7 +149,7 @@ const Sidebar = ({
             icon={<IconUsers className="text-lg text-primary" />}
             name=" Settings"
             onClick={() => push("/marketplace/settings")}
-            isActive={pathname?.includes("partners")}
+            isActive={pathname?.includes("Settings")}
             items={[{ name: "All settings", path: "/marketplace/settings" }]}
           />
 
@@ -211,7 +214,7 @@ const Sidebar = ({
             icon={<IconBox />}
             name=" Order"
             onClick={() => push("/marketplace/orders2/all")}
-            isActive={pathname?.includes("all")}
+            isActive={pathname?.includes("Order")}
             items={[
               { name: "All", path: "/marketplace/orders2/all" },
               { name: "State", path: "/marketplace/order/state" },
@@ -262,7 +265,7 @@ const Sidebar = ({
                 isActive={pathname?.includes("access")}
                 items={[
                   { name: "Users", path: "/access/users" },
-                  { name: "Roles", path: "/access/roles" },
+                  { name: "Roles", path: "/marketplace/roles" },
                   { name: "Permissions", path: "/marketplace/permissions" },
 
                   { name: "Logs", path: "/access/logs" },

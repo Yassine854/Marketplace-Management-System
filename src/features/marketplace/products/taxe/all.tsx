@@ -151,7 +151,7 @@ const TaxManagementPage = () => {
               <p className="ml-4 mt-6 text-xl font-bold">Tax Management</p>
               <div className="flex h-16 w-56  items-center justify-center  ">
                 <button
-                  onClick={() => router.push("/taxe/new")}
+                  onClick={() => router.push("/marketplace/products/taxe/new")}
                   className="btn"
                   title="New Taxe"
                 >

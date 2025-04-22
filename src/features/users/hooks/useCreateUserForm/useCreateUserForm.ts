@@ -20,10 +20,11 @@ export const useCreateUserForm = () => {
   });
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    const { username, firstName, lastName, roleId, password } = data;
+    const { username, firstName, lastName, roleId, mRoleId, password } = data;
 
     await createUser({
       roleId,
+      mRoleId,
       username,
       lastName,
       password,

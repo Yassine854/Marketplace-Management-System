@@ -130,7 +130,7 @@ const NewManufacturerPage = () => {
       setSelectedCategories([]);
 
       setTimeout(() => {
-        router.push("/manufacturer/all");
+        router.push("/marketplace/products/manufacturer/all");
       }, 1500);
     } catch (error) {
       setError(
@@ -303,7 +303,9 @@ const NewManufacturerPage = () => {
           <div className="flex gap-4 pt-4">
             <button
               type="button"
-              onClick={() => router.push("/manufacturer/all")}
+              onClick={() =>
+                router.push("/marketplace/products/manufacturer/all")
+              }
               className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gray-200 px-4 py-3 font-medium text-gray-700 transition duration-300 hover:bg-gray-300 hover:text-gray-900"
             >
               <FiX /> Cancel

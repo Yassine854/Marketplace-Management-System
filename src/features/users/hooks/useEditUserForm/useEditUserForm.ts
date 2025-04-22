@@ -34,6 +34,7 @@ export const useEditUserForm = () => {
       setValue("firstName", user?.firstName);
       setValue("lastName", user?.lastName);
       setValue("roleId", user?.roleId);
+      setValue("mRoleId", user?.mRoleId);
     }
   }, [user]);
 

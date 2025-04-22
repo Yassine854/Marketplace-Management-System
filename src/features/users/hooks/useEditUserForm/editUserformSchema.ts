@@ -3,6 +3,7 @@ import * as z from "zod";
 export const editUserFormSchema = z
   .object({
     roleId: z.string({ required_error: "Required" }),
+    mRoleId: z.string({ required_error: "Required" }),
     lastName: z.string().min(1, { message: "Required" }),
     firstName: z.string().min(1, { message: "Required" }),
     password: z

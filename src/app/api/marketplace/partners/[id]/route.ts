@@ -28,6 +28,7 @@ export async function GET(
         orders: true,
         reservations: true,
         typePartner: true,
+        role: true,
       },
     });
 
@@ -87,6 +88,7 @@ export async function PATCH(
       "coverageArea",
       "minimumAmount",
       "typePartnerId",
+      "roleId",
     ];
 
     const missingFields = requiredFields.filter(
@@ -99,7 +101,6 @@ export async function PATCH(
       );
     }
 
-    // Check for username/email conflicts
     const username = formData.get("username") as string;
     const email = formData.get("email") as string;
 
@@ -144,7 +145,6 @@ export async function PATCH(
     }
 
     if (newLogoFile) {
-      // Validate file type
       const validLogoTypes = ["image/jpeg", "image/png", "image/webp"];
       if (!validLogoTypes.includes(newLogoFile.type)) {
         return NextResponse.json(
@@ -229,6 +229,7 @@ export async function PATCH(
         coverageArea: formData.get("coverageArea") as string,
         minimumAmount: parseFloat(formData.get("minimumAmount") as string),
         typePartnerId: formData.get("typePartnerId") as string,
+        roleId: formData.get("roleId") as string,
         isActive: formData.get("isActive") === "true",
         logo: logoUrl,
         patent: patentUrl,

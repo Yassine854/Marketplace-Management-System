@@ -23,6 +23,7 @@ interface EditPartnerModalProps {
     typePartnerId: string;
   }) => void;
   typePartners: Array<{ id: string; name: string }>;
+  roles: Array<{ id: string; name: string }>;
   partner: Partner;
 }
 
@@ -31,6 +32,7 @@ const EditPartnerModal = ({
   onClose,
   onEdit,
   typePartners,
+  roles,
   partner,
 }: EditPartnerModalProps) => {
   const [formData, setFormData] = useState({
@@ -64,7 +66,8 @@ const EditPartnerModal = ({
       !formData.position.trim() ||
       !formData.coverageArea.trim() ||
       formData.minimumAmount <= 0 ||
-      !formData.typePartnerId.trim()
+      !formData.typePartnerId.trim() ||
+      !formData.roleId.trim()
     ) {
       toast.error("Please fill in required fields");
       return;
@@ -335,6 +338,27 @@ const EditPartnerModal = ({
                   {typePartners?.map((type) => (
                     <option key={type.id} value={type.id}>
                       {type.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Role *
+                </label>
+                <select
+                  value={formData.roleId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, roleId: e.target.value })
+                  }
+                  className="w-full rounded-lg border p-3"
+                  required
+                >
+                  <option value="">Select Role</option>
+                  {roles?.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
                     </option>
                   ))}
                 </select>

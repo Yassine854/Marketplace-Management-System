@@ -7,10 +7,10 @@ const prisma = new PrismaClient();
 // 🟢 GET: Retrieve all related products (with included product data)
 export async function GET(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // const session = await auth();
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
     const relatedProducts = await prisma.relatedProduct.findMany({
       include: {

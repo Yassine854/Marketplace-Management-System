@@ -1,119 +1,70 @@
-import PartnerTable from "../table/PartnerTable";
+import RoleTable from "../table/RoleTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import Pagination from "@/features/shared/elements/Pagination/pagination";
 import { useState, useEffect, useMemo } from "react";
-import { useGetAllPartners } from "../hooks/useGetAllPartners";
-import { Partner } from "@/types/partner";
-import { usePartnerActions } from "../hooks/usePartnerActions";
-import { useCreatePartner } from "../hooks/useCreatePartner";
-import CreatePartnerModal from "../components/CreatePartnerModal";
-import EditPartnerModal from "../components/EditPartnerModal";
+import { useGetAllRoles } from "../hooks/useGetAllRoles";
+import { useRoleActions } from "../hooks/useRoleActions";
+import { useCreateRole } from "../hooks/useCreateRole";
+import CreateRoleModal from "../components/CreateRoleModal";
+import EditRoleModal from "../components/EditRoleModal";
+import { Role } from "@/types/role";
 
-interface TypePartner {
-  id: string;
-  name: string;
-}
-interface Role {
-  id: string;
-  name: string;
-}
-
-const PartnerPage = () => {
-  const { partners, isLoading, error, refetch } = useGetAllPartners();
-  const { editPartner, deletePartner } = usePartnerActions();
-  const { createPartner } = useCreatePartner();
-
-  // State for type partners dropdown
-  const [typePartners, setTypePartners] = useState<TypePartner[]>([]);
-  const [roles, setRoles] = useState<Role[]>([]);
+const RolePage = () => {
+  const { roles, isLoading, error, refetch } = useGetAllRoles();
+  const {
+    editRole,
+    deleteRole,
+    isLoading: isActionLoading,
+    error: actionError,
+  } = useRoleActions();
+  const {
+    createRole,
+    isLoading: isCreating,
+    error: createError,
+  } = useCreateRole();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortState, setSortState] = useState<"newest" | "oldest">("newest");
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
-  useEffect(() => {
-    const fetchTypePartners = async () => {
-      try {
-        const responses = await Promise.all([
-          fetch("/api/marketplace/typePartner/getAll"),
-        ]);
-        const [typePartners] = await Promise.all(
-          responses.map((res) => res.json()),
-        );
-        setTypePartners(typePartners.typePartners);
-      } catch (error) {
-        console.error("Error fetching type partners:", error);
-        setTypePartners([]);
-        setRoles([]);
-      }
-    };
-
-    const fetchRoles = async () => {
-      try {
-        const responses = await Promise.all([
-          fetch("/api/marketplace/roles/getAll"),
-        ]);
-        const [roles] = await Promise.all(responses.map((res) => res.json()));
-        setRoles(roles.roles);
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-        setTypePartners([]);
-        setTypePartners([]);
-      }
-    };
-
-    fetchTypePartners();
-    fetchRoles();
-  }, []);
-
-  // Filtered partners
-  const filteredPartners = useMemo(() => {
-    return partners.filter((partner) => {
-      const searchContent = `
-        ${partner.username}
-        ${partner.firstName}
-        ${partner.lastName}
-        ${partner.email}
-        ${partner.telephone}
-      `.toLowerCase();
+  const filteredRoles = useMemo(() => {
+    return roles.filter((role) => {
+      const searchContent = `${role.id} ${role.name}`.toLowerCase();
       return searchContent.includes(searchTerm.toLowerCase());
     });
-  }, [partners, searchTerm]);
+  }, [roles, searchTerm]);
 
-  // Pagination
   useEffect(() => {
     setCurrentPage(1);
   }, [itemsPerPage]);
 
-  const handleEdit = async (id: string, updatedPartner: Partial<Partner>) => {
-    const result = await editPartner(id, {
-      ...updatedPartner,
-      id: undefined,
-      createdAt: undefined,
-      updatedAt: undefined,
-    });
-    if (result) refetch();
+  const handleEdit = async (id: string, updatedRole: Role) => {
+    const result = await editRole(id, updatedRole);
+    if (result) {
+      refetch();
+    }
   };
 
   const handleDelete = async (id: string) => {
-    const result = await deletePartner(id);
-    if (result) refetch();
+    const result = await deleteRole(id);
+    if (result) {
+      refetch();
+    }
   };
 
-  const totalPages = Math.ceil(filteredPartners.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredRoles.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedPartners = filteredPartners.slice(
+  const paginatedRoles = filteredRoles.slice(
     startIndex,
     startIndex + itemsPerPage,
   );
 
-  const openEditModal = (partner: Partner) => {
-    setSelectedPartner(partner);
+  const openEditModal = (role: Role) => {
+    setSelectedRole(role);
     setIsEditModalOpen(true);
   };
 
@@ -138,12 +89,13 @@ const PartnerPage = () => {
         }}
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xl font-bold capitalize">Partners</p>
+          <p className="text-xl font-bold capitalize">Roles</p>
+
           <div className="flex flex-wrap gap-2 sm:items-center sm:justify-end sm:justify-between">
             <div className="relative m-4 w-full sm:w-auto sm:min-w-[200px] sm:flex-1">
               <input
                 type="text"
-                placeholder="Search partners..."
+                placeholder="Search..."
                 className="w-full rounded-lg border p-2 pl-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -167,12 +119,11 @@ const PartnerPage = () => {
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
             </select>
-
             <div className="flex h-16 w-56 items-center justify-center">
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="btn"
-                title="Add new partner"
+                title="Add new"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -188,28 +139,25 @@ const PartnerPage = () => {
                   <path d="M12 5l0 14" />
                   <path d="M5 12l14 0" />
                 </svg>
-                <span className="hidden md:inline">Add Partner</span>
+                <span className="hidden md:inline">Add new</span>
               </button>
             </div>
           </div>
         </div>
       </div>
-
       <Divider />
-
       <div className="relative flex w-full flex-grow flex-col overflow-y-scroll bg-n10 px-3">
-        <PartnerTable
-          partners={paginatedPartners}
+        <RoleTable
+          roles={paginatedRoles}
           isLoading={isLoading}
           error={error}
+          refetch={refetch}
+          isSidebarOpen={false}
           onEdit={openEditModal}
           onDelete={handleDelete}
-          typePartners={typePartners}
         />
       </div>
-
       <Divider />
-
       <div>
         <Pagination
           currentPage={currentPage}
@@ -218,33 +166,28 @@ const PartnerPage = () => {
           onPageChange={setCurrentPage}
           onItemsPerPageChange={setItemsPerPage}
         />
-
-        <CreatePartnerModal
+        <CreateRoleModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onCreate={async (partnerData) => {
-            try {
-              await createPartner(partnerData);
-              refetch(); // This should now work after implementing step 2
+          onCreate={(role) =>
+            createRole(role, () => {
+              refetch();
               setIsModalOpen(false);
-            } catch (error) {
-              console.error("Error creating partner:", error);
-            }
-          }}
-          typePartners={typePartners}
-          roles={roles}
+            })
+          }
         />
-
-        {isEditModalOpen && selectedPartner && (
-          <EditPartnerModal
+        {isEditModalOpen && selectedRole && (
+          <EditRoleModal
             isOpen={isEditModalOpen}
             onClose={() => setIsEditModalOpen(false)}
-            onEdit={(updatedData) =>
-              handleEdit(selectedPartner.id, updatedData)
+            onEdit={(id, updatedRole) =>
+              handleEdit(id, {
+                ...selectedRole,
+                ...updatedRole,
+              })
             }
-            partner={selectedPartner}
-            typePartners={typePartners}
-            roles={roles}
+            id={selectedRole.id}
+            initialName={selectedRole.name}
           />
         )}
       </div>
@@ -252,4 +195,4 @@ const PartnerPage = () => {
   );
 };
 
-export default PartnerPage;
+export default RolePage;

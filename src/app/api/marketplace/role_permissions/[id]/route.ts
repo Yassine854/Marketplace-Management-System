@@ -56,13 +56,28 @@ export async function PATCH(
     }
 
     const { id } = params;
-    const { roleId, permissionId } = await req.json();
+    const { roleId, permissionId, actions } = await req.json();
+
+    if (!roleId || !permissionId) {
+      return NextResponse.json(
+        { error: "roleId and permissionId are required." },
+        { status: 400 },
+      );
+    }
+
+    if (!actions || !Array.isArray(actions) || actions.length === 0) {
+      return NextResponse.json(
+        { error: "actions must be a non-empty array of strings." },
+        { status: 400 },
+      );
+    }
 
     const updated = await prisma.rolePermission.update({
       where: { id },
       data: {
         roleId,
         permissionId,
+        actions,
       },
     });
 

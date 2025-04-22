@@ -48,6 +48,7 @@ const EditProductModal = ({
 }: EditProductModalProps) => {
   const [formState, setFormState] = useState({
     name: "",
+    barcode: "",
     sku: "",
     price: 0,
     cost: undefined as number | undefined,
@@ -83,6 +84,7 @@ const EditProductModal = ({
 
       setFormState({
         name: product.name,
+        barcode: product.barcode,
         sku: product.sku,
         price: product.price,
         cost: product.cost,
@@ -230,7 +232,12 @@ const EditProductModal = ({
   };
 
   const handleSubmit = async () => {
-    if (!formState.name || !formState.sku || !formState.price) {
+    if (
+      !formState.name ||
+      !formState.barcode ||
+      !formState.sku ||
+      !formState.price
+    ) {
       toast.error("Please fill in required fields");
       return;
     }
@@ -292,7 +299,6 @@ const EditProductModal = ({
         }),
       );
 
-      toast.success("Product updated successfully!");
       onClose();
     } catch (error) {
       toast.error(
@@ -322,7 +328,7 @@ const EditProductModal = ({
             <h3 className="text-xl font-semibold text-primary">
               Basic Information
             </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Product Name *
@@ -342,6 +348,17 @@ const EditProductModal = ({
                   type="text"
                   value={formState.sku}
                   onChange={(e) => handleInputChange("sku", e.target.value)}
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Bar Code *
+                </label>
+                <input
+                  type="text"
+                  value={formState.barcode}
+                  onChange={(e) => handleInputChange("barcode", e.target.value)}
                   className="w-full rounded-lg border p-3"
                 />
               </div>

@@ -68,23 +68,38 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    // Separate relationships and non-prisma fields from main product data
-    const {
-      subCategories,
-      relatedProducts,
-      images, // Remove images from update payload
-      ...productData
-    } = body;
+    const { subCategories, relatedProducts, images, ...productData } = body;
 
-    // Validate required fields
-    if (!productData.name || !productData.sku || !productData.price) {
+    if (
+      !productData.name ||
+      !productData.barcode ||
+      !productData.sku ||
+      !productData.price
+    ) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
       );
     }
 
-    // Convert numeric fields
+    const barcode = productData.barcode;
+
+    if (barcode) {
+      const existingProductWithBarcode = await prisma.product.findFirst({
+        where: {
+          barcode,
+          id: { not: id },
+        },
+      });
+
+      if (existingProductWithBarcode) {
+        return NextResponse.json(
+          { message: "Barcode already exists" },
+          { status: 400 },
+        );
+      }
+    }
+
     const numericFields = {
       price: Number(productData.price),
       cost: productData.cost ? Number(productData.cost) : undefined,

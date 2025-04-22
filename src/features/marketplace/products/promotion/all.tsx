@@ -186,7 +186,9 @@ const PromotionManagementPage = () => {
               </p>
               <div className="flex h-12 items-center justify-center">
                 <button
-                  onClick={() => router.push("/promotion/new")}
+                  onClick={() =>
+                    router.push("/marketplace/products/promotion/new")
+                  }
                   className="btn flex items-center gap-2 px-3 py-2.5 text-sm"
                   title="New Promotion"
                 >

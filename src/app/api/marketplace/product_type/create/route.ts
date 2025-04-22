@@ -9,9 +9,46 @@ const prisma = new PrismaClient();
 export async function POST(req: Request) {
   try {
     const session = await auth();
-
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    const rolePermissions = await prisma.rolePermission.findMany({
+      where: {
+        roleId: user.mRoleId,
+      },
+      include: {
+        permission: true,
+      },
+    });
+
+    // console.log("Fetched rolePermissions:", rolePermissions);
+
+    const canCreate = rolePermissions.some(
+      (rp) =>
+        rp.permission?.resource === "Product Type" &&
+        rp.actions.includes("create"),
+    );
+
+    if (!canCreate) {
+      return NextResponse.json(
+        { message: "Forbidden: missing 'create' permission for Product Type" },
+        { status: 403 },
+      );
     }
 
     const body = await req.json();
