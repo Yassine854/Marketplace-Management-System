@@ -11,13 +11,73 @@ export async function GET(
 ) {
   try {
     const session = await auth();
-
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
 
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    // Get user's role to check if they're KamiounAdminMaster
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+    });
+
+    // If user is KamiounAdminMaster, allow access
+    if (userRole?.name === "KamiounAdminMaster") {
+      const { id } = params;
+      const promotion = await prisma.promotion.findUnique({
+        where: { id },
+        include: { products: true },
+      });
+
+      if (!promotion) {
+        return NextResponse.json(
+          { message: "Promotion not found" },
+          { status: 404 },
+        );
+      }
+
+      return NextResponse.json(
+        { message: "Promotion retrieved successfully", promotion },
+        { status: 200 },
+      );
+    }
+
+    // For non-KamiounAdminMaster users, check permissions
+    const rolePermissions = await prisma.rolePermission.findMany({
+      where: {
+        roleId: user.mRoleId,
+      },
+      include: {
+        permission: true,
+      },
+    });
+
+    const canCreate = rolePermissions.some(
+      (rp) =>
+        rp.permission?.resource === "Promotion" && rp.actions.includes("read"),
+    );
+
+    if (!canCreate) {
+      return NextResponse.json(
+        { message: "Forbidden: missing 'read' permission for Promotion" },
+        { status: 403 },
+      );
+    }
+
+    const { id } = params;
     const promotion = await prisma.promotion.findUnique({
       where: { id },
       include: {
@@ -50,16 +110,58 @@ export async function PATCH(
 ) {
   try {
     const session = await auth();
-
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    // Get user's role to check if they're KamiounAdminMaster
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+    });
+
+    // If user is not KamiounAdminMaster, check permissions
+    if (userRole?.name !== "KamiounAdminMaster") {
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canCreate = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Promotion" &&
+          rp.actions.includes("update"),
+      );
+
+      if (!canCreate) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'update' permission for Promotion" },
+          { status: 403 },
+        );
+      }
     }
 
     const { id } = params;
     const body = await req.json();
     console.log("Body received:", body);
 
-    // Ensure that startDate and endDate are valid
     const startDate = new Date(body.startDate);
     const endDate = new Date(body.endDate);
 
@@ -101,13 +203,55 @@ export async function DELETE(
 ) {
   try {
     const session = await auth();
-
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
 
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    // Get user's role to check if they're KamiounAdminMaster
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+    });
+
+    // If user is not KamiounAdminMaster, check permissions
+    if (userRole?.name !== "KamiounAdminMaster") {
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canCreate = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Promotion" &&
+          rp.actions.includes("delete"),
+      );
+
+      if (!canCreate) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'delete' permission for Promotion" },
+          { status: 403 },
+        );
+      }
+    }
+
+    const { id } = params;
     await prisma.promotion.delete({ where: { id } });
 
     return NextResponse.json(

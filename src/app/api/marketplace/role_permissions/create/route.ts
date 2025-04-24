@@ -4,45 +4,32 @@ import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    const data = await request.json();
 
-    const { roleId, permissionId, actions } = await req.json();
-
-    if (!roleId || !permissionId) {
+    // Validate required fields
+    if (!data.roleId || !data.permissionId || !Array.isArray(data.actions)) {
       return NextResponse.json(
-        { error: "roleId and permissionId are required." },
+        { error: "Missing required fields" },
         { status: 400 },
       );
     }
 
-    if (!actions || !Array.isArray(actions) || actions.length === 0) {
-      return NextResponse.json(
-        { error: "actions must be a non-empty array of strings." },
-        { status: 400 },
-      );
-    }
-
-    const rolePermission = await prisma.rolePermission.create({
+    // Your existing creation logic
+    const result = await prisma.rolePermission.create({
       data: {
-        roleId,
-        permissionId,
-        actions,
+        roleId: data.roleId,
+        permissionId: data.permissionId,
+        actions: data.actions,
       },
     });
 
-    return NextResponse.json(
-      { message: "RolePermission created successfully", rolePermission },
-      { status: 201 },
-    );
+    return NextResponse.json(result);
   } catch (error) {
-    console.error("Error creating RolePermission:", error);
+    console.error("Create role permission error:", error);
     return NextResponse.json(
-      { error: "Failed to create RolePermission" },
+      { error: "Failed to create role permission" },
       { status: 500 },
     );
   }

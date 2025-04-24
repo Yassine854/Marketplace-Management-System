@@ -4,6 +4,34 @@ import { auth } from "../../../../../services/auth";
 
 const prisma = new PrismaClient();
 
+// Helper function to check if user is KamiounAdminMaster
+async function isKamiounAdminMaster(mRoleId: string) {
+  const userRole = await prisma.role.findUnique({
+    where: { id: mRoleId },
+  });
+  return userRole?.name === "KamiounAdminMaster";
+}
+
+// Helper function to check permissions
+async function checkPermission(mRoleId: string, requiredAction: string) {
+  // First check if user is KamiounAdminMaster
+  if (await isKamiounAdminMaster(mRoleId)) {
+    return true;
+  }
+
+  // Otherwise check specific permissions
+  const rolePermissions = await prisma.rolePermission.findMany({
+    where: { roleId: mRoleId },
+    include: { permission: true },
+  });
+
+  return rolePermissions.some(
+    (rp) =>
+      rp.permission?.resource === "Product" &&
+      rp.actions.includes(requiredAction),
+  );
+}
+
 // 🟢 GET: Retrieve a product by ID (with includes)
 export async function GET(
   req: Request,
@@ -13,6 +41,28 @@ export async function GET(
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    const hasPermission = await checkPermission(user.mRoleId, "read");
+    if (!hasPermission) {
+      return NextResponse.json(
+        { message: "Forbidden: missing 'read' permission for Product" },
+        { status: 403 },
+      );
     }
 
     const { id } = params;
@@ -65,6 +115,28 @@ export async function PATCH(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    const hasPermission = await checkPermission(user.mRoleId, "update");
+    if (!hasPermission) {
+      return NextResponse.json(
+        { message: "Forbidden: missing 'update' permission for Product" },
+        { status: 403 },
+      );
+    }
+
     const { id } = params;
     const body = await req.json();
 
@@ -113,11 +185,17 @@ export async function PATCH(
         : undefined,
       sealable: productData.sealable ? Number(productData.sealable) : undefined,
       alertQte: productData.alertQte ? Number(productData.alertQte) : undefined,
-      loyaltyPoints: productData.loyaltyPoints
-        ? Number(productData.loyaltyPoints)
+      loyaltyPointsPerProduct: productData.loyaltyPointsPerProduct
+        ? Number(productData.loyaltyPointsPerProduct)
         : undefined,
-      loyaltyPointsAmount: productData.loyaltyPointsAmount
-        ? Number(productData.loyaltyPointsAmount)
+      loyaltyPointsPerUnit: productData.loyaltyPointsPerUnit
+        ? Number(productData.loyaltyPointsPerUnit)
+        : undefined,
+      loyaltyPointsBonusQuantity: productData.loyaltyPointsBonusQuantity
+        ? Number(productData.loyaltyPointsBonusQuantity)
+        : undefined,
+      loyaltyPointsThresholdQty: productData.loyaltyPointsThresholdQty
+        ? Number(productData.loyaltyPointsThresholdQty)
         : undefined,
     };
 
@@ -202,10 +280,30 @@ export async function DELETE(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    const hasPermission = await checkPermission(user.mRoleId, "delete");
+    if (!hasPermission) {
+      return NextResponse.json(
+        { message: "Forbidden: missing 'delete' permission for Product" },
+        { status: 403 },
+      );
+    }
+
     const { id } = params;
-
     await prisma.product.delete({ where: { id } });
-
     return NextResponse.json({ message: "Product deleted" }, { status: 200 });
   } catch (error) {
     console.error("Error deleting product:", error);

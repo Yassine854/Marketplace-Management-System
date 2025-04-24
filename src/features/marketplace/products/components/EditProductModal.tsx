@@ -60,8 +60,10 @@ const EditProductModal = ({
     maximumQte: undefined as number | undefined,
     sealable: undefined as number | undefined,
     alertQte: undefined as number | undefined,
-    loyaltyPoints: undefined as number | undefined,
-    loyaltyPointsAmount: undefined as number | undefined,
+    loyaltyPointsPerProduct: undefined as number | undefined,
+    loyaltyPointsPerUnit: undefined as number | undefined,
+    loyaltyPointsBonusQuantity: undefined as number | undefined,
+    loyaltyPointsThresholdQty: undefined as number | undefined,
     supplierId: "",
     productTypeId: "",
     typePcbId: "",
@@ -96,8 +98,10 @@ const EditProductModal = ({
         maximumQte: product.maximumQte,
         sealable: product.sealable,
         alertQte: product.alertQte,
-        loyaltyPoints: product.loyaltyPoints,
-        loyaltyPointsAmount: product.loyaltyPointsAmount,
+        loyaltyPointsPerProduct: product.loyaltyPointsPerProduct,
+        loyaltyPointsPerUnit: product.loyaltyPointsPerUnit,
+        loyaltyPointsBonusQuantity: product.loyaltyPointsBonusQuantity,
+        loyaltyPointsThresholdQty: product.loyaltyPointsThresholdQty,
         supplierId: product.supplierId || null,
         productTypeId: product.productTypeId || null,
         typePcbId: product.typePcbId || null,
@@ -500,26 +504,58 @@ const EditProductModal = ({
               </h3>
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Loyalty Points
+                  Points Per Product
                 </label>
                 <input
                   type="number"
-                  value={formState.loyaltyPoints || ""}
+                  value={formState.loyaltyPointsPerProduct || ""}
                   onChange={(e) =>
-                    handleInputChange("loyaltyPoints", e.target.value)
+                    handleInputChange("loyaltyPointsPerProduct", e.target.value)
                   }
                   className="w-full rounded-lg border p-3"
                 />
               </div>
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Loyalty Points Amount
+                  Points Per Unit
                 </label>
                 <input
                   type="number"
-                  value={formState.loyaltyPointsAmount || ""}
+                  value={formState.loyaltyPointsPerUnit || ""}
                   onChange={(e) =>
-                    handleInputChange("loyaltyPointsAmount", e.target.value)
+                    handleInputChange("loyaltyPointsPerUnit", e.target.value)
+                  }
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Bonus Quantity
+                </label>
+                <input
+                  type="number"
+                  value={formState.loyaltyPointsBonusQuantity || ""}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "loyaltyPointsBonusQuantity",
+                      e.target.value,
+                    )
+                  }
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Threshold Quantity
+                </label>
+                <input
+                  type="number"
+                  value={formState.loyaltyPointsThresholdQty || ""}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "loyaltyPointsThresholdQty",
+                      e.target.value,
+                    )
                   }
                   className="w-full rounded-lg border p-3"
                 />

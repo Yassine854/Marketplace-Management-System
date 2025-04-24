@@ -65,10 +65,22 @@ export async function PATCH(
       );
     }
 
-    if (!actions || !Array.isArray(actions) || actions.length === 0) {
+    if (!Array.isArray(actions)) {
       return NextResponse.json(
-        { error: "actions must be a non-empty array of strings." },
+        { error: "actions must be an array of strings." },
         { status: 400 },
+      );
+    }
+
+    // If actions array is empty, delete the role permission
+    if (actions.length === 0) {
+      await prisma.rolePermission.delete({
+        where: { id },
+      });
+
+      return NextResponse.json(
+        { message: "RolePermission deleted successfully" },
+        { status: 200 },
       );
     }
 

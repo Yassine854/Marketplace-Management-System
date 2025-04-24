@@ -16,7 +16,7 @@ const OrdersTableHead = ({
   return (
     <tr>
       <OrdersTableHeadSmallCell>
-        <div className="relative px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <div className="relative px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           {!!selectedOrders.length && (
             <div className="absolute right-0">{selectedOrders.length}</div>
           )}
@@ -64,7 +64,7 @@ const Checkbox = ({ checkboxRef, isChecked = false, onClick }: any) => {
   return (
     <div
       ref={checkboxRef}
-      className="flex h-5 w-5 items-center justify-center rounded-full   hover:bg-n70"
+      className="flex h-5 w-5 items-center justify-center rounded-full   text-white hover:bg-n70"
       onClick={(event: any) => {
         //  event.stopPropagation();
         onClick(!checked);

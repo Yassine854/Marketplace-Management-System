@@ -6,6 +6,7 @@ interface Product {
   manufacturer: string;
   name: string;
   sku: string;
+  skuPartner: string | null;
   stock_item?: {
     is_in_stock: boolean;
     qty: number;

@@ -69,7 +69,7 @@ const OrdersTable = ({ orders }: OrdersTableProps) => {
         style={{ width: "100%" }}
       >
         <thead
-          className="border-b border-gray-100 bg-gray-50 "
+          className="whitespace-nowrap border-b border-gray-100 bg-gray-50"
           style={{
             position: "sticky",
             top: 0,

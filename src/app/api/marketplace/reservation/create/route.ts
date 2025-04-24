@@ -14,6 +14,24 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
+    const existingData = await prisma.reservation.findFirst();
+
+    if (!existingData) {
+      const existingPermission = await prisma.permission.findFirst({
+        where: {
+          resource: "Reservation",
+        },
+      });
+
+      if (!existingPermission) {
+        await prisma.permission.create({
+          data: {
+            resource: "Reservation",
+          },
+        });
+      }
+    }
+
     const newReservation = await prisma.reservation.create({
       data: {
         amountExclTaxe: body.amountExclTaxe,

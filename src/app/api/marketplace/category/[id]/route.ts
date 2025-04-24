@@ -13,18 +13,61 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
-
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
 
+    // Get user's role
+    const userRole = await prisma.role.findFirst({
+      where: { id: user.mRoleId },
+    });
+
+    // Allow access if user is KamiounAdminMaster
+    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+
+    if (!isKamiounAdminMaster) {
+      if (!user.mRoleId) {
+        return NextResponse.json({ message: "No role found" }, { status: 403 });
+      }
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canRead = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Category" && rp.actions.includes("read"),
+      );
+
+      if (!canRead) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'read' permission for Category" },
+          { status: 403 },
+        );
+      }
+    }
+
+    const { id } = params;
     const category = await prisma.category.findUnique({
       where: { id },
       include: {
-        subCategories: true, // Include related subcategories
+        subCategories: true,
       },
     });
 
@@ -54,61 +97,66 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    // Get user's role
+    const userRole = await prisma.role.findFirst({
+      where: { id: user.mRoleId },
+    });
+
+    // Allow access if user is KamiounAdminMaster
+    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+
+    if (!isKamiounAdminMaster) {
+      if (!user.mRoleId) {
+        return NextResponse.json({ message: "No role found" }, { status: 403 });
+      }
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canUpdate = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Category" &&
+          rp.actions.includes("update"),
+      );
+
+      if (!canUpdate) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'update' permission for Category" },
+          { status: 403 },
+        );
+      }
     }
 
     const { id } = params;
     const formData = await req.formData();
     const nameCategory = formData.get("nameCategory") as string;
     const isActive = formData.get("isActive") === "true";
-
     const imageFile = formData.get("image") as File | null;
 
-    // Find the existing category
-    const existingCategory = await prisma.category.findUnique({
-      where: { id },
-    });
-
-    if (!existingCategory) {
-      return NextResponse.json(
-        { message: "Category not found" },
-        { status: 404 },
-      );
-    }
-
-    let imageUrl: string | null = existingCategory.image; // Default to existing image URL
+    let imageUrl: string | undefined;
 
     if (imageFile) {
-      // Ensure file is an image
-      const validImageTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "image/webp",
-      ];
-      if (!validImageTypes.includes(imageFile.type)) {
-        return NextResponse.json(
-          { error: "Invalid image format" },
-          { status: 400 },
-        );
-      }
-
-      // Delete the old image file if it exists
-      if (existingCategory.image) {
-        const oldImagePath = path.join(
-          process.cwd(),
-          "public",
-          existingCategory.image,
-        );
-        try {
-          await unlink(oldImagePath); // Remove the old image file
-        } catch (error) {
-          console.error("Error deleting old image:", error);
-        }
-      }
-
       // Save the new image
       const buffer = Buffer.from(await imageFile.arrayBuffer());
       const fileName = `${Date.now()}-${imageFile.name}`;
@@ -124,7 +172,7 @@ export async function PATCH(
       data: {
         nameCategory,
         isActive,
-        image: imageUrl,
+        ...(imageUrl && { image: imageUrl }),
       },
     });
 
@@ -147,37 +195,58 @@ export async function DELETE(
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
-
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
 
-    // Find the category to delete
-    const category = await prisma.category.findUnique({
-      where: { id },
+    // Get user's role
+    const userRole = await prisma.role.findFirst({
+      where: { id: user.mRoleId },
     });
 
-    if (!category) {
-      return NextResponse.json(
-        { message: "Category not found" },
-        { status: 404 },
-      );
-    }
+    // Allow access if user is KamiounAdminMaster
+    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
 
-    // Delete the image file if it exists
-    if (category.image) {
-      const imagePath = path.join(process.cwd(), "public", category.image);
-      try {
-        await unlink(imagePath); // Remove the image file
-      } catch (error) {
-        console.error("Error deleting image:", error);
+    if (!isKamiounAdminMaster) {
+      if (!user.mRoleId) {
+        return NextResponse.json({ message: "No role found" }, { status: 403 });
+      }
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canDelete = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Category" &&
+          rp.actions.includes("delete"),
+      );
+
+      if (!canDelete) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'delete' permission for Category" },
+          { status: 403 },
+        );
       }
     }
 
-    // Delete the category
+    const { id } = params;
     await prisma.category.delete({
       where: { id },
     });

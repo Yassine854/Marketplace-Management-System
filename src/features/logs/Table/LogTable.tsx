@@ -71,7 +71,8 @@ export default function LogTable({
     if (
       message.includes("order status changed") ||
       message.includes("order changed") ||
-      message.includes("Order status changed")
+      message.includes("Order status changed") ||
+      message.includes("order canceled")
     ) {
       setModalType("statusChanged");
     } else if (message.includes("Order edited")) {
@@ -139,18 +140,17 @@ export default function LogTable({
           style={{ width: "100%", borderSpacing: 0 }}
         >
           <thead
-            className="border-b border-gray-100 bg-gray-50"
+            className="border-b border-gray-100 bg-primary"
             style={{
               position: "sticky",
               top: 0,
               zIndex: 0,
-              backgroundColor: "#fff",
               padding: 0,
               margin: 0,
             }}
           >
             <tr>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
                 <input
                   type="checkbox"
                   onChange={toggleSelectAll}
@@ -158,22 +158,22 @@ export default function LogTable({
                   className="h-3 w-3 cursor-pointer appearance-none rounded-full border-2 border-gray-400 transition-colors checked:border-blue-500 checked:bg-blue-500 hover:border-blue-600 hover:bg-blue-200"
                 />
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 Type
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs  font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs  font-semibold uppercase tracking-wider text-white">
                 Message
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 Timestamp
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 Context
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 Data Before
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 Data After
               </th>
             </tr>

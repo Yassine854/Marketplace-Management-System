@@ -13,10 +13,54 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
-
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    // Get user's role
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.roleId },
+    });
+
+    // Allow access if user is KamiounAdminMaster
+    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+
+    if (!isKamiounAdminMaster) {
+      if (!user.mRoleId) {
+        return NextResponse.json({ message: "No role found" }, { status: 403 });
+      }
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canRead = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Partner" && rp.actions.includes("read"),
+      );
+
+      if (!canRead) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'read' permission for Partner" },
+          { status: 403 },
+        );
+      }
     }
 
     const { id } = params;
@@ -61,6 +105,52 @@ export async function PATCH(
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    // Get user's role
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+    });
+
+    // Allow access if user is KamiounAdminMaster
+    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+
+    if (!isKamiounAdminMaster) {
+      if (!user.mRoleId) {
+        return NextResponse.json({ message: "No role found" }, { status: 403 });
+      }
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canUpdate = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Partner" &&
+          rp.actions.includes("update"),
+      );
+
+      if (!canUpdate) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'update' permission for Partner" },
+          { status: 403 },
+        );
+      }
     }
 
     const { id } = params;
@@ -255,10 +345,56 @@ export async function DELETE(
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
-
+    //Session Authorization
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    //Permission Check
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    // Get user's role
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+    });
+
+    // Allow access if user is KamiounAdminMaster
+    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+
+    if (!isKamiounAdminMaster) {
+      if (!user.mRoleId) {
+        return NextResponse.json({ message: "No role found" }, { status: 403 });
+      }
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canDelete = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Partner" &&
+          rp.actions.includes("delete"),
+      );
+
+      if (!canDelete) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'delete' permission for Partner" },
+          { status: 403 },
+        );
+      }
     }
 
     const { id } = params;

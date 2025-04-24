@@ -15,10 +15,12 @@ interface CreateProductData {
   weight?: number;
   minimumQte?: number;
   maximumQte?: number;
-  sealable?: number; // Updated field
-  alertQte?: number; // Updated field
-  loyaltyPoints?: number; // New field
-  loyaltyPointsAmount?: number; // New field
+  sealable?: number;
+  alertQte?: number;
+  loyaltyPointsPerProduct?: number;
+  loyaltyPointsPerUnit?: number;
+  loyaltyPointsBonusQuantity?: number;
+  loyaltyPointsThresholdQty?: number;
   supplierId?: string;
   productTypeId?: string;
   typePcbId?: string;

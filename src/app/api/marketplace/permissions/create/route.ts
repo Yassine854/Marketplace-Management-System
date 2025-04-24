@@ -11,7 +11,72 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    const user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    // Get user's role to check if they're KamiounAdminMaster
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.mRoleId }, // Changed from roleId to mRoleId
+    });
+
+    // Allow access if user is KamiounAdminMaster
+    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+
+    if (!isKamiounAdminMaster) {
+      if (!user.mRoleId) {
+        return NextResponse.json({ message: "No role found" }, { status: 403 });
+      }
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canCreate = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Permission" &&
+          rp.actions.includes("create"),
+      );
+
+      if (!canCreate) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'create' permission for Permission" },
+          { status: 403 },
+        );
+      }
+    }
+
     const body = await req.json();
+
+    const existingData = await prisma.permission.findFirst();
+
+    if (!existingData) {
+      const existingPermission = await prisma.permission.findFirst({
+        where: {
+          resource: "Permission",
+        },
+      });
+
+      if (!existingPermission) {
+        await prisma.permission.create({
+          data: {
+            resource: "Permission",
+          },
+        });
+      }
+    }
+
     const { resource } = body;
 
     if (!resource) {

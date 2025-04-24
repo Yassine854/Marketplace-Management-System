@@ -68,8 +68,10 @@ const CreateProductModal = ({
     maximumQte: undefined as number | undefined,
     sealable: undefined as number | undefined,
     alertQte: undefined as number | undefined,
-    loyaltyPoints: undefined as number | undefined,
-    loyaltyPointsAmount: undefined as number | undefined,
+    loyaltyPointsPerProduct: undefined as number | undefined,
+    loyaltyPointsPerUnit: undefined as number | undefined,
+    loyaltyPointsBonusQuantity: undefined as number | undefined,
+    loyaltyPointsThresholdQty: undefined as number | undefined,
     supplierId: "",
     productTypeId: "",
     typePcbId: "",
@@ -98,8 +100,10 @@ const CreateProductModal = ({
         maximumQte: undefined,
         sealable: undefined,
         alertQte: undefined,
-        loyaltyPoints: undefined,
-        loyaltyPointsAmount: undefined,
+        loyaltyPointsPerProduct: undefined,
+        loyaltyPointsPerUnit: undefined,
+        loyaltyPointsBonusQuantity: undefined,
+        loyaltyPointsThresholdQty: undefined,
         supplierId: "",
         productTypeId: "",
         typePcbId: "",
@@ -154,11 +158,17 @@ const CreateProductModal = ({
           : undefined,
         sealable: formState.sealable ? Number(formState.sealable) : undefined,
         alertQte: formState.alertQte ? Number(formState.alertQte) : undefined,
-        loyaltyPoints: formState.loyaltyPoints
-          ? Number(formState.loyaltyPoints)
+        loyaltyPointsPerProduct: formState.loyaltyPointsPerProduct
+          ? Number(formState.loyaltyPointsPerProduct)
           : undefined,
-        loyaltyPointsAmount: formState.loyaltyPointsAmount
-          ? Number(formState.loyaltyPointsAmount)
+        loyaltyPointsPerUnit: formState.loyaltyPointsPerUnit
+          ? Number(formState.loyaltyPointsPerUnit)
+          : undefined,
+        loyaltyPointsBonusQuantity: formState.loyaltyPointsBonusQuantity
+          ? Number(formState.loyaltyPointsBonusQuantity)
+          : undefined,
+        loyaltyPointsThresholdQty: formState.loyaltyPointsThresholdQty
+          ? Number(formState.loyaltyPointsThresholdQty)
           : undefined,
         // Convert empty strings to undefined for relational IDs
         supplierId: formState.supplierId || undefined,
@@ -312,24 +322,68 @@ const CreateProductModal = ({
               <h3 className="text-xl font-semibold text-primary">
                 Loyalty Program
               </h3>
-              <input
-                type="number"
-                placeholder="Loyalty Points"
-                value={formState.loyaltyPoints || ""}
-                onChange={(e) =>
-                  handleInputChange("loyaltyPoints", e.target.value)
-                }
-                className="w-full rounded-lg border p-3"
-              />
-              <input
-                type="number"
-                placeholder="Loyalty Points Amount"
-                value={formState.loyaltyPointsAmount || ""}
-                onChange={(e) =>
-                  handleInputChange("loyaltyPointsAmount", e.target.value)
-                }
-                className="w-full rounded-lg border p-3"
-              />
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Points Per Product
+                </label>
+                <input
+                  type="number"
+                  placeholder="Points Per Product"
+                  value={formState.loyaltyPointsPerProduct || ""}
+                  onChange={(e) =>
+                    handleInputChange("loyaltyPointsPerProduct", e.target.value)
+                  }
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Points Per Unit
+                </label>
+                <input
+                  type="number"
+                  placeholder="Points Per Unit"
+                  value={formState.loyaltyPointsPerUnit || ""}
+                  onChange={(e) =>
+                    handleInputChange("loyaltyPointsPerUnit", e.target.value)
+                  }
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Bonus Quantity
+                </label>
+                <input
+                  type="number"
+                  placeholder="Bonus Quantity"
+                  value={formState.loyaltyPointsBonusQuantity || ""}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "loyaltyPointsBonusQuantity",
+                      e.target.value,
+                    )
+                  }
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Threshold Quantity
+                </label>
+                <input
+                  type="number"
+                  placeholder="Threshold Quantity"
+                  value={formState.loyaltyPointsThresholdQty || ""}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "loyaltyPointsThresholdQty",
+                      e.target.value,
+                    )
+                  }
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
             </div>
           </div>
 

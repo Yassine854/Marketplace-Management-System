@@ -7,17 +7,70 @@ import path from "path";
 
 const prisma = new PrismaClient();
 
+// Helper function to check KamiounAdminMaster role
+async function isKamiounAdminMaster(roleId: string) {
+  const userRole = await prisma.role.findUnique({
+    where: { id: roleId },
+  });
+  return userRole?.name === "KamiounAdminMaster";
+}
+
+// Helper function to check permissions
+async function checkPermission(
+  roleId: string,
+  resource: string,
+  action: string,
+) {
+  const rolePermissions = await prisma.rolePermission.findMany({
+    where: { roleId },
+    include: { permission: true },
+  });
+
+  return rolePermissions.some(
+    (rp) => rp.permission?.resource === resource && rp.actions.includes(action),
+  );
+}
+
 // 🟢 GET: Retrieve a single subcategory by ID
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    // const session = await auth();
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
 
-    // if (!session?.user) {
-    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    // }
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    // Skip permission check for KamiounAdminMaster
+    const isAdmin = await isKamiounAdminMaster(user.mRoleId);
+    if (!isAdmin) {
+      const hasPermission = await checkPermission(
+        user.mRoleId,
+        "SubCategory",
+        "read",
+      );
+      if (!hasPermission) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'read' permission for SubCategory" },
+          { status: 403 },
+        );
+      }
+    }
 
     const { id } = params;
 
@@ -59,9 +112,38 @@ export async function PATCH(
 ) {
   try {
     const session = await auth();
-
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    // Skip permission check for KamiounAdminMaster
+    const isAdmin = await isKamiounAdminMaster(user.mRoleId);
+    if (!isAdmin) {
+      const hasPermission = await checkPermission(
+        user.mRoleId,
+        "SubCategory",
+        "update",
+      );
+      if (!hasPermission) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'update' permission for SubCategory" },
+          { status: 403 },
+        );
+      }
     }
 
     const { id } = params;
@@ -164,9 +246,38 @@ export async function DELETE(
 ) {
   try {
     const session = await auth();
-
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    // Skip permission check for KamiounAdminMaster
+    const isAdmin = await isKamiounAdminMaster(user.mRoleId);
+    if (!isAdmin) {
+      const hasPermission = await checkPermission(
+        user.mRoleId,
+        "SubCategory",
+        "delete",
+      );
+      if (!hasPermission) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'delete' permission for SubCategory" },
+          { status: 403 },
+        );
+      }
     }
 
     const { id } = params;

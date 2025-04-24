@@ -13,9 +13,26 @@ export function useProductActions() {
     try {
       const { id: _, ...updateData } = updatedProduct;
 
+      // Convert loyalty points values to numbers
+      const numericData = {
+        ...updateData,
+        loyaltyPointsPerProduct: updateData.loyaltyPointsPerProduct
+          ? Number(updateData.loyaltyPointsPerProduct)
+          : undefined,
+        loyaltyPointsPerUnit: updateData.loyaltyPointsPerUnit
+          ? Number(updateData.loyaltyPointsPerUnit)
+          : undefined,
+        loyaltyPointsBonusQuantity: updateData.loyaltyPointsBonusQuantity
+          ? Number(updateData.loyaltyPointsBonusQuantity)
+          : undefined,
+        loyaltyPointsThresholdQty: updateData.loyaltyPointsThresholdQty
+          ? Number(updateData.loyaltyPointsThresholdQty)
+          : undefined,
+      };
+
       const response = await axios.patch(
         `/api/marketplace/products/${id}`,
-        updateData,
+        numericData,
       );
 
       if (response.status === 200) {
@@ -24,7 +41,7 @@ export function useProductActions() {
       }
     } catch (err: any) {
       console.log(err);
-      toast.error(err.response?.data?.message || "Error creating product");
+      toast.error(err.response?.data?.message || "Error updating product");
     } finally {
       setIsLoading(false);
     }

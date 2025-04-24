@@ -7,13 +7,79 @@ const prisma = new PrismaClient();
 // 🟢 POST: Create a new product
 export async function POST(req: Request) {
   try {
+    //Session Authorization
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
+    //Permission Check
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    // Get user's role
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+    });
+
+    // Allow access if user is KamiounAdminMaster
+    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+
+    if (!isKamiounAdminMaster) {
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canCreate = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Product" &&
+          rp.actions.includes("create"),
+      );
+
+      if (!canCreate) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'create' permission for Product" },
+          { status: 403 },
+        );
+      }
+    }
 
     // 🟢 Handle FormData instead of req.json()
     const formData = await req.formData();
+
+    const existingData = await prisma.product.findFirst();
+
+    if (!existingData) {
+      const existingPermission = await prisma.permission.findFirst({
+        where: {
+          resource: "Product",
+        },
+      });
+
+      if (!existingPermission) {
+        await prisma.permission.create({
+          data: {
+            resource: "Product",
+          },
+        });
+      }
+    }
+
     const barcode = formData.get("barcode") as string | null;
     if (barcode) {
       const existingProduct = await prisma.product.findUnique({
@@ -37,7 +103,6 @@ export async function POST(req: Request) {
         product_id: uniqueProductId,
         name: formData.get("name") as string,
         barcode,
-
         sku: formData.get("sku") as string,
         price: parseFloat(formData.get("price") as string),
         cost: formData.get("cost")
@@ -54,15 +119,20 @@ export async function POST(req: Request) {
         sealable: formData.get("sealable")
           ? parseInt(formData.get("sealable") as string)
           : null,
-
         alertQte: formData.get("alertQte")
           ? parseInt(formData.get("alertQte") as string)
           : null,
-        loyaltyPoints: formData.get("loyaltyPoints")
-          ? parseFloat(formData.get("loyaltyPoints") as string)
+        loyaltyPointsPerProduct: formData.get("loyaltyPointsPerProduct")
+          ? parseFloat(formData.get("loyaltyPointsPerProduct") as string)
           : null,
-        loyaltyPointsAmount: formData.get("loyaltyPointsAmount")
-          ? parseFloat(formData.get("loyaltyPointsAmount") as string)
+        loyaltyPointsPerUnit: formData.get("loyaltyPointsPerUnit")
+          ? parseFloat(formData.get("loyaltyPointsPerUnit") as string)
+          : null,
+        loyaltyPointsBonusQuantity: formData.get("loyaltyPointsBonusQuantity")
+          ? parseInt(formData.get("loyaltyPointsBonusQuantity") as string)
+          : null,
+        loyaltyPointsThresholdQty: formData.get("loyaltyPointsThresholdQty")
+          ? parseInt(formData.get("loyaltyPointsThresholdQty") as string)
           : null,
         pcb: formData.get("pcb") as string,
         weight: formData.get("weight")

@@ -8,25 +8,79 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
-    // const session = await auth();
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
 
-    // if (!session?.user) {
-    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    // }
+    const user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    // Get user's role
+    const userRole = await prisma.role.findFirst({
+      where: { id: user.mRoleId },
+    });
+
+    // Allow access if user is KamiounAdminMaster
+    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+
+    if (!isKamiounAdminMaster) {
+      if (!user.mRoleId) {
+        return NextResponse.json({ message: "No role found" }, { status: 403 });
+      }
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canCreate = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Category" &&
+          rp.actions.includes("create"),
+      );
+
+      if (!canCreate) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'create' permission for Category" },
+          { status: 403 },
+        );
+      }
+    }
 
     const formData = await req.formData();
 
-    const nameCategory = formData.get("nameCategory") as string;
+    const existingData = await prisma.category.findFirst();
 
-    const imageFile = formData.get("image") as File | null;
+    if (!existingData) {
+      const existingPermission = await prisma.permission.findFirst({
+        where: {
+          resource: "Category",
+        },
+      });
 
-    // Validate required fields
-    if (!nameCategory) {
-      return NextResponse.json(
-        { error: "Category name is required" },
-        { status: 400 },
-      );
+      if (!existingPermission) {
+        await prisma.permission.create({
+          data: {
+            resource: "Category",
+          },
+        });
+      }
     }
+
+    const nameCategory = formData.get("nameCategory") as string;
+    const imageFile = formData.get("image") as File | null;
 
     let imageUrl: string | null = null;
 
@@ -63,10 +117,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(
-      {
-        message: "Category created successfully",
-        category: newCategory,
-      },
+      { message: "Category created successfully", category: newCategory },
       { status: 201 },
     );
   } catch (error) {

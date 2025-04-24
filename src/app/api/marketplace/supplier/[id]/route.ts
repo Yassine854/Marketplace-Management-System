@@ -11,10 +11,52 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
-
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    // Check if user is KamiounAdminMaster
+    const isAdmin = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+      select: { name: true },
+    });
+
+    if (isAdmin?.name !== "KamiounAdminMaster") {
+      if (!user.mRoleId) {
+        return NextResponse.json({ message: "No role found" }, { status: 403 });
+      }
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canRead = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Supplier" && rp.actions.includes("read"),
+      );
+
+      if (!canRead) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'read' permission for Supplier" },
+          { status: 403 },
+        );
+      }
     }
 
     const { id } = params;
@@ -50,18 +92,58 @@ export async function PATCH(
 ) {
   try {
     const session = await auth();
-
-    // Check if the user is authenticated
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    // Check if user is KamiounAdminMaster
+    const isAdmin = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+      select: { name: true },
+    });
+
+    if (isAdmin?.name !== "KamiounAdminMaster") {
+      if (!user.mRoleId) {
+        return NextResponse.json({ message: "No role found" }, { status: 403 });
+      }
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canUpdate = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Supplier" &&
+          rp.actions.includes("update"),
+      );
+
+      if (!canUpdate) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'update' permission for Supplier" },
+          { status: 403 },
+        );
+      }
     }
 
     const { id } = params;
     const body = await req.json();
 
-    // Update transaction to ensure data integrity
     const updatedManufacturer = await prisma.$transaction(async (prisma) => {
-      // 1. Update basic manufacturer information
       const manufacturer = await prisma.manufacturer.update({
         where: { id },
         data: {
@@ -79,14 +161,11 @@ export async function PATCH(
         },
       });
 
-      // 2. Handle categories
       if (body.categories) {
-        // Delete existing categories
         await prisma.supplierCategory.deleteMany({
           where: { supplierId: id },
         });
 
-        // Create new categories if provided
         if (body.categories.length > 0) {
           await prisma.supplierCategory.createMany({
             data: body.categories.map((categoryId: string) => ({
@@ -97,7 +176,6 @@ export async function PATCH(
         }
       }
 
-      // 3. Fetch the updated manufacturer with categories
       return prisma.manufacturer.findUnique({
         where: { id },
         include: {
@@ -110,7 +188,6 @@ export async function PATCH(
       });
     });
 
-    // Return the updated manufacturer
     return NextResponse.json(
       {
         message: "Manufacturer updated successfully",
@@ -136,10 +213,53 @@ export async function DELETE(
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth(); // Get user session
-
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    // Check if user is KamiounAdminMaster
+    const isAdmin = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+      select: { name: true },
+    });
+
+    if (isAdmin?.name !== "KamiounAdminMaster") {
+      if (!user.mRoleId) {
+        return NextResponse.json({ message: "No role found" }, { status: 403 });
+      }
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canDelete = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Supplier" &&
+          rp.actions.includes("delete"),
+      );
+
+      if (!canDelete) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'delete' permission for Supplier" },
+          { status: 403 },
+        );
+      }
     }
 
     const { id } = params;

@@ -15,6 +15,76 @@ export async function GET(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    // Get user's role to check if they're KamiounAdminMaster
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+    });
+
+    // If user is KamiounAdminMaster, allow access
+    if (userRole?.name === "KamiounAdminMaster") {
+      const { id } = params;
+      const reservation = await prisma.reservation.findUnique({
+        where: { id },
+        include: {
+          customer: true,
+          agent: true,
+          partner: true,
+          order: true,
+          paymentMethod: true,
+          reservationItems: true,
+        },
+      });
+
+      if (!reservation) {
+        return NextResponse.json(
+          { message: "Reservation not found" },
+          { status: 404 },
+        );
+      }
+
+      return NextResponse.json(
+        { message: "Reservation retrieved successfully", reservation },
+        { status: 200 },
+      );
+    }
+
+    // For non-KamiounAdminMaster users, check permissions
+    const rolePermissions = await prisma.rolePermission.findMany({
+      where: {
+        roleId: user.mRoleId,
+      },
+      include: {
+        permission: true,
+      },
+    });
+
+    const canRead = rolePermissions.some(
+      (rp) =>
+        rp.permission?.resource === "Reservation" &&
+        rp.actions.includes("read"),
+    );
+
+    if (!canRead) {
+      return NextResponse.json(
+        { message: "Forbidden: missing 'read' permission for Reservation" },
+        { status: 403 },
+      );
+    }
+
     const { id } = params;
     const reservation = await prisma.reservation.findUnique({
       where: { id },
@@ -36,7 +106,7 @@ export async function GET(
     }
 
     return NextResponse.json(
-      { message: "Reservation retrieved", reservation },
+      { message: "Reservation retrieved successfully", reservation },
       { status: 200 },
     );
   } catch (error) {
@@ -59,6 +129,50 @@ export async function PATCH(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    // Get user's role to check if they're KamiounAdminMaster
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+    });
+
+    // If user is not KamiounAdminMaster, check permissions
+    if (userRole?.name !== "KamiounAdminMaster") {
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canUpdate = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Reservation" &&
+          rp.actions.includes("update"),
+      );
+
+      if (!canUpdate) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'update' permission for Reservation" },
+          { status: 403 },
+        );
+      }
+    }
+
     const { id } = params;
     const body = await req.json();
 
@@ -68,7 +182,10 @@ export async function PATCH(
     });
 
     return NextResponse.json(
-      { message: "Reservation updated", reservation: updatedReservation },
+      {
+        message: "Reservation updated successfully",
+        reservation: updatedReservation,
+      },
       { status: 200 },
     );
   } catch (error) {
@@ -91,6 +208,50 @@ export async function DELETE(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    // Get user's role to check if they're KamiounAdminMaster
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+    });
+
+    // If user is not KamiounAdminMaster, check permissions
+    if (userRole?.name !== "KamiounAdminMaster") {
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canDelete = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Reservation" &&
+          rp.actions.includes("delete"),
+      );
+
+      if (!canDelete) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'delete' permission for Reservation" },
+          { status: 403 },
+        );
+      }
+    }
+
     const { id } = params;
     await prisma.reservationItem.deleteMany({
       where: { reservationId: id },
@@ -98,7 +259,7 @@ export async function DELETE(
     await prisma.reservation.delete({ where: { id } });
 
     return NextResponse.json(
-      { message: "Reservation deleted" },
+      { message: "Reservation deleted successfully" },
       { status: 200 },
     );
   } catch (error) {

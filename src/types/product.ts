@@ -13,8 +13,10 @@ export interface Product {
   maximumQte?: number;
   sealable?: number;
   alertQte?: number;
-  loyaltyPoints?: number;
-  loyaltyPointsAmount?: number;
+  loyaltyPointsPerProduct?: number;
+  loyaltyPointsPerUnit?: number;
+  loyaltyPointsBonusQuantity?: number;
+  loyaltyPointsThresholdQty?: number;
   typePcbId?: string;
   productTypeId?: string;
   productStatusId?: string;

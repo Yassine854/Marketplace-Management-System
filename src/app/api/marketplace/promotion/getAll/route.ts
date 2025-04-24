@@ -7,13 +7,55 @@ const prisma = new PrismaClient();
 export async function GET(req: Request) {
   try {
     const session = await auth();
-
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
+    // Get user's role to check if they're KamiounAdminMaster
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+    });
+
+    // If user is not KamiounAdminMaster, check permissions
+    if (userRole?.name !== "KamiounAdminMaster") {
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canRead = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Promotion" &&
+          rp.actions.includes("read"),
+      );
+
+      if (!canRead) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'read' permission for Promotion" },
+          { status: 403 },
+        );
+      }
+    }
+
     const url = new URL(req.url);
-    ("");
     const page = parseInt(url.searchParams.get("page") || "1", 10);
     const limit = parseInt(url.searchParams.get("limit") || "25", 10);
 

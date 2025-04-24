@@ -10,13 +10,76 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
-    // Get form data first before any other processing
-    const formData = await req.formData();
-
-    // Then check authentication
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+    };
+
+    // Get user's role to check if they're KamiounAdminMaster
+    const userRole = await prisma.role.findUnique({
+      where: { id: user.mRoleId },
+    });
+
+    // Allow access if user is KamiounAdminMaster
+    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+
+    if (!isKamiounAdminMaster) {
+      if (!user.mRoleId) {
+        return NextResponse.json({ message: "No role found" }, { status: 403 });
+      }
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          roleId: user.mRoleId,
+        },
+        include: {
+          permission: true,
+        },
+      });
+
+      const canCreate = rolePermissions.some(
+        (rp) =>
+          rp.permission?.resource === "Partner" &&
+          rp.actions.includes("create"),
+      );
+
+      if (!canCreate) {
+        return NextResponse.json(
+          { message: "Forbidden: missing 'create' permission for Partner" },
+          { status: 403 },
+        );
+      }
+    }
+
+    // Get form data first before any other processing
+    const formData = await req.formData();
+
+    const existingData = await prisma.partner.findFirst();
+
+    if (!existingData) {
+      const existingPermission = await prisma.permission.findFirst({
+        where: {
+          resource: "Partner",
+        },
+      });
+
+      if (!existingPermission) {
+        await prisma.permission.create({
+          data: {
+            resource: "Partner",
+          },
+        });
+      }
     }
 
     // Validate required fields
