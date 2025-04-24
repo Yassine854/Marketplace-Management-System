@@ -68,37 +68,44 @@ export function useCreateProduct() {
         formData,
       );
 
-      if (response.status == 200) {
+      if (response.status == 200 || response.status == 201) {
         toast.success("Product created successfully!");
       }
 
       const productId = response.data.product.id;
 
-      const imageFormData = new FormData();
-      imageFormData.append("productId", productId);
-      images.forEach((image) => {
-        imageFormData.append("images", image);
-      });
-
-      await Promise.all([
+      // Create an array of promises for subcategories and related products
+      const promises = [
         ...productData.subCategories.map((subcategoryId) =>
           axios.post("/api/marketplace/product_subcategories/create", {
             productId,
             subcategoryId,
           }),
         ),
-
         ...productData.relatedProducts.map((relatedProductId) =>
           axios.post("/api/marketplace/related_products/create", {
             productId,
             relatedProductId,
           }),
         ),
+      ];
 
-        axios.post("/api/marketplace/image/create", imageFormData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        }),
-      ]);
+      // Only add image upload promise if there are images
+      if (images.length > 0) {
+        const imageFormData = new FormData();
+        imageFormData.append("productId", productId);
+        images.forEach((image) => {
+          imageFormData.append("images", image);
+        });
+
+        promises.push(
+          axios.post("/api/marketplace/image/create", imageFormData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          }),
+        );
+      }
+
+      await Promise.all(promises);
 
       if (response.status === 201 && response.data.product?.id) {
         onSuccess?.(response.data.product.id);

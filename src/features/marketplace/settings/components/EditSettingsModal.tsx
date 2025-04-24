@@ -227,13 +227,9 @@ const EditSettingModal = ({
             <div className="sm:col-span-2">
               <select
                 value={partnerId ?? ""}
-                onChange={(e) => setPartnerId(e.target.value)}
-                disabled={loadingPartners}
-                className="w-full rounded border border-gray-300 bg-gray-50 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={true} // Always disabled in edit mode
+                className="w-full cursor-not-allowed rounded border border-gray-300 bg-gray-100 p-2 text-sm focus:outline-none"
               >
-                <option value="" disabled>
-                  {loadingPartners ? "Loading partners..." : "Select partner"}
-                </option>
                 {partners.map((partner) => (
                   <option key={partner.id} value={partner.id}>
                     {partner.username}

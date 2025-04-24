@@ -980,10 +980,10 @@ const SupplierForm = () => {
                         >
                           <option value="0">Select a payment method</option>
                           <option value="CHEQUE">Cheque</option>
-                          <option value="ESPECES">Cash</option>
+                          <option value="cash">Cash</option>
                           <option value="TRAITE">Traite</option>
                         </select>
-                        {payment.type && payment.type !== "cash" && (
+                        {payment.type && (
                           <input
                             type="number"
                             value={payment.percentage}

@@ -10,12 +10,14 @@ export const useEditUser = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (user: any) => {
-      await axios.servicesClient.put("/api/users/editUser", user);
+      // Rename password to newPassword before sending
+      const { password, ...rest } = user;
+      const payload = password ? { ...rest, newPassword: password } : rest;
+      await axios.servicesClient.put("/api/users/editUser", payload);
     },
     onSuccess: () => {
       refetchAll();
       toast.success(`User Edited Successfully`, { duration: 5000 });
-
       navigateToUsersTable();
     },
     onError: () => {

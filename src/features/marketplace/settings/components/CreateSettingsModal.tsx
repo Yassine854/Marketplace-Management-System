@@ -82,8 +82,23 @@ const CreateSettingModal = ({
   useEffect(() => {
     const fetchPartners = async () => {
       try {
-        const response = await axios.get("/api/marketplace/partners/getAll");
-        setPartners(response.data.partners);
+        const [partnersResponse, settingsResponse] = await Promise.all([
+          axios.get("/api/marketplace/partners/getAll"),
+          axios.get("/api/marketplace/settings/getAll"),
+        ]);
+
+        const allPartners = partnersResponse.data.partners;
+        const existingSettings = settingsResponse.data.settings;
+
+        // Filter out partners that already have settings
+        const partnersWithSettings = new Set(
+          existingSettings.map((setting: Setting) => setting.partnerId),
+        );
+        const availablePartners = allPartners.filter(
+          (partner: { id: string }) => !partnersWithSettings.has(partner.id),
+        );
+
+        setPartners(availablePartners);
       } catch (error) {
         console.error("Error fetching partners:", error);
       } finally {

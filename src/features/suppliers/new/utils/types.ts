@@ -22,7 +22,6 @@ export type Supplier = {
 };
 export type Product = Partial<PrismaProduct> & {
   website_ids: number[];
-  skuPartner: string | null;
 };
 
 export interface ProductWithQuantities {
