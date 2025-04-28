@@ -30,7 +30,7 @@ export async function GET(
 
     // Get user's role
     const userRole = await prisma.role.findUnique({
-      where: { id: user.roleId },
+      where: { id: user.mRoleId },
     });
 
     // Allow access if user is KamiounAdminMaster
@@ -178,7 +178,7 @@ export async function PATCH(
       "coverageArea",
       "minimumAmount",
       "typePartnerId",
-      "roleId",
+      "mRoleId",
     ];
 
     const missingFields = requiredFields.filter(
@@ -319,7 +319,7 @@ export async function PATCH(
         coverageArea: formData.get("coverageArea") as string,
         minimumAmount: parseFloat(formData.get("minimumAmount") as string),
         typePartnerId: formData.get("typePartnerId") as string,
-        roleId: formData.get("roleId") as string,
+        mRoleId: formData.get("mRoleId") as string,
         isActive: formData.get("isActive") === "true",
         logo: logoUrl,
         patent: patentUrl,

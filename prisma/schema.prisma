@@ -46,6 +46,7 @@ model MilkRunAuditTrail {
 }
 model Log {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  incrementId String?
   type       String
   message    String
   context    Json?
@@ -315,8 +316,8 @@ model Partner {
   minimumAmount   Float    
   typePartner     TypePartner @relation(fields: [typePartnerId], references: [id])
   typePartnerId   String   @db.ObjectId   
-  roleId          String?
-  role            Role?     @relation(fields: [roleId], references: [id])
+  mRoleId          String?
+  role            Role?     @relation(fields: [mRoleId], references: [id])
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -341,42 +342,53 @@ model Agent {
   telephone String?
   address   String?
   password  String?
-  roleId    String?
+  mRoleId    String?
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
   orders   Order[]
+  role            Role?     @relation(fields: [mRoleId], references: [id])
+
   reservations Reservation[]
   @@map("agents")
 }
 
 model Customers {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  firstName String?
-  lastName  String?
-  governorate String?
-  gender String?
-  retailer_profile String?
-  email     String?   
-  telephone String?
-  address   String?
-  password  String?
-  roleId    String?
-  isActive  Boolean?  @default(true)
-  created_at DateTime? @default(now())
-  updated_at DateTime? @updatedAt
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName    String
+  lastName     String
+  governorate  String
+  gender       String
+  email        String    @unique
+  telephone    String
+  address      String
+  password     String
+  mRoleId       String?
+  isActive     Boolean?  @default(true)
+  created_at   DateTime? @default(now())
+  updated_at   DateTime? @updatedAt
 
-  favoriteProducts FavoriteProduct[]
-  favoritePartners FavoritePartner[]
-  orders   Order[]
-  reservations Reservation[]
-  notifications   NotifyMe[] 
+  // Champs business
+  socialName   String?
+  fiscalId     String
+  businessType String
+  activity1    String
+  activity2    String?
+  
+  // Nouveaux champs ajoutés
+  cinPhoto     String?   
+  patentPhoto  String?   
+  // Relations
+  favoriteProducts  FavoriteProduct[]
+  favoritePartners  FavoritePartner[]
+  orders            Order[]
+  reservations      Reservation[]
+  notifications     NotifyMe[]
+  role            Role?     @relation(fields: [mRoleId], references: [id])
+
   @@map("customers")
 }
-
-
-
 
 
 
@@ -768,6 +780,8 @@ model Role {
   name        String         @unique
   permissions RolePermission[]
   partners    Partner[]
+  agents      Agent[]
+  customers   Customers[]
   admins      User[]
 
 }

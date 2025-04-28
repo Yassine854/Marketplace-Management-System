@@ -106,7 +106,7 @@ const Sidebar = ({
                 path: "/marketplace/products/categories",
               },
               {
-                name: "Suppliers",
+                name: "Manufacturers",
                 path: "/marketplace/products/manufacturer/all",
               },
               { name: "Tax", path: "/marketplace/products/taxe/all" },

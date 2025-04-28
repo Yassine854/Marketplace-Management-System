@@ -259,6 +259,7 @@ const EditSettingModal = ({
                   </option>
                   <option value="Fixe">Fixe</option>
                   <option value="par KM">par KM</option>
+                  <option value="Weight">Weight</option>
                 </select>
               </div>
               <div>

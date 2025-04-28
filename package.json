@@ -107,6 +107,7 @@
     "nextjs13-progress": "^1.3.3",
     "npm": "^10.9.2",
     "pagination": "^0.4.6",
+    "papaparse": "^5.5.2",
     "postcss": "^8.4.31",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.3",

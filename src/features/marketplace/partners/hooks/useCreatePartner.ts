@@ -14,7 +14,7 @@ export function useCreatePartner() {
       telephone: string;
       address: string;
       password: string;
-      roleId: string;
+      mRoleId: string;
       responsibleName: string;
       position: string;
       coverageArea: string;
@@ -36,7 +36,7 @@ export function useCreatePartner() {
     formData.append("telephone", partnerData.telephone);
     formData.append("address", partnerData.address);
     formData.append("password", partnerData.password);
-    formData.append("roleId", partnerData.roleId);
+    formData.append("mRoleId", partnerData.mRoleId);
     formData.append("responsibleName", partnerData.responsibleName);
     formData.append("position", partnerData.position);
     formData.append("coverageArea", partnerData.coverageArea);

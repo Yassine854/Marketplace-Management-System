@@ -26,7 +26,7 @@ export async function GET(
 
     // Get user's role to check if they're KamiounAdminMaster
     const userRole = await prisma.role.findUnique({
-      where: { id: user.roleId },
+      where: { id: user.mRoleId },
     });
 
     // Allow access if user is KamiounAdminMaster
@@ -114,7 +114,7 @@ export async function PATCH(
 
     // Get user's role to check if they're KamiounAdminMaster
     const userRole = await prisma.role.findUnique({
-      where: { id: user.roleId },
+      where: { id: user.mRoleId },
     });
 
     // Allow access if user is KamiounAdminMaster
@@ -243,7 +243,7 @@ export async function DELETE(
 
     // Get user's role to check if they're KamiounAdminMaster
     const userRole = await prisma.role.findUnique({
-      where: { id: user.roleId },
+      where: { id: user.mRoleId },
     });
 
     // Allow access if user is KamiounAdminMaster

@@ -224,6 +224,9 @@ importers:
       pagination:
         specifier: ^0.4.6
         version: 0.4.6
+      papaparse:
+        specifier: ^5.5.2
+        version: 5.5.2
       postcss:
         specifier: ^8.4.31
         version: 8.4.31
@@ -9691,6 +9694,9 @@ packages:
 
   pako@1.0.11:
     resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
+
+  papaparse@5.5.2:
+    resolution: {integrity: sha512-PZXg8UuAc4PcVwLosEEDYjPyfWnTEhOrUfdv+3Bx+NuAb+5NhDmXzg5fHWmdCh1mP5p7JAZfFr3IMQfcntNAdA==}
 
   param-case@3.0.4:
     resolution: {integrity: sha512-RXlj7zCYokReqWpOPH9oYivUzLYZ5vAPIfEmCTNViosC78F8F0H9y7T7gG2M39ymgutxF5gcFEsyZQSph9Bp3A==}
@@ -24423,6 +24429,8 @@ snapshots:
   pagination@0.4.6: {}
 
   pako@1.0.11: {}
+
+  papaparse@5.5.2: {}
 
   param-case@3.0.4:
     dependencies:

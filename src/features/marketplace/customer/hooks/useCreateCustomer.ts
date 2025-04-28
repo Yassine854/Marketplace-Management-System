@@ -12,8 +12,13 @@ export function useCreateCustomer() {
 
     try {
       const formData = new FormData();
+
       Object.entries(customerData).forEach(([key, value]) => {
-        formData.append(key, value.toString());
+        if (value instanceof File) {
+          formData.append(key, value);
+        } else if (value !== undefined && value !== null) {
+          formData.append(key, value.toString());
+        }
       });
 
       const response = await axios.post(
@@ -30,8 +35,10 @@ export function useCreateCustomer() {
         return response.data.customer;
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to create customer");
-      throw err;
+      const errorMessage =
+        err.response?.data?.error || "Failed to create customer";
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
     }

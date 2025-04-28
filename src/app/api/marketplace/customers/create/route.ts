@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { auth } from "../../../../../services/auth";
+import { writeFile } from "fs/promises";
+import path from "path";
 
 const prisma = new PrismaClient();
 
@@ -78,6 +80,36 @@ export async function POST(req: Request) {
       }
     }
 
+    // Handle file uploads
+    const cinPhotoFile = formData.get("cinPhoto") as File | null;
+    const patentPhotoFile = formData.get("patentPhoto") as File | null;
+
+    let cinPhotoUrl = null;
+    let patentPhotoUrl = null;
+
+    if (cinPhotoFile) {
+      const bytes = await cinPhotoFile.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      // Create unique filename
+      const filename = `${Date.now()}-${cinPhotoFile.name}`;
+      const filepath = path.join(process.cwd(), "public", "uploads", filename);
+
+      await writeFile(filepath, buffer);
+      cinPhotoUrl = `/uploads/${filename}`;
+    }
+
+    if (patentPhotoFile) {
+      const bytes = await patentPhotoFile.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const filename = `${Date.now()}-${patentPhotoFile.name}`;
+      const filepath = path.join(process.cwd(), "public", "uploads", filename);
+
+      await writeFile(filepath, buffer);
+      patentPhotoUrl = `/uploads/${filename}`;
+    }
+
     const customerData = {
       firstName: formData.get("firstName") as string,
       lastName: formData.get("lastName") as string,
@@ -85,10 +117,17 @@ export async function POST(req: Request) {
       telephone: formData.get("telephone") as string,
       address: formData.get("address") as string,
       governorate: formData.get("governorate") as string,
-      gender: formData.get("gender")
-        ? (formData.get("gender") as string)
-        : null,
+      gender: (formData.get("gender") as string).trim(),
       password: await hash(formData.get("password") as string, 10),
+      socialName: (formData.get("socialName") as string) || null,
+      fiscalId: formData.get("fiscalId") as string,
+      businessType: formData.get("businessType") as string,
+      activity1: formData.get("activity1") as string,
+      activity2: (formData.get("activity2") as string) || null,
+      cinPhoto: cinPhotoUrl,
+      patentPhoto: patentPhotoUrl,
+      isActive: true,
+      mRoleId: (formData.get("mRoleId") as string) || null,
     };
 
     const existingCustomer = await prisma.customers.findFirst({
@@ -106,12 +145,7 @@ export async function POST(req: Request) {
       data: customerData,
     });
 
-    return new NextResponse(JSON.stringify({ customer: newCustomer }), {
-      status: 201,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+    return NextResponse.json({ customer: newCustomer }, { status: 201 });
   } catch (error) {
     console.error("Creation error:", error);
     return NextResponse.json(

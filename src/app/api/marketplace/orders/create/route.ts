@@ -23,7 +23,7 @@ export async function POST(req: Request) {
 
     // Get user's role to check if they're KamiounAdminMaster
     const userRole = await prisma.role.findUnique({
-      where: { id: user.roleId },
+      where: { id: user.mRoleId },
     });
 
     // Allow access if user is KamiounAdminMaster

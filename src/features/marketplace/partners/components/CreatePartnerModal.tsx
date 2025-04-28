@@ -12,7 +12,7 @@ interface CreatePartnerModalProps {
     telephone: string;
     address: string;
     password: string;
-    roleId: string;
+    mRoleId: string;
     logo?: File;
     patent?: File;
     responsibleName: string;
@@ -40,7 +40,7 @@ const CreatePartnerModal = ({
     telephone: "",
     address: "",
     password: "",
-    roleId: "",
+    mRoleId: "",
     logo: undefined as File | undefined, // Allow File or undefined
     patent: undefined as File | undefined, // Allow File or undefined
     responsibleName: "",
@@ -78,7 +78,7 @@ const CreatePartnerModal = ({
       telephone: "",
       address: "",
       password: "",
-      roleId: "",
+      mRoleId: "",
       logo: undefined, // Reset to undefined
       patent: undefined, // Reset to undefined
       responsibleName: "",
@@ -343,9 +343,9 @@ const CreatePartnerModal = ({
                   Role *
                 </label>
                 <select
-                  value={formData.roleId}
+                  value={formData.mRoleId}
                   onChange={(e) =>
-                    setFormData({ ...formData, roleId: e.target.value })
+                    setFormData({ ...formData, mRoleId: e.target.value })
                   }
                   className="w-full rounded-lg border p-3"
                   required

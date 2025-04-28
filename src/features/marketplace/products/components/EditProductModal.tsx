@@ -573,7 +573,7 @@ const EditProductModal = ({
                 className="block text-sm font-medium text-gray-700"
                 htmlFor="supplier-select"
               >
-                Supplier
+                Manufacturer
               </label>
               <select
                 id="supplier-select"
@@ -583,7 +583,7 @@ const EditProductModal = ({
                 }
                 className="w-full rounded-lg border p-3"
               >
-                <option value="">Select Supplier</option>
+                <option value="">Select Manufacturer</option>
                 {suppliers.map((supplier) => (
                   <option key={supplier.id} value={supplier.id}>
                     {supplier.companyName}

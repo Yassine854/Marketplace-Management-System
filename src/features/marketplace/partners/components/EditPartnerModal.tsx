@@ -13,7 +13,7 @@ interface EditPartnerModalProps {
     telephone: string;
     address: string;
     password: string;
-    roleId: string;
+    mRoleId: string;
     logo?: File;
     patent?: File;
     responsibleName: string;
@@ -43,7 +43,7 @@ const EditPartnerModal = ({
     telephone: partner.telephone,
     address: partner.address,
     password: partner.password,
-    roleId: partner.roleId,
+    mRoleId: partner.mRoleId,
     logo: undefined as File | undefined,
     patent: undefined as File | undefined,
     responsibleName: partner.responsibleName,
@@ -67,7 +67,7 @@ const EditPartnerModal = ({
       !formData.coverageArea.trim() ||
       formData.minimumAmount <= 0 ||
       !formData.typePartnerId.trim() ||
-      !formData.roleId.trim()
+      !formData.mRoleId.trim()
     ) {
       toast.error("Please fill in required fields");
       return;
@@ -348,9 +348,9 @@ const EditPartnerModal = ({
                   Role *
                 </label>
                 <select
-                  value={formData.roleId}
+                  value={formData.mRoleId}
                   onChange={(e) =>
-                    setFormData({ ...formData, roleId: e.target.value })
+                    setFormData({ ...formData, mRoleId: e.target.value })
                   }
                   className="w-full rounded-lg border p-3"
                   required

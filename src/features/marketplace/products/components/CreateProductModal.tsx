@@ -1,6 +1,47 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
+interface Product {
+  id: string;
+  name: string;
+  barcode: string;
+  sku: string;
+  price: number;
+  cost?: number;
+  stock?: number;
+  description?: string;
+  pcb?: string;
+  weight?: number;
+  minimumQte?: number;
+  maximumQte?: number;
+  sealable?: number;
+  alertQte?: number;
+  loyaltyPointsPerProduct?: number;
+  loyaltyPointsPerUnit?: number;
+  loyaltyPointsBonusQuantity?: number;
+  loyaltyPointsThresholdQty?: number;
+  supplierId?: string;
+  productTypeId?: string;
+  typePcbId?: string;
+  productStatusId?: string;
+  taxId?: string;
+  promotionId?: string;
+  productSubCategories?: Array<{
+    subcategoryId: string;
+    subcategory: {
+      id: string;
+      name: string;
+    };
+  }>;
+  relatedProducts?: Array<{
+    relatedProductId: string;
+    relatedProduct: {
+      id: string;
+      name: string;
+    };
+  }>;
+}
+
 interface CreateProductModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -84,6 +125,10 @@ const CreateProductModal = ({
     images: [] as File[],
   });
 
+  const [skuSearch, setSkuSearch] = useState("");
+  const [matchingProducts, setMatchingProducts] = useState<Product[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
   useEffect(() => {
     if (!isOpen) {
       setFormState({
@@ -118,6 +163,35 @@ const CreateProductModal = ({
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    const searchProducts = async () => {
+      if (!skuSearch.trim()) {
+        setMatchingProducts([]);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const response = await fetch("/api/marketplace/products/getAll");
+        const data = await response.json();
+
+        const matches = data.products.filter((product: Product) =>
+          product.sku.toLowerCase().includes(skuSearch.toLowerCase()),
+        );
+
+        setMatchingProducts(matches);
+      } catch (error) {
+        console.error("Error searching products:", error);
+        toast.error("Failed to search products");
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(searchProducts, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [skuSearch]);
+
   const handleInputChange = (field: string, value: any) => {
     setFormState((prev) => ({
       ...prev,
@@ -129,6 +203,100 @@ const CreateProductModal = ({
     if (e.target.files) {
       handleInputChange("images", Array.from(e.target.files));
     }
+  };
+
+  const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const csvText = event.target?.result as string;
+      const lines = csvText.split("\n");
+      if (lines.length < 2) return; // Need at least header and one data row
+
+      const headers = lines[0].split(",").map((h) => h.trim());
+      const values = lines[1].split(",").map((v) => v.trim());
+
+      // Create a mapping of values
+      const data = headers.reduce(
+        (acc, header, index) => {
+          acc[header] = values[index];
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
+
+      // Update form state based on CSV data
+      setFormState((prev) => ({
+        ...prev,
+        name: data["name"] || prev.name,
+        barcode: data["barcode"] || prev.barcode,
+        sku: data["sku"] || prev.sku,
+        price: Number(data["price"]) || prev.price,
+        cost: Number(data["cost"]) || prev.cost,
+        stock: Number(data["stock"]) || prev.stock,
+        description: data["description"] || prev.description,
+        pcb: data["pcb"] || prev.pcb,
+        weight: Number(data["weight"]) || prev.weight,
+        minimumQte: Number(data["minimumQte"]) || prev.minimumQte,
+        maximumQte: Number(data["maximumQte"]) || prev.maximumQte,
+        sealable: Number(data["sealable"]) || prev.sealable,
+        alertQte: Number(data["alertQte"]) || prev.alertQte,
+        loyaltyPointsPerProduct:
+          Number(data["loyaltyPointsPerProduct"]) ||
+          prev.loyaltyPointsPerProduct,
+        loyaltyPointsPerUnit:
+          Number(data["loyaltyPointsPerUnit"]) || prev.loyaltyPointsPerUnit,
+        loyaltyPointsBonusQuantity:
+          Number(data["loyaltyPointsBonusQuantity"]) ||
+          prev.loyaltyPointsBonusQuantity,
+        loyaltyPointsThresholdQty:
+          Number(data["loyaltyPointsThresholdQty"]) ||
+          prev.loyaltyPointsThresholdQty,
+      }));
+    };
+
+    reader.readAsText(file);
+  };
+
+  const handleProductSelect = (product: Product) => {
+    setFormState({
+      ...formState,
+      name: product.name,
+      barcode: product.barcode,
+      sku: product.sku,
+      price: product.price,
+      cost: product.cost,
+      stock: product.stock,
+      description: product.description || "",
+      pcb: product.pcb || "",
+      weight: product.weight,
+      minimumQte: product.minimumQte,
+      maximumQte: product.maximumQte,
+      sealable: product.sealable,
+      alertQte: product.alertQte,
+      loyaltyPointsPerProduct: product.loyaltyPointsPerProduct,
+      loyaltyPointsPerUnit: product.loyaltyPointsPerUnit,
+      loyaltyPointsBonusQuantity: product.loyaltyPointsBonusQuantity,
+      loyaltyPointsThresholdQty: product.loyaltyPointsThresholdQty,
+      supplierId: product.supplierId || "",
+      productTypeId: product.productTypeId || "",
+      typePcbId: product.typePcbId || "",
+      productStatusId: product.productStatusId || "",
+      taxId: product.taxId || "",
+      promotionId: product.promotionId || "",
+      // Extract subcategory IDs from productSubCategories array
+      subCategories: product.productSubCategories
+        ? product.productSubCategories.map((psc) => psc.subcategoryId)
+        : [],
+      // Extract related product IDs from relatedProducts array
+      relatedProducts: product.relatedProducts
+        ? product.relatedProducts.map((rp) => rp.relatedProductId)
+        : [],
+    });
+    setSkuSearch("");
+    setMatchingProducts([]);
   };
 
   const handleSubmit = async () => {
@@ -205,6 +373,48 @@ const CreateProductModal = ({
         </h2>
 
         <div className="grid grid-cols-1 gap-6 divide-y divide-gray-200 md:grid-cols-2">
+          {/* CSV Upload */}
+          <div className="mb-6 md:col-span-2">
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleCsvUpload}
+                className="rounded-lg border p-3"
+              />
+              <span className="text-sm text-gray-500">
+                Upload CSV to auto-fill fields
+              </span>
+            </div>
+          </div>
+          {/* SKU Search */}
+          <div className="mb-6 md:col-span-2">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search by SKU..."
+                value={skuSearch}
+                onChange={(e) => setSkuSearch(e.target.value)}
+                className="w-full rounded-lg border p-3"
+              />
+              {isSearching && (
+                <span className="absolute right-3 top-3">Loading...</span>
+              )}
+              {matchingProducts.length > 0 && (
+                <div className="absolute z-10 mt-1 w-full rounded-lg border bg-white shadow-lg">
+                  {matchingProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      className="cursor-pointer p-3 hover:bg-gray-100"
+                      onClick={() => handleProductSelect(product)}
+                    >
+                      {product.sku} - {product.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
           {/* Basic Information */}
           <div className="space-y-4 pb-6 md:col-span-2">
             <h3 className="text-xl font-semibold text-primary">
@@ -397,7 +607,7 @@ const CreateProductModal = ({
               onChange={(e) => handleInputChange("supplierId", e.target.value)}
               className="w-full rounded-lg border p-3"
             >
-              <option value="">Select Supplier</option>
+              <option value="">Select Manufacturer</option>
               {suppliers.map((supplier) => (
                 <option key={supplier.id} value={supplier.id}>
                   {supplier.companyName}

@@ -50,13 +50,13 @@ const CustomerPage = () => {
     result = result.sort((a, b) => {
       if (sortState === "newest") {
         return (
-          new Date(b.createdAt || 0).getTime() -
-          new Date(a.createdAt || 0).getTime()
+          new Date(b.created_at || 0).getTime() -
+          new Date(a.created_at || 0).getTime()
         );
       } else {
         return (
-          new Date(a.createdAt || 0).getTime() -
-          new Date(b.createdAt || 0).getTime()
+          new Date(a.created_at || 0).getTime() -
+          new Date(b.created_at || 0).getTime()
         );
       }
     });
@@ -68,9 +68,9 @@ const CustomerPage = () => {
     setCurrentPage(1);
   }, [itemsPerPage, searchTerm]);
 
-  const handleEdit = async (id: string, updatedCustomer: Customer) => {
+  const handleEdit = async (id: string, formData: FormData) => {
     try {
-      const result = await editCustomer(id, updatedCustomer);
+      const result = await editCustomer(id, formData);
       if (result) {
         await refetch();
         setIsEditModalOpen(false);
@@ -228,9 +228,7 @@ const CustomerPage = () => {
           <EditCustomerModal
             isOpen={isEditModalOpen}
             onClose={() => setIsEditModalOpen(false)}
-            onEdit={async (id, updatedCustomer) => {
-              await handleEdit(id, updatedCustomer);
-            }}
+            onEdit={handleEdit}
             customer={selectedCustomer}
             isLoading={isLoading}
             error={error}

@@ -7,7 +7,7 @@ export interface Partner {
   telephone: string;
   address: string;
   password: string;
-  roleId: string;
+  mRoleId: string;
   isActive: boolean;
   logo?: any;
   patent?: any;

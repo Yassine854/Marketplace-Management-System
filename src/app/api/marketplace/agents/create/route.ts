@@ -110,7 +110,7 @@ export async function POST(req: Request) {
         telephone: body.telephone,
         address: body.address,
         password: hashedPassword, // Store hashed password
-        roleId: body.roleId,
+        mRoleId: body.mRoleId,
         isActive: body.isActive ?? true, // Default to true if not provided
       },
     });

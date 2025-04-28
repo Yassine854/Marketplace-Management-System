@@ -6,52 +6,42 @@ export function useCustomersActions() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const editCustomer = async (
-    id: string,
-    updatedCustomer: Partial<Customer>,
-  ) => {
+
+  const editCustomer = async (id: string, formData: FormData) => {
     setIsLoading(true);
     setError(null);
     setSuccessMessage(null);
 
     try {
-      if (
-        !updatedCustomer.email ||
-        !updatedCustomer.firstName ||
-        !updatedCustomer.lastName
-      ) {
-        throw new Error("Missing required fields");
-      }
+      // Validate required fields from FormData
+      const firstName = formData.get("firstName");
+      const lastName = formData.get("lastName");
+      const email = formData.get("email");
 
-      const formData = new FormData();
-      formData.append("firstName", String(updatedCustomer.firstName));
-      formData.append("lastName", String(updatedCustomer.lastName));
-      formData.append("email", String(updatedCustomer.email));
-      if (updatedCustomer.telephone)
-        formData.append("telephone", updatedCustomer.telephone);
-      if (updatedCustomer.address)
-        formData.append("address", String(updatedCustomer.address));
-      if (updatedCustomer.governorate)
-        formData.append("governorate", String(updatedCustomer.governorate));
-      if (updatedCustomer.password?.trim()) {
-        formData.append("password", updatedCustomer.password.trim());
+      if (!firstName || !lastName || !email) {
+        throw new Error("Missing required fields");
       }
 
       const response = await axios.patch(
         `/api/marketplace/customers/${id}`,
         formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
       );
 
       if (response.status === 200) {
         setSuccessMessage("Customer updated successfully!");
-        return true; // ✅ Changement ici
+        return true;
       } else {
         return false;
       }
     } catch (err: AxiosError | any) {
       console.error("Error editing customer:", err);
       setError(err.response?.data?.error || "Failed to edit customer");
-      return false; // ✅ retourne false en cas d’erreur
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +50,7 @@ export function useCustomersActions() {
   const deleteCustomer = async (id: string) => {
     setIsLoading(true);
     setError(null);
-    setSuccessMessage(null); // Reset success message before request
+    setSuccessMessage(null);
     try {
       const response = await axios.delete(`/api/marketplace/customers/${id}`);
       if (response.status === 200) {

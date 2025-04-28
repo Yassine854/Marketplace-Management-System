@@ -25,6 +25,10 @@ export default function RoleTable({
   const handleDelete = (id: string) => {
     deleteRole(id).then(() => refetch());
   };
+
+  const isKamiounAdminMaster = (roleName: string) =>
+    roleName === "KamiounAdminMaster";
+
   return (
     <div style={{ overflowX: "auto" }}>
       <div
@@ -95,18 +99,26 @@ export default function RoleTable({
                     {role.name}
                   </td>
                   <td className="px-4 py-2 text-center">
-                    <button
-                      onClick={() => onEdit(role)}
-                      className="mx-2 text-blue-500 hover:text-blue-700"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(role.id)}
-                      className="mx-2 text-red-500 hover:text-red-700"
-                    >
-                      <FaTrash />
-                    </button>
+                    {!isKamiounAdminMaster(role.name) ? (
+                      <>
+                        <button
+                          onClick={() => onEdit(role)}
+                          className="mx-2 text-blue-500 hover:text-blue-700"
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(role.id)}
+                          className="mx-2 text-red-500 hover:text-red-700"
+                        >
+                          <FaTrash />
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-sm text-gray-500">
+                        Protected Role
+                      </span>
+                    )}
                   </td>
                 </tr>
               ))}
