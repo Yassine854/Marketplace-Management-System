@@ -46,7 +46,7 @@ export default function TypePartnerTable({
   return (
     <div style={{ overflowX: "auto" }}>
       <div
-        className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+        className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3"
         style={{ maxHeight: "600px" }}
       >
         <table
@@ -55,15 +55,15 @@ export default function TypePartnerTable({
           cellSpacing={0}
           style={{ width: "100%" }}
         >
-          <thead className="border-b border-gray-100 bg-gray-50">
+          <thead className="border-b border-gray-100 bg-primary">
             <tr>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-primary">
                 ID
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-primary">
                 Name
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-primary">
                 Actions
               </th>
             </tr>

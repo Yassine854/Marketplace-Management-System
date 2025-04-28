@@ -174,9 +174,9 @@ const PromotionManagementPage = () => {
         }}
       >
         <div className="relative grid h-full w-full items-center justify-center gap-4">
-          <div className="box w-full min-w-[800px] xl:p-8">
+          <div className="box w-full min-w-[1500px] xl:p-8">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
-              <p className="ml-4 mt-6 text-xl font-bold">
+              <p className="ml-4 mt-6 text-3xl font-bold text-primary">
                 Promotion Management
               </p>
               <div className="mt-6 flex items-center gap-4">
@@ -184,7 +184,7 @@ const PromotionManagementPage = () => {
                   onClick={() =>
                     router.push("/marketplace/products/promotion/new")
                   }
-                  className="mr-4 flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"
+                  className="btn"
                   title="New Promotion"
                 >
                   <svg
@@ -222,7 +222,7 @@ const PromotionManagementPage = () => {
             </div>
 
             <div
-              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3"
               style={{ maxHeight: "600px", width: "100%" }}
             >
               <PromotionTable

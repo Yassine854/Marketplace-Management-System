@@ -6,11 +6,11 @@ const prisma = new PrismaClient();
 
 export async function GET(req: Request) {
   try {
-    const session = await auth();
+    /*  const session = await auth();
 
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    }*/
 
     const roles = await prisma.role.findMany({
       include: {

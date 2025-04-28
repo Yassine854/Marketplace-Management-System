@@ -1,14 +1,14 @@
 const TaxTableHead = () => {
   return (
-    <thead className="border-b border-gray-100 bg-gray-50">
+    <thead className="sticky top-0 z-10 border-b border-gray-100 bg-primary">
       <tr>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           ID
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           Value
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           Actions
         </th>
       </tr>

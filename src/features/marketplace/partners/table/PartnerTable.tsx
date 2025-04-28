@@ -22,25 +22,25 @@ export default function PartnerTable({
   return (
     <div style={{ overflowX: "auto" }}>
       <div
-        className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+        className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3"
         style={{ maxHeight: "600px" }}
       >
         <table className="w-full">
-          <thead className="border-b border-gray-100 bg-gray-50">
+          <thead className="border-b border-gray-100 bg-primary">
             <tr>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 ID
               </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 Username
               </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 Email
               </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 Responsible
               </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 Actions
               </th>
             </tr>

@@ -54,18 +54,18 @@ export default function StatusTable({
           cellSpacing={0}
           style={{ width: "100%" }}
         >
-          <thead className="border-b border-gray-100 bg-gray-50">
+          <thead className="border-b border-gray-100 bg-primary">
             <tr>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 ID
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 Name
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 State ID
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 Actions
               </th>
             </tr>

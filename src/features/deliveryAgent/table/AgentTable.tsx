@@ -48,28 +48,28 @@ export default function AgentTable({
           cellSpacing={0}
           style={{ width: "100%" }}
         >
-          <thead className="border-b border-gray-100 bg-gray-50">
+          <thead className="border-b border-gray-100 bg-primary">
             <tr>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 firstname
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 lastname
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 username
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 email
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 telephone
               </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 address
               </th>
 
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 Actions
               </th>
             </tr>

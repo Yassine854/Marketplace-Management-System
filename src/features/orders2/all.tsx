@@ -263,7 +263,9 @@ const OrderManagementPage = () => {
         <div className="relative grid h-full w-full items-center justify-center gap-4">
           <div className="box w-full min-w-[800px] xl:p-14">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
-              <p className="ml-4 mt-6 text-xl font-bold">Order Management</p>
+              <p className="ml-4 mt-6 text-3xl font-bold text-primary">
+                Order Management
+              </p>
             </div>
 
             <div className="mb-5 space-y-4">
@@ -320,7 +322,7 @@ const OrderManagementPage = () => {
               />
             )}
 
-            <div className="box mb-5 mt-5 flex max-h-[600px] w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3">
+            <div className="box mb-5 mt-5 flex max-h-[600px] w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3">
               <OrderTable
                 data={orders}
                 loading={loading}

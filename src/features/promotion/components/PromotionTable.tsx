@@ -40,7 +40,7 @@ const PromoTable = ({
 
   return (
     <div className="w-full overflow-x-auto">
-      <table className="w-full">
+      <table className="w-full p-0">
         <PromoTableHead />
         <tbody className="divide-y divide-gray-100">
           {loading ? (

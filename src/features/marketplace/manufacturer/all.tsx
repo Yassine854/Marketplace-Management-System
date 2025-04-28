@@ -173,13 +173,13 @@ const ManufacturerManagementPage = () => {
         <div className="relative grid h-full w-full items-center justify-center gap-4">
           <div className="box w-full min-w-[800px] xl:p-8">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
-              <p className="ml-4 mt-6 text-xl font-bold">
-                Manufacturer Management
+              <p className="ml-4 mt-6 text-3xl font-bold text-primary">
+                Supplier Management
               </p>
               <div className="mt-6 flex items-center gap-4">
                 <button
                   onClick={() => router.push("/manufacturer/new")}
-                  className="mr-4 flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"
+                  className="btn"
                   title="New Manufacturer"
                 >
                   <svg
@@ -196,7 +196,7 @@ const ManufacturerManagementPage = () => {
                     <path d="M12 5l0 14" />
                     <path d="M5 12l14 0" />
                   </svg>
-                  <span className="hidden md:inline">New Manufacturer</span>
+                  <span className="hidden md:inline">New Supplier</span>
                 </button>
               </div>
             </div>
@@ -205,7 +205,7 @@ const ManufacturerManagementPage = () => {
               <div className="relative flex w-full gap-2 sm:w-auto sm:min-w-[200px] sm:flex-1">
                 <input
                   type="text"
-                  placeholder="Search Manufacturers..."
+                  placeholder="Search Suppliers..."
                   className="w-[400px] rounded-lg border p-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -217,7 +217,7 @@ const ManufacturerManagementPage = () => {
             </div>
 
             <div
-              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3"
               style={{ maxHeight: "600px", width: "100%" }}
             >
               <ManufacturerTable

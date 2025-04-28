@@ -95,7 +95,7 @@ const SettingsPage = () => {
         }}
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xl font-bold capitalize">Settings</p>
+          <p className="text-3xl font-bold capitalize text-primary">Settings</p>
 
           <div className="flex flex-wrap gap-2 sm:items-center sm:justify-end sm:justify-between">
             <div className="relative m-4 w-full sm:w-auto sm:min-w-[200px] sm:flex-1">

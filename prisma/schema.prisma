@@ -44,6 +44,7 @@ model MilkRunAuditTrail {
 }
 model Log {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  incrementId String?
   type       String
   message    String
   context    Json?
@@ -773,6 +774,7 @@ model RolePermission {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
   roleId       String
   permissionId String
+  actions String[]
   role         Role       @relation(fields: [roleId], references: [id],onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id],onDelete: Cascade)
   @@unique([roleId, permissionId])
