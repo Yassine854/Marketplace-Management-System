@@ -63,6 +63,14 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
+    // Validate required type field
+    if (!body.type?.trim()) {
+      return NextResponse.json(
+        { message: "Product type name is required" },
+        { status: 400 },
+      );
+    }
+
     const existingData = await prisma.productType.findFirst();
 
     if (!existingData) {
@@ -83,7 +91,7 @@ export async function POST(req: Request) {
 
     // Check if the product type already exists
     const existingProductType = await prisma.productType.findUnique({
-      where: { type: body.type },
+      where: { type: body.type.trim() },
     });
 
     if (existingProductType) {
@@ -96,7 +104,7 @@ export async function POST(req: Request) {
     // Create the new ProductType
     const newProductType = await prisma.productType.create({
       data: {
-        type: body.type,
+        type: body.type.trim(),
       },
     });
 

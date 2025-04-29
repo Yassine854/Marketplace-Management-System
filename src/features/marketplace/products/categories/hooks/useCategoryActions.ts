@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { axios } from "@/libs/axios";
 import { Category } from "@/types/category";
+import { toast } from "react-hot-toast";
 
 export function useCategoryActions() {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +55,10 @@ export function useCategoryActions() {
         return response.data.message;
       }
     } catch (err: any) {
-      setError("Failed to delete category");
+      const errorMessage =
+        err.response?.data?.message || "Failed to delete category";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error deleting category:", err);
     } finally {
       setIsLoading(false);

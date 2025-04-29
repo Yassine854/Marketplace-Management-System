@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export interface ProductType {
   id: string;
@@ -46,7 +47,10 @@ export function useProductTypeActions() {
         return response.data.message;
       }
     } catch (err: any) {
-      setError("Failed to delete product type");
+      const errorMessage =
+        err.response?.data?.message || "Failed to delete product type";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error deleting product type:", err);
     } finally {
       setIsLoading(false);

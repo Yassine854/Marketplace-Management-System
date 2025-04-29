@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 interface TypePartner {
   id: string;
@@ -45,7 +46,10 @@ export function useTypePartnerActions() {
         return response.data.message;
       }
     } catch (err: any) {
-      setError("Failed to delete type partner");
+      const errorMessage =
+        err.response?.data?.message || "Failed to delete type partner";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error deleting type partner:", err);
     } finally {
       setIsLoading(false);

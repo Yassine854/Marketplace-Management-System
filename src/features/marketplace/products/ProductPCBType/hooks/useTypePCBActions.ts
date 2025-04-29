@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export interface TypePcb {
   id: string;
@@ -40,7 +41,10 @@ export function useTypePcbActions() {
         return response.data.message;
       }
     } catch (err: any) {
-      setError("Failed to delete PCB type");
+      const errorMessage =
+        err.response?.data?.message || "Failed to delete PCB type";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error deleting PCB type:", err);
     } finally {
       setIsLoading(false);

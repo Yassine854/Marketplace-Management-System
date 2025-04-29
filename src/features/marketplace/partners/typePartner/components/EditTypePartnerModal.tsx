@@ -37,6 +37,7 @@ const EditTypePartnerModal: React.FC<EditTypePartnerModalProps> = ({
           className="mb-4 w-full rounded border p-2"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          required
         />
         <div className="flex justify-end space-x-2">
           <button className="rounded bg-gray-300 px-4 py-2" onClick={onClose}>

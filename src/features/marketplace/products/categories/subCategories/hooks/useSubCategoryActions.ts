@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { axios } from "@/libs/axios";
 import { SubCategory } from "@/types/subCategory";
+import { toast } from "react-hot-toast";
 
 export function useSubCategoryActions() {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +55,10 @@ export function useSubCategoryActions() {
         return response.data.message;
       }
     } catch (err: any) {
-      setError("Failed to delete subcategory");
+      const errorMessage =
+        err.response?.data?.message || "Failed to delete subcategory";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error deleting subcategory:", err);
     } finally {
       setIsLoading(false);

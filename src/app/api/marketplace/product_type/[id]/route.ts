@@ -85,7 +85,7 @@ export async function GET(
 }
 
 // PUT: Update a ProductType
-export async function PUT(
+export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
 ) {

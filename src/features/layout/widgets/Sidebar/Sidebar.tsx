@@ -267,6 +267,7 @@ const Sidebar = ({
                   { name: "Users", path: "/access/users" },
                   { name: "Roles", path: "/marketplace/roles" },
                   { name: "Permissions", path: "/marketplace/permissions" },
+                  { name: "RBAC", path: "/marketplace/role-permissions" },
 
                   { name: "Logs", path: "/access/logs" },
                 ]}

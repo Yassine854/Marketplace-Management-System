@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Role } from "@/types/role";
 import { Permission } from "@/types/permission";
 import { toast } from "react-hot-toast";
-import { FiCheck, FiX } from "react-icons/fi";
+import { FiCheck, FiX, FiSave } from "react-icons/fi";
 
 interface RolePermission {
   id: string;
@@ -15,14 +15,25 @@ interface RolePermission {
   permission: Permission;
 }
 
+interface SelectedPermission {
+  roleId: string;
+  permissionId: string;
+  action: string;
+  currentState: boolean;
+}
+
 export default function RolePermissionMatrix() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [rolePermissions, setRolePermissions] = useState<RolePermission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPermissions, setSelectedPermissions] = useState<
+    SelectedPermission[]
+  >([]);
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
 
-  const availableActions = ["create", "read", "update", "delete"];
+  const availableActions: string[] = ["create", "read", "update", "delete"];
 
   useEffect(() => {
     fetchData();
@@ -66,7 +77,11 @@ export default function RolePermissionMatrix() {
       let newActions: string[];
       let method: string;
       let url: string;
-      let body: any;
+      let body: {
+        roleId: string;
+        permissionId: string;
+        actions: string[];
+      };
 
       if (existingRolePermission) {
         newActions = existingRolePermission.actions.includes(action)
@@ -107,6 +122,126 @@ export default function RolePermissionMatrix() {
     }
   };
 
+  const handleCheckboxClick = (
+    roleId: string,
+    permissionId: string,
+    action: string,
+    currentState: boolean,
+    event: React.MouseEvent,
+  ) => {
+    event.preventDefault(); // Prevent default checkbox behavior
+
+    if (isSelectionMode) {
+      const selectionKey = `${roleId}-${permissionId}-${action}`;
+      const existingIndex = selectedPermissions.findIndex(
+        (p) =>
+          p.roleId === roleId &&
+          p.permissionId === permissionId &&
+          p.action === action,
+      );
+
+      if (existingIndex >= 0) {
+        setSelectedPermissions((prev) =>
+          prev.filter((_, index) => index !== existingIndex),
+        );
+      } else {
+        setSelectedPermissions((prev) => [
+          ...prev,
+          {
+            roleId,
+            permissionId,
+            action,
+            currentState,
+          },
+        ]);
+      }
+    } else {
+      handleActionToggle(
+        roleId,
+        permissionId,
+        action,
+        getRolePermission(roleId, permissionId),
+      );
+    }
+  };
+
+  interface GroupedSelection {
+    roleId: string;
+    permissionId: string;
+    actions: string[];
+    currentState: boolean;
+    existingRolePermission: RolePermission | undefined;
+  }
+
+  const handleBatchSave = async () => {
+    try {
+      const groupedSelections = selectedPermissions.reduce<
+        Record<string, GroupedSelection>
+      >((acc, selection) => {
+        const key = `${selection.roleId}-${selection.permissionId}`;
+        if (!acc[key]) {
+          acc[key] = {
+            roleId: selection.roleId,
+            permissionId: selection.permissionId,
+            actions: [],
+            currentState: selection.currentState,
+            existingRolePermission: getRolePermission(
+              selection.roleId,
+              selection.permissionId,
+            ),
+          };
+        }
+        acc[key].actions.push(selection.action);
+        return acc;
+      }, {});
+
+      const promises = Object.values(groupedSelections).map((group) => {
+        const { roleId, permissionId, actions, existingRolePermission } = group;
+        let method: string;
+        let url: string;
+        let newActions: string[];
+
+        if (existingRolePermission) {
+          const currentActions = new Set(existingRolePermission.actions);
+          actions.forEach((action: string) => {
+            if (currentActions.has(action)) {
+              currentActions.delete(action);
+            } else {
+              currentActions.add(action);
+            }
+          });
+          newActions = Array.from(currentActions);
+
+          method = "PATCH";
+          url = `/api/marketplace/role_permissions/${existingRolePermission.id}`;
+        } else {
+          newActions = actions;
+          method = "POST";
+          url = "/api/marketplace/role_permissions/create";
+        }
+
+        return fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            roleId,
+            permissionId,
+            actions: newActions,
+          }),
+        });
+      });
+
+      await Promise.all(promises);
+      await fetchData();
+      setSelectedPermissions([]);
+      setIsSelectionMode(false);
+      toast.success("Batch permissions update successful");
+    } catch (err) {
+      toast.error("Failed to update batch permissions");
+      console.error(err);
+    }
+  };
+
   if (isLoading)
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -124,34 +259,71 @@ export default function RolePermissionMatrix() {
 
   return (
     <div className="p-6">
-      <div className="overflow-x-auto rounded-xl border border-gray-100 bg-white shadow-xl">
+      <div className="mb-6 flex justify-between">
+        <button
+          onClick={() => {
+            setIsSelectionMode(!isSelectionMode);
+            setSelectedPermissions([]);
+          }}
+          className={`flex items-center gap-2 rounded-lg px-4 py-2.5 font-medium transition-all duration-200 ${
+            isSelectionMode
+              ? "bg-red-500 text-white hover:bg-red-600"
+              : "bg-blue-500 text-white hover:bg-blue-600"
+          }`}
+        >
+          {isSelectionMode ? (
+            <>
+              <FiX className="h-4 w-4" />
+              Cancel Bulk Edit
+            </>
+          ) : (
+            <>
+              <FiCheck className="h-4 w-4" />
+              Bulk Edit Mode
+            </>
+          )}
+        </button>
+
+        {isSelectionMode && selectedPermissions.length > 0 && (
+          <button
+            onClick={handleBatchSave}
+            className="flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2.5 font-medium text-white transition-all duration-200 hover:bg-green-600"
+          >
+            <FiSave className="h-4 w-4" />
+            Save Changes ({selectedPermissions.length})
+          </button>
+        )}
+      </div>
+
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-lg">
         <div className="min-w-max">
           <table className="w-full">
             <thead>
-              <tr className="bg-gradient-to-r from-blue-50 to-indigo-50">
-                <th className="sticky left-0 z-10 border-b bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4">
+              <tr className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+                <th className="sticky left-0 z-10 bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4">
                   <div className="text-left text-sm font-semibold text-gray-700">
-                    Roles / Resources
+                    Roles
                   </div>
                 </th>
                 {permissions.map((permission) => (
                   <th
                     key={permission.id}
-                    className="border-b border-l px-6 py-4"
+                    className="border-b border-l border-gray-200 px-6 py-4"
                   >
-                    <div className="space-y-2 text-center">
+                    <div className="space-y-3">
                       <div className="text-sm font-semibold text-gray-700">
                         {permission.resource}
                       </div>
-                      <div className="flex items-center justify-center space-x-4">
+                      <div className="flex items-center justify-center space-x-6">
                         {availableActions.map((action) => (
-                          <span
+                          <div
                             key={action}
-                            className="text-xs font-medium uppercase text-gray-500"
-                            style={{ transform: "rotate(-45deg)" }}
+                            className="flex flex-col items-center"
                           >
-                            {action.charAt(0)}
-                          </span>
+                            <span className="text-xs font-medium capitalize text-gray-500">
+                              {action}
+                            </span>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -159,67 +331,82 @@ export default function RolePermissionMatrix() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 bg-white">
-              {roles.map((role) => (
-                <tr
-                  key={role.id}
-                  className="transition-colors hover:bg-gray-50"
-                >
-                  <td className="sticky left-0 z-10 whitespace-nowrap border-r bg-white px-6 py-4 hover:bg-gray-50">
-                    <div className="text-sm font-medium text-gray-900">
+            <tbody className="divide-y divide-gray-100">
+              {roles
+                .filter((role) => role.name !== "KamiounAdminMaster")
+                .map((role) => (
+                  <tr
+                    key={role.id}
+                    className="transition-all duration-200 hover:bg-blue-50"
+                  >
+                    <td className="sticky left-0 z-10 whitespace-nowrap border-r border-gray-200 bg-white px-6 py-4 font-medium text-gray-900 hover:bg-blue-50">
                       {role.name}
-                    </div>
-                  </td>
-                  {permissions.map((permission) => {
-                    const rolePermission = getRolePermission(
-                      role.id,
-                      permission.id,
-                    );
-                    return (
-                      <td
-                        key={`${role.id}-${permission.id}`}
-                        className="border-l px-6 py-4"
-                      >
-                        <div className="flex items-center justify-center space-x-4">
-                          {availableActions.map((action) => (
-                            <label
-                              key={action}
-                              className="relative inline-block"
-                              title={`${action} permission`}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={
-                                  rolePermission?.actions.includes(action) ??
-                                  false
-                                }
-                                onChange={() =>
-                                  handleActionToggle(
-                                    role.id,
-                                    permission.id,
-                                    action,
-                                    rolePermission,
-                                  )
-                                }
-                                className="h-4 w-4 rounded border-gray-300 text-blue-600 
-                                         shadow-sm transition-all duration-150 
-                                         ease-in-out hover:border-blue-400
-                                         focus:border-blue-300 focus:ring focus:ring-blue-200
-                                         focus:ring-opacity-50"
-                              />
-                              <span className="pointer-events-none absolute -top-1 bottom-0 left-0 right-0 flex items-center justify-center">
-                                {rolePermission?.actions.includes(action) && (
-                                  <FiCheck className="h-3 w-3 text-blue-600" />
-                                )}
-                              </span>
-                            </label>
-                          ))}
-                        </div>
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
+                    </td>
+                    {permissions.map((permission) => {
+                      const rolePermission = getRolePermission(
+                        role.id,
+                        permission.id,
+                      );
+                      return (
+                        <td
+                          key={`${role.id}-${permission.id}`}
+                          className="border-l border-gray-200 px-6 py-4"
+                        >
+                          <div className="flex items-center justify-center space-x-6">
+                            {availableActions.map((action) => {
+                              const isSelected = selectedPermissions.some(
+                                (p) =>
+                                  p.roleId === role.id &&
+                                  p.permissionId === permission.id &&
+                                  p.action === action,
+                              );
+                              const isChecked =
+                                rolePermission?.actions.includes(action) ??
+                                false;
+
+                              return (
+                                <label
+                                  key={action}
+                                  className={`relative inline-flex flex-col items-center gap-1 ${
+                                    isSelectionMode && isSelected
+                                      ? "rounded-lg p-1 ring-2 ring-blue-500"
+                                      : ""
+                                  }`}
+                                  title={`${action} permission`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => {}} // Controlled component
+                                    onClick={(e) =>
+                                      handleCheckboxClick(
+                                        role.id,
+                                        permission.id,
+                                        action,
+                                        isChecked,
+                                        e,
+                                      )
+                                    }
+                                    className="h-5 w-5 rounded-md border-2 border-gray-300 
+                                           text-blue-600 transition-all duration-200 
+                                           ease-in-out hover:border-blue-400
+                                           focus:border-blue-300 focus:ring-2 focus:ring-blue-200
+                                           focus:ring-opacity-50"
+                                  />
+                                  {isChecked && (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                      <FiCheck className="h-3 w-3 text-blue-600" />
+                                    </div>
+                                  )}
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

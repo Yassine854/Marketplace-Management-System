@@ -145,9 +145,34 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
+    // Validate required name field
+    if (!body.name?.trim()) {
+      return NextResponse.json(
+        { message: "Partner type name is required" },
+        { status: 400 },
+      );
+    }
+
+    // Check if another TypePartner with the same name exists (excluding current)
+    const existingTypePartner = await prisma.typePartner.findFirst({
+      where: {
+        name: body.name.trim(),
+        NOT: {
+          id: id,
+        },
+      },
+    });
+
+    if (existingTypePartner) {
+      return NextResponse.json(
+        { message: "TypePartner with this name already exists" },
+        { status: 409 },
+      );
+    }
+
     const updatedTypePartner = await prisma.typePartner.update({
       where: { id },
-      data: body,
+      data: { ...body, name: body.name.trim() },
     });
 
     return NextResponse.json(

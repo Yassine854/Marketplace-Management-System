@@ -60,6 +60,14 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
+    // Validate required name field
+    if (!body.name?.trim()) {
+      return NextResponse.json(
+        { message: "Partner type name is required" },
+        { status: 400 },
+      );
+    }
+
     const existingData = await prisma.typePartner.findFirst();
 
     if (!existingData) {
@@ -80,7 +88,7 @@ export async function POST(req: Request) {
 
     // Check if TypePartner already exists
     const existingTypePartner = await prisma.typePartner.findUnique({
-      where: { name: body.name },
+      where: { name: body.name.trim() },
     });
     if (existingTypePartner) {
       return NextResponse.json(
@@ -91,7 +99,7 @@ export async function POST(req: Request) {
 
     // Create new TypePartner
     const newTypePartner = await prisma.typePartner.create({
-      data: { name: body.name },
+      data: { name: body.name.trim() },
     });
 
     return NextResponse.json(

@@ -382,7 +382,7 @@ const EditCustomerModal = ({
               type="submit"
               form="customerForm"
               disabled={isLoading}
-              className="rounded-xl bg-green-600 px-6 py-2 text-white hover:bg-green-700 disabled:bg-green-400"
+              className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700"
             >
               {isLoading ? "Updating..." : "Update Customer"}
             </button>

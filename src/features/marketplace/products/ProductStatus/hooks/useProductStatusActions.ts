@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export interface ProductStatus {
   id: string;
@@ -52,7 +53,10 @@ export function useProductStatusActions() {
         return response.data.message;
       }
     } catch (err: any) {
-      setError("Failed to delete product status");
+      const errorMessage =
+        err.response?.data?.message || "Failed to delete product status";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error deleting product status:", err);
     } finally {
       setIsLoading(false);

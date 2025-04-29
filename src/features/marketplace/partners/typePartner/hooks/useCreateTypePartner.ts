@@ -9,9 +9,15 @@ export function useCreateTypePartner() {
     setIsLoading(true);
     setError(null);
 
+    if (!name?.trim()) {
+      setError("Type partner name is required");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await axios.post("/api/marketplace/typePartner/create", {
-        name,
+        name: name.trim(),
       });
       if (response.status === 201) {
         onSuccess?.();

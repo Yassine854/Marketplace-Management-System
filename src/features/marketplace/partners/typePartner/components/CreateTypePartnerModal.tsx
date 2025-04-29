@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 interface CreateTypePartnerModalProps {
   isOpen: boolean;
@@ -14,6 +15,15 @@ const CreateTypePartnerModal = ({
   const [name, setName] = useState("");
 
   if (!isOpen) return null;
+
+  const handleSubmit = () => {
+    if (!name.trim()) {
+      toast.error("Name is required");
+      return;
+    }
+    onCreate(name);
+    setName("");
+  };
 
   return (
     <div
@@ -31,6 +41,7 @@ const CreateTypePartnerModal = ({
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="mt-2 w-full rounded-lg border p-2"
+          required
         />
 
         <div className="mt-4 flex justify-end gap-2">
@@ -41,10 +52,7 @@ const CreateTypePartnerModal = ({
             Cancel
           </button>
           <button
-            onClick={() => {
-              onCreate(name);
-              setName("");
-            }}
+            onClick={handleSubmit}
             className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
           >
             Add
