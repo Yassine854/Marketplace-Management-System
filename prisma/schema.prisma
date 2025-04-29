@@ -15,6 +15,8 @@ model User {
   lastName  String
   password  String
   roleId    String
+  mRoleId    String?
+  role            Role?     @relation(fields: [mRoleId], references: [id])
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -97,7 +99,7 @@ model Product {
   updated_at     String?
   stock_item     StockItem?
 
-
+  barcode              String?  @unique
   pcb                  String?    
   weight               Float?   
   description          String?  
@@ -107,8 +109,10 @@ model Product {
   maximumQte           Int?  
   sealable             Float?
   alertQte             Int?
-  loyaltyPoints        Float?
-  loyaltyPointsAmount  Float?    
+  loyaltyPointsPerProduct       Float?
+  loyaltyPointsPerUnit  Float?    
+  loyaltyPointsBonusQuantity  Float? 
+  loyaltyPointsThresholdQty Float? 
 
   typePcbId            String?  @db.ObjectId 
   typePcb              TypePcb? @relation(fields: [typePcbId], references: [id]) 
@@ -312,8 +316,8 @@ model Partner {
   minimumAmount   Float    
   typePartner     TypePartner @relation(fields: [typePartnerId], references: [id])
   typePartnerId   String   @db.ObjectId   
-  roleId          String?
-  role            Role?     @relation(fields: [roleId], references: [id])
+  mRoleId          String?
+  role            Role?     @relation(fields: [mRoleId], references: [id])
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -338,42 +342,53 @@ model Agent {
   telephone String?
   address   String?
   password  String?
-  roleId    String?
+  mRoleId    String?
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
   orders   Order[]
+  role            Role?     @relation(fields: [mRoleId], references: [id])
+
   reservations Reservation[]
   @@map("agents")
 }
 
 model Customers {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  firstName String?
-  lastName  String?
-  governorate String?
-  gender String?
-  retailer_profile String?
-  email     String?   
-  telephone String?
-  address   String?
-  password  String?
-  roleId    String?
-  isActive  Boolean?  @default(true)
-  created_at DateTime? @default(now())
-  updated_at DateTime? @updatedAt
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName    String
+  lastName     String
+  governorate  String
+  gender       String
+  email        String    @unique
+  telephone    String
+  address      String
+  password     String
+  mRoleId       String?
+  isActive     Boolean?  @default(true)
+  created_at   DateTime? @default(now())
+  updated_at   DateTime? @updatedAt
 
-  favoriteProducts FavoriteProduct[]
-  favoritePartners FavoritePartner[]
-  orders   Order[]
-  reservations Reservation[]
-  notifications   NotifyMe[] 
+  // Champs business
+  socialName   String?
+  fiscalId     String
+  businessType String
+  activity1    String
+  activity2    String?
+  
+  // Nouveaux champs ajoutés
+  cinPhoto     String?   
+  patentPhoto  String?   
+  // Relations
+  favoriteProducts  FavoriteProduct[]
+  favoritePartners  FavoritePartner[]
+  orders            Order[]
+  reservations      Reservation[]
+  notifications     NotifyMe[]
+  role            Role?     @relation(fields: [mRoleId], references: [id])
+
   @@map("customers")
 }
-
-
-
 
 
 
@@ -516,9 +531,9 @@ model FavoritePartner {
   productId   String   @db.ObjectId
   partnerId   String   @db.ObjectId
 
-  customer    Customers @relation(fields: [customerId], references: [id])
-  product     Product  @relation(fields: [productId], references: [id])
-  partner     Partner  @relation(fields: [partnerId], references: [id])
+  customer    Customers @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
   @@unique([customerId, productId, partnerId])
 
@@ -573,24 +588,25 @@ model Order {
   customerId          String   @db.ObjectId
   customer            Customers @relation(fields: [customerId], references: [id]) 
 
-  agentId             String?  @db.ObjectId
-  agent               Agent?   @relation(fields: [agentId], references: [id]) 
+  agentId           String?  @db.ObjectId
+  agent             Agent?   @relation(fields: [agentId], references: [id]) 
 
-  reservationId       String?  @db.ObjectId @unique
-  reservation         Reservation? @relation
+  reservationId     String?  @db.ObjectId @unique
+  reservation       Reservation? @relation
 
-  mainOrderId   String?   @db.ObjectId
-  mainOrder     MainOrder? @relation(fields: [mainOrderId], references: [id])
+  mainOrderId       String?   @db.ObjectId
+  mainOrder         MainOrder? @relation(fields: [mainOrderId], references: [id])
 
 
-  partnerId           String   @db.ObjectId
-  partner            Partner   @relation(fields: [partnerId], references: [id]) 
-  orderItems OrderItem[]
-  loyaltyPoints LoyaltyPoints[]
+  partnerId         String   @db.ObjectId
+  partner           Partner   @relation(fields: [partnerId], references: [id]) 
+  orderItems        OrderItem[]
+  loyaltyPoints     LoyaltyPoints[]
   paymentMethodId   String       @db.ObjectId
-  paymentMethod     OrderPayment @relation(fields: [paymentMethodId], references: [id]) // Each Order has 1 PaymentMethod
+  paymentMethod     OrderPayment @relation(fields: [paymentMethodId], references: [id]) 
 
 }
+
 
 
 model OrderItem {
@@ -602,7 +618,7 @@ model OrderItem {
   discountedPrice Float
   weight          Float
   sku             String   @unique
-  taxId           String   @db.ObjectId
+  taxId           String?   @db.ObjectId
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -613,8 +629,9 @@ model OrderItem {
   productId       String   @db.ObjectId
   product         Product   @relation(fields: [productId], references: [id]) 
 
-  tax             Tax      @relation(fields: [taxId], references: [id]) 
+  tax             Tax?      @relation(fields: [taxId], references: [id]) 
 }
+
 
 model OrderPayment {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -664,16 +681,16 @@ model Reservation {
   paymentMethod       OrderPayment @relation(fields: [paymentMethodId], references: [id]) 
 }
 
+
 model ReservationItem {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   qteReserved    Int
-  qteCanceled    Int
   discountedPrice Float
   weight         Float
-  sku            String @unique
-  taxId           String   @db.ObjectId
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  sku            String    @unique 
+  taxId          String?   @db.ObjectId
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   // Relationships
   reservationId  String   @db.ObjectId
@@ -681,8 +698,9 @@ model ReservationItem {
 
   productId      String   @db.ObjectId
   product        Product @relation(fields: [productId], references: [id]) 
-  tax             Tax      @relation(fields: [taxId], references: [id]) 
+  tax             Tax?      @relation(fields: [taxId], references: [id]) 
 }
+
 
 model LoyaltyPoints {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -737,7 +755,7 @@ model Settings {
   loyaltyPointsAmount     String   
   loyaltyPointsUnique    String  
   partnerId    String?   @db.ObjectId
-  partner      Partner?  @relation(fields: [partnerId], references: [id]) 
+  partner      Partner?  @relation(fields: [partnerId], references: [id], onDelete: Cascade) 
   schedules   SettingSchedule[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -762,6 +780,10 @@ model Role {
   name        String         @unique
   permissions RolePermission[]
   partners    Partner[]
+  agents      Agent[]
+  customers   Customers[]
+  admins      User[]
+
 }
 
 model Permission {
@@ -774,7 +796,7 @@ model RolePermission {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
   roleId       String
   permissionId String
-  actions String[]
+  actions      String[]
   role         Role       @relation(fields: [roleId], references: [id],onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id],onDelete: Cascade)
   @@unique([roleId, permissionId])

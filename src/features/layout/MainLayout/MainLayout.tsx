@@ -13,28 +13,30 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   } = useMainLayout();
 
   return (
-    <div className="h-screen w-screen">
+    <div className="h-screen w-screen overflow-hidden">
       <TopNav setSidebar={setSidebarIsOpen} sidebarIsOpen={sidebarIsOpen} />
 
-      <Sidebar
-        isAdmin={isAdmin}
-        isNoEditUser={isNoEditUser}
-        sidebarIsOpen={sidebarIsOpen}
-        setSidebar={setSidebarIsOpen}
-        onOrderStatusClick={(status: any) => {
-          setStatus(status);
-          navigateToOrders();
-        }}
-      />
-      <div className="flex h-full flex-grow ">
-        <div
-          className={`transition-all duration-300 ease-in-out  overflow-x-hidden${
-            sidebarIsOpen
-              ? "h-full  ltr:xxl:w-[280px] ltr:xxxl:w-[336px] rtl:xxl:w-[280px] rtl:xxxl:w-[336px]"
-              : "h-full w-0"
-          }`}
+      <div className="flex h-[calc(100vh-64px)] pt-16">
+        <Sidebar
+          isAdmin={isAdmin}
+          isNoEditUser={isNoEditUser}
+          sidebarIsOpen={sidebarIsOpen}
+          setSidebar={setSidebarIsOpen}
+          onOrderStatusClick={(status: any) => {
+            setStatus(status);
+            navigateToOrders();
+          }}
         />
-        <div className="flex h-full flex-grow">{children}</div>
+
+        <main
+          className={`flex-1 overflow-auto transition-all duration-300 ${
+            sidebarIsOpen
+              ? "ltr:xxl:ml-[280px] ltr:xxxl:ml-[336px] rtl:xxl:mr-[280px] rtl:xxxl:mr-[336px]"
+              : ""
+          }`}
+        >
+          {children}
+        </main>
       </div>
     </div>
   );
