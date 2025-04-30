@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export interface Setting {
   id: string;
@@ -26,10 +27,14 @@ export function useSettingsActions() {
         updatedSetting,
       );
       if (response.status === 200) {
+        toast.success("Setting updated successfully!");
         return response.data.setting;
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update setting");
+      const errorMessage =
+        err.response?.data?.message || "Failed to update setting";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error updating setting:", err);
     } finally {
       setIsLoading(false);
@@ -42,10 +47,14 @@ export function useSettingsActions() {
     try {
       const response = await axios.delete(`/api/marketplace/settings/${id}`);
       if (response.status === 200) {
+        toast.success("Setting deleted successfully!");
         return response.data.message;
       }
     } catch (err: any) {
-      setError("Failed to delete setting");
+      const errorMessage =
+        err.response?.data?.message || "Failed to delete setting";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error deleting setting:", err);
     } finally {
       setIsLoading(false);

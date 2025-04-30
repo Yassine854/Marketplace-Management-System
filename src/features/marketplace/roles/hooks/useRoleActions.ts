@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export interface Role {
   id: string;
@@ -21,10 +22,14 @@ export function useRoleActions() {
         updatedRole,
       );
       if (response.status === 200) {
+        toast.success("Role updated successfully!");
         return response.data.role;
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update role");
+      const errorMessage =
+        err.response?.data?.message || "Failed to update role";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error updating role:", err);
     } finally {
       setIsLoading(false);
@@ -37,10 +42,14 @@ export function useRoleActions() {
     try {
       const response = await axios.delete(`/api/marketplace/roles/${id}`);
       if (response.status === 200) {
+        toast.success("Role deleted successfully!");
         return response.data.message;
       }
     } catch (err: any) {
-      setError("Failed to delete role");
+      const errorMessage =
+        err.response?.data?.message || "Failed to delete role";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error deleting role:", err);
     } finally {
       setIsLoading(false);

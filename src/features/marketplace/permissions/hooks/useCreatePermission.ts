@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 interface CreatePermissionData {
   resource: string;
@@ -22,11 +23,15 @@ export function useCreatePermission() {
       });
 
       if (response.status === 201) {
+        toast.success("Permission created successfully!");
         onSuccess?.();
       }
     } catch (err: any) {
-      setError("Erreur lors de la création de la permission");
-      console.error("Erreur:", err);
+      const errorMessage =
+        err.response?.data?.message || "Failed to create permission";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      console.error("Error:", err);
     } finally {
       setIsLoading(false);
     }

@@ -21,16 +21,18 @@ export function useTypePartnerActions() {
     setIsLoading(true);
     setError(null);
     try {
-      // Send only the 'name' field instead of the entire object
-      const response = await axios.patch(
-        `/api/marketplace/typePartner/${id}`,
-        { name: updatedTypePartner.name }, // <-- Key change here
-      );
+      const response = await axios.patch(`/api/marketplace/typePartner/${id}`, {
+        name: updatedTypePartner.name,
+      });
       if (response.status === 200) {
+        toast.success("Partner type updated successfully!");
         return response.data.typePartner;
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update type partner");
+      const errorMessage =
+        err.response?.data?.message || "Failed to update partner type";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error updating type partner:", err);
     } finally {
       setIsLoading(false);
@@ -43,11 +45,12 @@ export function useTypePartnerActions() {
     try {
       const response = await axios.delete(`/api/marketplace/typePartner/${id}`);
       if (response.status === 200) {
+        toast.success("Partner type deleted successfully!");
         return response.data.message;
       }
     } catch (err: any) {
       const errorMessage =
-        err.response?.data?.message || "Failed to delete type partner";
+        err.response?.data?.message || "Failed to delete partner type";
       setError(errorMessage);
       toast.error(errorMessage);
       console.error("Error deleting type partner:", err);

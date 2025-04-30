@@ -26,10 +26,14 @@ export function useProductTypeActions() {
         updatedProductType,
       );
       if (response.status === 200) {
+        toast.success("Product type updated successfully!");
         return response.data.productType;
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update product type");
+      const errorMessage =
+        err.response?.data?.message || "Failed to update product type";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error updating product type:", err);
     } finally {
       setIsLoading(false);
@@ -44,6 +48,7 @@ export function useProductTypeActions() {
         `/api/marketplace/product_type/${id}`,
       );
       if (response.status === 200) {
+        toast.success("Product type deleted successfully!");
         return response.data.message;
       }
     } catch (err: any) {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { SubCategory } from "@/types/subCategory";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 interface EditSubCategoryModalProps {
   isOpen: boolean;
@@ -26,12 +27,10 @@ const EditSubCategoryModal = ({
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  // Update form when initialData changes
   useEffect(() => {
     if (initialData) {
       setName(initialData.name);
       setIsActive(initialData.isActive ?? true);
-      // Note: Existing image handling might need additional logic for display
     }
   }, [initialData]);
 
@@ -64,9 +63,17 @@ const EditSubCategoryModal = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-2xl transition-all duration-300 ease-in-out"
+        className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-2xl transition-all duration-300 ease-in-out"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+        >
+          <XMarkIcon className="h-6 w-6" />
+        </button>
+
         <h2 className="mb-4 text-2xl font-bold text-gray-800">
           Edit Subcategory
         </h2>

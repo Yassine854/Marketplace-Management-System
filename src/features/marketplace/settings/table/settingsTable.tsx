@@ -29,31 +29,23 @@ export default function SettingsTable({
   return (
     <div style={{ overflowX: "auto" }}>
       <div
-        className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+        className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3"
         style={{ maxHeight: "600px" }}
       >
         <table className="w-full">
-          <thead className="border-b border-gray-100 bg-gray-50">
+          <thead className="border-b border-gray-100 bg-primary">
             <tr>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                ID
-              </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 Partner
               </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 Delivery Type
               </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Delivery Type Amount
-              </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Free Delivery Amount
-              </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+
+              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 Loyalty Points Amount
               </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 Actions
               </th>
             </tr>
@@ -102,20 +94,12 @@ export default function SettingsTable({
                   className="transition-colors duration-150 hover:bg-gray-50"
                 >
                   <td className="px-4 py-2 text-center text-sm text-gray-900">
-                    {setting.id}
-                  </td>
-                  <td className="px-4 py-2 text-center text-sm text-gray-900">
                     {setting.partner.username}
                   </td>
                   <td className="px-4 py-2 text-center text-sm text-gray-900">
                     {setting.deliveryType}
                   </td>
-                  <td className="px-4 py-2 text-center text-sm text-gray-900">
-                    {setting.deliveryTypeAmount}
-                  </td>
-                  <td className="px-4 py-2 text-center text-sm text-gray-900">
-                    {setting.freeDeliveryAmount}
-                  </td>
+
                   <td className="px-4 py-2 text-center text-sm text-gray-900">
                     {setting.loyaltyPointsAmount}
                   </td>

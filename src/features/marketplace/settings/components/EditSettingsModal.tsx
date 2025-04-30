@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Setting } from "@/types/settings";
 import axios from "axios";
+import { X } from "lucide-react";
 
 interface EditSettingModalProps {
   isOpen: boolean;
@@ -58,16 +59,27 @@ const EditSettingModal = ({
   const handleAddSchedule = () => {
     const usedDays = schedules.map((s) => s.day);
     const nextDay = joursDisponibles.find((day) => !usedDays.includes(day));
-    if (!nextDay) return;
+    if (nextDay) {
+      setSchedules([
+        ...schedules,
+        { day: nextDay, startTime: "", endTime: "" },
+      ]);
+    }
+  };
 
-    setSchedules([
-      ...schedules,
-      {
-        day: nextDay,
-        startTime: "",
-        endTime: "",
-      },
-    ]);
+  const handleScheduleChange = (
+    index: number,
+    field: "day" | "startTime" | "endTime",
+    value: string,
+  ) => {
+    const newSchedules = [...schedules];
+    newSchedules[index][field] = value;
+    setSchedules(newSchedules);
+  };
+
+  const handleRemoveSchedule = (index: number) => {
+    const newSchedules = schedules.filter((_, i) => i !== index);
+    setSchedules(newSchedules);
   };
 
   useEffect(() => {
@@ -85,73 +97,25 @@ const EditSettingModal = ({
     if (isOpen) fetchPartners();
   }, [isOpen]);
 
-  const handleRemoveSchedule = async (index: number) => {
-    const scheduleToRemove = schedules[index];
-    if (!scheduleToRemove.id) {
-      setSchedules(schedules.filter((_, i) => i !== index));
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      await axios.delete(
-        `/api/marketplace/settings_schedule/${scheduleToRemove.id}`,
-      );
-      setSchedules(schedules.filter((_, i) => i !== index));
-    } catch (error) {
-      setFormError("Failed to remove schedule");
-      console.error("Delete schedule error:", error);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   const validateForm = () => {
     if (!partnerId) {
       setFormError("Please select a partner");
       return false;
     }
     if (!deliveryType || !deliveryTypeAmount) {
-      setFormError("Please fill in delivery type and delivery amount");
+      setFormError("Please fill in delivery type and amount");
       return false;
     }
     if (schedules.length === 0) {
-      setFormError("Please maintain at least one schedule");
+      setFormError("Please add at least one schedule");
       return false;
     }
     if (schedules.some((s) => !s.startTime || !s.endTime)) {
-      setFormError("Please fill in all schedule start and end times");
+      setFormError("Please fill in all schedule times");
       return false;
     }
     setFormError(null);
     return true;
-  };
-
-  const handleScheduleChange = async (
-    index: number,
-    field: "day" | "startTime" | "endTime",
-    value: string,
-  ) => {
-    const newSchedules = [...schedules];
-    newSchedules[index][field] = value;
-
-    // If schedule already exists, update via API
-    if (newSchedules[index].id) {
-      try {
-        await axios.patch(
-          `/api/marketplace/settings_schedule/${newSchedules[index].id}`,
-          {
-            [field]: value,
-          },
-        );
-      } catch (error) {
-        setFormError("Failed to update schedule");
-        console.error("Update schedule error:", error);
-        return;
-      }
-    }
-
-    setSchedules(newSchedules);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -164,7 +128,6 @@ const EditSettingModal = ({
       // Filter schedules that don't have an id (new schedules)
       const newSchedules = schedules.filter((s) => !s.id);
       for (const s of newSchedules) {
-        // Call the API to create the schedule.
         await axios.post("/api/marketplace/settings_schedule/create", {
           day: s.day,
           startTime: s.startTime,
@@ -173,7 +136,6 @@ const EditSettingModal = ({
         });
       }
 
-      // Construct the updated setting object
       const updatedSetting: Setting = {
         ...setting,
         deliveryType,
@@ -185,50 +147,58 @@ const EditSettingModal = ({
         schedules,
       };
 
-      // Pass updated setting and close modal
-      onEdit(updatedSetting);
-      onClose();
+      await onEdit(updatedSetting);
+      onClose(); // Add this line to close the modal after successful update
     } catch (error) {
-      console.error("Save error:", error);
-      setFormError("Failed to save new schedules");
+      console.error("Error updating setting:", error);
+      setFormError("Failed to update setting");
     } finally {
       setIsProcessing(false);
     }
   };
 
-  if (!isOpen || !setting) return null;
+  if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-3xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl"
+        className="w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"
         style={{ maxHeight: "95vh" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800">
-          Edit Setting
-        </h2>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="flex-1 text-left text-2xl font-bold text-gray-800">
+            Edit Setting
+          </h2>
+          <button
+            onClick={onClose}
+            className="rounded-full p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Error Message */}
           {formError && (
-            <div className="rounded-lg bg-red-100 p-3 text-red-700">
+            <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
               {formError}
             </div>
           )}
 
           {/* Partner Selection */}
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <label className="text-sm font-medium text-gray-600">
-              Partner Name
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <label className="self-center text-sm font-medium text-gray-700">
+              Partner
             </label>
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-3">
               <select
                 value={partnerId ?? ""}
-                disabled={true} // Always disabled in edit mode
-                className="w-full cursor-not-allowed rounded border border-gray-300 bg-gray-100 p-2 text-sm focus:outline-none"
+                disabled={true}
+                className="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-100 p-2.5 text-sm"
               >
                 {partners.map((partner) => (
                   <option key={partner.id} value={partner.id}>
@@ -240,98 +210,88 @@ const EditSettingModal = ({
           </div>
 
           {/* Delivery Type + Amount */}
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <label className="text-sm font-medium text-gray-600">
-              Delivery Details
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <label className="self-center text-sm font-medium text-gray-700">
+              Delivery
             </label>
-            <div className="grid grid-cols-2 gap-2 sm:col-span-2">
-              <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Delivery Type
-                </label>
-                <select
-                  value={deliveryType}
-                  onChange={(e) => setDeliveryType(e.target.value)}
-                  className="w-full rounded border border-gray-300 bg-gray-50 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option disabled value="">
-                    Select Type
-                  </option>
-                  <option value="Fixe">Fixe</option>
-                  <option value="par KM">par KM</option>
-                  <option value="Weight">Weight</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Delivery Amount
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter amount"
-                  value={deliveryTypeAmount}
-                  onChange={(e) => setDeliveryTypeAmount(e.target.value)}
-                  className="w-full rounded border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+            <div className="grid grid-cols-2 gap-4 sm:col-span-3">
+              <select
+                value={deliveryType}
+                onChange={(e) => setDeliveryType(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option disabled value="">
+                  Type
+                </option>
+                <option value="Fixe">Fixe</option>
+                <option value="par KM">par KM</option>
+                <option value="Weight">Weight</option>
+              </select>
+              <input
+                type="text"
+                placeholder="Amount"
+                value={deliveryTypeAmount}
+                onChange={(e) => setDeliveryTypeAmount(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
+              />
             </div>
           </div>
 
           {/* Free Delivery */}
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <label className="text-sm font-medium text-gray-600">
-              Free Delivery Threshold
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <label className="self-center text-sm font-medium text-gray-700">
+              Free Delivery From
             </label>
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-3">
               <input
                 type="text"
-                placeholder="Enter free delivery amount"
+                placeholder="Enter amount"
                 value={freeDeliveryAmount}
                 onChange={(e) => setFreeDeliveryAmount(e.target.value)}
-                className="w-full rounded border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
           </div>
 
           {/* Loyalty Points */}
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <label className="text-sm font-medium text-gray-600">
-              Loyalty Points
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <label className="self-center text-sm font-medium text-gray-700">
+              Loyalty
             </label>
-            <div className="grid grid-cols-3 gap-2 sm:col-span-2">
+            <div className="grid grid-cols-3 gap-4 sm:col-span-3">
               <div>
-                <label className="text-xs font-medium text-gray-500">
+                <label className="mb-1 block text-xs font-medium text-gray-600">
                   Points Amount
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter points amount"
+                  placeholder="Points Amount"
                   value={loyaltyPointsAmount}
                   onChange={(e) => setLoyaltyPointsAmount(e.target.value)}
-                  className="w-full rounded border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500">
+                <label className="mb-1 block text-xs font-medium text-gray-600">
                   Unique Points
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter unique points"
+                  placeholder="Unique Points"
                   value={loyaltyPointsUnique}
                   onChange={(e) => setLoyaltyPointsUnique(e.target.value)}
-                  className="w-full rounded border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Fixed Rate
+                <label className="mb-1 block text-xs font-medium text-gray-600">
+                  Value
                 </label>
                 <input
                   type="text"
                   value="1 DT"
                   readOnly
-                  className="w-full cursor-not-allowed rounded border border-gray-300 bg-gray-100 p-2 text-sm"
+                  className="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-100 p-2.5 text-sm"
                 />
               </div>
             </div>
@@ -339,17 +299,31 @@ const EditSettingModal = ({
 
           {/* Schedules Section */}
           <div className="space-y-4">
-            <label className="text-sm font-medium text-gray-600">
-              Schedules
-            </label>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <label className="text-sm font-medium text-gray-700">
+                  Schedules
+                </label>
+                {schedules.length < 7 && (
+                  <button
+                    type="button"
+                    onClick={handleAddSchedule}
+                    className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                  >
+                    + Add Schedule
+                  </button>
+                )}
+              </div>
+            </div>
+
             {schedules.map((schedule, index) => (
               <div
                 key={index}
-                className="rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-md"
+                className="rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-sm"
               >
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                   <div>
-                    <label className="text-xs font-medium text-gray-500">
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
                       Day
                     </label>
                     <select
@@ -357,7 +331,7 @@ const EditSettingModal = ({
                       onChange={(e) =>
                         handleScheduleChange(index, "day", e.target.value)
                       }
-                      className="w-full rounded-md border border-gray-300 bg-white p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                       {joursDisponibles
                         .filter(
@@ -375,7 +349,7 @@ const EditSettingModal = ({
                   </div>
 
                   <div>
-                    <label className="text-xs font-medium text-gray-500">
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
                       Start Time
                     </label>
                     <input
@@ -384,11 +358,12 @@ const EditSettingModal = ({
                       onChange={(e) =>
                         handleScheduleChange(index, "startTime", e.target.value)
                       }
-                      className="w-full rounded-md border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
+
                   <div>
-                    <label className="text-xs font-medium text-gray-500">
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
                       End Time
                     </label>
                     <input
@@ -397,7 +372,7 @@ const EditSettingModal = ({
                       onChange={(e) =>
                         handleScheduleChange(index, "endTime", e.target.value)
                       }
-                      className="w-full rounded-md border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
 
@@ -405,7 +380,7 @@ const EditSettingModal = ({
                     <button
                       type="button"
                       onClick={() => handleRemoveSchedule(index)}
-                      className="text-sm text-red-500 hover:underline"
+                      className="text-sm font-medium text-red-600 hover:text-red-700"
                     >
                       Remove
                     </button>
@@ -413,31 +388,23 @@ const EditSettingModal = ({
                 </div>
               </div>
             ))}
-
-            {schedules.length < 7 && (
-              <button
-                type="button"
-                onClick={handleAddSchedule}
-                className="ml-4 inline-flex items-center gap-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-              >
-                + Add Schedule
-              </button>
-            )}
           </div>
 
-          <div className="flex justify-end space-x-2 pt-4">
+          {/* Form Buttons */}
+          <div className="flex justify-end gap-4 border-t pt-6">
             <button
               type="button"
               onClick={onClose}
-              className="rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-600"
+              className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="rounded bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
+              disabled={isProcessing}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:bg-blue-400"
             >
-              Save Changes
+              {isProcessing ? "Updating..." : "Update Setting"}
             </button>
           </div>
         </form>

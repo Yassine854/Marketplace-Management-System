@@ -34,10 +34,14 @@ export function useCategoryActions() {
       );
 
       if (response.status === 200) {
+        toast.success("Category updated successfully");
         return response.data.category;
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update category");
+      const errorMessage =
+        err.response?.data?.message || "Failed to update category";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error updating category:", err);
     } finally {
       setIsLoading(false);
@@ -52,6 +56,7 @@ export function useCategoryActions() {
         `/api/marketplace/category/${id}`,
       );
       if (response.status === 200) {
+        toast.success("Category deleted successfully");
         return response.data.message;
       }
     } catch (err: any) {

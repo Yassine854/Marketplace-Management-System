@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Setting } from "@/types/settings";
 import axios from "axios";
+import { X } from "lucide-react";
 
 interface CreateSettingModalProps {
   isOpen: boolean;
@@ -152,35 +153,45 @@ const CreateSettingModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-3xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl"
+        className="w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"
         style={{ maxHeight: "95vh" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800">
-          Add Setting
-        </h2>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="flex-1 text-left text-2xl font-bold text-gray-800">
+            Create Setting
+          </h2>
+          <button
+            onClick={onClose}
+            className="rounded-full p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Error Message */}
           {formError && (
-            <div className="rounded-lg bg-red-100 p-3 text-red-700">
+            <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
               {formError}
             </div>
           )}
 
           {/* Partner Selection */}
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <label className="text-sm font-medium text-gray-600">Partner</label>
-            <div className="sm:col-span-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <label className="self-center text-sm font-medium text-gray-700">
+              Partner
+            </label>
+            <div className="sm:col-span-3">
               <select
                 value={partnerId ?? ""}
                 onChange={(e) => setPartnerId(e.target.value)}
                 disabled={loadingPartners}
-                className="w-full rounded border border-gray-300 bg-gray-50 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
               >
                 <option value="" disabled>
                   {loadingPartners ? "Loading..." : "Select a partner"}
@@ -195,15 +206,15 @@ const CreateSettingModal = ({
           </div>
 
           {/* Delivery Type + Amount */}
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <label className="text-sm font-medium text-gray-600">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <label className="self-center text-sm font-medium text-gray-700">
               Delivery
             </label>
-            <div className="grid grid-cols-2 gap-2 sm:col-span-2">
+            <div className="grid grid-cols-2 gap-4 sm:col-span-3">
               <select
                 value={deliveryType}
                 onChange={(e) => setDeliveryType(e.target.value)}
-                className="w-full rounded border border-gray-300 bg-gray-50 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
               >
                 <option disabled value="">
                   Type
@@ -217,68 +228,83 @@ const CreateSettingModal = ({
                 placeholder="Amount"
                 value={deliveryTypeAmount}
                 onChange={(e) => setDeliveryTypeAmount(e.target.value)}
-                className="w-full rounded border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
           </div>
 
           {/* Free Delivery */}
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <label className="text-sm font-medium text-gray-600">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <label className="self-center text-sm font-medium text-gray-700">
               Free Delivery From
             </label>
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-3">
               <input
                 type="text"
                 placeholder="Enter amount"
                 value={freeDeliveryAmount}
                 onChange={(e) => setFreeDeliveryAmount(e.target.value)}
-                className="w-full rounded border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
           </div>
 
           {/* Loyalty Points */}
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <label className="text-sm font-medium text-gray-600">Loyalty</label>
-            <div className="grid grid-cols-3 gap-2 sm:col-span-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <label className="self-center text-sm font-medium text-gray-700">
+              Loyalty
+            </label>
+            <div className="grid grid-cols-3 gap-4 sm:col-span-3">
               <input
                 type="text"
                 placeholder="Points Amount"
                 value={loyaltyPointsAmount}
                 onChange={(e) => setLoyaltyPointsAmount(e.target.value)}
-                className="w-full rounded border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
               />
               <input
                 type="text"
                 placeholder="Unique Points"
                 value={loyaltyPointsUnique}
                 onChange={(e) => setLoyaltyPointsUnique(e.target.value)}
-                className="w-full rounded border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
               />
               <input
                 type="text"
                 value="1 DT"
                 readOnly
-                className="w-full cursor-not-allowed rounded border border-gray-300 bg-gray-100 p-2 text-sm"
+                className="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-100 p-2.5 text-sm"
               />
             </div>
           </div>
 
           {/* Schedules Section */}
           <div className="space-y-4">
-            <label className="text-sm font-medium text-gray-600">
-              Schedules
-            </label>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <label className="text-sm font-medium text-gray-700">
+                  Schedules
+                </label>
+                {schedules.length < 7 && (
+                  <button
+                    type="button"
+                    onClick={handleAddSchedule}
+                    className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                  >
+                    + Add Schedule
+                  </button>
+                )}
+              </div>
+            </div>
+
             {schedules.map((schedule, index) => (
               <div
                 key={index}
-                className="rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-md"
+                className="rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-sm"
               >
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-                  {/* Day Selection */}
                   <div>
-                    <label className="text-sm font-medium text-gray-600">
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
                       Day
                     </label>
                     <select
@@ -286,7 +312,7 @@ const CreateSettingModal = ({
                       onChange={(e) =>
                         handleScheduleChange(index, "day", e.target.value)
                       }
-                      className="w-full rounded-md border border-gray-300 bg-white p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                       {joursDisponibles
                         .filter(
@@ -303,9 +329,8 @@ const CreateSettingModal = ({
                     </select>
                   </div>
 
-                  {/* Time Inputs */}
                   <div>
-                    <label className="text-sm font-medium text-gray-600">
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
                       Start Time
                     </label>
                     <input
@@ -314,11 +339,12 @@ const CreateSettingModal = ({
                       onChange={(e) =>
                         handleScheduleChange(index, "startTime", e.target.value)
                       }
-                      className="w-full rounded-md border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
+
                   <div>
-                    <label className="text-sm font-medium text-gray-600">
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
                       End Time
                     </label>
                     <input
@@ -327,16 +353,15 @@ const CreateSettingModal = ({
                       onChange={(e) =>
                         handleScheduleChange(index, "endTime", e.target.value)
                       }
-                      className="w-full rounded-md border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
 
-                  {/* Remove Button */}
                   <div className="flex items-end justify-end">
                     <button
                       type="button"
                       onClick={() => handleRemoveSchedule(index)}
-                      className="text-sm text-red-500 hover:underline"
+                      className="text-sm font-medium text-red-600 hover:text-red-700"
                     >
                       Remove
                     </button>
@@ -344,32 +369,22 @@ const CreateSettingModal = ({
                 </div>
               </div>
             ))}
-
-            {schedules.length < 7 && (
-              <button
-                type="button"
-                onClick={handleAddSchedule}
-                className="ml-4 inline-flex items-center gap-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-              >
-                + Add Schedule
-              </button>
-            )}
           </div>
 
           {/* Form Buttons */}
-          <div className="flex justify-end space-x-2 pt-4">
+          <div className="flex justify-end gap-4 border-t pt-6">
             <button
               type="button"
               onClick={onClose}
-              className="rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-600"
+              className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="rounded bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
             >
-              Add
+              Create Setting
             </button>
           </div>
         </form>

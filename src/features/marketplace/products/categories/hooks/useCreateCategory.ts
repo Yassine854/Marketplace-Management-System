@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export function useCreateCategory() {
   const [isLoading, setIsLoading] = useState(false);
@@ -39,11 +40,15 @@ export function useCreateCategory() {
       );
 
       if (response.status === 201) {
+        toast.success("Category created successfully");
         onSuccess?.();
       }
     } catch (err: any) {
-      setError("Erreur lors de la création de la catégorie");
-      console.error("Erreur:", err);
+      const errorMessage =
+        err.response?.data?.message || "Failed to create category";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      console.error("Error creating category:", err);
     } finally {
       setIsLoading(false);
     }

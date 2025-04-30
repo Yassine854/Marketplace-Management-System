@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 interface CreateCategoryModalProps {
   isOpen: boolean;
@@ -6,7 +7,7 @@ interface CreateCategoryModalProps {
   onCreate: (categoryData: {
     nameCategory: string;
     isActive?: boolean;
-    image?: File | null; // Change this to File | null
+    image?: File | null;
   }) => void;
 }
 
@@ -25,7 +26,7 @@ const CreateCategoryModal = ({
     const categoryData = {
       nameCategory: nameCategory.trim(),
       isActive,
-      image: imageFile, // Pass the File object directly
+      image: imageFile,
     };
 
     onCreate(categoryData);
@@ -46,9 +47,17 @@ const CreateCategoryModal = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-2xl transition-all duration-300 ease-in-out"
+        className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-2xl transition-all duration-300 ease-in-out"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+        >
+          <XMarkIcon className="h-6 w-6" />
+        </button>
+
         <h2 className="mb-4 text-2xl font-bold text-gray-800">
           Create New Category
         </h2>

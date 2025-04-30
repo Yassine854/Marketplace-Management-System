@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 
 export interface TypePcb {
   id: string;
-  name: string; // name instead of 'type'
+  name: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -22,10 +22,14 @@ export function useTypePcbActions() {
         updatedTypePcb,
       );
       if (response.status === 200) {
+        toast.success("PCB type updated successfully!");
         return response.data.typePcb;
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update PCB type");
+      const errorMessage =
+        err.response?.data?.message || "Failed to update PCB type";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error updating PCB type:", err);
     } finally {
       setIsLoading(false);
@@ -38,6 +42,7 @@ export function useTypePcbActions() {
     try {
       const response = await axios.delete(`/api/marketplace/type_pcb/${id}`);
       if (response.status === 200) {
+        toast.success("PCB type deleted successfully!");
         return response.data.message;
       }
     } catch (err: any) {

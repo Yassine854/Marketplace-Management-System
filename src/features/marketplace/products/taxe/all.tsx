@@ -146,7 +146,7 @@ const TaxManagementPage = () => {
         }}
       >
         <div className="relative grid h-full w-full items-center justify-center gap-4">
-          <div className="box w-full min-w-[800px] xl:p-8">
+          <div className="box w-full min-w-[1400px] xl:p-8">
             <div className="bb-dashed mb-6 mt-9 flex items-center justify-between pb-6">
               <p className="ml-4 mt-6 text-xl font-bold">Tax Management</p>
               <div className="flex h-16 w-56  items-center justify-center  ">
@@ -190,7 +190,7 @@ const TaxManagementPage = () => {
             </div>
 
             <div
-              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-4 dark:bg-bg3"
+              className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3"
               style={{ maxHeight: "600px", width: "100%" }}
             >
               <TaxTable

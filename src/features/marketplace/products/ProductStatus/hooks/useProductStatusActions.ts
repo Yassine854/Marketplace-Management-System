@@ -28,12 +28,14 @@ export function useProductStatusActions() {
         updatedProductStatus,
       );
       if (response.status === 200) {
+        toast.success("Product status updated successfully!");
         return response.data.productStatus;
       }
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || "Failed to update product status",
-      );
+      const errorMessage =
+        err.response?.data?.message || "Failed to update product status";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error updating product status:", err);
     } finally {
       setIsLoading(false);
@@ -50,6 +52,7 @@ export function useProductStatusActions() {
         `/api/marketplace/product_status/${id}`,
       );
       if (response.status === 200) {
+        toast.success("Product status deleted successfully!");
         return response.data.message;
       }
     } catch (err: any) {

@@ -1,20 +1,20 @@
 const PromoTableHead = () => {
   return (
-    <thead className="border-b border-gray-100 bg-gray-50">
+    <thead className="border-b border-gray-100 bg-primary">
       <tr>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           ID
         </th>
-        <th className="min-w-[150px] whitespace-nowrap px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           Promo Price
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           Start Date
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           End Date
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           Actions
         </th>
       </tr>

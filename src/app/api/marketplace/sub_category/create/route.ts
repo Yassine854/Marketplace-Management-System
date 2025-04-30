@@ -78,7 +78,8 @@ export async function POST(req: Request) {
     }
 
     const name = formData.get("name") as string;
-    const categoryId = formData.get("categoryId") as string; // Must be a valid ObjectId
+    const categoryId = formData.get("categoryId") as string;
+    const isActive = formData.get("isActive") === "true";
     const imageFile = formData.get("image") as File | null;
 
     // Validate required fields
@@ -111,7 +112,7 @@ export async function POST(req: Request) {
       const filePath = path.join(process.cwd(), "public/uploads", fileName);
 
       await writeFile(filePath, buffer);
-      imageUrl = `/uploads/${fileName}`; // Public URL for the stored image
+      imageUrl = `/uploads/${fileName}`;
     }
 
     // Create new subcategory in Prisma
@@ -119,13 +120,14 @@ export async function POST(req: Request) {
       data: {
         name,
         categoryId,
+        isActive,
         ...(imageUrl && { image: imageUrl }),
       },
     });
 
     return NextResponse.json(
       {
-        message: "SubCategory created successfully",
+        message: "Subcategory created successfully",
         subCategory: newSubCategory,
       },
       { status: 201 },

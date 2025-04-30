@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export interface Permission {
   id: string;
@@ -25,10 +26,14 @@ export function usePermissionActions() {
         updatedPermission,
       );
       if (response.status === 200) {
+        toast.success("Permission updated successfully!");
         return response.data.permission;
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update permission");
+      const errorMessage =
+        err.response?.data?.message || "Failed to update permission";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error updating permission:", err);
     } finally {
       setIsLoading(false);
@@ -41,10 +46,14 @@ export function usePermissionActions() {
     try {
       const response = await axios.delete(`/api/marketplace/permissions/${id}`);
       if (response.status === 200) {
+        toast.success("Permission deleted successfully!");
         return response.data.message;
       }
     } catch (err: any) {
-      setError("Failed to delete permission");
+      const errorMessage =
+        err.response?.data?.message || "Failed to delete permission";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error deleting permission:", err);
     } finally {
       setIsLoading(false);

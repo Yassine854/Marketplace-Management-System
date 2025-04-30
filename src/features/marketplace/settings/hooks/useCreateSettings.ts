@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import { Setting } from "@/types/settings"; // Ensure you import the Setting type
+import { Setting } from "@/types/settings";
+import { toast } from "react-hot-toast";
 
 export function useCreateSetting() {
   const [isLoading, setIsLoading] = useState(false);
@@ -38,12 +39,14 @@ export function useCreateSetting() {
         );
 
         await Promise.all(schedulePromises);
+        toast.success("Setting created successfully!");
         onSuccess?.();
       }
     } catch (err: any) {
-      setError(
-        err.response?.data?.error || "Failed to create setting and schedules",
-      );
+      const errorMessage =
+        err.response?.data?.error || "Failed to create setting and schedules";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error:", err);
     } finally {
       setIsLoading(false);

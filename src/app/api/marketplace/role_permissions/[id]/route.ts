@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
-
 const prisma = new PrismaClient();
-
 // GET, PATCH, DELETE a RolePermission by ID
 export async function GET(
   req: Request,
@@ -14,9 +12,7 @@ export async function GET(
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-
     const { id } = params;
-
     const rolePermission = await prisma.rolePermission.findUnique({
       where: { id },
       include: {
@@ -24,14 +20,12 @@ export async function GET(
         permission: true,
       },
     });
-
     if (!rolePermission) {
       return NextResponse.json(
         { message: "RolePermission not found" },
         { status: 404 },
       );
     }
-
     return NextResponse.json(
       { message: "Fetched successfully", rolePermission },
       { status: 200 },
@@ -44,7 +38,6 @@ export async function GET(
     );
   }
 }
-
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -54,7 +47,6 @@ export async function PATCH(
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-
     const { id } = params;
     const { roleId, permissionId, actions } = await req.json();
 
@@ -92,7 +84,6 @@ export async function PATCH(
         actions,
       },
     });
-
     return NextResponse.json(
       { message: "Updated successfully", rolePermission: updated },
       { status: 200 },
@@ -105,7 +96,6 @@ export async function PATCH(
     );
   }
 }
-
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
@@ -115,11 +105,8 @@ export async function DELETE(
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-
     const { id } = params;
-
     await prisma.rolePermission.delete({ where: { id } });
-
     return NextResponse.json(
       { message: "Deleted successfully" },
       { status: 200 },

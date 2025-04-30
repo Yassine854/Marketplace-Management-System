@@ -36,9 +36,6 @@ export default function PermissionTable({
           <thead className="border-b border-gray-100 bg-gray-50">
             <tr>
               <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                ID
-              </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
                 Resource
               </th>
               <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -89,9 +86,6 @@ export default function PermissionTable({
                   key={permission.id}
                   className="transition-colors duration-150 hover:bg-gray-50"
                 >
-                  <td className="px-4 py-2 text-center text-sm text-gray-900">
-                    {permission.id}
-                  </td>
                   <td className="px-4 py-2 text-center text-sm text-gray-900">
                     {permission.resource}
                   </td>

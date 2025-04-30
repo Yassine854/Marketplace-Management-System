@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export function useCreatePartner() {
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +50,7 @@ export function useCreatePartner() {
     if (partnerData.patent) {
       formData.append("patent", partnerData.patent);
     }
+
     try {
       const response = await axios.post(
         "/api/marketplace/partners/create",
@@ -60,11 +62,15 @@ export function useCreatePartner() {
         },
       );
       if (response.status === 201) {
+        toast.success("Partner created successfully");
         onSuccess?.();
       }
     } catch (err: any) {
-      setError("Erreur lors de la création du partenaire");
-      console.error("Erreur:", err);
+      const errorMessage =
+        err.response?.data?.message || "Error creating partner";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      console.error("Error:", err);
     } finally {
       setIsLoading(false);
     }

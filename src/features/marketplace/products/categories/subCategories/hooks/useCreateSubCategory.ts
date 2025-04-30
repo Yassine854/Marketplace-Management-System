@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export function useCreateSubCategory() {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,10 +22,7 @@ export function useCreateSubCategory() {
       const formData = new FormData();
       formData.append("name", subCategoryData.name);
       formData.append("categoryId", subCategoryData.categoryId);
-
-      if (subCategoryData.isActive !== undefined) {
-        formData.append("isActive", String(subCategoryData.isActive));
-      }
+      formData.append("isActive", String(subCategoryData.isActive ?? true));
 
       if (subCategoryData.image) {
         formData.append("image", subCategoryData.image);
@@ -41,10 +39,14 @@ export function useCreateSubCategory() {
       );
 
       if (response.status === 201) {
+        toast.success("Subcategory created successfully");
         onSuccess?.();
       }
     } catch (err: any) {
-      setError("Error creating subcategory");
+      const errorMessage =
+        err.response?.data?.message || "Error creating subcategory";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error:", err);
     } finally {
       setIsLoading(false);

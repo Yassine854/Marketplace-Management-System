@@ -39,9 +39,6 @@ export default function RoleTable({
           <thead className="border-b border-gray-100 bg-gray-50">
             <tr>
               <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                ID
-              </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
                 Name
               </th>
               <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -92,9 +89,6 @@ export default function RoleTable({
                   key={role.id}
                   className="transition-colors duration-150 hover:bg-gray-50"
                 >
-                  <td className="px-4 py-2 text-center text-sm text-gray-900">
-                    {role.id}
-                  </td>
                   <td className="px-4 py-2 text-center text-sm text-gray-900">
                     {role.name}
                   </td>

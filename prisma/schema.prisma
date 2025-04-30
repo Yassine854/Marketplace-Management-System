@@ -725,7 +725,6 @@ model MainOrder {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-
   // One-to-many relationship with Order
   orders    Order[]
 }

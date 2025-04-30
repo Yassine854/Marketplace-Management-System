@@ -34,10 +34,14 @@ export function useSubCategoryActions() {
       );
 
       if (response.status === 200) {
+        toast.success("Subcategory updated successfully");
         return response.data.subCategory;
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update subcategory");
+      const errorMessage =
+        err.response?.data?.message || "Failed to update subcategory";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error updating subcategory:", err);
     } finally {
       setIsLoading(false);
@@ -52,6 +56,7 @@ export function useSubCategoryActions() {
         `/api/marketplace/sub_category/${id}`,
       );
       if (response.status === 200) {
+        toast.success("Subcategory deleted successfully");
         return response.data.message;
       }
     } catch (err: any) {

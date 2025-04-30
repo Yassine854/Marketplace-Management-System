@@ -9,6 +9,10 @@ import FileSaver from "file-saver";
 import { FaRedo } from "react-icons/fa";
 //import Pagination from "@mui/material/Pagination";
 import styles from "../styles/pagination.module.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function LogsPage() {
   const { logs, isLoading, error, refetch } = useGetAllLogs();
@@ -24,13 +28,35 @@ export default function LogsPage() {
     product: "",
     sku: "", // Nouveau filtre SKU
     timestamp: { start: "", end: "" },
+    isValid: () => {
+      if (!tempFilters.timestamp.start && !tempFilters.timestamp.end)
+        return true;
+      if (tempFilters.timestamp.start && tempFilters.timestamp.end) {
+        return (
+          new Date(tempFilters.timestamp.start) <=
+          new Date(tempFilters.timestamp.end)
+        );
+      }
+      return true;
+    },
   });
   const [tempFilters, setTempFilters] = useState({
     orderId: "",
     username: "",
     product: "",
-    sku: "", // Nouveau filtre SKU
+    sku: "",
     timestamp: { start: "", end: "" },
+    isValid: () => {
+      if (!tempFilters.timestamp.start && !tempFilters.timestamp.end)
+        return true;
+      if (tempFilters.timestamp.start && tempFilters.timestamp.end) {
+        return (
+          new Date(tempFilters.timestamp.start) <=
+          new Date(tempFilters.timestamp.end)
+        );
+      }
+      return true;
+    },
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -146,10 +172,12 @@ export default function LogsPage() {
           : null;
         const isDateInRange = (logDate: Date, start: string, end: string) => {
           const logTime = logDate.getTime();
-          const startTime = start ? new Date(start).getTime() : -Infinity;
+          const startTime = start
+            ? new Date(start + "T00:00:00").getTime()
+            : -Infinity;
           const endTime = end
             ? new Date(end + "T23:59:59").getTime()
-            : Infinity; // Inclure toute la journée
+            : Infinity;
 
           return logTime >= startTime && logTime <= endTime;
         };
@@ -292,6 +320,7 @@ export default function LogsPage() {
                   product: "",
                   sku: "",
                   timestamp: { start: "", end: "" },
+                  isValid: () => true,
                 });
                 setTempFilters({
                   orderId: "",
@@ -299,6 +328,23 @@ export default function LogsPage() {
                   product: "",
                   sku: "",
                   timestamp: { start: "", end: "" },
+                  isValid: () => {
+                    if (
+                      !tempFilters.timestamp.start &&
+                      !tempFilters.timestamp.end
+                    )
+                      return true;
+                    if (
+                      tempFilters.timestamp.start &&
+                      tempFilters.timestamp.end
+                    ) {
+                      return (
+                        new Date(tempFilters.timestamp.start) <=
+                        new Date(tempFilters.timestamp.end)
+                      );
+                    }
+                    return true;
+                  },
                 });
               }}
             >
@@ -421,39 +467,62 @@ export default function LogsPage() {
               />
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Date Range</label>
-                <input
-                  type="date"
-                  className="rounded-lg border p-2"
-                  max={tempFilters.timestamp.end || undefined}
-                  value={tempFilters.timestamp.start}
-                  onChange={(e) => {
-                    const newStart = e.target.value;
-                    const currentEnd = tempFilters.timestamp.end;
-                    if (!newStart || !currentEnd || newStart <= currentEnd) {
-                      setTempFilters({
-                        ...tempFilters,
-                        timestamp: {
-                          ...tempFilters.timestamp,
-                          start: newStart,
-                        },
-                      });
-                    }
+                <DatePicker
+                  selected={
+                    tempFilters.timestamp.start
+                      ? new Date(tempFilters.timestamp.start)
+                      : null
+                  }
+                  onChange={(date: Date | null) => {
+                    const newStart = date?.toISOString().split("T")[0] || "";
+                    setTempFilters({
+                      ...tempFilters,
+                      timestamp: {
+                        start: newStart,
+                        end:
+                          tempFilters.timestamp.end &&
+                          newStart > tempFilters.timestamp.end
+                            ? ""
+                            : tempFilters.timestamp.end,
+                      },
+                    });
                   }}
+                  maxDate={
+                    tempFilters.timestamp.end
+                      ? new Date(tempFilters.timestamp.end)
+                      : undefined
+                  }
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Date de début"
+                  className="w-full rounded-lg border p-2"
+                  isClearable
                 />
                 <span className="text-center">to</span>
-                <input
-                  type="date"
-                  className="rounded-lg border p-2"
-                  value={tempFilters.timestamp.end}
-                  onChange={(e) =>
+                <DatePicker
+                  selected={
+                    tempFilters.timestamp.end
+                      ? new Date(tempFilters.timestamp.end)
+                      : null
+                  }
+                  onChange={(date: Date | null) => {
+                    const newEnd = date?.toISOString().split("T")[0] || "";
                     setTempFilters({
                       ...tempFilters,
                       timestamp: {
                         ...tempFilters.timestamp,
-                        end: e.target.value,
+                        end: newEnd,
                       },
-                    })
+                    });
+                  }}
+                  minDate={
+                    tempFilters.timestamp.start
+                      ? new Date(tempFilters.timestamp.start)
+                      : undefined
                   }
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Date de fin"
+                  className="w-full rounded-lg border p-2"
+                  isClearable
                 />
               </div>
             </div>
@@ -467,7 +536,37 @@ export default function LogsPage() {
               <button
                 className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                 onClick={() => {
-                  setFilters(tempFilters);
+                  if (
+                    tempFilters.timestamp.start &&
+                    tempFilters.timestamp.end &&
+                    new Date(tempFilters.timestamp.start) >
+                      new Date(tempFilters.timestamp.end)
+                  ) {
+                    toast.error(
+                      "La date de fin doit être postérieure à la date de début",
+                    );
+                    return;
+                  }
+                  setFilters({
+                    ...tempFilters,
+                    isValid: () => {
+                      if (
+                        !tempFilters.timestamp.start &&
+                        !tempFilters.timestamp.end
+                      )
+                        return true;
+                      if (
+                        tempFilters.timestamp.start &&
+                        tempFilters.timestamp.end
+                      ) {
+                        return (
+                          new Date(tempFilters.timestamp.start) <=
+                          new Date(tempFilters.timestamp.end)
+                        );
+                      }
+                      return true;
+                    },
+                  });
                   setIsFilterOpen(false);
                 }}
               >

@@ -82,187 +82,40 @@ const EditPartnerModal = ({
       onClick={onClose}
     >
       <div
-        className="max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-2xl bg-white p-8 shadow-2xl"
+        className="w-full max-w-6xl rounded-2xl bg-white p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-6 text-3xl font-bold text-gray-800">Edit Partner</h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-800">Edit Partner</h2>
+          <button
+            onClick={onClose}
+            className="rounded-full p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 focus:outline-none"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
 
-        <div className="grid grid-cols-1 gap-6 divide-y divide-gray-200 md:grid-cols-2">
-          {/* Personal Information */}
-          <div className="space-y-4 pb-6">
-            <h3 className="text-xl font-semibold text-primary">
-              Personal Information
-            </h3>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Username *
-                </label>
-                <input
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) =>
-                    setFormData({ ...formData, username: e.target.value })
-                  }
-                  className="w-full rounded-lg border p-3"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  First Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, firstName: e.target.value })
-                  }
-                  className="w-full rounded-lg border p-3"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Last Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, lastName: e.target.value })
-                  }
-                  className="w-full rounded-lg border p-3"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full rounded-lg border p-3"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Password *
-                </label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  className="w-full rounded-lg border p-3"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Company Information */}
-          <div className="space-y-4 pb-6 pt-6">
-            <h3 className="text-xl font-semibold text-primary">
-              Company Information
-            </h3>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Telephone
-                </label>
-                <input
-                  type="text"
-                  value={formData.telephone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, telephone: e.target.value })
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Address
-                </label>
-                <input
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) =>
-                    setFormData({ ...formData, address: e.target.value })
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Logo
-                </label>
-                {partner.logo && (
-                  <div className="mb-2">
-                    <span className="text-sm">Current Logo: </span>
-                    <a
-                      href={partner.logo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      View Logo
-                    </a>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    setFormData({ ...formData, logo: e.target.files?.[0] })
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Patent
-                </label>
-                {partner.patent && (
-                  <div className="mb-2">
-                    <span className="text-sm">Current Patent: </span>
-                    <a
-                      href={partner.patent}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      View Patent
-                    </a>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  onChange={(e) =>
-                    setFormData({ ...formData, patent: e.target.files?.[0] })
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Partnership Details */}
-          <div className="space-y-4 pt-6 md:col-span-2">
-            <h3 className="text-xl font-semibold text-primary">
+        <div className="grid grid-cols-3 gap-4">
+          {/* Partnership Details - Left column */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-primary">
               Partnership Details
             </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+
+            <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Responsible Name *
+                  Responsible *
                 </label>
                 <input
                   type="text"
@@ -273,7 +126,7 @@ const EditPartnerModal = ({
                       responsibleName: e.target.value,
                     })
                   }
-                  className="w-full rounded-lg border p-3"
+                  className="w-full rounded-lg border p-2 text-sm"
                   required
                 />
               </div>
@@ -287,10 +140,13 @@ const EditPartnerModal = ({
                   onChange={(e) =>
                     setFormData({ ...formData, position: e.target.value })
                   }
-                  className="w-full rounded-lg border p-3"
+                  className="w-full rounded-lg border p-2 text-sm"
                   required
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Coverage Area *
@@ -301,13 +157,13 @@ const EditPartnerModal = ({
                   onChange={(e) =>
                     setFormData({ ...formData, coverageArea: e.target.value })
                   }
-                  className="w-full rounded-lg border p-3"
+                  className="w-full rounded-lg border p-2 text-sm"
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Minimum Amount *
+                  Min Amount *
                 </label>
                 <input
                   type="number"
@@ -318,66 +174,241 @@ const EditPartnerModal = ({
                       minimumAmount: Number(e.target.value),
                     })
                   }
-                  className="w-full rounded-lg border p-3"
+                  className="w-full rounded-lg border p-2 text-sm"
                   required
                 />
               </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Partner Type *
-                </label>
-                <select
-                  value={formData.typePartnerId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, typePartnerId: e.target.value })
-                  }
-                  className="w-full rounded-lg border p-3"
-                  required
-                >
-                  <option value="">Select Partner Type</option>
-                  {typePartners?.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            </div>
 
-              <div className="md:col-span-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Partner Type *
+              </label>
+              <select
+                value={formData.typePartnerId}
+                onChange={(e) =>
+                  setFormData({ ...formData, typePartnerId: e.target.value })
+                }
+                className="w-full rounded-lg border p-2 text-sm"
+                required
+              >
+                <option value="">Select Partner Type</option>
+                {typePartners?.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Role *
+              </label>
+              <select
+                value={formData.mRoleId}
+                onChange={(e) =>
+                  setFormData({ ...formData, mRoleId: e.target.value })
+                }
+                className="w-full rounded-lg border p-2 text-sm"
+                required
+              >
+                <option value="">Select Role</option>
+                {roles?.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Personal Information - Middle column */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-primary">
+              Personal Information
+            </h3>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Role *
+                  First Name *
                 </label>
-                <select
-                  value={formData.mRoleId}
+                <input
+                  type="text"
+                  value={formData.firstName}
                   onChange={(e) =>
-                    setFormData({ ...formData, mRoleId: e.target.value })
+                    setFormData({ ...formData, firstName: e.target.value })
                   }
-                  className="w-full rounded-lg border p-3"
+                  className="w-full rounded-lg border p-2 text-sm"
                   required
-                >
-                  <option value="">Select Role</option>
-                  {roles?.map((role) => (
-                    <option key={role.id} value={role.id}>
-                      {role.name}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Last Name *
+                </label>
+                <input
+                  type="text"
+                  value={formData.lastName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, lastName: e.target.value })
+                  }
+                  className="w-full rounded-lg border p-2 text-sm"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Username *
+              </label>
+              <input
+                type="text"
+                value={formData.username}
+                onChange={(e) =>
+                  setFormData({ ...formData, username: e.target.value })
+                }
+                className="w-full rounded-lg border p-2 text-sm"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Email *
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                className="w-full rounded-lg border p-2 text-sm"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Password *
+              </label>
+              <input
+                type="password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                className="w-full rounded-lg border p-2 text-sm"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Company Information - Right column */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-primary">
+              Company Information
+            </h3>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Telephone *
+              </label>
+              <input
+                type="text"
+                value={formData.telephone}
+                onChange={(e) =>
+                  setFormData({ ...formData, telephone: e.target.value })
+                }
+                className="w-full rounded-lg border p-2 text-sm"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Address *
+              </label>
+              <input
+                type="text"
+                value={formData.address}
+                onChange={(e) =>
+                  setFormData({ ...formData, address: e.target.value })
+                }
+                className="w-full rounded-lg border p-2 text-sm"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Logo
+              </label>
+              {partner.logo && (
+                <div className="mb-2">
+                  <span className="text-sm">Current Logo: </span>
+                  <a
+                    href={partner.logo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    View Logo
+                  </a>
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setFormData({ ...formData, logo: e.target.files?.[0] })
+                }
+                className="w-full rounded-lg border p-2 text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Patent
+              </label>
+              {partner.patent && (
+                <div className="mb-2">
+                  <span className="text-sm">Current Patent: </span>
+                  <a
+                    href={partner.patent}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    View Patent
+                  </a>
+                </div>
+              )}
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={(e) =>
+                  setFormData({ ...formData, patent: e.target.files?.[0] })
+                }
+                className="w-full rounded-lg border p-2 text-sm"
+              />
             </div>
           </div>
         </div>
 
         {/* Buttons */}
-        <div className="mt-8 flex justify-end gap-4">
+        <div className="mt-6 flex justify-end gap-4">
           <button
             onClick={onClose}
-            className="rounded-lg bg-gray-400 px-5 py-2 text-white hover:bg-gray-500"
+            className="rounded-lg bg-gray-400 px-4 py-2 text-sm text-white hover:bg-gray-500"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700"
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
           >
             Save Changes
           </button>

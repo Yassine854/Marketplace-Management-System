@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Customer } from "@/types/customer";
+import { toast } from "react-hot-toast";
 
 export function useCreateCustomer() {
   const [isLoading, setIsLoading] = useState(false);
@@ -32,12 +33,14 @@ export function useCreateCustomer() {
       );
 
       if (response.status === 201) {
+        toast.success("Customer created successfully!");
         return response.data.customer;
       }
     } catch (err: any) {
       const errorMessage =
         err.response?.data?.error || "Failed to create customer";
       setError(errorMessage);
+      toast.error(errorMessage);
       throw new Error(errorMessage);
     } finally {
       setIsLoading(false);

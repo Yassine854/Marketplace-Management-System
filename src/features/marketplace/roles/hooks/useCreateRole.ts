@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 interface CreateRoleData {
   name: string;
@@ -19,11 +20,15 @@ export function useCreateRole() {
       });
 
       if (response.status === 201) {
+        toast.success("Role created successfully!");
         onSuccess?.();
       }
     } catch (err: any) {
-      setError("Erreur lors de la création du rôle");
-      console.error("Erreur:", err);
+      const errorMessage =
+        err.response?.data?.message || "Failed to create role";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      console.error("Error:", err);
     } finally {
       setIsLoading(false);
     }

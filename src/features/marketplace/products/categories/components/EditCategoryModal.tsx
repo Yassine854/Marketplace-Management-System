@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import type { Category } from "@/types/category"; // Adjust import path
 
 interface EditCategoryModalProps {
@@ -63,9 +64,17 @@ const EditCategoryModal = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-2xl transition-all duration-300 ease-in-out"
+        className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-2xl transition-all duration-300 ease-in-out"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+        >
+          <XMarkIcon className="h-6 w-6" />
+        </button>
+
         <h2 className="mb-4 text-2xl font-bold text-gray-800">Edit Category</h2>
 
         {/* Category Name Input */}

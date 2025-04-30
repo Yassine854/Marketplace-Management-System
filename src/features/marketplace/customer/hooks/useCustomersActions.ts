@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios, { AxiosError } from "axios";
 import { Customer } from "@/types/customer";
+import { toast } from "react-hot-toast";
 
 export function useCustomersActions() {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +20,9 @@ export function useCustomersActions() {
       const email = formData.get("email");
 
       if (!firstName || !lastName || !email) {
-        throw new Error("Missing required fields");
+        const errorMsg = "Missing required fields";
+        toast.error(errorMsg);
+        throw new Error(errorMsg);
       }
 
       const response = await axios.patch(
@@ -33,14 +36,18 @@ export function useCustomersActions() {
       );
 
       if (response.status === 200) {
-        setSuccessMessage("Customer updated successfully!");
+        const successMsg = "Customer updated successfully!";
+        setSuccessMessage(successMsg);
+        toast.success(successMsg);
         return true;
       } else {
         return false;
       }
     } catch (err: AxiosError | any) {
       console.error("Error editing customer:", err);
-      setError(err.response?.data?.error || "Failed to edit customer");
+      const errorMsg = err.response?.data?.error || "Failed to edit customer";
+      setError(errorMsg);
+      toast.error(errorMsg);
       return false;
     } finally {
       setIsLoading(false);
@@ -54,12 +61,16 @@ export function useCustomersActions() {
     try {
       const response = await axios.delete(`/api/marketplace/customers/${id}`);
       if (response.status === 200) {
-        setSuccessMessage("Customer deleted successfully!");
+        const successMsg = "Customer deleted successfully!";
+        setSuccessMessage(successMsg);
+        toast.success(successMsg);
         return response.data.message;
       }
     } catch (err: AxiosError | any) {
       console.error("Error deleting customer:", err);
-      setError(err.response?.data?.error || "Failed to delete customer");
+      const errorMsg = err.response?.data?.error || "Failed to delete customer";
+      setError(errorMsg);
+      toast.error(errorMsg);
       return null;
     } finally {
       setIsLoading(false);
