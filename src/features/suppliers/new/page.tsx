@@ -391,6 +391,7 @@ const SupplierForm = () => {
             id: product.id,
             product_id: product.product_id,
             sku: product.sku,
+            skuPartner: null,
             name: product.name,
             price: product.price,
             cost: product.cost ?? null,

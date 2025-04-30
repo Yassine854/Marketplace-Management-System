@@ -25,7 +25,16 @@ export default function CustomerTable({
   const { editCustomer, deleteCustomer } = useCustomersActions();
 
   const handleEdit = (id: string, updatedCustomer: Customer) => {
-    editCustomer(id, updatedCustomer).then(() => {
+    const formData = new FormData();
+    Object.entries(updatedCustomer).forEach(([key, value]) => {
+      if (value instanceof File) {
+        formData.append(key, value);
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
+      }
+    });
+
+    editCustomer(id, formData).then(() => {
       refetch();
     });
   };

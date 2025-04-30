@@ -23,10 +23,6 @@ export async function POST(req: Request) {
         reservationId: body.reservationId,
         productId: body.productId,
         taxId: body.taxId,
-        qteCanceled: body.qteCanceled || 0, // Default value or from body
-        reservation: { connect: { id: body.reservationId } }, // Adjust as needed
-        product: { connect: { id: body.productId } }, // Adjust as needed
-        tax: { connect: { id: body.taxId } }, // Adjust as needed
       },
     });
 
