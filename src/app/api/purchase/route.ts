@@ -17,17 +17,6 @@ export async function POST(req: Request) {
       files,
       products,
     } = await req.json();
-    console.log("Données de la requête:", {
-      manufacturerId,
-      warehouseId,
-      deliveryDate,
-      totalAmount,
-      status,
-      comments,
-      payments,
-      files,
-      products,
-    });
 
     const parsedManufacturerId = Number(manufacturerId);
     const parsedWarehouseId = Number(warehouseId);

@@ -160,7 +160,6 @@ export async function PATCH(
 
     const { id } = params;
     const body = await req.json();
-    console.log("Body received:", body);
 
     const startDate = new Date(body.startDate);
     const endDate = new Date(body.endDate);

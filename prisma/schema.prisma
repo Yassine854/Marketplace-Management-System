@@ -62,11 +62,11 @@ model Category {
   categoryId   Int?      // ID Magento
   nameCategory String
   isActive     Boolean?  @default(true)
-  image        String?             
+  image        String?
   createdAt    DateTime?           @default(now())
   updatedAt    DateTime?           @updatedAt
 
-  supplierCategories    SupplierCategory[]  
+  supplierCategories    SupplierCategory[]
   subCategories  SubCategory[]
 }
 
@@ -80,7 +80,7 @@ model Warehouse {
   code        String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  purchaseOrders PurchaseOrder[] 
+  purchaseOrders PurchaseOrder[]
 }
 model Product {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -100,35 +100,37 @@ model Product {
   stock_item     StockItem?
 
   barcode              String?  @unique
-  pcb                  String?    
-  weight               Float?   
-  description          String?  
-  stock                Int?     
-  promo                Boolean  @default(false)  
-  minimumQte           Int?     
-  maximumQte           Int?  
+  pcb                  String?
+  weight               Float?
+  description          String?
+  stock                Int?
+  promo                Boolean  @default(false)
+  minimumQte           Int?
+  maximumQte           Int?
   sealable             Float?
   alertQte             Int?
   loyaltyPointsPerProduct       Float?
-  loyaltyPointsPerUnit  Float?    
-  loyaltyPointsBonusQuantity  Float? 
-  loyaltyPointsThresholdQty Float? 
+  loyaltyPointsPerUnit          Float?
+  loyaltyPointsBonusQuantity    Float?
+  loyaltyPointsThresholdQty     Float?
 
-  typePcbId            String?  @db.ObjectId 
-  typePcb              TypePcb? @relation(fields: [typePcbId], references: [id]) 
-  productTypeId        String?  @db.ObjectId  
-  productType          ProductType? @relation(fields: [productTypeId], references: [id])  
-  productStatusId      String?  @db.ObjectId  
-  productStatus        ProductStatus? @relation(fields: [productStatusId], references: [id]) 
-  supplierId           String?  @db.ObjectId 
-  supplier             Manufacturer? @relation(fields: [supplierId], references: [id]) 
-  taxId                String?   @db.ObjectId 
+  typePcbId            String?  @db.ObjectId
+  typePcb              TypePcb? @relation(fields: [typePcbId], references: [id])
+  productTypeId        String?  @db.ObjectId
+  productType          ProductType? @relation(fields: [productTypeId], references: [id])
+  productStatusId      String?  @db.ObjectId
+  productStatus        ProductStatus? @relation(fields: [productStatusId], references: [id])
+  supplierId           String?  @db.ObjectId
+  supplier             Manufacturer? @relation(fields: [supplierId], references: [id])
+  taxId                String?   @db.ObjectId
   tax                  Tax?      @relation(fields: [taxId], references: [id])
   promotion            Promotion?  @relation(fields: [promotionId], references: [id])
   promotionId          String?     @db.ObjectId
+  hasPartner  Boolean   @default(false)
+
   images               Image[]
   notifyRequests       NotifyMe[]
-  
+
   relatedProducts      RelatedProduct[] @relation("ProductToRelatedProduct")
   relatedTo            RelatedProduct[] @relation("RelatedProductToProduct")
 
@@ -141,7 +143,9 @@ model Product {
   orderItems OrderItem[]
   reservationItems    ReservationItem[]
   skuPartners SkuPartner[]
-  
+  partnerId   String?   @db.ObjectId
+  partner     Partner?  @relation(fields: [partnerId], references: [id])
+
   @@index([category_ids])
   @@map("products")
 }
@@ -175,14 +179,14 @@ model Manufacturer {
   country              String?
   capital              String?
   email                String?
-  payments             Payment[]     
-  purchaseOrders       PurchaseOrder[] 
+  payments             Payment[]
+  purchaseOrders       PurchaseOrder[]
   address              String?
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
-  products Product[]  
-  supplierCategories    SupplierCategory[]  
+  products Product[]
+  supplierCategories    SupplierCategory[]
   @@map("manufacturers")
 }
 model Payment {
@@ -233,7 +237,7 @@ enum OrderState {
 model File {
 
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String 
+  name      String
   url       String
   order     PurchaseOrder? @relation(fields: [orderId], references: [id])
 
@@ -268,7 +272,7 @@ model PurchaseOrder {
   comments        Comment[]
   payments        Payment[]
   files           File[]
-  products        ProductOrdered[] 
+  products        ProductOrdered[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   @@map("purchase_orders")
@@ -280,8 +284,8 @@ model ProductOrdered {
   name           String
   quantity       Int
   priceExclTax   Float
-  total          Float 
-  sku            String? 
+  total          Float
+  sku            String?
   purchaseOrder  PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id])
   purchaseOrderId String?
   @@map("productOrdered")
@@ -308,14 +312,14 @@ model Partner {
   address         String
   password        String
   isActive        Boolean  @default(true)
-  logo            String?  
-  patent          String?  
-  responsibleName String   
-  position        String  
-  coverageArea    String   
-  minimumAmount   Float    
+  logo            String?
+  patent          String?
+  responsibleName String
+  position        String
+  coverageArea    String
+  minimumAmount   Float
   typePartner     TypePartner @relation(fields: [typePartnerId], references: [id])
-  typePartnerId   String   @db.ObjectId   
+  typePartnerId   String   @db.ObjectId
   mRoleId          String?
   role            Role?     @relation(fields: [mRoleId], references: [id])
 
@@ -326,6 +330,7 @@ model Partner {
   orders   Order[]
   reservations Reservation[]
   skuPartners SkuPartner[]
+  products Product[]
   settings Settings[]
   @@map("partners")
 }
@@ -375,10 +380,10 @@ model Customers {
   businessType String
   activity1    String
   activity2    String?
-  
+
   // Nouveaux champs ajoutés
-  cinPhoto     String?   
-  patentPhoto  String?   
+  cinPhoto     String?
+  patentPhoto  String?
   // Relations
   favoriteProducts  FavoriteProduct[]
   favoritePartners  FavoritePartner[]
@@ -395,35 +400,35 @@ model Customers {
 
 model TypePcb {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  name    String   @unique 
-  products Product[]  
-  
-  @@map("type_pcb") 
+  name    String   @unique
+  products Product[]
+
+  @@map("type_pcb")
 }
 
 
 model ProductType {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  type    String   @unique 
-  products Product[] 
-  
-  @@map("product_types") 
+  type    String   @unique
+  products Product[]
+
+  @@map("product_types")
 }
 
 
 model ProductStatus {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  actif   Boolean  @default(true) 
-  name    String   @unique         
-  products Product[]  
+  actif   Boolean  @default(true)
+  name    String   @unique
+  products Product[]
 
   @@map("product_statuses")
 }
 
 model Tax {
   id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  value    Float     @unique 
-  products Product[] 
+  value    Float     @unique
+  products Product[]
   orderItems OrderItem[]
   reservationItems    ReservationItem[]
   @@map("taxes")
@@ -431,18 +436,18 @@ model Tax {
 
 model Promotion {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  startDate  DateTime  
-  endDate    DateTime  
-  promoPrice Float     
-  products   Product[] 
+  startDate  DateTime
+  endDate    DateTime
+  promoPrice Float
+  products   Product[]
 
   @@map("promotions")
 }
 
 model Image {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  url        String   
-  altText    String?  
+  url        String
+  altText    String?
   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId  String   @db.ObjectId
 
@@ -452,7 +457,7 @@ model Image {
 
 model NotifyMe {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  clientName  String   
+  clientName  String
   product     Product  @relation(fields: [productSku], references: [sku])
   productSku  String
   customerId  String   @db.ObjectId
@@ -470,7 +475,7 @@ model RelatedProduct {
   product          Product  @relation("ProductToRelatedProduct", fields: [productId], references: [id], onDelete: Cascade)
   relatedProduct   Product  @relation("RelatedProductToProduct", fields: [relatedProductId], references: [id], onDelete: Cascade)
 
-  @@unique([productId, relatedProductId])  
+  @@unique([productId, relatedProductId])
   @@map("related_products")
 }
 
@@ -482,17 +487,17 @@ model SupplierCategory {
   supplier   Manufacturer   @relation(fields: [supplierId], references: [id])
   category   Category  @relation(fields: [categoryId], references: [id])
 
-  // @@unique([supplierId, categoryId])  
+  // @@unique([supplierId, categoryId])
 }
 
 
 model ProductSubCategory {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
   productId  String    @db.ObjectId
-  subcategoryId String    @db.ObjectId  
+  subcategoryId String    @db.ObjectId
 
   product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  subcategory SubCategory  @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)  
+  subcategory SubCategory  @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
   @@unique([productId, subcategoryId])
 }
 
@@ -500,14 +505,14 @@ model SubCategory {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   isActive    Boolean?  @default(true)
-  image       String?       
+  image       String?
   categoryId  String    @db.ObjectId
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   productSubCategories       ProductSubCategory[]
 
-  @@unique([name, categoryId]) 
+  @@unique([name, categoryId])
 }
 
 
@@ -520,7 +525,7 @@ model FavoriteProduct {
   product     Product  @relation(fields: [productId], references: [id])
 
   @@unique([customerId, productId])
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -544,7 +549,7 @@ model FavoritePartner {
 model State {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String   @unique
-  statuses  Status[] 
+  statuses  Status[]
   orders   Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -579,17 +584,17 @@ model Order {
 
   // Relationships
   statusId            String   @db.ObjectId
-  status              Status   @relation(fields: [statusId], references: [id]) 
+  status              Status   @relation(fields: [statusId], references: [id])
   isActive            Boolean  @default(true)
 
   stateId             String   @db.ObjectId
-  state               State    @relation(fields: [stateId], references: [id]) 
+  state               State    @relation(fields: [stateId], references: [id])
 
   customerId          String   @db.ObjectId
-  customer            Customers @relation(fields: [customerId], references: [id]) 
+  customer            Customers @relation(fields: [customerId], references: [id])
 
   agentId           String?  @db.ObjectId
-  agent             Agent?   @relation(fields: [agentId], references: [id]) 
+  agent             Agent?   @relation(fields: [agentId], references: [id])
 
   reservationId     String?  @db.ObjectId @unique
   reservation       Reservation? @relation
@@ -599,11 +604,11 @@ model Order {
 
 
   partnerId         String   @db.ObjectId
-  partner           Partner   @relation(fields: [partnerId], references: [id]) 
+  partner           Partner   @relation(fields: [partnerId], references: [id])
   orderItems        OrderItem[]
   loyaltyPoints     LoyaltyPoints[]
   paymentMethodId   String       @db.ObjectId
-  paymentMethod     OrderPayment @relation(fields: [paymentMethodId], references: [id]) 
+  paymentMethod     OrderPayment @relation(fields: [paymentMethodId], references: [id])
 
 }
 
@@ -624,12 +629,12 @@ model OrderItem {
 
   // Relationships
   orderId         String   @db.ObjectId
-  order           Order    @relation(fields: [orderId], references: [id]) 
+  order           Order    @relation(fields: [orderId], references: [id])
 
   productId       String   @db.ObjectId
-  product         Product   @relation(fields: [productId], references: [id]) 
+  product         Product   @relation(fields: [productId], references: [id])
 
-  tax             Tax?      @relation(fields: [taxId], references: [id]) 
+  tax             Tax?      @relation(fields: [taxId], references: [id])
 }
 
 
@@ -640,7 +645,7 @@ model OrderPayment {
   updatedAt DateTime @updatedAt
 
   // Relationships
-  orders    Order[]  
+  orders    Order[]
   reservations    Reservation[]
 }
 
@@ -664,13 +669,13 @@ model Reservation {
 
   // Relationships
   customerId          String   @db.ObjectId
-  customer            Customers @relation(fields: [customerId], references: [id]) 
+  customer            Customers @relation(fields: [customerId], references: [id])
 
   agentId             String?  @db.ObjectId
-  agent               Agent?   @relation(fields: [agentId], references: [id]) 
+  agent               Agent?   @relation(fields: [agentId], references: [id])
 
   partnerId           String   @db.ObjectId
-  partner             Partner  @relation(fields: [partnerId], references: [id]) 
+  partner             Partner  @relation(fields: [partnerId], references: [id])
 
   orderId             String?  @db.ObjectId @unique
   order               Order?   @relation(fields: [orderId], references: [id])
@@ -678,7 +683,7 @@ model Reservation {
   reservationItems    ReservationItem[]
 
   paymentMethodId     String   @db.ObjectId
-  paymentMethod       OrderPayment @relation(fields: [paymentMethodId], references: [id]) 
+  paymentMethod       OrderPayment @relation(fields: [paymentMethodId], references: [id])
 }
 
 
@@ -687,18 +692,18 @@ model ReservationItem {
   qteReserved    Int
   discountedPrice Float
   weight         Float
-  sku            String    @unique 
+  sku            String    @unique
   taxId          String?   @db.ObjectId
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
   // Relationships
   reservationId  String   @db.ObjectId
-  reservation    Reservation @relation(fields: [reservationId], references: [id]) 
+  reservation    Reservation @relation(fields: [reservationId], references: [id])
 
   productId      String   @db.ObjectId
-  product        Product @relation(fields: [productId], references: [id]) 
-  tax             Tax?      @relation(fields: [taxId], references: [id]) 
+  product        Product @relation(fields: [productId], references: [id])
+  tax             Tax?      @relation(fields: [taxId], references: [id])
 }
 
 
@@ -713,7 +718,7 @@ model LoyaltyPoints {
   // Relationships
 
   orderId      String?   @db.ObjectId
-  order        Order?    @relation(fields: [orderId], references: [id]) 
+  order        Order?    @relation(fields: [orderId], references: [id])
 
 
 }
@@ -721,7 +726,7 @@ model LoyaltyPoints {
 
 model MainOrder {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -735,7 +740,12 @@ model SkuPartner {
   partnerId   String   @db.ObjectId
   skuPartner  String   @unique
   skuProduct  String
-
+  stock       Int
+  Price       String
+  loyaltyPointsPerProduct       Float?
+  loyaltyPointsPerUnit          Float?
+  loyaltyPointsBonusQuantity    Float?
+  loyaltyPointsThresholdQty     Float?
   product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
@@ -750,11 +760,11 @@ model Settings {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   deliveryType      String
   deliveryTypeAmount      String
-  freeDeliveryAmount     String 
-  loyaltyPointsAmount     String   
-  loyaltyPointsUnique    String  
+  freeDeliveryAmount     String
+  loyaltyPointsAmount     String
+  loyaltyPointsUnique    String
   partnerId    String?   @db.ObjectId
-  partner      Partner?  @relation(fields: [partnerId], references: [id], onDelete: Cascade) 
+  partner      Partner?  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
   schedules   SettingSchedule[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -787,7 +797,7 @@ model Role {
 
 model Permission {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  resource  String  
+  resource  String
   roles     RolePermission[]
 }
 

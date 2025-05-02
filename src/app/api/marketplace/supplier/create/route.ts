@@ -91,22 +91,6 @@ export async function POST(req: Request) {
       categories,
     } = body;
 
-    // Log the received data
-    console.log("Received data:", {
-      manufacturerId,
-      code,
-      companyName,
-      contactName,
-      phoneNumber,
-      postalCode,
-      city,
-      country,
-      capital,
-      email,
-      address,
-      categories,
-    });
-
     // Create the manufacturer in the database
     const newManufacturer = await prisma.manufacturer.create({
       data: {

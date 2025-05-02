@@ -67,6 +67,12 @@ export async function PATCH(
         partnerId: body.partnerId,
         skuPartner: body.skuPartner,
         skuProduct: body.skuProduct,
+        stock: body.stock,
+        Price: body.Price,
+        loyaltyPointsPerProduct: body.loyaltyPointsPerProduct,
+        loyaltyPointsPerUnit: body.loyaltyPointsPerUnit,
+        loyaltyPointsBonusQuantity: body.loyaltyPointsBonusQuantity,
+        loyaltyPointsThresholdQty: body.loyaltyPointsThresholdQty,
       },
     });
 

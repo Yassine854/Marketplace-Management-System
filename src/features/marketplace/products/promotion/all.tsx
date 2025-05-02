@@ -150,7 +150,6 @@ const PromotionManagementPage = () => {
   };
 
   const handleEdit = (promotion: Promotion) => {
-    console.log(promotion);
     setEditingPromotion(promotion);
   };
 

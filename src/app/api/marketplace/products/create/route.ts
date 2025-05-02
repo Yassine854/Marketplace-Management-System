@@ -94,6 +94,21 @@ export async function POST(req: Request) {
       }
     }
 
+    // Check if SKU already exists
+    const sku = formData.get("sku") as string;
+    if (sku) {
+      const existingProductWithSku = await prisma.product.findUnique({
+        where: { sku },
+      });
+
+      if (existingProductWithSku) {
+        return NextResponse.json(
+          { message: "SKU already exists" },
+          { status: 400 },
+        );
+      }
+    }
+
     const timestamp = Date.now();
     const randomComponent = Math.floor(Math.random() * 1000000);
     const uniqueProductId = parseInt(`${timestamp}${randomComponent}`);
@@ -103,7 +118,7 @@ export async function POST(req: Request) {
         product_id: uniqueProductId,
         name: formData.get("name") as string,
         barcode,
-        sku: formData.get("sku") as string,
+        sku: sku,
         price: parseFloat(formData.get("price") as string),
         cost: formData.get("cost")
           ? parseFloat(formData.get("cost") as string)
@@ -153,6 +168,7 @@ export async function POST(req: Request) {
       },
     });
 
+    // Return the product data immediately
     return NextResponse.json(
       { message: "Product created", product: newProduct },
       { status: 201 },

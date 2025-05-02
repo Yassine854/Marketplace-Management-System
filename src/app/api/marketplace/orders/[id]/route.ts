@@ -150,7 +150,6 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
-    console.log("Incoming PATCH request body:", body);
     const {
       id: _,
       createdAt,

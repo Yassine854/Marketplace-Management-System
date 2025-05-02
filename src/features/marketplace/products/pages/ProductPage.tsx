@@ -40,7 +40,9 @@ const ProductPage = () => {
   const [taxes, setTaxOptions] = useState<any[]>([]);
   const [promotions, setPromotionOptions] = useState<any[]>([]);
   const [subCategories, setSubCategoryOptions] = useState<any[]>([]);
-  const [partners, setPartners] = useState<any[]>([]);
+  const [partners, setPartners] = useState<
+    Array<{ id: string; username: string }>
+  >([]);
 
   const [imageFiles, setImageFiles] = useState<File[]>([]);
 
@@ -243,9 +245,17 @@ const ProductPage = () => {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onCreate={async (productData) => {
-            await createProduct(productData);
-            refetch();
-            setIsModalOpen(false);
+            try {
+              const result = await createProduct(productData);
+              if (result) {
+                refetch();
+                return result;
+              }
+              return null;
+            } catch (error) {
+              // Pass the error up to the modal to handle
+              throw error;
+            }
           }}
           suppliers={suppliers}
           productTypes={productTypes}
@@ -255,6 +265,7 @@ const ProductPage = () => {
           relatedProducts={products}
           taxes={taxes}
           promotions={promotions}
+          partners={partners}
         />
 
         <EditProductModal

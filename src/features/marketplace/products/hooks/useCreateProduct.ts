@@ -31,6 +31,16 @@ interface CreateProductData {
   relatedProducts: string[];
   promo: boolean;
   images?: File[];
+  skuPartners?: Array<{
+    partnerId: string;
+    skuPartner: string;
+    stock: number;
+    price: number;
+    loyaltyPointsPerProduct?: number;
+    loyaltyPointsPerUnit?: number;
+    loyaltyPointsBonusQuantity?: number;
+    loyaltyPointsThresholdQty?: number;
+  }>;
 }
 
 export function useCreateProduct() {
@@ -50,6 +60,7 @@ export function useCreateProduct() {
 
       Object.entries(productData).forEach(([key, value]) => {
         if (key === "images") return;
+        if (key === "skuPartners") return; // Skip skuPartners for now
 
         if (Array.isArray(value)) {
           value.forEach((item, index) =>
@@ -59,6 +70,7 @@ export function useCreateProduct() {
           formData.append(key, value.toString());
         }
       });
+
       if (productData.promo !== undefined) {
         formData.append("promo", productData.promo.toString());
       }
@@ -90,6 +102,30 @@ export function useCreateProduct() {
         ),
       ];
 
+      // Add SKU partner creation promises
+      if (productData.skuPartners && productData.skuPartners.length > 0) {
+        const validSkuPartners = productData.skuPartners.filter(
+          (partner) => partner.partnerId && partner.skuPartner,
+        );
+
+        promises.push(
+          ...validSkuPartners.map((partner) =>
+            axios.post("/api/marketplace/sku_partner/create", {
+              productId,
+              partnerId: partner.partnerId,
+              skuPartner: partner.skuPartner,
+              skuProduct: productData.sku,
+              stock: partner.stock || 0,
+              price: partner.price || 0,
+              loyaltyPointsPerProduct: partner.loyaltyPointsPerProduct,
+              loyaltyPointsPerUnit: partner.loyaltyPointsPerUnit,
+              loyaltyPointsBonusQuantity: partner.loyaltyPointsBonusQuantity,
+              loyaltyPointsThresholdQty: partner.loyaltyPointsThresholdQty,
+            }),
+          ),
+        );
+      }
+
       // Only add image upload promise if there are images
       if (images.length > 0) {
         const imageFormData = new FormData();
@@ -111,8 +147,15 @@ export function useCreateProduct() {
         onSuccess?.(response.data.product.id);
         return response.data.product;
       }
+
+      return null;
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Error creating product");
+      const errorMessage =
+        err.response?.data?.message || "Error creating product";
+      setError(errorMessage);
+
+      // Throw the error so it can be caught by the component
+      throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
     }

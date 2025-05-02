@@ -15,7 +15,6 @@ export const useGetAllStates = () => {
       const { data } = await axios.servicesClient.get<{ states: State[] }>(
         "/api/marketplace/state/getAll",
       );
-      console.log("received response ", data);
       setState(data.states || []);
     } catch (err) {
       let errorMessage = "Failed to fetch states";

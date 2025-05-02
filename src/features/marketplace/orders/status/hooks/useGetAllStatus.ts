@@ -15,7 +15,6 @@ export const useGetAllStatus = () => {
       const { data } = await axios.servicesClient.get<{ statuses: Status[] }>(
         "/api/marketplace/status/getAll",
       );
-      console.log("received response ", data);
       setStatus(data.statuses || []);
     } catch (err) {
       let errorMessage = "Failed to fetch status";

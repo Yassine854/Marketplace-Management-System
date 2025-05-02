@@ -60,7 +60,6 @@ const ManufacturerManagementPage = () => {
 
         if (!response.ok) throw new Error("Failed to fetch categories");
         const data = await response.json();
-        console.log("API Response:", data);
         if (!Array.isArray(data)) {
           throw new Error("Invalid categories data format");
         }

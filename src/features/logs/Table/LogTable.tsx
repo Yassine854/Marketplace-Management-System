@@ -66,7 +66,6 @@ export default function LogTable({
 
   const handleDataClick = (data: any, message: string) => {
     setSelectedData(data);
-    console.log(message);
 
     if (
       message.includes("order status changed") ||

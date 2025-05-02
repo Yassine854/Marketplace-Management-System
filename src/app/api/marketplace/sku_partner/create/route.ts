@@ -33,6 +33,12 @@ export async function POST(req: Request) {
         partnerId: body.partnerId,
         skuPartner: body.skuPartner,
         skuProduct: body.skuProduct,
+        stock: body.stock || 0,
+        Price: body.price?.toString() || "0",
+        loyaltyPointsPerProduct: body.loyaltyPointsPerProduct || null,
+        loyaltyPointsPerUnit: body.loyaltyPointsPerUnit || null,
+        loyaltyPointsBonusQuantity: body.loyaltyPointsBonusQuantity || null,
+        loyaltyPointsThresholdQty: body.loyaltyPointsThresholdQty || null,
       },
     });
 

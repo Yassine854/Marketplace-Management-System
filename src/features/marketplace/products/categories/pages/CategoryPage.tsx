@@ -14,7 +14,6 @@ import { useRouter } from "@/libs/next-intl/i18nNavigation";
 
 const CategoryPage = () => {
   const { categories, isLoading, error, refetch } = useGetAllCategories();
-  console.log("Fetched categories:", categories);
 
   const {
     editCategory,

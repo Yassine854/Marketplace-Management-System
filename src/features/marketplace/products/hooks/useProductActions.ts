@@ -40,7 +40,6 @@ export function useProductActions() {
         return response;
       }
     } catch (err: any) {
-      console.log(err);
       toast.error(err.response?.data?.message || "Error updating product");
     } finally {
       setIsLoading(false);
