@@ -142,21 +142,18 @@ export async function PATCH(
 
     const { subCategories, relatedProducts, images, ...productData } = body;
 
-    if (
-      !productData.name ||
-      !productData.barcode ||
-      !productData.sku ||
-      !productData.price
-    ) {
+    if (!productData.name || !productData.sku || !productData.price) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
       );
     }
 
-    const barcode = productData.barcode;
+    // Handle barcode - convert null/undefined to empty string to maintain uniqueness
+    const barcode = productData.barcode || "";
 
-    if (barcode) {
+    // Only check for duplicate barcode if it's not an empty string
+    if (barcode !== "") {
       const existingProductWithBarcode = await prisma.product.findFirst({
         where: {
           barcode,
@@ -171,6 +168,27 @@ export async function PATCH(
         );
       }
     }
+
+    // Check if SKU already exists (excluding the current product)
+    const sku = productData.sku;
+    if (sku) {
+      const existingProductWithSku = await prisma.product.findFirst({
+        where: {
+          sku,
+          id: { not: id }, // Exclude the current product from the check
+        },
+      });
+
+      if (existingProductWithSku) {
+        return NextResponse.json(
+          { message: "SKU already exists" },
+          { status: 400 },
+        );
+      }
+    }
+
+    // Update productData with the processed barcode
+    productData.barcode = barcode;
 
     const numericFields = {
       price: Number(productData.price),

@@ -6,8 +6,8 @@ interface SkuPartner {
   partnerId: string;
   skuPartner: string;
   stock?: number;
-  Price?: string; // Changed to uppercase to match schema
-  price?: number; // Keep lowercase for internal use as number
+  Price?: string;
+  price?: number;
   loyaltyPointsPerProduct?: number;
   loyaltyPointsPerUnit?: number;
   loyaltyPointsBonusQuantity?: number;
@@ -156,6 +156,13 @@ const EditProductModal = ({
     }
   }, [product, isOpen, initialSkuPartners, partners]);
 
+  // Add this useEffect to reset loading state when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoading(false); // Reset loading state when modal opens
+    }
+  }, [isOpen]);
+
   const handleImageUpload = async (files: File[]) => {
     const uploadPromises = Array.from(files).map(async (file) => {
       const formData = new FormData();
@@ -215,11 +222,7 @@ const EditProductModal = ({
     }
   };
 
-  const handleSkuPartnerChange = (
-    index: number,
-    field: keyof SkuPartner,
-    value: string | number,
-  ) => {
+  const handleSkuPartnerChange = (index: number, field: string, value: any) => {
     const updatedPartners = [...skuPartners];
 
     // Special handling for price field
@@ -238,6 +241,14 @@ const EditProductModal = ({
         ...updatedPartners[index],
         price: numValue, // Store as number for UI
         Price: String(numValue), // Update Price (string) for API
+        partner: updatedPartners[index].partner,
+      };
+    } else if (field === "skuPartner") {
+      // For skuPartner field, allow empty string in the UI
+      // (we'll use product SKU as default when submitting)
+      updatedPartners[index] = {
+        ...updatedPartners[index],
+        skuPartner: value,
         partner: updatedPartners[index].partner,
       };
     } else {
@@ -333,112 +344,177 @@ const EditProductModal = ({
     }
   };
 
+  const handleClose = () => {
+    setIsLoading(false); // Reset loading state when modal closes
+    onClose();
+  };
+
   const handleSubmit = async () => {
-    if (
-      !formState.name ||
-      !formState.barcode ||
-      !formState.sku ||
-      !formState.price
-    ) {
+    if (!formState.name || !formState.sku || !formState.price) {
       toast.error("Please fill in required fields");
       return;
     }
 
-    const cleanedData = {
-      ...formState,
-      supplierId: formState.supplierId || null,
-      productTypeId: formState.productTypeId || null,
-      typePcbId: formState.typePcbId || null,
-      productStatusId: formState.productStatusId || null,
-      taxId: formState.taxId || null,
-      promotionId: formState.promotionId || null,
-    };
-
     setIsLoading(true);
+
     try {
+      // Upload new images if any
       if (formState.images.length > 0) {
-        const newImages = await handleImageUpload(formState.images);
-        setExistingImages((prev) => [...prev, ...newImages]);
+        try {
+          const newImages = await handleImageUpload(formState.images);
+          setExistingImages((prev) => [...prev, ...newImages]);
+        } catch (imageError) {
+          console.error("Error uploading images:", imageError);
+          toast.error("Failed to upload images");
+          // Continue with the update even if image upload fails
+        }
       }
 
-      const updatedProductData = {
-        ...cleanedData,
+      const cleanedData = {
+        ...formState,
         id: product?.id,
-        price: Number(cleanedData.price),
-        cost: cleanedData.cost ? Number(cleanedData.cost) : undefined,
-        stock: cleanedData.stock ? Number(cleanedData.stock) : undefined,
-        subCategories: cleanedData.subCategories,
-        relatedProducts: cleanedData.relatedProducts,
+        supplierId: formState.supplierId || null,
+        productTypeId: formState.productTypeId || null,
+        typePcbId: formState.typePcbId || null,
+        productStatusId: formState.productStatusId || null,
+        taxId: formState.taxId || null,
+        promotionId: formState.promotionId || null,
+        price: Number(formState.price),
+        cost: formState.cost ? Number(formState.cost) : undefined,
+        stock: formState.stock ? Number(formState.stock) : undefined,
+        subCategories: formState.subCategories,
+        relatedProducts: formState.relatedProducts,
       };
 
-      await onEdit(updatedProductData);
+      // Try to update the product
+      try {
+        await onEdit(cleanedData);
+      } catch (productError: any) {
+        // Extract the error message from the API response
+        let errorMessage = "Failed to update product";
 
-      // Handle SKU partners
-      await Promise.all(
-        skuPartners.map(async (sp) => {
-          if (!sp.partnerId || !sp.skuPartner) return;
-
-          // Use the uppercase Price field that we've been maintaining
-          const priceAsString = sp.Price || String(sp.price) || "0";
-
-          const payload = {
-            partnerId: sp.partnerId,
-            skuPartner: sp.skuPartner,
-            skuProduct: formState.sku,
-            productId: product?.id,
-            stock: sp.stock !== undefined ? Number(sp.stock) : 0,
-            Price: priceAsString, // Use uppercase Price as expected by the API
-            loyaltyPointsPerProduct: sp.loyaltyPointsPerProduct,
-            loyaltyPointsPerUnit: sp.loyaltyPointsPerUnit,
-            loyaltyPointsBonusQuantity: sp.loyaltyPointsBonusQuantity,
-            loyaltyPointsThresholdQty: sp.loyaltyPointsThresholdQty,
-          };
-
-          if (sp.id) {
-            const response = await fetch(
-              `/api/marketplace/sku_partner/${sp.id}`,
-              {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-              },
-            );
-
-            if (!response.ok) {
-              const errorData = await response.json();
-              console.error("Error updating SKU partner:", errorData);
-              throw new Error(
-                errorData.message || "Failed to update SKU partner",
-              );
-            }
-          } else {
-            const response = await fetch(
-              "/api/marketplace/sku_partner/create",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-              },
-            );
-
-            if (!response.ok) {
-              const errorData = await response.json();
-              console.error("Error creating SKU partner:", errorData);
-              throw new Error(
-                errorData.message || "Failed to create SKU partner",
-              );
-            }
+        if (productError.response?.data) {
+          // If there's a message field in the response data, use it
+          if (productError.response.data.message) {
+            errorMessage = productError.response.data.message;
           }
-        }),
-      );
+          // If there's an error field in the response data, use it
+          else if (productError.response.data.error) {
+            errorMessage = productError.response.data.error;
+          }
+        } else if (productError instanceof Error) {
+          errorMessage = productError.message;
+        }
 
-      onClose();
-      toast.success("Product updated successfully");
+        if (errorMessage.includes("Barcode already exists")) {
+          toast.error(
+            "This barcode already exists. Please use a different barcode.",
+          );
+        } else if (errorMessage.includes("SKU already exists")) {
+          toast.error("This SKU already exists. Please use a different SKU.");
+        } else if (errorMessage.toLowerCase().includes("unique constraint")) {
+          if (errorMessage.toLowerCase().includes("barcode")) {
+            toast.error(
+              "This barcode already exists. Please use a different barcode.",
+            );
+          } else if (errorMessage.toLowerCase().includes("sku")) {
+            toast.error("This SKU already exists. Please use a different SKU.");
+          } else {
+            toast.error(errorMessage);
+          }
+        } else if (errorMessage.includes("Missing required fields")) {
+          toast.error("Please fill in all required fields.");
+        } else {
+          toast.error(errorMessage);
+        }
+
+        console.error("Error updating product:", productError);
+        setIsLoading(false);
+        return; // Stop execution and keep modal open
+      }
+
+      // Process SKU partners only if product update was successful
+      try {
+        await Promise.all(
+          skuPartners.map(async (sp) => {
+            if (!sp.partnerId) return;
+
+            // Use the uppercase Price field that we've been maintaining
+            const priceAsString = sp.Price || String(sp.price) || "0";
+
+            // Use partner's SKU if provided, otherwise use product SKU
+            const partnerSku = sp.skuPartner?.trim() || formState.sku;
+
+            const payload = {
+              partnerId: sp.partnerId,
+              skuPartner: partnerSku,
+              skuProduct: formState.sku,
+              productId: product?.id,
+              stock: sp.stock !== undefined ? Number(sp.stock) : 0,
+              Price: priceAsString, // Use uppercase Price as expected by the API
+              loyaltyPointsPerProduct: sp.loyaltyPointsPerProduct,
+              loyaltyPointsPerUnit: sp.loyaltyPointsPerUnit,
+              loyaltyPointsBonusQuantity: sp.loyaltyPointsBonusQuantity,
+              loyaltyPointsThresholdQty: sp.loyaltyPointsThresholdQty,
+            };
+
+            if (sp.id) {
+              const response = await fetch(
+                `/api/marketplace/sku_partner/${sp.id}`,
+                {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                },
+              );
+
+              if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(
+                  errorData.message ||
+                    errorData.error ||
+                    "Failed to update SKU partner",
+                );
+              }
+            } else {
+              const response = await fetch(
+                "/api/marketplace/sku_partner/create",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                },
+              );
+
+              if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(
+                  errorData.message ||
+                    errorData.error ||
+                    "Failed to create SKU partner",
+                );
+              }
+            }
+          }),
+        );
+      } catch (partnerError) {
+        console.error("Error with SKU partners:", partnerError);
+        toast.error(
+          partnerError instanceof Error
+            ? partnerError.message
+            : "Failed to update partner SKUs",
+        );
+        setIsLoading(false);
+        return; // Stop execution and keep modal open
+      }
+
+      // Only close the modal if everything succeeded
+      setIsLoading(false); // Reset loading state before closing
+      handleClose();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to update product",
-      );
-    } finally {
+      // This catches any other unexpected errors
+      console.error("Unexpected error:", error);
+      toast.error("An unexpected error occurred");
       setIsLoading(false);
     }
   };
@@ -448,7 +524,7 @@ const EditProductModal = ({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         className="max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-xl bg-white shadow-xl"
@@ -457,7 +533,7 @@ const EditProductModal = ({
         <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white p-6">
           <h2 className="text-2xl font-bold text-gray-800">Edit Product</h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
           >
             <svg
@@ -560,7 +636,7 @@ const EditProductModal = ({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Bar Code *
+                    Bar Code
                   </label>
                   <input
                     type="text"
@@ -1268,7 +1344,7 @@ const EditProductModal = ({
         {/* Fixed footer with buttons */}
         <div className="sticky bottom-0 flex justify-end gap-4 border-t bg-white p-6">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-lg bg-gray-400 px-5 py-2 text-white hover:bg-gray-500"
           >
             Cancel

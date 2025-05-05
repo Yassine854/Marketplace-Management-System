@@ -86,7 +86,6 @@ export function useCreateProduct() {
 
       const productId = response.data.product.id;
 
-      // Create an array of promises for subcategories and related products
       const promises = [
         ...productData.subCategories.map((subcategoryId) =>
           axios.post("/api/marketplace/product_subcategories/create", {
@@ -105,7 +104,7 @@ export function useCreateProduct() {
       // Add SKU partner creation promises
       if (productData.skuPartners && productData.skuPartners.length > 0) {
         const validSkuPartners = productData.skuPartners.filter(
-          (partner) => partner.partnerId && partner.skuPartner,
+          (partner) => partner.partnerId,
         );
 
         promises.push(
@@ -113,7 +112,7 @@ export function useCreateProduct() {
             axios.post("/api/marketplace/sku_partner/create", {
               productId,
               partnerId: partner.partnerId,
-              skuPartner: partner.skuPartner,
+              skuPartner: partner.skuPartner || productData.sku,
               skuProduct: productData.sku,
               stock: partner.stock || 0,
               price: partner.price || 0,
@@ -154,7 +153,6 @@ export function useCreateProduct() {
         err.response?.data?.message || "Error creating product";
       setError(errorMessage);
 
-      // Throw the error so it can be caught by the component
       throw new Error(errorMessage);
     } finally {
       setIsLoading(false);

@@ -294,12 +294,7 @@ const CreateProductModal = ({
   };
 
   const handleSubmit = async () => {
-    if (
-      !formState.name ||
-      !formState.barcode ||
-      !formState.sku ||
-      !formState.price
-    ) {
+    if (!formState.name || !formState.sku || !formState.price) {
       toast.error("Please fill in required fields");
       return;
     }
@@ -499,7 +494,7 @@ const CreateProductModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Bar Code *
+                  Bar Code
                 </label>
                 <input
                   type="text"

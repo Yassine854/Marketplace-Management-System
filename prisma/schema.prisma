@@ -99,7 +99,7 @@ model Product {
   updated_at     String?
   stock_item     StockItem?
 
-  barcode              String?  @unique
+  barcode              String?  // Remove @unique here
   pcb                  String?
   weight               Float?
   description          String?
@@ -738,7 +738,7 @@ model SkuPartner {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   productId   String   @db.ObjectId
   partnerId   String   @db.ObjectId
-  skuPartner  String   @unique
+  skuPartner  String   
   skuProduct  String
   stock       Int
   Price       String
@@ -752,7 +752,7 @@ model SkuPartner {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@unique([productId, partnerId, skuPartner])
+  @@unique([productId, partnerId])
   @@map("sku_partners")
 }
 

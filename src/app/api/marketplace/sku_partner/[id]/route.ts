@@ -1,4 +1,4 @@
-// app/api/skupartner/[id]/route.ts
+// app/api/marketplace/sku_partner/[id]/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
@@ -59,6 +59,8 @@ export async function PATCH(
 
     const { id } = params;
     const body = await req.json();
+
+    // No need to check for uniqueness of skuPartner since they don't have to be unique
 
     const updatedSkuPartner = await prisma.skuPartner.update({
       where: { id },

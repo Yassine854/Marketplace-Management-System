@@ -1,4 +1,4 @@
-// app/api/skupartner/create/route.ts
+// app/api/marketplace/sku_partner/create/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
@@ -27,6 +27,22 @@ export async function POST(req: Request) {
       );
     }
 
+    // No need to check for uniqueness of skuPartner since they don't have to be unique
+    // However, we should check that the same partner isn't assigned to the same product multiple times
+    const existingPartnerProduct = await prisma.skuPartner.findFirst({
+      where: {
+        productId: body.productId,
+        partnerId: body.partnerId,
+      },
+    });
+
+    if (existingPartnerProduct) {
+      return NextResponse.json(
+        { message: "This partner is already assigned to this product" },
+        { status: 409 },
+      );
+    }
+
     const newSkuPartner = await prisma.skuPartner.create({
       data: {
         productId: body.productId,
@@ -34,7 +50,7 @@ export async function POST(req: Request) {
         skuPartner: body.skuPartner,
         skuProduct: body.skuProduct,
         stock: body.stock || 0,
-        Price: body.price?.toString() || "0",
+        Price: body.Price || "0",
         loyaltyPointsPerProduct: body.loyaltyPointsPerProduct || null,
         loyaltyPointsPerUnit: body.loyaltyPointsPerUnit || null,
         loyaltyPointsBonusQuantity: body.loyaltyPointsBonusQuantity || null,

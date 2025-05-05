@@ -82,7 +82,8 @@ export async function POST(req: Request) {
 
     const barcode = formData.get("barcode") as string | null;
     if (barcode) {
-      const existingProduct = await prisma.product.findUnique({
+      // Use findFirst instead of findUnique since barcode is no longer a unique field
+      const existingProduct = await prisma.product.findFirst({
         where: { barcode },
       });
 
@@ -117,7 +118,7 @@ export async function POST(req: Request) {
       data: {
         product_id: uniqueProductId,
         name: formData.get("name") as string,
-        barcode,
+        barcode: (formData.get("barcode") as string) || "", // Use empty string instead of null
         sku: sku,
         price: parseFloat(formData.get("price") as string),
         cost: formData.get("cost")
