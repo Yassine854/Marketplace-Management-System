@@ -3,6 +3,17 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useNavigation } from "@/features/shared/hooks/useNavigation";
 import { useGlobalStore } from "../stores/GlobalStore";
 
+// Add this type definition
+interface AuthUser {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  roleId: string;
+  mRoleId: string;
+  isActive: boolean;
+}
+
 export const useAuth = () => {
   const { data, status } = useSession();
   const resetAllStores = useResetStores();
@@ -24,5 +35,11 @@ export const useAuth = () => {
     reset();
   };
 
-  return { login, logout, user: data?.user, status };
+  // Cast the user to the AuthUser type
+  return {
+    login,
+    logout,
+    user: data?.user as AuthUser | undefined,
+    status,
+  };
 };

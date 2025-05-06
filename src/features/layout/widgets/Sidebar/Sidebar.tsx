@@ -17,6 +17,7 @@ import {
   IconCreditCard,
   IconUser,
   IconTruck,
+  IconPhoto,
 } from "@tabler/icons-react";
 import { FaBoxOpen } from "react-icons/fa";
 import Link from "next/link";
@@ -29,6 +30,8 @@ import SidebarSubMenu from "@/features/shared/elements/SidebarElements/SidebarSu
 import SidebarOrdersSubMenu from "@/features/shared/elements/SidebarElements/SidebarOrdersSubMenu";
 import path from "path";
 import SidebarSuppliersSubMenu from "@/features/shared/elements/SidebarElements/SidebarSuppliersSubMenu";
+import { useState, useEffect } from "react";
+import { useAuth } from "../../../shared/hooks/useAuth";
 
 const Sidebar = ({
   isAdmin,
@@ -46,6 +49,47 @@ const Sidebar = ({
     validOrdersCount,
     readyOrdersCount,
   } = useSidebar(setSidebar);
+
+  const { user } = useAuth();
+  const [userPermissions, setUserPermissions] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Fetch user permissions when component mounts
+    const fetchPermissions = async () => {
+      try {
+        const response = await fetch(
+          "/api/marketplace/role_permissions/getAll",
+        );
+        const data = await response.json();
+
+        if (data.rolePermissions) {
+          // Filter permissions for current user's role
+          const myPermissions = data.rolePermissions.filter(
+            (rp: any) => rp.roleId === user?.mRoleId,
+          );
+          setUserPermissions(myPermissions);
+        }
+      } catch (error) {
+        console.error("Error fetching permissions:", error);
+      }
+    };
+
+    if (user?.mRoleId) {
+      fetchPermissions();
+    }
+  }, [user?.mRoleId]);
+
+  // Helper function to check if user has permission for a resource
+  const hasPermission = (resource: string) => {
+    // Admin always has access to everything
+    if (isAdmin) return true;
+
+    // Check if user has permission for this resource
+    return userPermissions.some(
+      (rp) =>
+        rp.permission?.resource === resource && rp.actions.includes("read"),
+    );
+  };
 
   return (
     <aside
@@ -74,6 +118,8 @@ const Sidebar = ({
       <div className="fixed left-0 right-0 h-full overflow-y-auto pb-12">
         <div className="min-h-[70%] px-4 pb-24 xxl:px-6 xxxl:px-8">
           <Divider />
+
+          {/* Dashboard - everyone can see */}
           <SidebarButton
             onClick={() => push("/dashboard")}
             name={"Dashboard"}
@@ -83,158 +129,238 @@ const Sidebar = ({
           <Divider />
 
           {/* Suppliers Analytics */}
+          {hasPermission("Supplier Dashboard") && (
+            <>
+              <SidebarSuppliersSubMenu
+                name={"Supplier Dashboard"}
+                icon={<IconDeviceAnalytics />}
+                isActive={pathname?.includes("supplierDashboard")}
+              />
+              <Divider />
+            </>
+          )}
 
-          <SidebarSuppliersSubMenu
-            name={"Supplier Dashboard"}
-            icon={<IconDeviceAnalytics />}
-            isActive={pathname?.includes("supplierDashboard")}
-          />
+          {/* Products */}
+          {hasPermission("Product") && (
+            <>
+              <SidebarSubMenu
+                icon={<IconShoppingCart />}
+                name="Products"
+                onClick={() => push("/marketplace/products")}
+                isActive={pathname?.includes("products")}
+                items={[
+                  { name: "All", path: "/marketplace/products" },
+                  ...(hasPermission("Category")
+                    ? [
+                        {
+                          name: "Categories",
+                          path: "/marketplace/products/categories",
+                        },
+                      ]
+                    : []),
+                  ...(hasPermission("Supplier")
+                    ? [
+                        {
+                          name: "Suppliers",
+                          path: "/marketplace/products/manufacturer/all",
+                        },
+                      ]
+                    : []),
+                  ...(hasPermission("Tax")
+                    ? [
+                        {
+                          name: "Tax",
+                          path: "/marketplace/products/taxe/all",
+                        },
+                      ]
+                    : []),
+                  ...(hasPermission("Promotion")
+                    ? [
+                        {
+                          name: "Promotion",
+                          path: "/marketplace/products/promotion/all",
+                        },
+                      ]
+                    : []),
+                  ...(hasPermission("Product Type")
+                    ? [
+                        {
+                          name: "Product Type",
+                          path: "/marketplace/products/ProductTypes",
+                        },
+                      ]
+                    : []),
+                  ...(hasPermission("Product Status")
+                    ? [
+                        {
+                          name: "Product Status",
+                          path: "/marketplace/products/ProductStatus",
+                        },
+                      ]
+                    : []),
+                  ...(hasPermission("Type PCB")
+                    ? [
+                        {
+                          name: "Type PCB",
+                          path: "/marketplace/products/ProductPCBType",
+                        },
+                      ]
+                    : []),
+                ].filter(Boolean)}
+              />
+              <Divider />
+            </>
+          )}
 
-          <Divider />
+          {/* Partners */}
+          {hasPermission("Partner") && (
+            <>
+              <SidebarSubMenu
+                icon={<IconUsers className="text-lg text-primary" />}
+                name=" Partners"
+                onClick={() => push("/marketplace/partners")}
+                isActive={pathname?.includes("partners")}
+                items={[
+                  { name: "All partners", path: "/marketplace/partners" },
+                  {
+                    name: "Partner Types",
+                    path: "/marketplace/partners/type_partners",
+                  },
+                ]}
+              />
+              <Divider />
+            </>
+          )}
 
-          <Divider />
-          <SidebarSubMenu
-            icon={<IconShoppingCart />}
-            name="Products"
-            onClick={() => push("/marketplace/products")} // Update main click
-            isActive={pathname?.includes("products")}
-            items={[
-              { name: "All", path: "/marketplace/products" },
-              // { name: "New Product", path: "/marketplace/products/new" },
-              {
-                name: "Categories",
-                path: "/marketplace/products/categories",
-              },
-              {
-                name: "Suppliers",
-                path: "/marketplace/products/manufacturer/all",
-              },
-              { name: "Tax", path: "/marketplace/products/taxe/all" },
-              {
-                name: "Promotion",
-                path: "/marketplace/products/promotion/all",
-              },
-              {
-                name: "Product Type",
-                path: "/marketplace/products/ProductTypes",
-              },
-              {
-                name: "Product Status",
-                path: "/marketplace/products/ProductStatus",
-              },
-              {
-                name: "Type PCB",
-                path: "/marketplace/products/ProductPCBType",
-              },
-            ]}
-          />
+          {/* Settings */}
+          {hasPermission("Settings") && (
+            <>
+              <SidebarSubMenu
+                icon={<IconUsers className="text-lg text-primary" />}
+                name=" Settings"
+                onClick={() => push("/marketplace/settings")}
+                isActive={pathname?.includes("Settings")}
+                items={[
+                  { name: "All settings", path: "/marketplace/settings" },
+                ]}
+              />
+              <Divider />
+            </>
+          )}
 
-          <Divider />
-          <SidebarSubMenu
-            icon={<IconUsers className="text-lg text-primary" />}
-            name=" Partners"
-            onClick={() => push("/marketplace/partners")}
-            isActive={pathname?.includes("partners")}
-            items={[
-              { name: "All partners", path: "/marketplace/partners" },
-              {
-                name: "Partner Types",
-                path: "/marketplace/partners/type_partners",
-              },
-            ]}
-          />
+          {/* Orders */}
+          {isAdmin && (
+            <>
+              <SidebarOrdersSubMenu
+                onClick={() => push("/orders")}
+                items={statuses}
+                isAdmin={isAdmin}
+                selectedStatus={selectedStatus}
+                openOrdersCount={openOrdersCount}
+                readyOrdersCount={readyOrdersCount}
+                validOrdersCount={validOrdersCount}
+                onSubMenuItemClick={onOrderStatusClick}
+                isActive={
+                  pathname?.includes("order") &&
+                  !pathname?.includes("audit-trail")
+                }
+              />
+              <Divider />
+            </>
+          )}
 
-          <Divider />
-          <SidebarSubMenu
-            icon={<IconUsers className="text-lg text-primary" />}
-            name=" Settings"
-            onClick={() => push("/marketplace/settings")}
-            isActive={pathname?.includes("Settings")}
-            items={[{ name: "All settings", path: "/marketplace/settings" }]}
-          />
+          {/* Milk Run */}
+          {hasPermission("Milk Run") && (
+            <>
+              <SidebarSubMenu
+                icon={<IconMap2 />}
+                name={"Milk Run"}
+                onClick={() => push("/milk-run")}
+                isActive={pathname?.includes("milk-run")}
+                items={
+                  isNoEditUser
+                    ? [{ name: "History", path: "/milk-run-history" }]
+                    : [
+                        { name: "Main", path: "/milk-run" },
+                        { name: "History", path: "/milk-run-history" },
+                      ]
+                }
+              />
+              <Divider />
+            </>
+          )}
 
-          <Divider />
-          <SidebarOrdersSubMenu
-            onClick={() => push("/orders")}
-            items={statuses}
-            isAdmin={isAdmin}
-            selectedStatus={selectedStatus}
-            openOrdersCount={openOrdersCount}
-            readyOrdersCount={readyOrdersCount}
-            validOrdersCount={validOrdersCount}
-            onSubMenuItemClick={onOrderStatusClick}
-            isActive={
-              pathname?.includes("order") && !pathname?.includes("audit-trail")
-            }
-          />
+          {/* Purchase order */}
+          {hasPermission("Supplier") && (
+            <>
+              <SidebarSubMenu
+                icon={<IconShoppingCart />}
+                name="Purchase order"
+                onClick={() => push("/suppliers/all")}
+                isActive={pathname?.includes("suppliers")}
+                items={[
+                  { name: "All", path: "/suppliers/all" },
+                  { name: "In Progress", path: "/suppliers/inProg" },
+                  { name: "Ready", path: "/suppliers/readyState" },
+                  { name: "Delivered", path: "/suppliers/deliveredState" },
+                  { name: "Completed", path: "/suppliers/completedState" },
+                ]}
+              />
+              <Divider />
+            </>
+          )}
 
-          <Divider />
-          <SidebarSubMenu
-            icon={<IconMap2 />}
-            name={"Milk Run"}
-            onClick={() => push("/milk-run")}
-            isActive={pathname?.includes("milk-run")}
-            items={
-              isNoEditUser
-                ? [{ name: "History", path: "/milk-run-history" }]
-                : [
-                    { name: "Main", path: "/milk-run" },
-                    { name: "History", path: "/milk-run-history" },
-                  ]
-            }
-          />
+          {/* Reservation */}
+          {hasPermission("Reservation") && (
+            <>
+              <SidebarSubMenu
+                icon={<IconClipboardCheck />}
+                name="Reservation"
+                onClick={() => push("/marketplace/reservation/all")}
+                isActive={pathname?.includes("reservation")}
+                items={[{ name: "All", path: "/marketplace/reservation/all" }]}
+              />
+              <Divider />
+            </>
+          )}
 
-          <Divider />
-          <SidebarSubMenu
-            icon={<IconShoppingCart />}
-            name="Purchase order"
-            onClick={() => push("/suppliers/all")}
-            isActive={pathname?.includes("suppliers")}
-            items={[
-              { name: "All", path: "/suppliers/all" },
-              { name: "In Progress", path: "/suppliers/inProg" },
-              { name: "Ready", path: "/suppliers/readyState" },
-              { name: "Delivered", path: "/suppliers/deliveredState" },
-              { name: "Completed", path: "/suppliers/completedState" },
-            ]}
-          />
+          {/* Order */}
+          {hasPermission("Order") && (
+            <>
+              <SidebarSubMenu
+                icon={<IconBox />}
+                name=" Order"
+                onClick={() => push("/marketplace/orders2/all")}
+                isActive={pathname?.toLowerCase().includes("order")}
+                items={[
+                  { name: "All", path: "/orders2/all" },
+                  { name: "State", path: "/order/state" },
+                  { name: "Status", path: "/order/status" },
+                  { name: "payment method", path: "/PaymentMethod" },
+                ]}
+              />
+              <Divider />
+            </>
+          )}
 
-          <Divider />
-          <SidebarSubMenu
-            icon={<IconClipboardCheck />}
-            name="Reservation"
-            onClick={() => push("/marketplace/reservation/all")}
-            isActive={pathname?.includes("reservation")}
-            items={[{ name: "All", path: "/marketplace/reservation/all" }]}
-          />
+          {/* Reports */}
+          {hasPermission("Reports") && (
+            <>
+              <SidebarSubMenu
+                icon={<IconReport />}
+                name="Reports"
+                onClick={() => push("/reports/agent")}
+                isActive={pathname?.includes("reports")}
+                items={[
+                  { name: "Agent", path: "/reports/agent" },
+                  { name: "Supplier", path: "/reports/supplier" },
+                ]}
+              />
+              <Divider />
+            </>
+          )}
 
-          <Divider />
-
-          <SidebarSubMenu
-            icon={<IconBox />}
-            name=" Order"
-            onClick={() => push("/marketplace/orders2/all")}
-            isActive={pathname?.toLowerCase().includes("order")}
-            items={[
-              { name: "All", path: "/orders2/all" },
-              { name: "State", path: "/order/state" },
-              { name: "Status", path: "/order/status" },
-              { name: "payment method", path: "/PaymentMethod" },
-            ]}
-          />
-
-          <Divider />
-          <SidebarSubMenu
-            icon={<IconReport />}
-            name="Reports"
-            onClick={() => push("/reports/agent")}
-            isActive={pathname?.includes("reports")}
-            items={[
-              { name: "Agent", path: "/reports/agent" },
-              { name: "Supplier", path: "/reports/supplier" },
-            ]}
-          />
-          <Divider />
+          {/* Notifications */}
           <SidebarButton
             name={"Notifications"}
             icon={<IconBell />}
@@ -242,20 +368,46 @@ const Sidebar = ({
             isActive={pathname?.includes("notifications")}
           />
           <Divider />
-          <SidebarButton
-            name="Delivery Agent"
-            icon={<IconTruck />}
-            onClick={() => push("/marketplace/deliveryAgent")}
-            isActive={pathname?.includes("deliveryAgent")}
-          />
 
-          <Divider />
-          <SidebarButton
-            name="Customer"
-            icon={<IconUser />}
-            onClick={() => push("/marketplace/customer")}
-            isActive={pathname?.includes("customer")}
-          />
+          {/* Banner */}
+          {hasPermission("Banner") && (
+            <>
+              <SidebarButton
+                name="Banner"
+                icon={<IconPhoto />}
+                onClick={() => push("/marketplace/banner")}
+                isActive={pathname?.includes("/marketplace/banner")}
+              />
+              <Divider />
+            </>
+          )}
+
+          {/* Delivery Agent */}
+          {hasPermission("Delivery Agent") && (
+            <>
+              <SidebarButton
+                name="Delivery Agent"
+                icon={<IconTruck />}
+                onClick={() => push("/marketplace/deliveryAgent")}
+                isActive={pathname?.includes("deliveryAgent")}
+              />
+              <Divider />
+            </>
+          )}
+
+          {/* Customer */}
+          {hasPermission("Customer") && (
+            <>
+              <SidebarButton
+                name="Customer"
+                icon={<IconUser />}
+                onClick={() => push("/marketplace/customer")}
+                isActive={pathname?.includes("customer")}
+              />
+            </>
+          )}
+
+          {/* Access Control - Admin only */}
           {isAdmin && (
             <>
               <SidebarSubMenu
@@ -274,6 +426,8 @@ const Sidebar = ({
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
             </>
           )}
+
+          {/* Audit Trail - Admin only */}
           {isAdmin && (
             <>
               <SidebarSubMenu
@@ -292,6 +446,8 @@ const Sidebar = ({
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
             </>
           )}
+
+          {/* Screen - Admin only */}
           {isAdmin && (
             <>
               <SidebarSubMenu
@@ -301,7 +457,7 @@ const Sidebar = ({
                   push("/screen");
                 }}
                 isActive={pathname?.includes("screen")}
-                items={[{ name: "screen", path: "" }, ,]}
+                items={[{ name: "screen", path: "" }]}
               />
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
             </>

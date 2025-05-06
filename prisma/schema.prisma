@@ -810,3 +810,10 @@ model RolePermission {
   permission   Permission @relation(fields: [permissionId], references: [id],onDelete: Cascade)
   @@unique([roleId, permissionId])
 }
+
+model Banner {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  url        String
+  altText    String?
+  @@map("banners")
+}

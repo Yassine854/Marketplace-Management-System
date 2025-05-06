@@ -26,6 +26,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           roleId: user.roleId,
           mRoleId: user.mRoleId,
           isActive: user.isActive,
+          userType: user.userType, // Add this to distinguish user types
         };
       },
     }),
