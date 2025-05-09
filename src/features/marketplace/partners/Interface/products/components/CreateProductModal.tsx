@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import Select from "react-select";
+import { useSearchBar } from "@/features/shared/inputs/SearchBar/useSearchBar";
 
 interface Product {
   id: string;
@@ -160,6 +161,12 @@ const CreateProductModal = ({
     Record<string, Array<{ id: string; name: string }>>
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Add these state variables
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<Array<Product>>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isOpen) {
@@ -358,6 +365,90 @@ const CreateProductModal = ({
     fetchPartnerSources();
   }, []);
 
+  // Add a function to search products by barcode or SKU
+  const searchProducts = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await axios.get(
+        `/api/marketplace/products/search?query=${encodeURIComponent(query)}`,
+      );
+      if (response.data && Array.isArray(response.data.products)) {
+        setSearchResults(response.data.products);
+      } else {
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error("Error searching products:", error);
+      toast.error("Failed to search products");
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Add a debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm) {
+        searchProducts(searchTerm);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Add a function to select a product and fill the form
+  const selectProduct = (product: Product) => {
+    // Map subcategories and related products to their IDs
+    const subCategoryIds =
+      product.productSubCategories?.map((sc) => sc.subcategoryId) || [];
+    const relatedProductIds =
+      product.relatedProducts?.map((rp) => rp.relatedProductId) || [];
+
+    setFormState({
+      name: product.name,
+      barcode: product.barcode,
+      sku: product.sku,
+      price: product.price,
+      cost: product.cost,
+      stock: product.stock,
+      description: product.description || "",
+      pcb: product.pcb || "",
+      weight: product.weight,
+      minimumQte: product.minimumQte,
+      maximumQte: product.maximumQte,
+      sealable: product.sealable,
+      alertQte: product.alertQte,
+      loyaltyPointsPerProduct: product.loyaltyPointsPerProduct,
+      loyaltyPointsPerUnit: product.loyaltyPointsPerUnit,
+      loyaltyPointsBonusQuantity: product.loyaltyPointsBonusQuantity,
+      loyaltyPointsThresholdQty: product.loyaltyPointsThresholdQty,
+      supplierId: product.supplierId || "",
+      productTypeId: product.productTypeId || "",
+      typePcbId: product.typePcbId || "",
+      productStatusId: product.productStatusId || "",
+      taxId: product.taxId || "",
+      promotionId: product.promotionId || "",
+      subCategories: subCategoryIds,
+      relatedProducts: relatedProductIds,
+      promo: !!product.promotionId,
+      images: [],
+      partnerSku: "",
+      stocks: [],
+    });
+
+    // Clear search results and search term
+    setSearchResults([]);
+    setSearchTerm("");
+
+    toast.success(`Product "${product.name}" loaded into form`);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -512,7 +603,7 @@ const CreateProductModal = ({
           </button>
         </div>
 
-        {/* CSV Upload and SKU Search */}
+        {/* CSV Upload and Product Search */}
         <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -524,6 +615,53 @@ const CreateProductModal = ({
               onChange={handleCsvUpload}
               className="w-full rounded-lg border p-2 text-sm"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Search by Barcode or SKU
+            </label>
+            <div className="relative">
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Enter barcode or SKU to search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full rounded-lg border p-2 text-sm"
+              />
+              {isSearching && (
+                <div className="absolute right-3 top-2">
+                  <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
+                </div>
+              )}
+
+              {/* Search Results Dropdown */}
+              {searchResults.length > 0 && (
+                <div className="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg">
+                  <ul className="max-h-60 overflow-auto rounded-md py-1 text-base">
+                    {searchResults.map((product) => (
+                      <li
+                        key={product.id}
+                        onClick={() => selectProduct(product)}
+                        className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                      >
+                        <div className="flex justify-between">
+                          <span className="font-medium">{product.name}</span>
+                          <span className="text-sm text-gray-500">
+                            ${product.price.toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="flex space-x-4 text-xs text-gray-500">
+                          <span>Barcode: {product.barcode}</span>
+                          <span>SKU: {product.sku}</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
