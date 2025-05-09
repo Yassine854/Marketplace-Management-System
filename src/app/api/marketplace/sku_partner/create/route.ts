@@ -12,19 +12,42 @@ export async function POST(req: Request) {
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
+    let user = session.user as {
+      id: string;
+      roleId: string;
+      mRoleId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+      userType?: string;
+    };
 
     const body = await req.json();
 
-    if (
-      !body.productId ||
-      !body.partnerId ||
-      !body.skuPartner ||
-      !body.skuProduct
-    ) {
+    if (!body.productId || !body.skuPartner || !body.skuProduct) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 },
       );
+    }
+
+    let partnerId;
+    if (user.userType === "partner") {
+      partnerId = user.id;
+    } else {
+      // For admin users, get the partnerId from the request body
+      partnerId = body.partnerId;
+
+      if (!partnerId) {
+        return NextResponse.json(
+          {
+            message:
+              "Invalid request: 'partnerId' is required for admin users.",
+          },
+          { status: 400 },
+        );
+      }
     }
 
     // No need to check for uniqueness of skuPartner since they don't have to be unique
@@ -32,7 +55,7 @@ export async function POST(req: Request) {
     const existingPartnerProduct = await prisma.skuPartner.findFirst({
       where: {
         productId: body.productId,
-        partnerId: body.partnerId,
+        partnerId: partnerId,
       },
     });
 
@@ -46,15 +69,9 @@ export async function POST(req: Request) {
     const newSkuPartner = await prisma.skuPartner.create({
       data: {
         productId: body.productId,
-        partnerId: body.partnerId,
+        partnerId: partnerId,
         skuPartner: body.skuPartner,
         skuProduct: body.skuProduct,
-        stock: body.stock || 0,
-        Price: body.Price || "0",
-        loyaltyPointsPerProduct: body.loyaltyPointsPerProduct || null,
-        loyaltyPointsPerUnit: body.loyaltyPointsPerUnit || null,
-        loyaltyPointsBonusQuantity: body.loyaltyPointsBonusQuantity || null,
-        loyaltyPointsThresholdQty: body.loyaltyPointsThresholdQty || null,
       },
     });
 

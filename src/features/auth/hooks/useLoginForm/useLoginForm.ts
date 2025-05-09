@@ -30,31 +30,34 @@ export const useLoginForm = () => {
   });
 
   //Get Token to access supplier dashboard
-  const handleApiLogin = async (username: string, password: string) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        return { error: errorData.message || "Login failed" };
-      }
+  // const handleApiLogin = async (username: string, password: string) => {
+  //   try {
+  //     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ username, password }),
+  //     });
 
-      const result = await response.json();
-      return {
-        token: result.token,
-        user: result.user,
-        role: result.user?.role,
-      };
-    } catch (error) {
-      return { error: "Network error. Please try again." };
-    }
-  };
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       return { error: errorData.message || "Login failed" };
+  //     }
+
+  //     const result = await response.json();
+  //     return {
+  //       token: result.token,
+  //       user: result.user,
+  //       role: result.user?.role,
+  //     };
+  //   } catch (error) {
+  //     return { error: "Network error. Please try again." };
+  //   }
+  // };
+
+  //End supplier token access
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setIsLoading(true);
@@ -63,15 +66,15 @@ export const useLoginForm = () => {
 
     //Supplier Access //
 
-    const apiResponse = await handleApiLogin(username, password);
+    // const apiResponse = await handleApiLogin(username, password);
 
-    if (apiResponse.error) {
-      throw new Error(apiResponse.error);
-    }
+    // if (apiResponse.error) {
+    //   throw new Error(apiResponse.error);
+    // }
 
-    if (apiResponse.token) {
-      localStorage.setItem("authToken", apiResponse.token);
-    }
+    // if (apiResponse.token) {
+    //   localStorage.setItem("authToken", apiResponse.token);
+    // }
 
     //End Supplier Access //
     setIsLoading(false);

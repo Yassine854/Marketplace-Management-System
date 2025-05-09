@@ -113,6 +113,8 @@ model Product {
   loyaltyPointsPerUnit          Float?
   loyaltyPointsBonusQuantity    Float?
   loyaltyPointsThresholdQty     Float?
+  accepted    Boolean  @default(true)
+
 
   typePcbId            String?  @db.ObjectId
   typePcb              TypePcb? @relation(fields: [typePcbId], references: [id])
@@ -126,7 +128,6 @@ model Product {
   tax                  Tax?      @relation(fields: [taxId], references: [id])
   promotion            Promotion?  @relation(fields: [promotionId], references: [id])
   promotionId          String?     @db.ObjectId
-  hasPartner  Boolean   @default(false)
 
   images               Image[]
   notifyRequests       NotifyMe[]
@@ -143,8 +144,6 @@ model Product {
   orderItems OrderItem[]
   reservationItems    ReservationItem[]
   skuPartners SkuPartner[]
-  partnerId   String?   @db.ObjectId
-  partner     Partner?  @relation(fields: [partnerId], references: [id])
 
   @@index([category_ids])
   @@map("products")
@@ -326,15 +325,14 @@ model Partner {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
+  sources       Source[]
   favoritePartners FavoritePartner[]
   orders   Order[]
   reservations Reservation[]
   skuPartners SkuPartner[]
-  products Product[]
   settings Settings[]
   @@map("partners")
 }
-
 
 
 
@@ -734,27 +732,7 @@ model MainOrder {
   orders    Order[]
 }
 
-model SkuPartner {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  productId   String   @db.ObjectId
-  partnerId   String   @db.ObjectId
-  skuPartner  String   
-  skuProduct  String
-  stock       Int
-  Price       String
-  loyaltyPointsPerProduct       Float?
-  loyaltyPointsPerUnit          Float?
-  loyaltyPointsBonusQuantity    Float?
-  loyaltyPointsThresholdQty     Float?
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@unique([productId, partnerId])
-  @@map("sku_partners")
-}
 
 model Settings {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -816,4 +794,58 @@ model Banner {
   url        String
   altText    String?
   @@map("banners")
+}
+
+model SkuPartner {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId   String   @db.ObjectId
+  partnerId   String   @db.ObjectId
+  skuPartner  String   
+  skuProduct  String
+
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  stock       Stock[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([productId, partnerId])
+  @@map("sku_partners")
+}
+
+model Source {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  partnerId   String   @db.ObjectId
+  partner     Partner?  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  stock       Stock[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("sources")
+}
+
+model Stock {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  skuPartnerId    String   @db.ObjectId
+  sourceId        String   @db.ObjectId
+
+  stockQuantity   Int
+  minQty          Int
+  maxQty          Int
+  price           Float
+  loyaltyPointsPerProduct       Int?
+  loyaltyPointsPerUnit          Int?
+  loyaltyPointsBonusQuantity    Int?
+  loyaltyPointsThresholdQty     Int?
+
+  skuPartner      SkuPartner  @relation(fields: [skuPartnerId], references: [id], onDelete: Cascade)
+  source          Source      @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([skuPartnerId, sourceId])
+  @@map("stocks")
 }

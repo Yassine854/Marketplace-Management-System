@@ -43,6 +43,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         token.userFirstName = user.firstName;
         token.userLastName = user.lastName;
         token.isActive = user.isActive;
+        token.userType = user.userType; // Add this line to include userType
       }
 
       // - After Update:", token);
@@ -62,6 +63,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         firstName: token.userFirstName,
         lastName: token.userLastName,
         isActive: token.isActive,
+        userType: token.userType, // Add this line to include userType
       };
 
       //  - After Fix:", session);

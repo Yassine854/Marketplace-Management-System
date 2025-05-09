@@ -52,6 +52,7 @@ const Sidebar = ({
 
   const { user } = useAuth();
   const [userPermissions, setUserPermissions] = useState<any[]>([]);
+  const [isPartner, setIsPartner] = useState(false);
 
   useEffect(() => {
     // Fetch user permissions when component mounts
@@ -78,6 +79,13 @@ const Sidebar = ({
       fetchPermissions();
     }
   }, [user?.mRoleId]);
+
+  useEffect(() => {
+    // Check if user is a partner based on userType
+    if (user) {
+      setIsPartner(user.userType === "partner");
+    }
+  }, [user]);
 
   // Helper function to check if user has permission for a resource
   const hasPermission = (resource: string) => {
@@ -141,7 +149,7 @@ const Sidebar = ({
           )}
 
           {/* Products */}
-          {hasPermission("Product") && (
+          {isAdmin && hasPermission("Product") && (
             <>
               <SidebarSubMenu
                 icon={<IconShoppingCart />}
@@ -207,6 +215,20 @@ const Sidebar = ({
                       ]
                     : []),
                 ].filter(Boolean)}
+              />
+              <Divider />
+            </>
+          )}
+
+          {/* Sources */}
+          {isPartner && (
+            <>
+              <SidebarSubMenu
+                icon={<IconUsers className="text-lg text-primary" />}
+                name=" Sources"
+                onClick={() => push("/marketplace/source")}
+                isActive={pathname?.includes("Sources")}
+                items={[{ name: "All Sources", path: "/marketplace/source" }]}
               />
               <Divider />
             </>
@@ -333,10 +355,13 @@ const Sidebar = ({
                 onClick={() => push("/marketplace/orders2/all")}
                 isActive={pathname?.toLowerCase().includes("order")}
                 items={[
-                  { name: "All", path: "/orders2/all" },
-                  { name: "State", path: "/order/state" },
-                  { name: "Status", path: "/order/status" },
-                  { name: "payment method", path: "/PaymentMethod" },
+                  { name: "All", path: "/marketplace/orders2/all" },
+                  { name: "State", path: "/marketplace/order/state" },
+                  { name: "Status", path: "/marketplace/order/status" },
+                  {
+                    name: "payment method",
+                    path: "/marketplace/PaymentMethod",
+                  },
                 ]}
               />
               <Divider />
@@ -370,7 +395,8 @@ const Sidebar = ({
           <Divider />
 
           {/* Banner */}
-          {hasPermission("Banner") && (
+
+          {isAdmin && hasPermission("Banner") && (
             <>
               <SidebarButton
                 name="Banner"
@@ -444,6 +470,30 @@ const Sidebar = ({
                 ]}
               />
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
+            </>
+          )}
+
+          {/* Partner Interfaces */}
+          {isPartner && hasPermission("Product") && (
+            <>
+              <SidebarSubMenu
+                icon={<IconShoppingCart />}
+                name="Products"
+                onClick={() => push("/marketplace/partners/products")}
+                isActive={pathname?.includes("products")}
+                items={[
+                  { name: "All", path: "/marketplace/partners/products" },
+                  ...(hasPermission("Category")
+                    ? [
+                        {
+                          name: "Categories",
+                          path: "/marketplace/products/categories",
+                        },
+                      ]
+                    : []),
+                ].filter(Boolean)}
+              />
+              <Divider />
             </>
           )}
 

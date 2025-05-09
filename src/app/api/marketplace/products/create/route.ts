@@ -21,6 +21,7 @@ export async function POST(req: Request) {
       firstName: string;
       lastName: string;
       isActive: boolean;
+      userType?: string;
     };
 
     if (!user.mRoleId) {
@@ -114,6 +115,11 @@ export async function POST(req: Request) {
     const randomComponent = Math.floor(Math.random() * 1000000);
     const uniqueProductId = parseInt(`${timestamp}${randomComponent}`);
 
+    let accepted = true;
+    if (user.userType === "partner") {
+      accepted = false;
+    }
+
     const newProduct = await prisma.product.create({
       data: {
         product_id: uniqueProductId,
@@ -166,6 +172,7 @@ export async function POST(req: Request) {
           formData.get("promo") === "true" && formData.get("promotionId")
             ? (formData.get("promotionId") as string)
             : null,
+        accepted: accepted,
       },
     });
 
@@ -175,7 +182,6 @@ export async function POST(req: Request) {
       { status: 201 },
     );
   } catch (error) {
-    console.error("Error creating product:", error);
     return NextResponse.json(
       { error: "Failed to create product" },
       { status: 500 },

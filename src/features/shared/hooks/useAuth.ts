@@ -12,6 +12,7 @@ interface AuthUser {
   roleId: string;
   mRoleId: string;
   isActive: boolean;
+  userType?: string; // Add userType to the interface
 }
 
 export const useAuth = () => {
