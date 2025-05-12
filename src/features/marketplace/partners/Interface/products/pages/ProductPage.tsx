@@ -1,11 +1,11 @@
+import { useState, useEffect, useMemo } from "react";
+import { useGetAllProducts } from "../hooks/useGetAllProducts";
+import { useProductActions } from "../hooks/useProductActions";
+import { useCreateProduct } from "../hooks/useCreateProduct";
+import { Product } from "@/types/product";
 import ProductTable from "../table/ProductTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import Pagination from "@/features/shared/elements/Pagination/pagination";
-import { useState, useEffect, useMemo } from "react";
-import { useGetAllProducts } from "../hooks/useGetAllProducts";
-import { Product } from "@/types/product";
-import { useProductActions } from "../hooks/useProductActions";
-import { useCreateProduct } from "../hooks/useCreateProduct";
 import CreateProductModal from "../components/CreateProductModal";
 import EditProductModal from "../components/EditProductModal";
 
@@ -31,6 +31,7 @@ const ProductPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [skuPartners, setSkuPartners] = useState([]);
+  const [sources, setSources] = useState([]); // Add sources state
 
   // Change your state initializations to:
   const [typePcbs, setTypePcbOptions] = useState<any[]>([]);
@@ -40,9 +41,6 @@ const ProductPage = () => {
   const [taxes, setTaxOptions] = useState<any[]>([]);
   const [promotions, setPromotionOptions] = useState<any[]>([]);
   const [subCategories, setSubCategoryOptions] = useState<any[]>([]);
-  const [partners, setPartners] = useState<
-    Array<{ id: string; username: string }>
-  >([]);
 
   const [imageFiles, setImageFiles] = useState<File[]>([]);
 
@@ -106,7 +104,6 @@ const ProductPage = () => {
           fetch("/api/marketplace/promotion/getAll"),
           fetch("/api/marketplace/sub_category/getAll"),
           fetch("/api/marketplace/products/getAll"),
-          fetch("/api/marketplace/partners/getAll"),
         ]);
 
         const [
@@ -118,7 +115,6 @@ const ProductPage = () => {
           promotions,
           subCategories,
           products,
-          partners,
         ] = await Promise.all(responses.map((res) => res.json()));
 
         setTypePcbOptions(typePcbs.typePcbs);
@@ -128,7 +124,6 @@ const ProductPage = () => {
         setTaxOptions(taxes.taxes);
         setPromotionOptions(promotions.promotions);
         setSubCategoryOptions(subCategories.subCategories);
-        setPartners(partners.partners);
       } catch (error) {}
     };
 
@@ -153,6 +148,25 @@ const ProductPage = () => {
     setSelectedProduct(product);
     setIsEditModalOpen(true);
   };
+
+  // Fetch sources when component mounts
+  useEffect(() => {
+    const fetchSources = async () => {
+      try {
+        const response = await fetch("/api/marketplace/source/getAll");
+        if (response.ok) {
+          const data = await response.json();
+          setSources(data.sources || []);
+        } else {
+          console.error("Failed to fetch sources");
+        }
+      } catch (error) {
+        console.error("Error fetching sources:", error);
+      }
+    };
+
+    fetchSources();
+  }, []);
 
   return (
     <div className="box-border flex h-screen w-full flex-col p-4 pt-24">
@@ -248,6 +262,7 @@ const ProductPage = () => {
             try {
               const result = await createProduct(productData);
               if (result) {
+                // Explicitly call refetch after product creation
                 refetch();
                 return result;
               }
@@ -255,6 +270,9 @@ const ProductPage = () => {
             } catch (error) {
               // Pass the error up to the modal to handle
               throw error;
+            } finally {
+              // Ensure refetch is called even if there's an error
+              refetch();
             }
           }}
           suppliers={suppliers}
@@ -265,7 +283,6 @@ const ProductPage = () => {
           relatedProducts={products}
           taxes={taxes}
           promotions={promotions}
-          partners={partners}
         />
 
         <EditProductModal
@@ -285,8 +302,8 @@ const ProductPage = () => {
           relatedProducts={products}
           taxes={taxes}
           promotions={promotions}
-          partners={partners}
           skuPartners={skuPartners}
+          sources={sources} // Add sources prop
         />
       </div>
     </div>

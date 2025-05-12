@@ -114,7 +114,7 @@ model Product {
   loyaltyPointsBonusQuantity    Float?
   loyaltyPointsThresholdQty     Float?
   accepted    Boolean  @default(true)
-
+  hasPartner  Boolean  @default(false)
 
   typePcbId            String?  @db.ObjectId
   typePcb              TypePcb? @relation(fields: [typePcbId], references: [id])
@@ -128,6 +128,9 @@ model Product {
   tax                  Tax?      @relation(fields: [taxId], references: [id])
   promotion            Promotion?  @relation(fields: [promotionId], references: [id])
   promotionId          String?     @db.ObjectId
+  partnerId            String?     @db.ObjectId
+
+
 
   images               Image[]
   notifyRequests       NotifyMe[]
@@ -144,6 +147,7 @@ model Product {
   orderItems OrderItem[]
   reservationItems    ReservationItem[]
   skuPartners SkuPartner[]
+  partner     Partner?  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
   @@index([category_ids])
   @@map("products")
@@ -331,6 +335,7 @@ model Partner {
   reservations Reservation[]
   skuPartners SkuPartner[]
   settings Settings[]
+  products Product[]
   @@map("partners")
 }
 

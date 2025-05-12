@@ -24,6 +24,7 @@ export interface Product {
   taxId?: string;
   promotionId?: string;
   promo?: boolean;
+  accepted?: boolean;
   createdAt?: string;
   updatedAt?: string;
   supplier?: {

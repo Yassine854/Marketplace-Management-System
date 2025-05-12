@@ -116,8 +116,13 @@ export async function POST(req: Request) {
     const uniqueProductId = parseInt(`${timestamp}${randomComponent}`);
 
     let accepted = true;
+    let hasPartner = false;
+    let partnerId;
+
     if (user.userType === "partner") {
       accepted = false;
+      hasPartner = true;
+      partnerId = user.id;
     }
 
     const newProduct = await prisma.product.create({
@@ -173,6 +178,8 @@ export async function POST(req: Request) {
             ? (formData.get("promotionId") as string)
             : null,
         accepted: accepted,
+        partnerId: partnerId,
+        hasPartner: hasPartner,
       },
     });
 

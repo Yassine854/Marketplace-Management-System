@@ -55,6 +55,40 @@ export function useCreateProduct() {
     setError(null);
 
     try {
+      // First, check if a product with this barcode already exists
+      if (productData.barcode) {
+        try {
+          const searchResponse = await axios.get(
+            `/api/marketplace/products/search?query=${encodeURIComponent(
+              productData.barcode,
+            )}`,
+          );
+
+          if (
+            searchResponse.data &&
+            Array.isArray(searchResponse.data.products) &&
+            searchResponse.data.products.length > 0
+          ) {
+            // Find the product with matching barcode
+            const existingProduct = searchResponse.data.products.find(
+              (p: any) => p.barcode === productData.barcode,
+            );
+
+            if (existingProduct) {
+              // Process related data for the existing product
+              await processRelatedData(existingProduct.id, productData);
+
+              onSuccess?.(existingProduct.id);
+              return existingProduct;
+            }
+          }
+        } catch (searchError) {
+          console.error("Error searching for existing product:", searchError);
+          // Continue with product creation if search fails
+        }
+      }
+
+      // If no existing product was found, create a new one
       const formData = new FormData();
       const images = productData.images || [];
 
@@ -128,11 +162,6 @@ export function useCreateProduct() {
       // Add promo flag
       formData.append("promo", productData.promo.toString());
 
-      // Log the FormData entries for debugging - using Array.from instead of for...of
-      const formDataEntries: string[] = [];
-      formData.forEach((value, key) => {
-        formDataEntries.push(`${key}: ${value}`);
-      });
       const response = await axios.post(
         "/api/marketplace/products/create",
         formData,
@@ -148,61 +177,8 @@ export function useCreateProduct() {
       }
       const productId = response.data.product.id;
 
-      const promises = [
-        ...productData.subCategories.map((subcategoryId) =>
-          axios.post("/api/marketplace/product_subcategories/create", {
-            productId,
-            subcategoryId,
-          }),
-        ),
-        ...productData.relatedProducts.map((relatedProductId) =>
-          axios.post("/api/marketplace/related_products/create", {
-            productId,
-            relatedProductId,
-          }),
-        ),
-      ];
-
-      // Add SKU partner creation promises
-      if (productData.skuPartners && productData.skuPartners.length > 0) {
-        const validSkuPartners = productData.skuPartners.filter(
-          (partner) => partner.partnerId,
-        );
-
-        promises.push(
-          ...validSkuPartners.map((partner) =>
-            axios.post("/api/marketplace/sku_partner/create", {
-              productId,
-              partnerId: partner.partnerId,
-              skuPartner: partner.skuPartner || productData.sku,
-              skuProduct: productData.sku,
-              stock: partner.stock || 0,
-              price: partner.price || 0,
-              loyaltyPointsPerProduct: partner.loyaltyPointsPerProduct,
-              loyaltyPointsPerUnit: partner.loyaltyPointsPerUnit,
-              loyaltyPointsBonusQuantity: partner.loyaltyPointsBonusQuantity,
-              loyaltyPointsThresholdQty: partner.loyaltyPointsThresholdQty,
-            }),
-          ),
-        );
-      }
-
-      // Only add image upload promise if there are images
-      if (images.length > 0) {
-        const imageFormData = new FormData();
-        imageFormData.append("productId", productId);
-        images.forEach((image) => {
-          imageFormData.append("images", image);
-        });
-
-        promises.push(
-          axios.post("/api/marketplace/image/create", imageFormData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          }),
-        );
-      }
-
-      await Promise.all(promises);
+      // Process related data for the new product
+      await processRelatedData(productId, productData);
 
       if (response.status === 201 && response.data.product?.id) {
         onSuccess?.(response.data.product.id);
@@ -211,6 +187,44 @@ export function useCreateProduct() {
 
       return null;
     } catch (err: any) {
+      // Check if the error is due to barcode already existing
+      if (
+        err.response?.status === 400 &&
+        err.response?.data?.message === "Barcode already exists"
+      ) {
+        // Try to find the existing product with this barcode
+        try {
+          const searchResponse = await axios.get(
+            `/api/marketplace/products/search?query=${encodeURIComponent(
+              productData.barcode,
+            )}`,
+          );
+
+          if (
+            searchResponse.data &&
+            Array.isArray(searchResponse.data.products) &&
+            searchResponse.data.products.length > 0
+          ) {
+            // Find the product with matching barcode
+            const existingProduct = searchResponse.data.products.find(
+              (p: any) => p.barcode === productData.barcode,
+            );
+
+            if (existingProduct) {
+              // Process related data for the existing product
+              await processRelatedData(existingProduct.id, productData);
+              onSuccess?.(existingProduct.id);
+              return existingProduct;
+            }
+          }
+        } catch (searchError) {
+          console.error(
+            "Error searching for existing product after barcode conflict:",
+            searchError,
+          );
+        }
+      }
+
       const errorMessage =
         err.response?.data?.message || "Error creating product";
       setError(errorMessage);
@@ -219,6 +233,68 @@ export function useCreateProduct() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Process related data for the new product
+  const processRelatedData = async (
+    productId: string,
+    productData: CreateProductData,
+  ) => {
+    const promises = [
+      ...productData.subCategories.map((subcategoryId) =>
+        axios.post("/api/marketplace/product_subcategories/create", {
+          productId,
+          subcategoryId,
+        }),
+      ),
+      ...productData.relatedProducts.map((relatedProductId) =>
+        axios.post("/api/marketplace/related_products/create", {
+          productId,
+          relatedProductId,
+        }),
+      ),
+    ];
+
+    // Add SKU partner creation promises
+    if (productData.skuPartners && productData.skuPartners.length > 0) {
+      const validSkuPartners = productData.skuPartners.filter(
+        (partner) => partner.partnerId,
+      );
+
+      promises.push(
+        ...validSkuPartners.map((partner) =>
+          axios.post("/api/marketplace/sku_partner/create", {
+            productId,
+            partnerId: partner.partnerId,
+            skuPartner: partner.skuPartner || productData.sku,
+            skuProduct: productData.sku,
+            stock: partner.stock || 0,
+            price: partner.price || 0,
+            loyaltyPointsPerProduct: partner.loyaltyPointsPerProduct,
+            loyaltyPointsPerUnit: partner.loyaltyPointsPerUnit,
+            loyaltyPointsBonusQuantity: partner.loyaltyPointsBonusQuantity,
+            loyaltyPointsThresholdQty: partner.loyaltyPointsThresholdQty,
+          }),
+        ),
+      );
+    }
+
+    // Only add image upload promise if there are images
+    if (productData.images && productData.images.length > 0) {
+      const imageFormData = new FormData();
+      imageFormData.append("productId", productId);
+      productData.images.forEach((image) => {
+        imageFormData.append("images", image);
+      });
+
+      promises.push(
+        axios.post("/api/marketplace/image/create", imageFormData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        }),
+      );
+    }
+
+    await Promise.all(promises);
   };
 
   return { createProduct, isLoading, error };

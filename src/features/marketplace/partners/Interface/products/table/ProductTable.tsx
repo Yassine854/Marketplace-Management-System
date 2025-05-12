@@ -19,14 +19,18 @@ export default function ProductTable({
   onEdit,
   onDelete,
 }: ProductTableProps) {
-  const { deleteProduct } = useProductActions();
+  const { deleteSkuPartner } = useProductActions();
 
   const handleDelete = (id: string) => {
-    deleteProduct(id).then(() => refetch());
+    deleteSkuPartner(id).then((success) => {
+      if (success) {
+        refetch();
+      }
+    });
   };
 
   return (
-    <div style={{ overflowX: "auto" }}>
+    <div className="overflow-hidden rounded-lg border border-gray-200 shadow-md">
       <div
         className="box mb-5 mt-5 flex w-full justify-between overflow-y-auto rounded-lg bg-primary/5 p-0 dark:bg-bg3"
         style={{ maxHeight: "600px" }}
@@ -46,14 +50,15 @@ export default function ProductTable({
               <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 Price
               </th>
-              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
-                Stock
-              </th>
+
               <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 Supplier
               </th>
               <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 Status
+              </th>
+              <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
+                Review
               </th>
               <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
                 Actions
@@ -115,9 +120,7 @@ export default function ProductTable({
                   <td className="px-4 py-2 text-center text-sm text-gray-900">
                     {product.price.toFixed(2)} DT
                   </td>
-                  <td className="px-4 py-2 text-center text-sm text-gray-900">
-                    {product.stock ?? "N/A"}
-                  </td>
+
                   <td className="px-4 py-2 text-center text-sm text-gray-900">
                     {product.supplier?.companyName || "N/A"}
                   </td>
@@ -130,6 +133,15 @@ export default function ProductTable({
                       }`}
                     >
                       {product.productStatus?.name || "N/A"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    <span
+                      className={`badge ${
+                        product.accepted ? "bg-success" : "bg-danger"
+                      }`}
+                    >
+                      {product.accepted ? "Accepted" : "Pending"}
                     </span>
                   </td>
                   <td className="px-4 py-2 text-center">

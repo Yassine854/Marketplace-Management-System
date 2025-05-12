@@ -55,7 +55,6 @@ const Sidebar = ({
   const [isPartner, setIsPartner] = useState(false);
 
   useEffect(() => {
-    // Fetch user permissions when component mounts
     const fetchPermissions = async () => {
       try {
         const response = await fetch(
@@ -64,7 +63,6 @@ const Sidebar = ({
         const data = await response.json();
 
         if (data.rolePermissions) {
-          // Filter permissions for current user's role
           const myPermissions = data.rolePermissions.filter(
             (rp: any) => rp.roleId === user?.mRoleId,
           );
@@ -87,12 +85,9 @@ const Sidebar = ({
     }
   }, [user]);
 
-  // Helper function to check if user has permission for a resource
   const hasPermission = (resource: string) => {
-    // Admin always has access to everything
     if (isAdmin) return true;
 
-    // Check if user has permission for this resource
     return userPermissions.some(
       (rp) =>
         rp.permission?.resource === resource && rp.actions.includes("read"),
@@ -220,6 +215,30 @@ const Sidebar = ({
             </>
           )}
 
+          {/* Partner Interfaces */}
+          {isPartner && hasPermission("Product") && (
+            <>
+              <SidebarSubMenu
+                icon={<IconShoppingCart />}
+                name="Products"
+                onClick={() => push("/marketplace/partners/products")}
+                isActive={pathname?.includes("products")}
+                items={[
+                  { name: "All", path: "/marketplace/partners/products" },
+                  ...(hasPermission("Category")
+                    ? [
+                        {
+                          name: "Categories",
+                          path: "/marketplace/products/categories",
+                        },
+                      ]
+                    : []),
+                ].filter(Boolean)}
+              />
+              <Divider />
+            </>
+          )}
+
           {/* Sources */}
           {isPartner && (
             <>
@@ -235,7 +254,7 @@ const Sidebar = ({
           )}
 
           {/* Partners */}
-          {hasPermission("Partner") && (
+          {isAdmin && hasPermission("Partner") && (
             <>
               <SidebarSubMenu
                 icon={<IconUsers className="text-lg text-primary" />}
@@ -255,7 +274,7 @@ const Sidebar = ({
           )}
 
           {/* Settings */}
-          {hasPermission("Settings") && (
+          {isAdmin && hasPermission("Settings") && (
             <>
               <SidebarSubMenu
                 icon={<IconUsers className="text-lg text-primary" />}
@@ -313,7 +332,7 @@ const Sidebar = ({
           )}
 
           {/* Purchase order */}
-          {hasPermission("Supplier") && (
+          {isAdmin && (
             <>
               <SidebarSubMenu
                 icon={<IconShoppingCart />}
@@ -386,14 +405,18 @@ const Sidebar = ({
           )}
 
           {/* Notifications */}
-          <SidebarButton
-            name={"Notifications"}
-            icon={<IconBell />}
-            onClick={() => push("/notifications")}
-            isActive={pathname?.includes("notifications")}
-          />
-          <Divider />
+          {isAdmin && (
+            <>
+              <SidebarButton
+                name={"Notifications"}
+                icon={<IconBell />}
+                onClick={() => push("/notifications")}
+                isActive={pathname?.includes("notifications")}
+              />
 
+              <Divider />
+            </>
+          )}
           {/* Banner */}
 
           {isAdmin && hasPermission("Banner") && (
@@ -470,30 +493,6 @@ const Sidebar = ({
                 ]}
               />
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
-            </>
-          )}
-
-          {/* Partner Interfaces */}
-          {isPartner && hasPermission("Product") && (
-            <>
-              <SidebarSubMenu
-                icon={<IconShoppingCart />}
-                name="Products"
-                onClick={() => push("/marketplace/partners/products")}
-                isActive={pathname?.includes("products")}
-                items={[
-                  { name: "All", path: "/marketplace/partners/products" },
-                  ...(hasPermission("Category")
-                    ? [
-                        {
-                          name: "Categories",
-                          path: "/marketplace/products/categories",
-                        },
-                      ]
-                    : []),
-                ].filter(Boolean)}
-              />
-              <Divider />
             </>
           )}
 

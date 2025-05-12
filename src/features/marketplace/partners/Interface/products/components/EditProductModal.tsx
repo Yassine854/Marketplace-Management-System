@@ -1,18 +1,36 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
+
+// Add Stock interface
+interface Stock {
+  id?: string;
+  sourceId: string;
+  stockQuantity: number;
+  minQty: number;
+  maxQty: number;
+  price: number;
+  loyaltyPointsPerProduct?: number;
+  loyaltyPointsPerUnit?: number;
+  loyaltyPointsBonusQuantity?: number;
+  loyaltyPointsThresholdQty?: number;
+  source?: {
+    id: string;
+    name: string;
+  };
+}
 
 interface SkuPartner {
   id?: string;
   partnerId: string;
   skuPartner: string;
-  stock?: number;
-  Price?: string;
-  price?: number;
-  loyaltyPointsPerProduct?: number;
-  loyaltyPointsPerUnit?: number;
-  loyaltyPointsBonusQuantity?: number;
-  loyaltyPointsThresholdQty?: number;
-  partner?: { id: string; username: string };
+  stock?: Stock[];
+}
+
+// Add Source interface
+interface Source {
+  id: string;
+  name: string;
 }
 
 interface ProductImage {
@@ -33,8 +51,8 @@ interface EditProductModalProps {
   relatedProducts: Array<{ id: string; name: string }>;
   taxes: Array<{ id: string; value: string }>;
   promotions: Array<{ id: string; promoPrice: string }>;
-  partners: Array<{ id: string; username: string }>;
   skuPartners: SkuPartner[];
+  sources: Array<{ id: string; name: string }>;
 }
 
 const EditProductModal = ({
@@ -50,9 +68,132 @@ const EditProductModal = ({
   relatedProducts,
   taxes,
   promotions,
-  partners,
   skuPartners: initialSkuPartners,
+  sources: initialSources,
 }: EditProductModalProps) => {
+  // Add session to get current user
+  const { data: session } = useSession();
+  const [partnerSkuPartner, setPartnerSkuPartner] = useState<SkuPartner | null>(
+    null,
+  );
+  const [stocks, setStocks] = useState<Stock[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("basic");
+  const [existingImages, setExistingImages] = useState<ProductImage[]>([]);
+
+  // Get user info from session
+  const user = session?.user as
+    | {
+        id: string;
+        roleId?: string;
+        mRoleId?: string;
+        userType?: string;
+      }
+    | undefined;
+
+  const isPartner = user?.userType === "partner";
+  const partnerId = isPartner ? user.id : null;
+
+  // useEffect to find the partner's SKU partner and fetch stocks
+  useEffect(() => {
+    if (product && isOpen && isPartner && partnerId) {
+      // Find the SKU partner that belongs to the logged-in partner
+      const partnerSku = initialSkuPartners.find(
+        (sp) => sp.partnerId === partnerId,
+      );
+      setPartnerSkuPartner(partnerSku || null);
+
+      // Fetch stocks if we have a SKU partner
+      const fetchStocks = async () => {
+        if (partnerSku?.id) {
+          try {
+            const response = await fetch("/api/marketplace/stock/getAll");
+            if (response.ok) {
+              const data = await response.json();
+              // Filter stocks for this SKU partner
+              const partnerStocks = data.stocks.filter(
+                (stock: any) => stock.skuPartnerId === partnerSku.id,
+              );
+              setStocks(partnerStocks || []);
+            }
+          } catch (error) {
+            console.error("Error fetching stocks:", error);
+            toast.error("Failed to load stocks");
+          }
+        }
+      };
+
+      fetchStocks();
+    }
+  }, [product, isOpen, initialSkuPartners, partnerId, isPartner]);
+
+  // Add function to handle stock changes
+  const handleStockChange = (index: number, field: string, value: any) => {
+    const updatedStocks = [...stocks];
+    updatedStocks[index] = {
+      ...updatedStocks[index],
+      [field]: field === "sourceId" ? value : Number(value),
+    };
+    setStocks(updatedStocks);
+  };
+
+  // Add function to add a new stock
+  const addStock = () => {
+    if (!partnerSkuPartner?.id) {
+      toast.error("You need to save your SKU first before adding stock");
+      return;
+    }
+
+    setStocks([
+      ...stocks,
+      {
+        sourceId: "",
+        stockQuantity: 0,
+        minQty: 0,
+        maxQty: 0,
+        price: 0,
+        loyaltyPointsPerProduct: undefined,
+        loyaltyPointsPerUnit: undefined,
+        loyaltyPointsBonusQuantity: undefined,
+        loyaltyPointsThresholdQty: undefined,
+      },
+    ]);
+  };
+
+  // Add a function to remove stock
+  const removeStock = async (index: number) => {
+    const stockToRemove = stocks[index];
+
+    // If the stock has an ID, it exists in the database and needs to be deleted via API
+    if (stockToRemove.id) {
+      try {
+        const response = await fetch(
+          `/api/marketplace/stock/${stockToRemove.id}`,
+          {
+            method: "DELETE",
+          },
+        );
+
+        if (response.ok) {
+          toast.success("Stock deleted successfully");
+        } else {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to delete stock");
+        }
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to delete stock",
+        );
+        return; // Don't remove from UI if API call failed
+      }
+    }
+
+    // Remove from UI
+    const updatedStocks = [...stocks];
+    updatedStocks.splice(index, 1);
+    setStocks(updatedStocks);
+  };
+
   const [formState, setFormState] = useState({
     name: "",
     barcode: "",
@@ -84,9 +225,17 @@ const EditProductModal = ({
   });
 
   const [skuPartners, setSkuPartners] = useState<SkuPartner[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [existingImages, setExistingImages] = useState<ProductImage[]>([]);
-  const [activeTab, setActiveTab] = useState("basic");
+  // Removed duplicate isLoading state
+  // const [isLoading, setIsLoading] = useState(false);
+  // Removed duplicate existingImages state
+  // const [existingImages, setExistingImages] = useState<ProductImage[]>([]);
+  // Removed duplicate activeTab state
+  // const [activeTab, setActiveTab] = useState("basic");
+
+  // Removed duplicate stocks and partnerSkuPartner states
+  // const [partnerSkuPartner, setPartnerSkuPartner] = useState<SkuPartner | null>(null);
+  // const [stocks, setStocks] = useState<Stock[]>([]);
+  const [sources, setSources] = useState<Source[]>([]);
 
   useEffect(() => {
     if (product && isOpen) {
@@ -129,32 +278,17 @@ const EditProductModal = ({
       const processedSkuPartners = initialSkuPartners.map((sp) => {
         let priceValue = 0;
 
-        if (sp.Price !== undefined && sp.Price !== null) {
-          priceValue = parseFloat(String(sp.Price));
-          if (isNaN(priceValue)) {
-            priceValue = 0;
-          }
-        }
-
         return {
           id: sp.id,
           partnerId: sp.partnerId,
           skuPartner: sp.skuPartner,
-          stock: sp.stock || 0,
-          Price: sp.Price, // Keep the original Price string
-          price: priceValue, // Store parsed float in lowercase price for UI
-          loyaltyPointsPerProduct: sp.loyaltyPointsPerProduct,
-          loyaltyPointsPerUnit: sp.loyaltyPointsPerUnit,
-          loyaltyPointsBonusQuantity: sp.loyaltyPointsBonusQuantity,
-          loyaltyPointsThresholdQty: sp.loyaltyPointsThresholdQty,
-          partner: partners.find((p) => p.id === sp.partnerId),
         };
       });
 
       setSkuPartners(processedSkuPartners);
       setActiveTab("basic");
     }
-  }, [product, isOpen, initialSkuPartners, partners]);
+  }, [product, isOpen, initialSkuPartners]);
 
   // Add this useEffect to reset loading state when modal opens/closes
   useEffect(() => {
@@ -225,44 +359,15 @@ const EditProductModal = ({
   const handleSkuPartnerChange = (index: number, field: string, value: any) => {
     const updatedPartners = [...skuPartners];
 
-    // Special handling for price field
-    if (field === "price") {
-      // Ensure we're getting a valid float value
-      let numValue: number;
-      if (typeof value === "string") {
-        // If the input is empty or not a valid number, default to 0
-        numValue = value === "" ? 0 : parseFloat(value);
-        if (isNaN(numValue)) numValue = 0;
-      } else {
-        numValue = value;
-      }
-
-      updatedPartners[index] = {
-        ...updatedPartners[index],
-        price: numValue, // Store as number for UI
-        Price: String(numValue), // Update Price (string) for API
-        partner: updatedPartners[index].partner,
-      };
-    } else if (field === "skuPartner") {
-      // For skuPartner field, allow empty string in the UI
-      // (we'll use product SKU as default when submitting)
+    // Only allow updating the skuPartner field
+    if (field === "skuPartner") {
       updatedPartners[index] = {
         ...updatedPartners[index],
         skuPartner: value,
-        partner: updatedPartners[index].partner,
       };
-    } else {
-      updatedPartners[index] = {
-        ...updatedPartners[index],
-        [field]: value,
-        partner:
-          field === "partnerId"
-            ? partners.find((p) => p.id === value)
-            : updatedPartners[index].partner,
-      };
-    }
 
-    setSkuPartners(updatedPartners);
+      setSkuPartners(updatedPartners);
+    }
   };
 
   const addSkuPartner = () => {
@@ -271,8 +376,6 @@ const EditProductModal = ({
       {
         partnerId: "",
         skuPartner: "",
-        stock: 0,
-        price: 0,
       },
     ]);
   };
@@ -312,18 +415,6 @@ const EditProductModal = ({
     setSkuPartners(updatedPartners);
   };
 
-  const getAvailablePartners = (currentIndex: number) => {
-    const selectedPartnerIds = skuPartners
-      .filter((_, i) => i !== currentIndex)
-      .map((p) => p.partnerId);
-
-    return partners.filter(
-      (p) =>
-        !selectedPartnerIds.includes(p.id) ||
-        p.id === skuPartners[currentIndex].partnerId,
-    );
-  };
-
   const handleDeleteImage = async (imageId: string) => {
     try {
       const response = await fetch(`/api/marketplace/image/${imageId}`, {
@@ -350,121 +441,129 @@ const EditProductModal = ({
   };
 
   const handleSubmit = async () => {
-    if (!formState.name || !formState.sku || !formState.price) {
-      toast.error("Please fill in required fields");
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      // Upload new images if any
-      if (formState.images.length > 0) {
-        try {
-          const newImages = await handleImageUpload(formState.images);
-          setExistingImages((prev) => [...prev, ...newImages]);
-        } catch (imageError) {
-          console.error("Error uploading images:", imageError);
-          toast.error("Failed to upload images");
-          // Continue with the update even if image upload fails
-        }
-      }
+      // Only update the partner SKU and stocks
+      if (partnerId) {
+        // First, update or create the SKU partner
+        let skuPartnerId = partnerSkuPartner?.id;
 
-      const cleanedData = {
-        ...formState,
-        id: product?.id,
-        supplierId: formState.supplierId || null,
-        productTypeId: formState.productTypeId || null,
-        typePcbId: formState.typePcbId || null,
-        productStatusId: formState.productStatusId || null,
-        taxId: formState.taxId || null,
-        promotionId: formState.promotionId || null,
-        price: Number(formState.price),
-        cost: formState.cost ? Number(formState.cost) : undefined,
-        stock: formState.stock ? Number(formState.stock) : undefined,
-        subCategories: formState.subCategories,
-        relatedProducts: formState.relatedProducts,
-      };
+        if (!skuPartnerId && partnerSkuPartner) {
+          // Create new SKU partner if it doesn't exist
+          const payload = {
+            partnerId: partnerId,
+            skuPartner: partnerSkuPartner.skuPartner?.trim() || formState.sku,
+            skuProduct: formState.sku,
+            productId: product?.id,
+          };
 
-      // Try to update the product
-      try {
-        await onEdit(cleanedData);
-      } catch (productError: any) {
-        // Extract the error message from the API response
-        let errorMessage = "Failed to update product";
+          const response = await fetch("/api/marketplace/sku_partner", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
 
-        if (productError.response?.data) {
-          // If there's a message field in the response data, use it
-          if (productError.response.data.message) {
-            errorMessage = productError.response.data.message;
-          }
-          // If there's an error field in the response data, use it
-          else if (productError.response.data.error) {
-            errorMessage = productError.response.data.error;
-          }
-        } else if (productError instanceof Error) {
-          errorMessage = productError.message;
-        }
-
-        if (errorMessage.includes("Barcode already exists")) {
-          toast.error(
-            "This barcode already exists. Please use a different barcode.",
-          );
-        } else if (errorMessage.includes("SKU already exists")) {
-          toast.error("This SKU already exists. Please use a different SKU.");
-        } else if (errorMessage.toLowerCase().includes("unique constraint")) {
-          if (errorMessage.toLowerCase().includes("barcode")) {
-            toast.error(
-              "This barcode already exists. Please use a different barcode.",
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              errorData.message || "Failed to create SKU partner",
             );
-          } else if (errorMessage.toLowerCase().includes("sku")) {
-            toast.error("This SKU already exists. Please use a different SKU.");
-          } else {
-            toast.error(errorMessage);
           }
-        } else if (errorMessage.includes("Missing required fields")) {
-          toast.error("Please fill in all required fields.");
-        } else {
-          toast.error(errorMessage);
+
+          const data = await response.json();
+          skuPartnerId = data.id;
+
+          // Update the partnerSkuPartner state with the new ID
+          setPartnerSkuPartner({
+            ...partnerSkuPartner,
+            id: skuPartnerId,
+          });
+        } else if (skuPartnerId && partnerSkuPartner) {
+          // Update existing SKU partner
+          const payload = {
+            partnerId: partnerId,
+            skuPartner: partnerSkuPartner.skuPartner?.trim() || formState.sku,
+            skuProduct: formState.sku,
+            productId: product?.id,
+          };
+
+          const response = await fetch(
+            `/api/marketplace/sku_partner/${skuPartnerId}`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            },
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              errorData.message || "Failed to update SKU partner",
+            );
+          }
         }
 
-        console.error("Error updating product:", productError);
-        setIsLoading(false);
-        return; // Stop execution and keep modal open
-      }
+        // Now handle stocks if we have a SKU partner ID
+        if (skuPartnerId) {
+          // Handle new stocks (those without an id)
+          const newStocks = stocks.filter((stock) => !stock.id);
+          for (const stock of newStocks) {
+            try {
+              const response = await fetch("/api/marketplace/stock", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  skuPartnerId: skuPartnerId,
+                  sourceId: stock.sourceId,
+                  stockQuantity: Number(stock.stockQuantity),
+                  minQty: Number(stock.minQty),
+                  maxQty: Number(stock.maxQty),
+                  price: Number(stock.price),
+                  loyaltyPointsPerProduct: stock.loyaltyPointsPerProduct,
+                  loyaltyPointsPerUnit: stock.loyaltyPointsPerUnit,
+                  loyaltyPointsBonusQuantity: stock.loyaltyPointsBonusQuantity,
+                  loyaltyPointsThresholdQty: stock.loyaltyPointsThresholdQty,
+                }),
+              });
 
-      // Process SKU partners only if product update was successful
-      try {
-        await Promise.all(
-          skuPartners.map(async (sp) => {
-            if (!sp.partnerId) return;
+              if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to create stock");
+              }
+            } catch (stockError) {
+              console.error("Error creating stock:", stockError);
+              toast.error(
+                stockError instanceof Error
+                  ? stockError.message
+                  : "Failed to create stock",
+              );
+            }
+          }
 
-            // Use the uppercase Price field that we've been maintaining
-            const priceAsString = sp.Price || String(sp.price) || "0";
-
-            // Use partner's SKU if provided, otherwise use product SKU
-            const partnerSku = sp.skuPartner?.trim() || formState.sku;
-
-            const payload = {
-              partnerId: sp.partnerId,
-              skuPartner: partnerSku,
-              skuProduct: formState.sku,
-              productId: product?.id,
-              stock: sp.stock !== undefined ? Number(sp.stock) : 0,
-              Price: priceAsString, // Use uppercase Price as expected by the API
-              loyaltyPointsPerProduct: sp.loyaltyPointsPerProduct,
-              loyaltyPointsPerUnit: sp.loyaltyPointsPerUnit,
-              loyaltyPointsBonusQuantity: sp.loyaltyPointsBonusQuantity,
-              loyaltyPointsThresholdQty: sp.loyaltyPointsThresholdQty,
-            };
-
-            if (sp.id) {
+          // Handle existing stocks (those with an id)
+          const existingStocks = stocks.filter((stock) => stock.id);
+          for (const stock of existingStocks) {
+            try {
               const response = await fetch(
-                `/api/marketplace/sku_partner/${sp.id}`,
+                `/api/marketplace/stock/${stock.id}`,
                 {
                   method: "PATCH",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(payload),
+                  body: JSON.stringify({
+                    skuPartnerId: skuPartnerId,
+                    sourceId: stock.sourceId,
+                    stockQuantity: Number(stock.stockQuantity),
+                    minQty: Number(stock.minQty),
+                    maxQty: Number(stock.maxQty),
+                    price: Number(stock.price),
+                    loyaltyPointsPerProduct: stock.loyaltyPointsPerProduct,
+                    loyaltyPointsPerUnit: stock.loyaltyPointsPerUnit,
+                    loyaltyPointsBonusQuantity:
+                      stock.loyaltyPointsBonusQuantity,
+                    loyaltyPointsThresholdQty: stock.loyaltyPointsThresholdQty,
+                  }),
                 },
               );
 
@@ -473,53 +572,48 @@ const EditProductModal = ({
                 throw new Error(
                   errorData.message ||
                     errorData.error ||
-                    "Failed to update SKU partner",
+                    "Failed to update stock",
                 );
               }
-            } else {
-              const response = await fetch(
-                "/api/marketplace/sku_partner/create",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(payload),
-                },
+            } catch (stockError) {
+              console.error("Error updating stock:", stockError);
+              toast.error(
+                stockError instanceof Error
+                  ? stockError.message
+                  : "Failed to update stock",
               );
-
-              if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                  errorData.message ||
-                    errorData.error ||
-                    "Failed to create SKU partner",
-                );
-              }
             }
-          }),
-        );
-      } catch (partnerError) {
-        console.error("Error with SKU partners:", partnerError);
-        toast.error(
-          partnerError instanceof Error
-            ? partnerError.message
-            : "Failed to update partner SKUs",
-        );
-        setIsLoading(false);
-        return; // Stop execution and keep modal open
-      }
+          }
+        }
 
-      // Only close the modal if everything succeeded
-      setIsLoading(false); // Reset loading state before closing
-      handleClose();
+        toast.success("Product information updated successfully");
+        onClose();
+      }
     } catch (error) {
-      // This catches any other unexpected errors
-      console.error("Unexpected error:", error);
-      toast.error("An unexpected error occurred");
+      console.error("Error updating product:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update product",
+      );
+    } finally {
       setIsLoading(false);
     }
   };
 
   if (!isOpen) return null;
+
+  // Add a function to get available sources (not already selected)
+  const getAvailableSources = (currentStockId?: string) => {
+    // Get all source IDs that are already selected in other stocks
+    const selectedSourceIds = stocks
+      .filter((stock) => stock.id !== currentStockId) // Exclude current stock
+      .map((stock) => stock.sourceId)
+      .filter(Boolean); // Filter out empty strings or undefined
+
+    // Return only sources that haven't been selected yet
+    return initialSources.filter(
+      (source) => !selectedSourceIds.includes(source.id),
+    );
+  };
 
   return (
     <div
@@ -624,14 +718,14 @@ const EditProductModal = ({
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Product Name *
+                    Product Name
                   </label>
                   <input
                     type="text"
                     placeholder="Product Name"
                     value={formState.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
                 <div>
@@ -642,22 +736,20 @@ const EditProductModal = ({
                     type="text"
                     placeholder="Bar Code"
                     value={formState.barcode}
-                    onChange={(e) =>
-                      handleInputChange("barcode", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    SKU *
+                    SKU
                   </label>
                   <input
                     type="text"
                     placeholder="SKU"
                     value={formState.sku}
-                    onChange={(e) => handleInputChange("sku", e.target.value)}
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
               </div>
@@ -668,17 +760,15 @@ const EditProductModal = ({
                 <textarea
                   placeholder="Description"
                   value={formState.description}
-                  onChange={(e) =>
-                    handleInputChange("description", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
+                  disabled
+                  className="w-full rounded-lg border bg-gray-100 p-3"
                   rows={4}
                 />
               </div>
             </div>
           )}
 
-          {/* Specifications */}
+          {/* Specifications - ensure all fields are disabled */}
           {activeTab === "specs" && (
             <div className="space-y-4 pt-6">
               <h3 className="text-xl font-semibold text-primary">
@@ -692,9 +782,9 @@ const EditProductModal = ({
                   <input
                     type="text"
                     placeholder="PCB"
-                    value={formState.pcb}
-                    onChange={(e) => handleInputChange("pcb", e.target.value)}
-                    className="w-full rounded-lg border p-3"
+                    value={formState.pcb || ""}
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
                 <div>
@@ -705,10 +795,8 @@ const EditProductModal = ({
                     type="number"
                     placeholder="Weight"
                     value={formState.weight || ""}
-                    onChange={(e) =>
-                      handleInputChange("weight", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
                 <div>
@@ -719,10 +807,8 @@ const EditProductModal = ({
                     type="number"
                     placeholder="Minimum Quantity"
                     value={formState.minimumQte || ""}
-                    onChange={(e) =>
-                      handleInputChange("minimumQte", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
                 <div>
@@ -733,10 +819,8 @@ const EditProductModal = ({
                     type="number"
                     placeholder="Maximum Quantity"
                     value={formState.maximumQte || ""}
-                    onChange={(e) =>
-                      handleInputChange("maximumQte", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
                 <div>
@@ -747,10 +831,8 @@ const EditProductModal = ({
                     type="number"
                     placeholder="Sealable"
                     value={formState.sealable || ""}
-                    onChange={(e) =>
-                      handleInputChange("sealable", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
                 <div>
@@ -761,17 +843,15 @@ const EditProductModal = ({
                     type="number"
                     placeholder="Alert Quantity"
                     value={formState.alertQte || ""}
-                    onChange={(e) =>
-                      handleInputChange("alertQte", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
               </div>
             </div>
           )}
 
-          {/* Pricing & Stock */}
+          {/* Pricing & Stock - all fields disabled */}
           {activeTab === "pricing" && (
             <div className="space-y-4 pt-6">
               <h3 className="text-xl font-semibold text-primary">
@@ -786,8 +866,8 @@ const EditProductModal = ({
                     type="number"
                     placeholder="Price *"
                     value={formState.price}
-                    onChange={(e) => handleInputChange("price", e.target.value)}
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
                 <div>
@@ -798,8 +878,8 @@ const EditProductModal = ({
                     type="number"
                     placeholder="Cost"
                     value={formState.cost || ""}
-                    onChange={(e) => handleInputChange("cost", e.target.value)}
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
                 <div>
@@ -810,92 +890,67 @@ const EditProductModal = ({
                     type="number"
                     placeholder="Stock"
                     value={formState.stock || ""}
-                    onChange={(e) => handleInputChange("stock", e.target.value)}
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
               </div>
 
-              {/* Loyalty Program */}
-              <div className="pt-4">
-                <h4 className="mb-3 text-lg font-medium text-gray-800">
-                  Loyalty Program
-                </h4>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Points Per Product
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Points Per Product"
-                      value={formState.loyaltyPointsPerProduct || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "loyaltyPointsPerProduct",
-                          e.target.value,
-                        )
-                      }
-                      className="w-full rounded-lg border p-3"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Points Per Unit
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Points Per Unit"
-                      value={formState.loyaltyPointsPerUnit || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "loyaltyPointsPerUnit",
-                          e.target.value,
-                        )
-                      }
-                      className="w-full rounded-lg border p-3"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Bonus Quantity
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Bonus Quantity"
-                      value={formState.loyaltyPointsBonusQuantity || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "loyaltyPointsBonusQuantity",
-                          e.target.value,
-                        )
-                      }
-                      className="w-full rounded-lg border p-3"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Threshold Quantity
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Threshold Quantity"
-                      value={formState.loyaltyPointsThresholdQty || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "loyaltyPointsThresholdQty",
-                          e.target.value,
-                        )
-                      }
-                      className="w-full rounded-lg border p-3"
-                    />
-                  </div>
+              {/* Loyalty points fields - disabled */}
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Loyalty Points Per Product
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Loyalty Points Per Product"
+                    value={formState.loyaltyPointsPerProduct || ""}
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Loyalty Points Per Unit
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Loyalty Points Per Unit"
+                    value={formState.loyaltyPointsPerUnit || ""}
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Loyalty Points Bonus Quantity
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Loyalty Points Bonus Quantity"
+                    value={formState.loyaltyPointsBonusQuantity || ""}
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Loyalty Points Threshold Quantity
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Loyalty Points Threshold Quantity"
+                    value={formState.loyaltyPointsThresholdQty || ""}
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
+                  />
                 </div>
               </div>
             </div>
           )}
 
-          {/* Relationships */}
+          {/* Relationships - all fields disabled */}
           {activeTab === "relations" && (
             <div className="space-y-4 pt-6">
               <h3 className="text-xl font-semibold text-primary">
@@ -908,10 +963,8 @@ const EditProductModal = ({
                   </label>
                   <select
                     value={formState.supplierId || ""}
-                    onChange={(e) =>
-                      handleInputChange("supplierId", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   >
                     <option value="">Select Manufacturer</option>
                     {suppliers.map((supplier) => (
@@ -921,19 +974,16 @@ const EditProductModal = ({
                     ))}
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Product Type
                   </label>
                   <select
                     value={formState.productTypeId || ""}
-                    onChange={(e) =>
-                      handleInputChange("productTypeId", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   >
-                    <option value="">Product Type</option>
+                    <option value="">Select Product Type</option>
                     {productTypes.map((type) => (
                       <option key={type.id} value={type.id}>
                         {type.type}
@@ -941,19 +991,16 @@ const EditProductModal = ({
                     ))}
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     PCB Type
                   </label>
                   <select
                     value={formState.typePcbId || ""}
-                    onChange={(e) =>
-                      handleInputChange("typePcbId", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   >
-                    <option value="">PCB Type</option>
+                    <option value="">Select PCB Type</option>
                     {typePcbs.map((pcb) => (
                       <option key={pcb.id} value={pcb.id}>
                         {pcb.name}
@@ -961,19 +1008,16 @@ const EditProductModal = ({
                     ))}
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Product Status
                   </label>
                   <select
                     value={formState.productStatusId || ""}
-                    onChange={(e) =>
-                      handleInputChange("productStatusId", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
                   >
-                    <option value="">Product Status</option>
+                    <option value="">Select Product Status</option>
                     {productStatuses.map((status) => (
                       <option key={status.id} value={status.id}>
                         {status.name}
@@ -981,82 +1025,66 @@ const EditProductModal = ({
                     ))}
                   </select>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Tax
-                  </label>
-                  <select
-                    value={formState.taxId || ""}
-                    onChange={(e) => handleInputChange("taxId", e.target.value)}
-                    className="w-full rounded-lg border p-3"
-                  >
-                    <option value="">Select Tax</option>
-                    {taxes.map((tax) => (
-                      <option key={tax.id} value={tax.id}>
-                        {tax.value}
-                      </option>
-                    ))}
-                  </select>
-                </div>
               </div>
 
-              {/* Sub-Categories & Related Products */}
-              <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Sub-Categories
-                  </label>
-                  <select
-                    multiple
-                    value={formState.subCategories}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "subCategories",
-                        Array.from(e.target.selectedOptions).map(
-                          (o) => o.value,
-                        ),
-                      )
-                    }
-                    className="w-full rounded-lg border p-3"
-                    size={5}
-                  >
-                    {subCategories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Related Products
-                  </label>
-                  <select
-                    multiple
-                    value={formState.relatedProducts}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "relatedProducts",
-                        Array.from(e.target.selectedOptions).map(
-                          (o) => o.value,
-                        ),
-                      )
-                    }
-                    className="w-full rounded-lg border p-3"
-                    size={5}
-                  >
-                    {relatedProducts.map((product) => (
-                      <option key={product.id} value={product.id}>
-                        {product.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              {/* Sub-categories - disabled */}
+              <div className="pt-4">
+                <h4 className="mb-3 text-lg font-medium text-gray-800">
+                  Sub-categories
+                </h4>
+                <select
+                  multiple
+                  value={formState.subCategories}
+                  disabled
+                  className="w-full rounded-lg border bg-gray-100 p-3"
+                  size={4}
+                >
+                  {subCategories.map((sc) => (
+                    <option key={sc.id} value={sc.id}>
+                      {sc.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {/* Promotion */}
+              {/* Related Products - disabled */}
+              <div className="pt-4">
+                <h4 className="mb-3 text-lg font-medium text-gray-800">
+                  Related Products
+                </h4>
+                <select
+                  multiple
+                  value={formState.relatedProducts}
+                  disabled
+                  className="w-full rounded-lg border bg-gray-100 p-3"
+                  size={4}
+                >
+                  {relatedProducts.map((rp) => (
+                    <option key={rp.id} value={rp.id}>
+                      {rp.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Tax - disabled */}
+              <div className="pt-4">
+                <h4 className="mb-3 text-lg font-medium text-gray-800">Tax</h4>
+                <select
+                  value={formState.taxId || ""}
+                  disabled
+                  className="w-full rounded-lg border bg-gray-100 p-3"
+                >
+                  <option value="">Select Tax</option>
+                  {taxes.map((tax) => (
+                    <option key={tax.id} value={tax.id}>
+                      {tax.value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Promotion - disabled */}
               <div className="pt-4">
                 <h4 className="mb-3 text-lg font-medium text-gray-800">
                   Promotion
@@ -1065,20 +1093,16 @@ const EditProductModal = ({
                   <input
                     type="checkbox"
                     checked={formState.promo}
-                    onChange={(e) =>
-                      handleInputChange("promo", e.target.checked)
-                    }
-                    className="h-5 w-5"
+                    disabled
+                    className="h-5 w-5 bg-gray-100"
                   />
                   <span>Promo Product</span>
                 </label>
                 {formState.promo && (
                   <select
                     value={formState.promotionId || ""}
-                    onChange={(e) =>
-                      handleInputChange("promotionId", e.target.value)
-                    }
-                    className="mt-2 w-full rounded-lg border p-3"
+                    disabled
+                    className="mt-2 w-full rounded-lg border bg-gray-100 p-3"
                   >
                     <option value="">Select Promotion</option>
                     {promotions.map((promo) => (
@@ -1093,88 +1117,85 @@ const EditProductModal = ({
           )}
 
           {/* Partner SKUs */}
-          {activeTab === "partners" && (
+          {activeTab === "partners" && isPartner && (
             <div className="space-y-4 pt-6 md:col-span-2">
               <h3 className="text-xl font-semibold text-primary">
-                Partner SKUs
+                Partner SKU
               </h3>
-              <div className="space-y-4">
-                {skuPartners.map((partner, index) => (
+
+              <div className="space-y-6">
+                <div className="rounded-lg border border-gray-200 p-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Your SKU
+                    </label>
+                    <input
+                      type="text"
+                      value={partnerSkuPartner?.skuPartner || ""}
+                      onChange={(e) =>
+                        setPartnerSkuPartner({
+                          ...(partnerSkuPartner || {
+                            partnerId: partnerId || "",
+                          }),
+                          skuPartner: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-lg border p-3"
+                      placeholder="Your SKU code"
+                    />
+                  </div>
+                </div>
+
+                <h3 className="mt-6 text-xl font-semibold text-primary">
+                  Stock Management
+                </h3>
+
+                {stocks.map((stock, index) => (
                   <div
                     key={index}
-                    className="rounded-lg border border-gray-200 p-4"
+                    className="relative rounded-lg border border-gray-200 p-4"
                   >
-                    <div className="mb-3 flex items-center justify-between">
-                      <h4 className="font-medium">Partner SKU #{index + 1}</h4>
+                    <div className="absolute right-2 top-2">
                       <button
-                        onClick={() => removeSkuPartner(index)}
+                        type="button"
+                        onClick={() => removeStock(index)}
                         className="text-red-500 hover:text-red-700"
+                        aria-label="Remove stock"
                       >
-                        Remove
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
                       </button>
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
-                          Partner
+                          Source
                         </label>
                         <select
-                          value={partner.partnerId}
+                          value={stock.sourceId}
                           onChange={(e) =>
-                            handleSkuPartnerChange(
-                              index,
-                              "partnerId",
-                              e.target.value,
-                            )
+                            handleStockChange(index, "sourceId", e.target.value)
                           }
                           className="w-full rounded-lg border p-3"
                         >
-                          <option value="">Select Partner</option>
-                          {getAvailablePartners(index).map((p) => (
-                            <option key={p.id} value={p.id}>
-                              {p.username}
+                          <option value="">Select Source</option>
+                          {getAvailableSources(stock.id).map((source) => (
+                            <option key={source.id} value={source.id}>
+                              {source.name}
                             </option>
                           ))}
                         </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Partner SKU
-                        </label>
-                        <input
-                          type="text"
-                          value={partner.skuPartner}
-                          onChange={(e) =>
-                            handleSkuPartnerChange(
-                              index,
-                              "skuPartner",
-                              e.target.value,
-                            )
-                          }
-                          className="w-full rounded-lg border p-3"
-                          placeholder="Partner's SKU code"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Stock
-                        </label>
-                        <input
-                          type="number"
-                          value={partner.stock}
-                          onChange={(e) =>
-                            handleSkuPartnerChange(
-                              index,
-                              "stock",
-                              Number(e.target.value),
-                            )
-                          }
-                          className="w-full rounded-lg border p-3"
-                          placeholder="Stock quantity"
-                        />
                       </div>
 
                       <div>
@@ -1183,36 +1204,84 @@ const EditProductModal = ({
                         </label>
                         <input
                           type="number"
-                          step="0.01" // Allow decimal values with 2 decimal places
-                          value={partner.price}
+                          value={stock.price}
                           onChange={(e) =>
-                            handleSkuPartnerChange(
-                              index,
-                              "price",
-                              parseFloat(e.target.value) || 0,
-                            )
+                            handleStockChange(index, "price", e.target.value)
                           }
                           className="w-full rounded-lg border p-3"
-                          placeholder="Price"
+                          min="0"
+                          step="0.01"
                         />
                       </div>
 
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Stock Quantity
+                        </label>
+                        <input
+                          type="number"
+                          value={stock.stockQuantity}
+                          onChange={(e) =>
+                            handleStockChange(
+                              index,
+                              "stockQuantity",
+                              e.target.value,
+                            )
+                          }
+                          className="w-full rounded-lg border p-3"
+                          min="0"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Minimum Quantity
+                        </label>
+                        <input
+                          type="number"
+                          value={stock.minQty}
+                          onChange={(e) =>
+                            handleStockChange(index, "minQty", e.target.value)
+                          }
+                          className="w-full rounded-lg border p-3"
+                          min="0"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Maximum Quantity
+                        </label>
+                        <input
+                          type="number"
+                          value={stock.maxQty}
+                          onChange={(e) =>
+                            handleStockChange(index, "maxQty", e.target.value)
+                          }
+                          className="w-full rounded-lg border p-3"
+                          min="0"
+                        />
+                      </div>
+
+                      {/* Loyalty Points Fields */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
                           Loyalty Points Per Product
                         </label>
                         <input
                           type="number"
-                          value={partner.loyaltyPointsPerProduct}
+                          value={stock.loyaltyPointsPerProduct || ""}
                           onChange={(e) =>
-                            handleSkuPartnerChange(
+                            handleStockChange(
                               index,
                               "loyaltyPointsPerProduct",
-                              Number(e.target.value),
+                              e.target.value
+                                ? Number(e.target.value)
+                                : undefined,
                             )
                           }
                           className="w-full rounded-lg border p-3"
-                          placeholder="Loyalty points per product"
+                          min="0"
                         />
                       </div>
 
@@ -1222,16 +1291,18 @@ const EditProductModal = ({
                         </label>
                         <input
                           type="number"
-                          value={partner.loyaltyPointsPerUnit}
+                          value={stock.loyaltyPointsPerUnit || ""}
                           onChange={(e) =>
-                            handleSkuPartnerChange(
+                            handleStockChange(
                               index,
                               "loyaltyPointsPerUnit",
-                              Number(e.target.value),
+                              e.target.value
+                                ? Number(e.target.value)
+                                : undefined,
                             )
                           }
                           className="w-full rounded-lg border p-3"
-                          placeholder="Loyalty points per unit"
+                          min="0"
                         />
                       </div>
 
@@ -1241,16 +1312,18 @@ const EditProductModal = ({
                         </label>
                         <input
                           type="number"
-                          value={partner.loyaltyPointsBonusQuantity}
+                          value={stock.loyaltyPointsBonusQuantity || ""}
                           onChange={(e) =>
-                            handleSkuPartnerChange(
+                            handleStockChange(
                               index,
                               "loyaltyPointsBonusQuantity",
-                              Number(e.target.value),
+                              e.target.value
+                                ? Number(e.target.value)
+                                : undefined,
                             )
                           }
                           className="w-full rounded-lg border p-3"
-                          placeholder="Bonus quantity"
+                          min="0"
                         />
                       </div>
 
@@ -1260,16 +1333,18 @@ const EditProductModal = ({
                         </label>
                         <input
                           type="number"
-                          value={partner.loyaltyPointsThresholdQty}
+                          value={stock.loyaltyPointsThresholdQty || ""}
                           onChange={(e) =>
-                            handleSkuPartnerChange(
+                            handleStockChange(
                               index,
                               "loyaltyPointsThresholdQty",
-                              Number(e.target.value),
+                              e.target.value
+                                ? Number(e.target.value)
+                                : undefined,
                             )
                           }
                           className="w-full rounded-lg border p-3"
-                          placeholder="Threshold quantity"
+                          min="0"
                         />
                       </div>
                     </div>
@@ -1278,62 +1353,38 @@ const EditProductModal = ({
 
                 <button
                   type="button"
-                  onClick={addSkuPartner}
+                  onClick={addStock}
                   className="w-full rounded-lg bg-gray-100 p-3 text-gray-700 hover:bg-gray-200"
                 >
-                  + Add Partner SKU
+                  + Add Stock for New Source
                 </button>
               </div>
             </div>
           )}
 
-          {/* Images */}
+          {/* Images tab - disabled */}
           {activeTab === "images" && (
-            <div className="space-y-4 pt-6 md:col-span-2">
+            <div className="space-y-4 pt-6">
               <h3 className="text-xl font-semibold text-primary">Images</h3>
-
-              {/* Existing images */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                 {existingImages.map((image) => (
-                  <div key={image.id} className="group relative">
+                  <div
+                    key={image.id}
+                    className="relative aspect-square overflow-hidden rounded-lg border"
+                  >
                     <img
                       src={image.url}
                       alt="Product"
-                      className="h-32 w-full rounded-lg object-cover"
+                      className="h-full w-full object-cover"
                     />
-                    <button
-                      onClick={() => handleDeleteImage(image.id)}
-                      className="absolute right-1 top-1 rounded-full bg-red-500 p-1 text-white transition-colors hover:bg-red-600"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
+                    {/* Remove delete button */}
                   </div>
                 ))}
               </div>
-
-              {/* New image upload */}
-              <div className="mt-4">
-                <label className="mb-2 block text-sm font-medium text-gray-700">
-                  Upload New Images
-                </label>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="w-full rounded-lg border p-3"
-                />
+              <div className="mt-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+                <p className="text-gray-500">
+                  Image uploads are disabled in partner mode
+                </p>
               </div>
             </div>
           )}

@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import Select from "react-select";
 import { useSearchBar } from "@/features/shared/inputs/SearchBar/useSearchBar";
+import { useCreateProduct } from "../hooks/useCreateProduct";
 
 interface Product {
   id: string;
@@ -95,7 +96,6 @@ interface CreateProductModalProps {
   relatedProducts: Array<{ id: string; name: string }>;
   taxes: Array<{ id: string; value: string }>;
   promotions: Array<{ id: string; promoPrice: string }>;
-  partners: Array<{ id: string; username: string }>;
 }
 
 const CreateProductModal = ({
@@ -110,7 +110,6 @@ const CreateProductModal = ({
   relatedProducts,
   taxes,
   promotions,
-  partners,
 }: CreateProductModalProps) => {
   const [formState, setFormState] = useState({
     name: "",
@@ -154,6 +153,9 @@ const CreateProductModal = ({
     }>,
   });
 
+  // Add this line to use the hook at the component level
+  const { createProduct } = useCreateProduct();
+
   const [activeTab, setActiveTab] = useState("basic");
 
   // Add state for sources
@@ -164,9 +166,13 @@ const CreateProductModal = ({
 
   // Add these state variables
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<Array<Product>>([]);
+  const [searchResults, setSearchResults] = useState<Array<any>>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Add a state to store the selected product ID
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -202,6 +208,7 @@ const CreateProductModal = ({
         stocks: [], // Empty array for stocks
       });
       setActiveTab("basic");
+      setSelectedProductId(null); // Reset selected product ID
     }
   }, [isOpen]);
 
@@ -365,22 +372,32 @@ const CreateProductModal = ({
     fetchPartnerSources();
   }, []);
 
-  // Add a function to search products by barcode or SKU
-  const searchProducts = async (query: string) => {
-    if (!query.trim()) {
-      setSearchResults([]);
+  // Simple function to search products by barcode or SKU
+  const searchProducts = async () => {
+    if (!searchTerm.trim()) {
       return;
     }
 
     setIsSearching(true);
     try {
+      // Use the dedicated search endpoint
       const response = await axios.get(
-        `/api/marketplace/products/search?query=${encodeURIComponent(query)}`,
+        `/api/marketplace/products/search?query=${encodeURIComponent(
+          searchTerm,
+        )}`,
       );
+
       if (response.data && Array.isArray(response.data.products)) {
-        setSearchResults(response.data.products);
+        if (response.data.products.length > 0) {
+          console.log("Search results:", response.data.products); // For debugging
+          setSearchResults(response.data.products);
+        } else {
+          setSearchResults([]);
+          toast.error("No products found with that barcode or SKU");
+        }
       } else {
         setSearchResults([]);
+        toast.error("Invalid response format from API");
       }
     } catch (error) {
       console.error("Error searching products:", error);
@@ -391,20 +408,14 @@ const CreateProductModal = ({
     }
   };
 
-  // Add a debounced search effect
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchTerm) {
-        searchProducts(searchTerm);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  // Add a function to select a product and fill the form
+  // Function to use a product's data in the form
   const selectProduct = (product: Product) => {
-    // Map subcategories and related products to their IDs
+    console.log("Selected product:", product);
+
+    // Store the selected product ID
+    setSelectedProductId(product.id);
+
+    // Extract subcategory IDs and related product IDs
     const subCategoryIds =
       product.productSubCategories?.map((sc) => sc.subcategoryId) || [];
     const relatedProductIds =
@@ -412,22 +423,22 @@ const CreateProductModal = ({
 
     setFormState({
       name: product.name,
-      barcode: product.barcode,
+      barcode: product.barcode || "",
       sku: product.sku,
       price: product.price,
-      cost: product.cost,
-      stock: product.stock,
+      cost: product.cost || 0,
+      stock: product.stock || 0,
       description: product.description || "",
       pcb: product.pcb || "",
-      weight: product.weight,
-      minimumQte: product.minimumQte,
-      maximumQte: product.maximumQte,
-      sealable: product.sealable,
-      alertQte: product.alertQte,
-      loyaltyPointsPerProduct: product.loyaltyPointsPerProduct,
-      loyaltyPointsPerUnit: product.loyaltyPointsPerUnit,
-      loyaltyPointsBonusQuantity: product.loyaltyPointsBonusQuantity,
-      loyaltyPointsThresholdQty: product.loyaltyPointsThresholdQty,
+      weight: product.weight || 0,
+      minimumQte: product.minimumQte || 0,
+      maximumQte: product.maximumQte || 0,
+      sealable: product.sealable || 0,
+      alertQte: product.alertQte || 0,
+      loyaltyPointsPerProduct: product.loyaltyPointsPerProduct || 0,
+      loyaltyPointsPerUnit: product.loyaltyPointsPerUnit || 0,
+      loyaltyPointsBonusQuantity: product.loyaltyPointsBonusQuantity || 0,
+      loyaltyPointsThresholdQty: product.loyaltyPointsThresholdQty || 0,
       supplierId: product.supplierId || "",
       productTypeId: product.productTypeId || "",
       typePcbId: product.typePcbId || "",
@@ -442,81 +453,177 @@ const CreateProductModal = ({
       stocks: [],
     });
 
-    // Clear search results and search term
+    // Clear search
     setSearchResults([]);
     setSearchTerm("");
 
-    toast.success(`Product "${product.name}" loaded into form`);
+    toast.success(`Product "${product.name}" data loaded into form`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate required fields
-    if (!formState.name.trim()) {
-      toast.error("Product Name is required");
-      return;
-    }
+    // Different validation based on whether we're creating a new product or using an existing one
+    if (!selectedProductId) {
+      // Validations for creating a new product
+      if (!formState.name.trim()) {
+        toast.error("Product Name is required");
+        return;
+      }
 
-    if (!formState.barcode.trim()) {
-      toast.error("Barcode is required");
-      return;
-    }
+      if (!formState.barcode.trim()) {
+        toast.error("Barcode is required");
+        return;
+      }
 
-    if (!formState.price || formState.price <= 0) {
-      toast.error("Price is required and must be greater than zero");
-      return;
+      if (!formState.price || formState.price <= 0) {
+        toast.error("Price is required and must be greater than zero");
+        return;
+      }
+    } else {
+      // Validations for creating just a SKU partner
+      // No need to validate barcode here
+
+      // Validate that at least one stock entry has a source
+      if (
+        formState.stocks.length > 0 &&
+        !formState.stocks.some((stock) => stock.sourceId)
+      ) {
+        toast.error("At least one stock entry must have a source selected");
+        return;
+      }
     }
 
     setIsSubmitting(true);
 
     try {
-      // Convert empty strings to undefined for relational fields
-      const payload = {
-        ...formState,
-        price: Number(formState.price),
-        cost: formState.cost ? Number(formState.cost) : undefined,
-        stock: formState.stock ? Number(formState.stock) : undefined,
-        weight: formState.weight ? Number(formState.weight) : undefined,
-        minimumQte: formState.minimumQte
-          ? Number(formState.minimumQte)
-          : undefined,
-        maximumQte: formState.maximumQte
-          ? Number(formState.maximumQte)
-          : undefined,
-        sealable: formState.sealable ? Number(formState.sealable) : undefined,
-        alertQte: formState.alertQte ? Number(formState.alertQte) : undefined,
-        loyaltyPointsPerProduct: formState.loyaltyPointsPerProduct
-          ? Number(formState.loyaltyPointsPerProduct)
-          : undefined,
-        loyaltyPointsPerUnit: formState.loyaltyPointsPerUnit
-          ? Number(formState.loyaltyPointsPerUnit)
-          : undefined,
-        loyaltyPointsBonusQuantity: formState.loyaltyPointsBonusQuantity
-          ? Number(formState.loyaltyPointsBonusQuantity)
-          : undefined,
-        loyaltyPointsThresholdQty: formState.loyaltyPointsThresholdQty
-          ? Number(formState.loyaltyPointsThresholdQty)
-          : undefined,
-        // Convert empty strings to undefined for relational IDs
-        supplierId: formState.supplierId || undefined,
-        productTypeId: formState.productTypeId || undefined,
-        typePcbId: formState.typePcbId || undefined,
-        productStatusId: formState.productStatusId || undefined,
-        taxId: formState.taxId || undefined,
-        promotionId: formState.promotionId || undefined,
-      };
+      let productId = selectedProductId;
 
-      // Remove partnerSku from the payload as it's not part of the product creation
-      const { partnerSku, stocks, ...productPayload } = payload;
+      // If we don't have a selected product, check if one exists with this barcode
+      if (!productId && formState.barcode) {
+        try {
+          // Search for product with this barcode
+          const searchResponse = await axios.get(
+            `/api/marketplace/products/search?query=${encodeURIComponent(
+              formState.barcode,
+            )}`,
+          );
 
-      const productResponse = await onCreate(productPayload);
+          if (
+            searchResponse.data &&
+            Array.isArray(searchResponse.data.products) &&
+            searchResponse.data.products.length > 0
+          ) {
+            // Use the first product that matches the barcode
+            const existingProduct = searchResponse.data.products.find(
+              (p: any) => p.barcode === formState.barcode,
+            );
 
-      if (!productResponse || !productResponse.id) {
-        throw new Error("Failed to create product");
+            if (existingProduct) {
+              productId = existingProduct.id;
+              toast(
+                `Found existing product with barcode ${formState.barcode}. Creating SKU partner only.`,
+              );
+            }
+          }
+        } catch (searchError) {
+          console.error("Error searching for product:", searchError);
+        }
       }
 
-      const productId = productResponse.id;
+      // Only create a new product if we don't have a product ID yet
+      if (!productId) {
+        // Convert empty strings to undefined for relational fields
+        const payload = {
+          ...formState,
+          price: Number(formState.price),
+          cost: formState.cost ? Number(formState.cost) : undefined,
+          stock: formState.stock ? Number(formState.stock) : undefined,
+          weight: formState.weight ? Number(formState.weight) : undefined,
+          minimumQte: formState.minimumQte
+            ? Number(formState.minimumQte)
+            : undefined,
+          maximumQte: formState.maximumQte
+            ? Number(formState.maximumQte)
+            : undefined,
+          sealable: formState.sealable ? Number(formState.sealable) : undefined,
+          alertQte: formState.alertQte ? Number(formState.alertQte) : undefined,
+          loyaltyPointsPerProduct: formState.loyaltyPointsPerProduct
+            ? Number(formState.loyaltyPointsPerProduct)
+            : undefined,
+          loyaltyPointsPerUnit: formState.loyaltyPointsPerUnit
+            ? Number(formState.loyaltyPointsPerUnit)
+            : undefined,
+          loyaltyPointsBonusQuantity: formState.loyaltyPointsBonusQuantity
+            ? Number(formState.loyaltyPointsBonusQuantity)
+            : undefined,
+          loyaltyPointsThresholdQty: formState.loyaltyPointsThresholdQty
+            ? Number(formState.loyaltyPointsThresholdQty)
+            : undefined,
+          subCategories: formState.subCategories,
+          relatedProducts: formState.relatedProducts,
+          promo: formState.promo,
+          images: formState.images,
+        };
+
+        // Remove partnerSku and stocks from the payload as they're not part of the product creation
+        const { partnerSku, stocks, ...productPayload } = payload;
+
+        try {
+          const productResponse = await createProduct(productPayload);
+          if (productResponse && productResponse.id) {
+            productId = productResponse.id;
+          } else {
+            throw new Error("Failed to create product");
+          }
+        } catch (error: any) {
+          // If the error is due to barcode already existing, try to find the product again
+          if (
+            error.message &&
+            error.message.includes("Barcode already exists")
+          ) {
+            try {
+              const retrySearch = await axios.get(
+                `/api/marketplace/products/search?query=${encodeURIComponent(
+                  formState.barcode,
+                )}`,
+              );
+
+              if (
+                retrySearch.data &&
+                Array.isArray(retrySearch.data.products) &&
+                retrySearch.data.products.length > 0
+              ) {
+                // Use the first product that matches the barcode
+                const existingProduct = retrySearch.data.products.find(
+                  (p: any) => p.barcode === formState.barcode,
+                );
+
+                if (existingProduct) {
+                  productId = existingProduct.id;
+                } else {
+                  throw new Error(
+                    "Could not find product with matching barcode",
+                  );
+                }
+              } else {
+                throw new Error("Could not find product with matching barcode");
+              }
+            } catch (retryError) {
+              console.error(
+                "Error finding product after barcode conflict:",
+                retryError,
+              );
+              throw new Error(
+                "Could not create product or find existing one with this barcode",
+              );
+            }
+          } else {
+            // If it's not a barcode conflict, rethrow the error
+            throw error;
+          }
+        }
+      }
 
       // Create SKU partner and stocks
       if (productId) {
@@ -554,14 +661,44 @@ const CreateProductModal = ({
 
             await Promise.all(stockPromises.filter(Boolean));
           }
-        } catch (skuError) {
+        } catch (skuError: any) {
           console.error("Error creating SKU partner or stocks:", skuError);
-          // Continue with success message even if SKU partner creation fails
+
+          // Check for the specific conflict error
+          if (
+            skuError.response?.status === 409 &&
+            skuError.response?.data?.message ===
+              "This partner is already assigned to this product"
+          ) {
+            toast.error("This product is already assigned to this partner");
+            // Return early to prevent the success message below
+            setIsSubmitting(false);
+            return;
+          } else {
+            // Handle other errors
+            toast.error("Failed to create SKU partner or stocks");
+            // Return early to prevent the success message below
+            setIsSubmitting(false);
+            return;
+          }
         }
       }
 
-      toast.success("Product created successfully");
+      toast.success(
+        selectedProductId || productId !== null
+          ? "SKU partner created successfully"
+          : "Product created successfully",
+      );
+
+      // Call the refetch function to update the product list
       onClose();
+
+      // Add a small delay before refetching to ensure the backend has processed everything
+      setTimeout(() => {
+        if (typeof onCreate === "function") {
+          onCreate(formState);
+        }
+      }, 500);
     } catch (error) {
       console.error("Error creating product:", error);
       toast.error("Failed to create product");
@@ -617,53 +754,92 @@ const CreateProductModal = ({
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Search by Barcode or SKU
-            </label>
-            <div className="relative">
+          {/* Simple Product Search */}
+          <div className="mb-4 flex items-end space-x-2">
+            <div className="flex-grow">
+              <label className="block text-sm font-medium text-gray-700">
+                Search by Barcode or SKU
+              </label>
               <input
-                ref={searchInputRef}
                 type="text"
-                placeholder="Enter barcode or SKU to search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-lg border p-2 text-sm"
+                placeholder="Enter barcode or SKU"
+                className="w-full rounded-lg border p-2"
+                onKeyDown={(e) => e.key === "Enter" && searchProducts()}
               />
-              {isSearching && (
-                <div className="absolute right-3 top-2">
-                  <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
-                </div>
-              )}
-
-              {/* Search Results Dropdown */}
-              {searchResults.length > 0 && (
-                <div className="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg">
-                  <ul className="max-h-60 overflow-auto rounded-md py-1 text-base">
-                    {searchResults.map((product) => (
-                      <li
-                        key={product.id}
-                        onClick={() => selectProduct(product)}
-                        className="cursor-pointer px-4 py-2 hover:bg-gray-100"
-                      >
-                        <div className="flex justify-between">
-                          <span className="font-medium">{product.name}</span>
-                          <span className="text-sm text-gray-500">
-                            ${product.price.toFixed(2)}
-                          </span>
-                        </div>
-                        <div className="flex space-x-4 text-xs text-gray-500">
-                          <span>Barcode: {product.barcode}</span>
-                          <span>SKU: {product.sku}</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
+            <button
+              type="button"
+              onClick={searchProducts}
+              disabled={isSearching}
+              className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:bg-blue-300"
+            >
+              {isSearching ? "Searching..." : "Search"}
+            </button>
           </div>
+
+          {/* Search Results - Simple List */}
+          {searchResults.length > 0 && (
+            <div className="mb-4 rounded-lg border p-3">
+              <h4 className="mb-2 font-medium">Found Products:</h4>
+              <ul className="divide-y">
+                {searchResults.map((product) => (
+                  <li
+                    key={product.id}
+                    className="flex items-center justify-between py-2"
+                  >
+                    <div>
+                      <p className="font-medium">{product.name}</p>
+                      <p className="text-sm text-gray-500">
+                        Barcode: {product.barcode} | SKU: {product.sku} | Price:{" "}
+                        {product.price} Dt
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => selectProduct(product)}
+                      className="rounded bg-green-100 px-3 py-1 text-sm text-green-700 hover:bg-green-200"
+                    >
+                      Use
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
+
+        {/* Show indicator when using existing product */}
+        {selectedProductId && (
+          <div className="mb-4 rounded-lg bg-blue-50 p-3 text-blue-700">
+            <div className="flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="mr-2 h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="font-medium">
+                Using existing product - only SKU partner and stocks will be
+                created
+              </span>
+            </div>
+            <button
+              type="button"
+              className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+              onClick={() => setSelectedProductId(null)}
+            >
+              Clear selection and create new product instead
+            </button>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="mb-6 flex border-b">
@@ -1238,7 +1414,7 @@ const CreateProductModal = ({
                 <div className="mt-4">
                   <div className="flex items-center justify-between">
                     <h5 className="text-md font-medium text-gray-700">
-                      Stocks
+                      Stock Management
                     </h5>
                     <button
                       type="button"
@@ -1252,22 +1428,31 @@ const CreateProductModal = ({
                   {formState.stocks.map((stock, stockIndex) => (
                     <div
                       key={stockIndex}
-                      className="mt-3 rounded-lg border border-gray-100 bg-gray-50 p-3"
+                      className="relative mt-3 rounded-lg border border-gray-200 bg-white p-4"
                     >
-                      <div className="mb-2 flex items-center justify-between">
-                        <h6 className="text-sm font-medium">
-                          Stock #{stockIndex + 1}
-                        </h6>
+                      <div className="absolute right-2 top-2">
                         <button
                           type="button"
                           onClick={() => removeStock(stockIndex)}
                           className="text-red-500 hover:text-red-700"
+                          aria-label="Remove stock"
                         >
-                          Remove
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
                         </button>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div>
                           <label className="block text-sm font-medium text-gray-700">
                             Source
@@ -1281,7 +1466,7 @@ const CreateProductModal = ({
                                 e.target.value,
                               )
                             }
-                            className="w-full rounded-lg border p-2"
+                            className="w-full rounded-lg border p-3"
                           >
                             <option value="">Select Source</option>
                             {getAvailableSources(stockIndex).map((source) => (
@@ -1306,7 +1491,8 @@ const CreateProductModal = ({
                                 Number(e.target.value),
                               )
                             }
-                            className="w-full rounded-lg border p-2"
+                            className="w-full rounded-lg border p-3"
+                            min="0"
                           />
                         </div>
 
@@ -1324,7 +1510,8 @@ const CreateProductModal = ({
                                 Number(e.target.value),
                               )
                             }
-                            className="w-full rounded-lg border p-2"
+                            className="w-full rounded-lg border p-3"
+                            min="0"
                           />
                         </div>
 
@@ -1342,7 +1529,8 @@ const CreateProductModal = ({
                                 Number(e.target.value),
                               )
                             }
-                            className="w-full rounded-lg border p-2"
+                            className="w-full rounded-lg border p-3"
+                            min="0"
                           />
                         </div>
 
@@ -1360,7 +1548,9 @@ const CreateProductModal = ({
                                 e.target.value,
                               )
                             }
-                            className="w-full rounded-lg border p-2"
+                            className="w-full rounded-lg border p-3"
+                            min="0"
+                            step="0.01"
                           />
                         </div>
 
@@ -1381,7 +1571,8 @@ const CreateProductModal = ({
                                   : undefined,
                               )
                             }
-                            className="w-full rounded-lg border p-2"
+                            className="w-full rounded-lg border p-3"
+                            min="0"
                           />
                         </div>
 
@@ -1401,7 +1592,8 @@ const CreateProductModal = ({
                                   : undefined,
                               )
                             }
-                            className="w-full rounded-lg border p-2"
+                            className="w-full rounded-lg border p-3"
+                            min="0"
                           />
                         </div>
 
@@ -1421,7 +1613,8 @@ const CreateProductModal = ({
                                   : undefined,
                               )
                             }
-                            className="w-full rounded-lg border p-2"
+                            className="w-full rounded-lg border p-3"
+                            min="0"
                           />
                         </div>
 
@@ -1441,7 +1634,8 @@ const CreateProductModal = ({
                                   : undefined,
                               )
                             }
-                            className="w-full rounded-lg border p-2"
+                            className="w-full rounded-lg border p-3"
+                            min="0"
                           />
                         </div>
                       </div>
@@ -1449,10 +1643,20 @@ const CreateProductModal = ({
                   ))}
 
                   {formState.stocks.length === 0 && (
-                    <div className="mt-2 text-center text-sm text-gray-500">
+                    <div className="mt-4 w-full rounded-lg bg-gray-100 p-3 text-center text-sm text-gray-500">
                       No stocks added. Click &quot;Add Stock&quot; to add stock
                       information.
                     </div>
+                  )}
+
+                  {formState.stocks.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={addStock}
+                      className="mt-4 w-full rounded-lg bg-gray-100 p-3 text-gray-700 hover:bg-gray-200"
+                    >
+                      + Add Stock for New Source
+                    </button>
                   )}
                 </div>
               </div>

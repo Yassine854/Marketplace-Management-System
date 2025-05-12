@@ -13,10 +13,26 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    // Get user info
+    const user = session.user as {
+      id: string;
+      roleId?: string;
+      mRoleId?: string;
+      userType?: string;
+    };
+
+    // Prepare query - if user is a partner, only return their SKU partners
+    let query = {};
+    if (user.userType === "partner") {
+      query = { partnerId: user.id };
+    }
+
     const skuPartners = await prisma.skuPartner.findMany({
+      where: query,
       include: {
         product: true,
         partner: true,
+        stock: true,
       },
     });
 
