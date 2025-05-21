@@ -77,7 +77,6 @@ export async function GET(
         images: true,
         productSubCategories: { include: { subcategory: true } },
         favoriteProducts: true,
-        favoritePartners: true,
         relatedProducts: { include: { relatedProduct: true } },
         skuPartners: true,
       },
@@ -140,6 +139,20 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
+    // Special case for just accepting a product
+    if (body.accepted === true && Object.keys(body).length === 1) {
+      const updatedProduct = await prisma.product.update({
+        where: { id },
+        data: { accepted: true },
+      });
+
+      return NextResponse.json(
+        { message: "Product accepted", product: updatedProduct },
+        { status: 200 },
+      );
+    }
+
+    // Regular update flow continues below
     const { subCategories, relatedProducts, images, ...productData } = body;
 
     if (!productData.name || !productData.sku || !productData.price) {

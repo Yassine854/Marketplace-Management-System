@@ -1,6 +1,6 @@
 import PartnerTable from "../table/PartnerTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllPartners } from "../hooks/useGetAllPartners";
 import { Partner } from "@/types/partner";

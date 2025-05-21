@@ -1,7 +1,7 @@
 import CustomerTable from "../table/CustomerTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
 import { useState, useEffect, useMemo } from "react";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 
 import { useGetAllCustomers } from "../hooks/useGetAllCustomers";
 import { Customer } from "@/types/customer";

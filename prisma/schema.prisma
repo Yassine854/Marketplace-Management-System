@@ -130,8 +130,7 @@ model Product {
   promotionId          String?     @db.ObjectId
   partnerId            String?     @db.ObjectId
 
-
-
+  activities           String[]   @default([]) @db.String // Array of activities that can be empty
   images               Image[]
   notifyRequests       NotifyMe[]
 
@@ -143,7 +142,6 @@ model Product {
 
   productSubCategories       ProductSubCategory[]
   favoriteProducts FavoriteProduct[]
-  favoritePartners FavoritePartner[]
   orderItems OrderItem[]
   reservationItems    ReservationItem[]
   skuPartners SkuPartner[]
@@ -336,6 +334,7 @@ model Partner {
   skuPartners SkuPartner[]
   settings Settings[]
   products Product[]
+  agents Agent[]
   @@map("partners")
 }
 
@@ -352,11 +351,14 @@ model Agent {
   password  String?
   mRoleId    String?
   isActive  Boolean?  @default(true)
+  partnerId   String   @db.ObjectId
+
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
   orders   Order[]
   role            Role?     @relation(fields: [mRoleId], references: [id])
+  partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
   reservations Reservation[]
   @@map("agents")
@@ -536,19 +538,16 @@ model FavoriteProduct {
 model FavoritePartner {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   customerId  String   @db.ObjectId
-  productId   String   @db.ObjectId
   partnerId   String   @db.ObjectId
 
   customer    Customers @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
-  @@unique([customerId, productId, partnerId])
+  @@unique([customerId, partnerId])
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
-
 model State {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String   @unique
@@ -658,10 +657,7 @@ model Reservation {
   amountTTC           Float
   amountBeforePromo   Float
   amountAfterPromo    Float
-  amountRefunded      Float
-  amountCanceled      Float
   amountOrdered       Float
-  amountShipped       Float
   shippingMethod      String
   isActive            Boolean  @default(false)
   loyaltyPtsValue     Int      @default(0)

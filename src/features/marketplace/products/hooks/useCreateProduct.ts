@@ -34,13 +34,8 @@ interface CreateProductData {
   skuPartners?: Array<{
     partnerId: string;
     skuPartner: string;
-    stock: number;
-    price: number;
-    loyaltyPointsPerProduct?: number;
-    loyaltyPointsPerUnit?: number;
-    loyaltyPointsBonusQuantity?: number;
-    loyaltyPointsThresholdQty?: number;
   }>;
+  activities?: string[];
 }
 
 export function useCreateProduct() {
@@ -61,6 +56,7 @@ export function useCreateProduct() {
       Object.entries(productData).forEach(([key, value]) => {
         if (key === "images") return;
         if (key === "skuPartners") return; // Skip skuPartners for now
+        if (key === "activities") return; // Skip activities for now, we'll handle them separately
 
         if (Array.isArray(value)) {
           value.forEach((item, index) =>
@@ -70,6 +66,13 @@ export function useCreateProduct() {
           formData.append(key, value.toString());
         }
       });
+
+      // Add activities to formData
+      if (productData.activities && productData.activities.length > 0) {
+        productData.activities.forEach((activity, index) => {
+          formData.append(`activities[${index}]`, activity);
+        });
+      }
 
       if (productData.promo !== undefined) {
         formData.append("promo", productData.promo.toString());
@@ -114,12 +117,6 @@ export function useCreateProduct() {
               partnerId: partner.partnerId,
               skuPartner: partner.skuPartner || productData.sku,
               skuProduct: productData.sku,
-              stock: partner.stock || 0,
-              price: partner.price || 0,
-              loyaltyPointsPerProduct: partner.loyaltyPointsPerProduct,
-              loyaltyPointsPerUnit: partner.loyaltyPointsPerUnit,
-              loyaltyPointsBonusQuantity: partner.loyaltyPointsBonusQuantity,
-              loyaltyPointsThresholdQty: partner.loyaltyPointsThresholdQty,
             }),
           ),
         );

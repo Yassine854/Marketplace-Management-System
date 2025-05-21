@@ -22,6 +22,27 @@ export async function POST(req: Request) {
       );
     }
 
+    // Check if the combination already exists
+    const existingProductSubCategory =
+      await prisma.productSubCategory.findFirst({
+        where: {
+          productId: body.productId,
+          subcategoryId: body.subcategoryId,
+        },
+      });
+
+    // If it already exists, return success without creating a duplicate
+    if (existingProductSubCategory) {
+      return NextResponse.json(
+        {
+          message: "ProductSubCategory already exists",
+          productSubCategory: existingProductSubCategory,
+        },
+        { status: 200 },
+      );
+    }
+
+    // Create new record only if it doesn't exist
     const newProductSubCategory = await prisma.productSubCategory.create({
       data: {
         productId: body.productId,

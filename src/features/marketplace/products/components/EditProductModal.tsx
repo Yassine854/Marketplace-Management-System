@@ -1,17 +1,11 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import Select from "react-select";
 
 interface SkuPartner {
   id?: string;
   partnerId: string;
   skuPartner: string;
-  stock?: number;
-  Price?: string;
-  price?: number;
-  loyaltyPointsPerProduct?: number;
-  loyaltyPointsPerUnit?: number;
-  loyaltyPointsBonusQuantity?: number;
-  loyaltyPointsThresholdQty?: number;
   partner?: { id: string; username: string };
 }
 
@@ -36,6 +30,22 @@ interface EditProductModalProps {
   partners: Array<{ id: string; username: string }>;
   skuPartners: SkuPartner[];
 }
+
+const ACTIVITIES = [
+  "alimentation générale",
+  "fruits secs",
+  "superette",
+  "epics et salaisons",
+  "vente volailles et dérivés",
+  "patisserie",
+  "boulangerie",
+  "restaurant",
+  "société",
+  "vente legumes et fruits",
+  "vente produits de parfumerie",
+  "cce d'ecipes",
+  "autre",
+];
 
 const EditProductModal = ({
   isOpen,
@@ -81,6 +91,7 @@ const EditProductModal = ({
     relatedProducts: [] as string[],
     promo: false,
     images: [] as File[],
+    activities: [] as string[],
   });
 
   const [skuPartners, setSkuPartners] = useState<SkuPartner[]>([]);
@@ -93,6 +104,7 @@ const EditProductModal = ({
       setExistingImages(product.images || []);
 
       setFormState({
+        activities: product.activities || [],
         name: product.name,
         barcode: product.barcode,
         sku: product.sku,
@@ -125,28 +137,12 @@ const EditProductModal = ({
         images: [],
       });
 
-      // Process SKU prtners to ensure price is correctly handled
+      // Process SKU partners - simplified version
       const processedSkuPartners = initialSkuPartners.map((sp) => {
-        let priceValue = 0;
-
-        if (sp.Price !== undefined && sp.Price !== null) {
-          priceValue = parseFloat(String(sp.Price));
-          if (isNaN(priceValue)) {
-            priceValue = 0;
-          }
-        }
-
         return {
           id: sp.id,
           partnerId: sp.partnerId,
           skuPartner: sp.skuPartner,
-          stock: sp.stock || 0,
-          Price: sp.Price, // Keep the original Price string
-          price: priceValue, // Store parsed float in lowercase price for UI
-          loyaltyPointsPerProduct: sp.loyaltyPointsPerProduct,
-          loyaltyPointsPerUnit: sp.loyaltyPointsPerUnit,
-          loyaltyPointsBonusQuantity: sp.loyaltyPointsBonusQuantity,
-          loyaltyPointsThresholdQty: sp.loyaltyPointsThresholdQty,
           partner: partners.find((p) => p.id === sp.partnerId),
         };
       });
@@ -225,40 +221,17 @@ const EditProductModal = ({
   const handleSkuPartnerChange = (index: number, field: string, value: any) => {
     const updatedPartners = [...skuPartners];
 
-    // Special handling for price field
-    if (field === "price") {
-      // Ensure we're getting a valid float value
-      let numValue: number;
-      if (typeof value === "string") {
-        // If the input is empty or not a valid number, default to 0
-        numValue = value === "" ? 0 : parseFloat(value);
-        if (isNaN(numValue)) numValue = 0;
-      } else {
-        numValue = value;
-      }
-
+    if (field === "partnerId") {
       updatedPartners[index] = {
         ...updatedPartners[index],
-        price: numValue, // Store as number for UI
-        Price: String(numValue), // Update Price (string) for API
-        partner: updatedPartners[index].partner,
+        partnerId: value,
+        partner: partners.find((p) => p.id === value),
       };
     } else if (field === "skuPartner") {
-      // For skuPartner field, allow empty string in the UI
-      // (we'll use product SKU as default when submitting)
       updatedPartners[index] = {
         ...updatedPartners[index],
         skuPartner: value,
         partner: updatedPartners[index].partner,
-      };
-    } else {
-      updatedPartners[index] = {
-        ...updatedPartners[index],
-        [field]: value,
-        partner:
-          field === "partnerId"
-            ? partners.find((p) => p.id === value)
-            : updatedPartners[index].partner,
       };
     }
 
@@ -271,8 +244,6 @@ const EditProductModal = ({
       {
         partnerId: "",
         skuPartner: "",
-        stock: 0,
-        price: 0,
       },
     ]);
   };
@@ -384,6 +355,7 @@ const EditProductModal = ({
         stock: formState.stock ? Number(formState.stock) : undefined,
         subCategories: formState.subCategories,
         relatedProducts: formState.relatedProducts,
+        activities: formState.activities, // Include activities in the update
       };
 
       // Try to update the product
@@ -440,7 +412,6 @@ const EditProductModal = ({
             if (!sp.partnerId) return;
 
             // Use the uppercase Price field that we've been maintaining
-            const priceAsString = sp.Price || String(sp.price) || "0";
 
             // Use partner's SKU if provided, otherwise use product SKU
             const partnerSku = sp.skuPartner?.trim() || formState.sku;
@@ -450,12 +421,6 @@ const EditProductModal = ({
               skuPartner: partnerSku,
               skuProduct: formState.sku,
               productId: product?.id,
-              stock: sp.stock !== undefined ? Number(sp.stock) : 0,
-              Price: priceAsString, // Use uppercase Price as expected by the API
-              loyaltyPointsPerProduct: sp.loyaltyPointsPerProduct,
-              loyaltyPointsPerUnit: sp.loyaltyPointsPerUnit,
-              loyaltyPointsBonusQuantity: sp.loyaltyPointsBonusQuantity,
-              loyaltyPointsThresholdQty: sp.loyaltyPointsThresholdQty,
             };
 
             if (sp.id) {
@@ -1007,53 +972,86 @@ const EditProductModal = ({
                   <label className="block text-sm font-medium text-gray-700">
                     Sub-Categories
                   </label>
-                  <select
-                    multiple
-                    value={formState.subCategories}
-                    onChange={(e) =>
+                  <Select
+                    isMulti
+                    name="subCategories"
+                    options={subCategories.map((cat) => ({
+                      value: cat.id,
+                      label: cat.name,
+                    }))}
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                    value={formState.subCategories.map((id) => {
+                      const cat = subCategories.find((c) => c.id === id);
+                      return { value: id, label: cat ? cat.name : id };
+                    })}
+                    onChange={(selected) => {
                       handleInputChange(
                         "subCategories",
-                        Array.from(e.target.selectedOptions).map(
-                          (o) => o.value,
-                        ),
-                      )
-                    }
-                    className="w-full rounded-lg border p-3"
-                    size={5}
-                  >
-                    {subCategories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
+                        selected ? selected.map((option) => option.value) : [],
+                      );
+                    }}
+                    placeholder="Search and select subcategories..."
+                    noOptionsMessage={() => "No subcategories found"}
+                  />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Related Products
                   </label>
-                  <select
-                    multiple
-                    value={formState.relatedProducts}
-                    onChange={(e) =>
+                  <Select
+                    isMulti
+                    name="relatedProducts"
+                    options={relatedProducts.map((product) => ({
+                      value: product.id,
+                      label: product.name,
+                    }))}
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                    value={formState.relatedProducts.map((id) => {
+                      const product = relatedProducts.find((p) => p.id === id);
+                      return { value: id, label: product ? product.name : id };
+                    })}
+                    onChange={(selected) => {
                       handleInputChange(
                         "relatedProducts",
-                        Array.from(e.target.selectedOptions).map(
-                          (o) => o.value,
-                        ),
-                      )
-                    }
-                    className="w-full rounded-lg border p-3"
-                    size={5}
-                  >
-                    {relatedProducts.map((product) => (
-                      <option key={product.id} value={product.id}>
-                        {product.name}
-                      </option>
-                    ))}
-                  </select>
+                        selected ? selected.map((option) => option.value) : [],
+                      );
+                    }}
+                    placeholder="Search and select related products..."
+                    noOptionsMessage={() => "No related products found"}
+                  />
                 </div>
+              </div>
+
+              {/* Activities multiselect */}
+              <div className="mb-4 mt-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Activities
+                </label>
+                <Select
+                  isMulti
+                  name="activities"
+                  options={ACTIVITIES.map((activity) => ({
+                    value: activity,
+                    label: activity,
+                  }))}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                  value={formState.activities.map((activity) => ({
+                    value: activity,
+                    label: activity,
+                  }))}
+                  onChange={(selected) => {
+                    handleInputChange(
+                      "activities",
+                      selected ? selected.map((option) => option.value) : [],
+                    );
+                  }}
+                  placeholder="Search and select activities..."
+                  noOptionsMessage={() => "No activities found"}
+                />
               </div>
 
               {/* Promotion */}
@@ -1094,7 +1092,7 @@ const EditProductModal = ({
 
           {/* Partner SKUs */}
           {activeTab === "partners" && (
-            <div className="space-y-4 pt-6 md:col-span-2">
+            <div className="space-y-4 pt-6">
               <h3 className="text-xl font-semibold text-primary">
                 Partner SKUs
               </h3>
@@ -1155,121 +1153,6 @@ const EditProductModal = ({
                           }
                           className="w-full rounded-lg border p-3"
                           placeholder="Partner's SKU code"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Stock
-                        </label>
-                        <input
-                          type="number"
-                          value={partner.stock}
-                          onChange={(e) =>
-                            handleSkuPartnerChange(
-                              index,
-                              "stock",
-                              Number(e.target.value),
-                            )
-                          }
-                          className="w-full rounded-lg border p-3"
-                          placeholder="Stock quantity"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Price
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01" // Allow decimal values with 2 decimal places
-                          value={partner.price}
-                          onChange={(e) =>
-                            handleSkuPartnerChange(
-                              index,
-                              "price",
-                              parseFloat(e.target.value) || 0,
-                            )
-                          }
-                          className="w-full rounded-lg border p-3"
-                          placeholder="Price"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Loyalty Points Per Product
-                        </label>
-                        <input
-                          type="number"
-                          value={partner.loyaltyPointsPerProduct}
-                          onChange={(e) =>
-                            handleSkuPartnerChange(
-                              index,
-                              "loyaltyPointsPerProduct",
-                              Number(e.target.value),
-                            )
-                          }
-                          className="w-full rounded-lg border p-3"
-                          placeholder="Loyalty points per product"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Loyalty Points Per Unit
-                        </label>
-                        <input
-                          type="number"
-                          value={partner.loyaltyPointsPerUnit}
-                          onChange={(e) =>
-                            handleSkuPartnerChange(
-                              index,
-                              "loyaltyPointsPerUnit",
-                              Number(e.target.value),
-                            )
-                          }
-                          className="w-full rounded-lg border p-3"
-                          placeholder="Loyalty points per unit"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Loyalty Points Bonus Quantity
-                        </label>
-                        <input
-                          type="number"
-                          value={partner.loyaltyPointsBonusQuantity}
-                          onChange={(e) =>
-                            handleSkuPartnerChange(
-                              index,
-                              "loyaltyPointsBonusQuantity",
-                              Number(e.target.value),
-                            )
-                          }
-                          className="w-full rounded-lg border p-3"
-                          placeholder="Bonus quantity"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Loyalty Points Threshold Quantity
-                        </label>
-                        <input
-                          type="number"
-                          value={partner.loyaltyPointsThresholdQty}
-                          onChange={(e) =>
-                            handleSkuPartnerChange(
-                              index,
-                              "loyaltyPointsThresholdQty",
-                              Number(e.target.value),
-                            )
-                          }
-                          className="w-full rounded-lg border p-3"
-                          placeholder="Threshold quantity"
                         />
                       </div>
                     </div>

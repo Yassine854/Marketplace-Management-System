@@ -68,9 +68,9 @@ export async function GET(req: Request) {
         images: true,
         productSubCategories: { include: { subcategory: true } },
         favoriteProducts: true,
-        favoritePartners: true,
         relatedProducts: { include: { relatedProduct: true } },
         skuPartners: true,
+        partner: true,
       },
     });
 

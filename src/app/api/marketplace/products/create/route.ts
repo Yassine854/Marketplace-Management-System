@@ -180,6 +180,10 @@ export async function POST(req: Request) {
         accepted: accepted,
         partnerId: partnerId,
         hasPartner: hasPartner,
+        // Get activities from formData
+        activities: Array.from(formData.entries())
+          .filter(([key]) => key.startsWith("activities["))
+          .map(([_, value]) => value as string),
       },
     });
 

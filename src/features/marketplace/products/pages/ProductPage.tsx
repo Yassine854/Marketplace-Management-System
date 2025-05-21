@@ -1,6 +1,6 @@
 import ProductTable from "../table/ProductTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllProducts } from "../hooks/useGetAllProducts";
 import { Product } from "@/types/product";
@@ -266,6 +266,7 @@ const ProductPage = () => {
           taxes={taxes}
           promotions={promotions}
           partners={partners}
+          activities={[]}
         />
 
         <EditProductModal

@@ -18,9 +18,8 @@ export async function POST(req: Request) {
     // Check if the favorite partner already exists for the given customer, product, and partner
     const existingFavoritePartner = await prisma.favoritePartner.findUnique({
       where: {
-        customerId_productId_partnerId: {
+        customerId_partnerId: {
           customerId: body.customerId,
-          productId: body.productId,
           partnerId: body.partnerId,
         },
       },
@@ -37,7 +36,6 @@ export async function POST(req: Request) {
     const newFavoritePartner = await prisma.favoritePartner.create({
       data: {
         customerId: body.customerId,
-        productId: body.productId,
         partnerId: body.partnerId,
       },
     });

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import Select from "react-select";
 
 interface Product {
   id: string;
@@ -42,6 +43,22 @@ interface Product {
   }>;
 }
 
+const ACTIVITIES = [
+  "alimentation générale",
+  "fruits secs",
+  "superette",
+  "epics et salaisons",
+  "vente volailles et dérivés",
+  "patisserie",
+  "boulangerie",
+  "restaurant",
+  "société",
+  "vente legumes et fruits",
+  "vente produits de parfumerie",
+  "cce d'ecipes",
+  "autre",
+];
+
 interface CreateProductModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -76,12 +93,6 @@ interface CreateProductModalProps {
     skuPartners?: Array<{
       partnerId: string;
       skuPartner: string;
-      stock: number;
-      price: number;
-      loyaltyPointsPerProduct?: number;
-      loyaltyPointsPerUnit?: number;
-      loyaltyPointsBonusQuantity?: number;
-      loyaltyPointsThresholdQty?: number;
     }>;
   }) => Promise<any>;
   suppliers: Array<{ id: string; companyName: string }>;
@@ -93,6 +104,7 @@ interface CreateProductModalProps {
   taxes: Array<{ id: string; value: string }>;
   promotions: Array<{ id: string; promoPrice: string }>;
   partners: Array<{ id: string; username: string }>;
+  activities: string[];
 }
 
 const CreateProductModal = ({
@@ -140,13 +152,8 @@ const CreateProductModal = ({
     skuPartners: [] as Array<{
       partnerId: string;
       skuPartner: string;
-      stock: number;
-      price: number;
-      loyaltyPointsPerProduct?: number;
-      loyaltyPointsPerUnit?: number;
-      loyaltyPointsBonusQuantity?: number;
-      loyaltyPointsThresholdQty?: number;
     }>,
+    activities: [] as string[],
   });
 
   const [activeTab, setActiveTab] = useState("basic");
@@ -182,6 +189,7 @@ const CreateProductModal = ({
         promo: false,
         images: [],
         skuPartners: [],
+        activities: [],
       });
       setActiveTab("basic");
     }
@@ -752,6 +760,7 @@ const CreateProductModal = ({
             <h3 className="text-xl font-semibold text-primary">
               Relationships
             </h3>
+
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -858,49 +867,86 @@ const CreateProductModal = ({
                 <label className="block text-sm font-medium text-gray-700">
                   Sub-Categories
                 </label>
-                <select
-                  multiple
-                  value={formState.subCategories}
-                  onChange={(e) =>
+                <Select
+                  isMulti
+                  name="subCategories"
+                  options={subCategories.map((cat) => ({
+                    value: cat.id,
+                    label: cat.name,
+                  }))}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                  value={formState.subCategories.map((id) => {
+                    const cat = subCategories.find((c) => c.id === id);
+                    return { value: id, label: cat ? cat.name : id };
+                  })}
+                  onChange={(selected) => {
                     handleInputChange(
                       "subCategories",
-                      Array.from(e.target.selectedOptions).map((o) => o.value),
-                    )
-                  }
-                  className="w-full rounded-lg border p-3"
-                  size={5}
-                >
-                  {subCategories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
+                      selected ? selected.map((option) => option.value) : [],
+                    );
+                  }}
+                  placeholder="Search and select subcategories..."
+                  noOptionsMessage={() => "No subcategories found"}
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Related Products
                 </label>
-                <select
-                  multiple
-                  value={formState.relatedProducts}
-                  onChange={(e) =>
+                <Select
+                  isMulti
+                  name="relatedProducts"
+                  options={relatedProducts.map((product) => ({
+                    value: product.id,
+                    label: product.name,
+                  }))}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                  value={formState.relatedProducts.map((id) => {
+                    const product = relatedProducts.find((p) => p.id === id);
+                    return { value: id, label: product ? product.name : id };
+                  })}
+                  onChange={(selected) => {
                     handleInputChange(
                       "relatedProducts",
-                      Array.from(e.target.selectedOptions).map((o) => o.value),
-                    )
-                  }
-                  className="w-full rounded-lg border p-3"
-                  size={5}
-                >
-                  {relatedProducts.map((product) => (
-                    <option key={product.id} value={product.id}>
-                      {product.name}
-                    </option>
-                  ))}
-                </select>
+                      selected ? selected.map((option) => option.value) : [],
+                    );
+                  }}
+                  placeholder="Search and select related products..."
+                  noOptionsMessage={() => "No related products found"}
+                />
               </div>
+            </div>
+
+            {/* Activities multiselect */}
+            <div className="mb-4 mt-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Activities
+              </label>
+              <Select
+                isMulti
+                name="activities"
+                options={ACTIVITIES.map((activity) => ({
+                  value: activity,
+                  label: activity,
+                }))}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                value={formState.activities.map((activity) => ({
+                  value: activity,
+                  label: activity,
+                }))}
+                onChange={(selected) => {
+                  handleInputChange(
+                    "activities",
+                    selected ? selected.map((option) => option.value) : [],
+                  );
+                }}
+                placeholder="Search and select activities..."
+                noOptionsMessage={() => "No activities found"}
+              />
             </div>
 
             {/* Promotion */}
@@ -1022,114 +1068,6 @@ const CreateProductModal = ({
                         }
                         className="w-full rounded-lg border p-3"
                         placeholder="Partner's SKU code"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Stock
-                      </label>
-                      <input
-                        type="number"
-                        value={partner.stock}
-                        onChange={(e) =>
-                          handleSkuPartnerChange(
-                            index,
-                            "stock",
-                            Number(e.target.value),
-                          )
-                        }
-                        className="w-full rounded-lg border p-3"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Price
-                      </label>
-                      <input
-                        type="number"
-                        value={partner.price}
-                        onChange={(e) =>
-                          handleSkuPartnerChange(
-                            index,
-                            "price",
-                            Number(e.target.value),
-                          )
-                        }
-                        className="w-full rounded-lg border p-3"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Loyalty Points Per Product
-                      </label>
-                      <input
-                        type="number"
-                        value={partner.loyaltyPointsPerProduct || ""}
-                        onChange={(e) =>
-                          handleSkuPartnerChange(
-                            index,
-                            "loyaltyPointsPerProduct",
-                            e.target.value ? Number(e.target.value) : undefined,
-                          )
-                        }
-                        className="w-full rounded-lg border p-3"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Loyalty Points Per Unit
-                      </label>
-                      <input
-                        type="number"
-                        value={partner.loyaltyPointsPerUnit || ""}
-                        onChange={(e) =>
-                          handleSkuPartnerChange(
-                            index,
-                            "loyaltyPointsPerUnit",
-                            e.target.value ? Number(e.target.value) : undefined,
-                          )
-                        }
-                        className="w-full rounded-lg border p-3"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Loyalty Points Bonus Quantity
-                      </label>
-                      <input
-                        type="number"
-                        value={partner.loyaltyPointsBonusQuantity || ""}
-                        onChange={(e) =>
-                          handleSkuPartnerChange(
-                            index,
-                            "loyaltyPointsBonusQuantity",
-                            e.target.value ? Number(e.target.value) : undefined,
-                          )
-                        }
-                        className="w-full rounded-lg border p-3"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Loyalty Points Threshold Quantity
-                      </label>
-                      <input
-                        type="number"
-                        value={partner.loyaltyPointsThresholdQty || ""}
-                        onChange={(e) =>
-                          handleSkuPartnerChange(
-                            index,
-                            "loyaltyPointsThresholdQty",
-                            e.target.value ? Number(e.target.value) : undefined,
-                          )
-                        }
-                        className="w-full rounded-lg border p-3"
                       />
                     </div>
                   </div>

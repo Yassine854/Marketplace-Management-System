@@ -1,6 +1,6 @@
 import PaymentMethodTable from "../table/PaymentMethodTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllMethods } from "../hooks/useGetAllMethod";
 import { Methods } from "@/types/Methods";

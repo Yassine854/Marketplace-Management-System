@@ -50,7 +50,7 @@ const RoleSelector = forwardRef<DropRef, any>(
     return (
       <div className="col-span-2 flex flex-col   md:col-span-1">
         <label className="ml-4  block font-medium md:text-lg">
-          Select Role *
+          Agent Type *
         </label>
         <div
           className="relative h-[45px] w-full rounded-3xl  bg-white"

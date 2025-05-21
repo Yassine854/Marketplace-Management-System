@@ -1,6 +1,6 @@
 import PermissionTable from "../table/PermissionTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllPermissions } from "../hooks/useGetAllPermissions";
 import { usePermissionActions } from "../hooks/usePermissionActions";

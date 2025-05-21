@@ -1,6 +1,6 @@
 import ProductStatusTable from "../table/ProductStatusTable"; // Table component for displaying ProductStatus
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllProductStatuses } from "../hooks/useGetAllProductStatuses"; // Custom hook for fetching all ProductStatuses
 import { ProductStatus } from "@/types/productStatus"; // Type for ProductStatus

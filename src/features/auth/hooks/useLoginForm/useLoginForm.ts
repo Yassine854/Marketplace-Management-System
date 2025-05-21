@@ -87,7 +87,9 @@ export const useLoginForm = () => {
       toast.error("Not Allowed to Login");
       return;
     }
-    toast.success("Welcome To Kamioun OMS !", { duration: 3000 });
+    toast.success("Welcome To Kamioun Marketplace Managment System !", {
+      duration: 3000,
+    });
     navigateToDashboard();
   };
 

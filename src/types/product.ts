@@ -23,6 +23,7 @@ export interface Product {
   supplierId?: string;
   taxId?: string;
   promotionId?: string;
+  partnerId?: string;
   promo?: boolean;
   accepted?: boolean;
   createdAt?: string;
@@ -36,7 +37,12 @@ export interface Product {
     name: string;
     actif: boolean;
   };
+  partner?: {
+    id: string;
+    username: string;
+  };
   productSubCategories?: any[];
   relatedProducts?: any[];
   images?: any[];
+  activities?: any[];
 }

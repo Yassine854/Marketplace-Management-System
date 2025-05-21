@@ -17,18 +17,11 @@ const ReservationTableHead = () => {
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           Amount After Promo
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-          Amount Refunded
-        </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-          Amount Canceled
-        </th>
+
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           Amount Ordered
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-          Amount Shipped
-        </th>
+
         <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-white">
           Shipping Method
         </th>

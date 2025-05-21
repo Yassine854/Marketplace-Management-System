@@ -3,16 +3,35 @@ import { logError } from "@/utils/logError";
 import { useAuth } from "@/features/shared/hooks/useAuth";
 import { IconLogout, IconSettings } from "@tabler/icons-react";
 import { useDropdown } from "@/features/shared/hooks/useDropdown";
+import { useRouter } from "@/libs/next-intl/i18nNavigation";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const useList = () => {
   const { logout } = useAuth();
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const isAdmin = user?.userType === "admin";
+  const isPartner = user?.userType === "partner";
 
   const list = [
     {
       icon: <IconSettings size={18} />,
-      url: "/settings",
+      url: isAdmin
+        ? "/access/users"
+        : isPartner
+        ? "/marketplace/partners/editProfile"
+        : "/settings",
       title: "Settings",
-      onClick: () => {},
+      onClick: () => {
+        const url = isAdmin
+          ? "/access/users"
+          : isPartner
+          ? "/marketplace/partners/editProfile"
+          : "/settings";
+        router.push(url);
+      },
     },
     {
       icon: <IconLogout size={18} />,
@@ -34,6 +53,37 @@ const Profile = () => {
   const { list } = useList();
   const { open, ref, toggleOpen } = useDropdown();
   const { user } = useAuth();
+  const [partnerLogo, setPartnerLogo] = useState<string | null>(null);
+
+  const isPartner = user?.userType === "partner";
+
+  useEffect(() => {
+    // Fetch partner data to get the logo if user is a partner
+    const fetchPartnerLogo = async () => {
+      if (isPartner && user?.id) {
+        try {
+          const response = await axios.get(
+            `/api/marketplace/partners/${user.id}`,
+          );
+          if (
+            response.data &&
+            response.data.partner &&
+            response.data.partner.logo
+          ) {
+            setPartnerLogo(response.data.partner.logo);
+          }
+        } catch (error) {
+          console.error("Error fetching partner logo:", error);
+        }
+      }
+    };
+
+    fetchPartnerLogo();
+  }, [isPartner, user?.id]);
+
+  // Determine which image to show
+  const profileImage =
+    isPartner && partnerLogo ? partnerLogo : "/images/etudiant.png";
 
   return (
     <div className="relative shrink-0" ref={ref}>
@@ -41,8 +91,8 @@ const Profile = () => {
         <Image
           loading="eager"
           priority={true}
-          src="/images/etudiant.png"
-          className="rounded-full"
+          src={profileImage}
+          className="h-10 w-10 rounded-full object-cover sm:h-12 sm:w-12"
           width={48}
           height={48}
           alt="profile img"
@@ -57,10 +107,10 @@ const Profile = () => {
           <Image
             loading="eager"
             priority={true}
-            src="/images/etudiant.png"
+            src={profileImage}
             width={60}
             height={60}
-            className="rounded-full"
+            className="h-[60px] w-[60px] rounded-full object-cover"
             alt="profile img"
           />
 

@@ -1,6 +1,6 @@
 import TypePCBTable from "../table/TypePCBTable"; // Table component for displaying TypePCBs
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllTypePcbs } from "../hooks/useGetAllTypePCBs"; // Custom hook for fetching all TypePCBs
 import { TypePcb } from "@/types/typePcb"; // Type for TypePcb

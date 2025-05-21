@@ -36,10 +36,7 @@ export interface Reservation {
   amountTTC: number;
   amountBeforePromo: number;
   amountAfterPromo: number;
-  amountRefunded: number;
-  amountCanceled: number;
   amountOrdered: number;
-  amountShipped: number;
   shippingMethod: string;
   isActive: boolean;
   loyaltyPtsValue: number;

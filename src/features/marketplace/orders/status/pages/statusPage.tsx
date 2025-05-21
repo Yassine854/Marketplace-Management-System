@@ -1,6 +1,6 @@
 import StatusTable from "../table/statusTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllStatus } from "../hooks/useGetAllStatus";
 import { Status } from "@/types/status";

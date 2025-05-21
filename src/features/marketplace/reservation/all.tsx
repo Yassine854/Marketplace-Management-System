@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import ReservationTable from "./components/ReservationTable";
-import Pagination from "../../shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import { Reservation } from "./types/reservation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

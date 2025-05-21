@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import TaxTable from "./components/TaxTable";
 import { useRouter } from "next/navigation";
-import Pagination from "../../../shared/elements/Pagination/pagination";
+import Pagination from "../../../shared/elements/Pagination/Pagination";
 import { Tax } from "./types/tax";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

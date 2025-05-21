@@ -1,6 +1,6 @@
 import RoleTable from "../table/RoleTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllRoles } from "../hooks/useGetAllRoles";
 import { useRoleActions } from "../hooks/useRoleActions";

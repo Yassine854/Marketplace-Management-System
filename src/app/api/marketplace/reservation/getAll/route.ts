@@ -20,6 +20,7 @@ export async function GET(req: Request) {
       firstName: string;
       lastName: string;
       isActive: boolean;
+      userType?: string;
     };
 
     // Get user's role to check permissions
@@ -50,6 +51,12 @@ export async function GET(req: Request) {
       );
     }
 
+    const isPartner = user.userType === "partner";
+    let CurrentpartnerId;
+    if (isPartner) {
+      CurrentpartnerId = user.id;
+    }
+
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get("page") || "1", 10);
     const limit = parseInt(url.searchParams.get("limit") || "25", 10);
@@ -58,89 +65,48 @@ export async function GET(req: Request) {
     const skip = (page - 1) * limit;
     const take = limit;
 
-    let reservations;
+    let whereClause: any = {};
+
+    if (isPartner) {
+      whereClause.partnerId = user.id;
+    }
+
     if (searchTerm) {
       if (ObjectId.isValid(searchTerm)) {
-        reservations = await prisma.reservation.findMany({
-          where: { id: searchTerm },
-          include: {
-            customer: true,
-            agent: true,
-            partner: true,
-            order: true,
-            paymentMethod: true,
-            reservationItems: {
-              include: {
-                product: {
-                  select: {
-                    name: true,
-                  },
-                },
-                tax: {
-                  select: {
-                    value: true,
-                  },
-                },
-              },
-            },
-          },
-        });
-      } else {
-        reservations = await prisma.reservation.findMany({
-          skip: skip,
-          take: take,
-          include: {
-            customer: true,
-            agent: true,
-            partner: true,
-            order: true,
-            paymentMethod: true,
-            reservationItems: {
-              include: {
-                product: {
-                  select: {
-                    name: true,
-                  },
-                },
-                tax: {
-                  select: {
-                    value: true,
-                  },
-                },
-              },
-            },
-          },
-        });
+        whereClause.id = searchTerm;
       }
-    } else {
-      reservations = await prisma.reservation.findMany({
-        skip: skip,
-        take: take,
-        include: {
-          customer: true,
-          agent: true,
-          partner: true,
-          order: true,
-          paymentMethod: true,
-          reservationItems: {
-            include: {
-              product: {
-                select: {
-                  name: true,
-                },
+    }
+
+    const reservations = await prisma.reservation.findMany({
+      where: whereClause,
+      skip: skip,
+      take: take,
+      include: {
+        customer: true,
+        agent: true,
+        partner: true,
+        order: true,
+        paymentMethod: true,
+        reservationItems: {
+          include: {
+            product: {
+              select: {
+                name: true,
               },
-              tax: {
-                select: {
-                  value: true,
-                },
+            },
+            tax: {
+              select: {
+                value: true,
               },
             },
           },
         },
-      });
-    }
+      },
+    });
 
-    const totalCount = await prisma.reservation.count();
+    const totalCount = await prisma.reservation.count({
+      where: whereClause,
+    });
 
     return NextResponse.json(
       {

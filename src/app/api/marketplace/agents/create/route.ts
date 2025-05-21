@@ -21,6 +21,7 @@ export async function POST(req: Request) {
       firstName: string;
       lastName: string;
       isActive: boolean;
+      userType?: string;
     };
 
     // Get user's role
@@ -63,6 +64,24 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+
+    let partnerId;
+    if (user.userType === "partner") {
+      partnerId = user.id;
+    } else {
+      // For admin users, get the partnerId from the request body
+      partnerId = body.partnerId;
+
+      if (!partnerId) {
+        return NextResponse.json(
+          {
+            message:
+              "Invalid request: 'partnerId' is required for admin users.",
+          },
+          { status: 400 },
+        );
+      }
+    }
 
     // Check if the agent already exists by username or email
     const existingAgent = await prisma.agent.findFirst({
@@ -111,7 +130,8 @@ export async function POST(req: Request) {
         address: body.address,
         password: hashedPassword, // Store hashed password
         mRoleId: body.mRoleId,
-        isActive: body.isActive ?? true, // Default to true if not provided
+        isActive: body.isActive ?? true,
+        partnerId: partnerId,
       },
     });
 

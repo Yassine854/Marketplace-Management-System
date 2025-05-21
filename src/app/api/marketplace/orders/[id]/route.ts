@@ -203,9 +203,31 @@ export async function PATCH(
       };
     }
 
+    // Add these conditions
+    if (body.stateId) {
+      data.state = { connect: { id: body.stateId } };
+    }
+    if (body.statusId) {
+      data.status = { connect: { id: body.statusId } };
+    }
+    if (body.agentId) {
+      data.agent = { connect: { id: body.agentId } };
+    }
+
     const updatedOrder = await prisma.order.update({
       where: { id },
       data,
+      include: {
+        status: true,
+        state: true,
+        customer: true,
+        agent: true,
+        reservation: true,
+        partner: true,
+        orderItems: true,
+        loyaltyPoints: true,
+        paymentMethod: true,
+      },
     });
 
     return NextResponse.json(

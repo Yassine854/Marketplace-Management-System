@@ -286,20 +286,8 @@ const EditReservationModal = ({
                 <div className="space-y-4">
                   {[
                     {
-                      label: "Amount Refunded",
-                      value: editedReservation.amountRefunded,
-                    },
-                    {
-                      label: "Amount Canceled",
-                      value: editedReservation.amountCanceled,
-                    },
-                    {
                       label: "Amount Ordered",
                       value: editedReservation.amountOrdered,
-                    },
-                    {
-                      label: "Amount Shipped",
-                      value: editedReservation.amountShipped,
                     },
                   ].map((field) => (
                     <ReadOnlyField

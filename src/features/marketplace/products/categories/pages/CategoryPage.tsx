@@ -1,6 +1,6 @@
 import CategoryTable from "../table/CategoryTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllCategories } from "../hooks/useGetAllCategories";
 import { Category } from "@/types/category";

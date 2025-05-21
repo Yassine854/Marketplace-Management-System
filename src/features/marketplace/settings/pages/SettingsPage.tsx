@@ -4,7 +4,7 @@ import { useSettingsActions } from "../hooks/useSettingsActions";
 import { useCreateSetting } from "../hooks/useCreateSettings";
 import SettingsTable from "../table/settingsTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import CreateSettingModal from "../components/CreateSettingsModal";
 import EditSettingModal from "../components/EditSettingsModal";
 import { Setting } from "@/types/settings";

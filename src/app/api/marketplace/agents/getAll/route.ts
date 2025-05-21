@@ -20,6 +20,7 @@ export async function GET() {
       firstName: string;
       lastName: string;
       isActive: boolean;
+      userType?: string;
     };
 
     // Get user's role
@@ -30,6 +31,7 @@ export async function GET() {
     // Allow access if user is KamiounAdminMaster
     const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
 
+    // Check permissions for non-admin users
     if (!isKamiounAdminMaster) {
       if (!user.mRoleId) {
         return NextResponse.json({ message: "No role found" }, { status: 403 });
@@ -60,7 +62,19 @@ export async function GET() {
       }
     }
 
-    const agents = await prisma.agent.findMany();
+    // Filter agents by partnerId if user is a partner, otherwise get all agents
+    let agents;
+    if (user.userType === "partner") {
+      // For partners, only return agents associated with their ID
+      agents = await prisma.agent.findMany({
+        where: {
+          partnerId: user.id,
+        },
+      });
+    } else {
+      // For admins and other authorized users, return all agents
+      agents = await prisma.agent.findMany();
+    }
 
     if (agents.length === 0) {
       return NextResponse.json(

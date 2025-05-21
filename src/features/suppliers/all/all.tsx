@@ -3,7 +3,7 @@ import PurchaseTable from "../components/PurchaseTable/PurchaseTable";
 import usePurchaseStore from "../stores/purchaseStore";
 import AdvancedFilters from "../components/AdvancedFilters/AdvancedFiltersAll";
 import { useRouter } from "next/navigation";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 const SupplierPurchasesPage = () => {
   const { purchases, loading, error, fetchPurchases, total } =
     usePurchaseStore();

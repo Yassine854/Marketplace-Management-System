@@ -5,7 +5,7 @@ import { useCreateProduct } from "../hooks/useCreateProduct";
 import { Product } from "@/types/product";
 import ProductTable from "../table/ProductTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import CreateProductModal from "../components/CreateProductModal";
 import EditProductModal from "../components/EditProductModal";
 

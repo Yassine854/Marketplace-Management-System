@@ -18,6 +18,13 @@ import {
   IconUser,
   IconTruck,
   IconPhoto,
+  IconSettings,
+  IconDatabase,
+  IconBuildingStore,
+  IconUserCheck,
+  IconShield,
+  IconCalendarEvent,
+  IconCategory,
 } from "@tabler/icons-react";
 import { FaBoxOpen } from "react-icons/fa";
 import Link from "next/link";
@@ -105,14 +112,14 @@ const Sidebar = ({
     >
       <div className={`p-5`}>
         <div className="flex items-center justify-center">
-          <Link href="/">
+          {/* <Link href="/">
             <Image
               alt="logo"
               width={180}
               height={38}
               src="/images/Kamioun-logo-text.png"
             />
-          </Link>
+          </Link> */}
           <button onClick={() => setSidebar(false)} className="xxl:hidden">
             <IconX />
           </button>
@@ -132,7 +139,7 @@ const Sidebar = ({
           <Divider />
 
           {/* Suppliers Analytics */}
-          {hasPermission("Supplier Dashboard") && (
+          {/* {hasPermission("Supplier Dashboard") && (
             <>
               <SidebarSuppliersSubMenu
                 name={"Supplier Dashboard"}
@@ -141,18 +148,22 @@ const Sidebar = ({
               />
               <Divider />
             </>
-          )}
+          )} */}
 
           {/* Products */}
           {isAdmin && hasPermission("Product") && (
             <>
               <SidebarSubMenu
-                icon={<IconShoppingCart />}
+                icon={<IconPackage />}
                 name="Products"
                 onClick={() => push("/marketplace/products")}
                 isActive={pathname?.includes("products")}
                 items={[
                   { name: "All", path: "/marketplace/products" },
+                  {
+                    name: "Pending",
+                    path: "/marketplace/products/PendingProducts",
+                  },
                   ...(hasPermission("Category")
                     ? [
                         {
@@ -215,11 +226,11 @@ const Sidebar = ({
             </>
           )}
 
-          {/* Partner Interfaces */}
+          {/* Partner Interface */}
           {isPartner && hasPermission("Product") && (
             <>
               <SidebarSubMenu
-                icon={<IconShoppingCart />}
+                icon={<IconPackage />}
                 name="Products"
                 onClick={() => push("/marketplace/partners/products")}
                 isActive={pathname?.includes("products")}
@@ -239,11 +250,11 @@ const Sidebar = ({
             </>
           )}
 
-          {/* Sources */}
+          {/* Partner Interface */}
           {isPartner && (
             <>
               <SidebarSubMenu
-                icon={<IconUsers className="text-lg text-primary" />}
+                icon={<IconDatabase />}
                 name=" Sources"
                 onClick={() => push("/marketplace/source")}
                 isActive={pathname?.includes("Sources")}
@@ -253,11 +264,11 @@ const Sidebar = ({
             </>
           )}
 
-          {/* Partners */}
+          {/* Admin Interface */}
           {isAdmin && hasPermission("Partner") && (
             <>
               <SidebarSubMenu
-                icon={<IconUsers className="text-lg text-primary" />}
+                icon={<IconBuildingStore />}
                 name=" Partners"
                 onClick={() => push("/marketplace/partners")}
                 isActive={pathname?.includes("partners")}
@@ -273,11 +284,11 @@ const Sidebar = ({
             </>
           )}
 
-          {/* Settings */}
+          {/* Admin Interface */}
           {isAdmin && hasPermission("Settings") && (
             <>
               <SidebarSubMenu
-                icon={<IconUsers className="text-lg text-primary" />}
+                icon={<IconSettings />}
                 name=" Settings"
                 onClick={() => push("/marketplace/settings")}
                 isActive={pathname?.includes("Settings")}
@@ -290,7 +301,7 @@ const Sidebar = ({
           )}
 
           {/* Orders */}
-          {isAdmin && (
+          {/* {isAdmin && (
             <>
               <SidebarOrdersSubMenu
                 onClick={() => push("/orders")}
@@ -308,10 +319,10 @@ const Sidebar = ({
               />
               <Divider />
             </>
-          )}
+          )} */}
 
           {/* Milk Run */}
-          {hasPermission("Milk Run") && (
+          {/* {hasPermission("Milk Run") && (
             <>
               <SidebarSubMenu
                 icon={<IconMap2 />}
@@ -329,10 +340,10 @@ const Sidebar = ({
               />
               <Divider />
             </>
-          )}
+          )} */}
 
           {/* Purchase order */}
-          {isAdmin && (
+          {/* {isAdmin && (
             <>
               <SidebarSubMenu
                 icon={<IconShoppingCart />}
@@ -349,13 +360,13 @@ const Sidebar = ({
               />
               <Divider />
             </>
-          )}
+          )} */}
 
-          {/* Reservation */}
-          {hasPermission("Reservation") && (
+          {/* Admin Interface */}
+          {isAdmin && hasPermission("Reservation") && (
             <>
               <SidebarSubMenu
-                icon={<IconClipboardCheck />}
+                icon={<IconCalendarEvent />}
                 name="Reservation"
                 onClick={() => push("/marketplace/reservation/all")}
                 isActive={pathname?.includes("reservation")}
@@ -365,8 +376,24 @@ const Sidebar = ({
             </>
           )}
 
-          {/* Order */}
-          {hasPermission("Order") && (
+          {/* Partner Interface */}
+          {isPartner && hasPermission("Reservation") && (
+            <>
+              <SidebarSubMenu
+                icon={<IconCalendarEvent />}
+                name="Reservation"
+                onClick={() => push("/marketplace/partners/reservations")}
+                isActive={pathname?.includes("reservation")}
+                items={[
+                  { name: "All", path: "/marketplace/partners/reservations" },
+                ]}
+              />
+              <Divider />
+            </>
+          )}
+
+          {/* Admin Interface */}
+          {isAdmin && hasPermission("Order") && (
             <>
               <SidebarSubMenu
                 icon={<IconBox />}
@@ -387,8 +414,50 @@ const Sidebar = ({
             </>
           )}
 
+          {/* Partner Interface */}
+          {isPartner && hasPermission("Order") && (
+            <>
+              <SidebarSubMenu
+                icon={<IconBox />}
+                name=" Orders"
+                onClick={() => push("/marketplace/partners/orders")}
+                isActive={pathname?.toLowerCase().includes("orders")}
+                items={[
+                  { name: "All", path: "/marketplace/partners/orders" },
+                  { name: "Open", path: "/marketplace/partners/orders/Open" },
+                  { name: "Valid", path: "/marketplace/partners/orders/Valid" },
+                  {
+                    name: "ReadyToShip",
+                    path: "/marketplace/partners/orders/ReadyToShip",
+                  },
+                  {
+                    name: "Shipped",
+                    path: "/marketplace/partners/orders/Shipped",
+                  },
+                  {
+                    name: "Delivered",
+                    path: "/marketplace/partners/orders/Delivered",
+                  },
+                  {
+                    name: "Canceled",
+                    path: "/marketplace/partners/orders/Canceled",
+                  },
+                  {
+                    name: "Unpaid",
+                    path: "/marketplace/partners/orders/Unpaid",
+                  },
+                  {
+                    name: "Archived",
+                    path: "/marketplace/partners/orders/Archived",
+                  },
+                ]}
+              />
+              <Divider />
+            </>
+          )}
+
           {/* Reports */}
-          {hasPermission("Reports") && (
+          {/* {hasPermission("Reports") && (
             <>
               <SidebarSubMenu
                 icon={<IconReport />}
@@ -402,10 +471,10 @@ const Sidebar = ({
               />
               <Divider />
             </>
-          )}
+          )} */}
 
           {/* Notifications */}
-          {isAdmin && (
+          {/* {isAdmin && (
             <>
               <SidebarButton
                 name={"Notifications"}
@@ -416,7 +485,7 @@ const Sidebar = ({
 
               <Divider />
             </>
-          )}
+          )} */}
           {/* Banner */}
 
           {isAdmin && hasPermission("Banner") && (
@@ -432,7 +501,7 @@ const Sidebar = ({
           )}
 
           {/* Delivery Agent */}
-          {hasPermission("Delivery Agent") && (
+          {isPartner && hasPermission("Delivery Agent") && (
             <>
               <SidebarButton
                 name="Delivery Agent"
@@ -445,7 +514,7 @@ const Sidebar = ({
           )}
 
           {/* Customer */}
-          {hasPermission("Customer") && (
+          {isAdmin && hasPermission("Customer") && (
             <>
               <SidebarButton
                 name="Customer"
@@ -453,6 +522,7 @@ const Sidebar = ({
                 onClick={() => push("/marketplace/customer")}
                 isActive={pathname?.includes("customer")}
               />
+              <Divider />
             </>
           )}
 
@@ -460,16 +530,16 @@ const Sidebar = ({
           {isAdmin && (
             <>
               <SidebarSubMenu
-                icon={<IconUsers />}
+                icon={<IconShield />}
                 name="Access Control"
                 onClick={() => push("/access/users")}
                 isActive={pathname?.includes("access")}
                 items={[
-                  { name: "Users", path: "/access/users" },
+                  { name: "Kamioun Agents", path: "/access/users" },
                   { name: "Roles", path: "/marketplace/roles" },
                   { name: "Permissions", path: "/marketplace/permissions" },
                   { name: "RBAC ", path: "/access/RBAC" },
-                  { name: "Logs", path: "/access/logs" },
+                  // { name: "Logs", path: "/access/logs" },
                 ]}
               />
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
@@ -477,7 +547,7 @@ const Sidebar = ({
           )}
 
           {/* Audit Trail - Admin only */}
-          {isAdmin && (
+          {/* {isAdmin && (
             <>
               <SidebarSubMenu
                 icon={<IconList />}
@@ -494,10 +564,10 @@ const Sidebar = ({
               />
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
             </>
-          )}
+          )} */}
 
           {/* Screen - Admin only */}
-          {isAdmin && (
+          {/* {isAdmin && (
             <>
               <SidebarSubMenu
                 icon={<IconList />}
@@ -510,7 +580,7 @@ const Sidebar = ({
               />
               <p className="mb-2 mt-2 border-t-2 border-dashed border-primary/20 text-xs font-semibold " />
             </>
-          )}
+          )} */}
         </div>
       </div>
     </aside>

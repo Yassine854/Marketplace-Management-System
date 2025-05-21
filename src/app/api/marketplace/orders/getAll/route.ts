@@ -19,6 +19,7 @@ export async function GET(req: Request) {
       firstName: string;
       lastName: string;
       isActive: boolean;
+      userType?: string;
     };
 
     // Get user's role to check if they're KamiounAdminMaster
@@ -28,6 +29,9 @@ export async function GET(req: Request) {
 
     // Allow access if user is KamiounAdminMaster
     const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+
+    // Check if user is a partner
+    const isPartner = user.userType === "partner";
 
     if (!isKamiounAdminMaster) {
       if (!user.mRoleId) {
@@ -100,13 +104,22 @@ export async function GET(req: Request) {
       );
     }
 
+    // If user is a partner, set CurrentpartnerId to user.id
+    let CurrentpartnerId;
+    if (isPartner) {
+      CurrentpartnerId = user.id;
+    }
+
     const whereClause: any = {
       ...(searchById && { id: searchById }),
       ...(statusId && { statusId }),
       ...(stateId && { stateId }),
       ...(customerId && { customerId }),
       ...(agentId && { agentId: agentId === "none" ? null : agentId }),
-      ...(partnerId && { partnerId }),
+      // If user is a partner, filter by their ID, otherwise use the partnerId from query params
+      ...(isPartner
+        ? { partnerId: CurrentpartnerId }
+        : partnerId && { partnerId }),
       ...(paymentMethodId && { paymentMethodId }),
       ...(fromMobile && { fromMobile: fromMobile === "true" }),
       ...(isActive && { isActive: isActive === "true" }),

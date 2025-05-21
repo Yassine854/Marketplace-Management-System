@@ -240,20 +240,80 @@ export function useCreateProduct() {
     productId: string,
     productData: CreateProductData,
   ) => {
-    const promises = [
-      ...productData.subCategories.map((subcategoryId) =>
-        axios.post("/api/marketplace/product_subcategories/create", {
-          productId,
-          subcategoryId,
-        }),
-      ),
-      ...productData.relatedProducts.map((relatedProductId) =>
-        axios.post("/api/marketplace/related_products/create", {
-          productId,
-          relatedProductId,
-        }),
-      ),
-    ];
+    const promises = [];
+
+    // Process subcategories
+    if (productData.subCategories && productData.subCategories.length > 0) {
+      // Use Promise.all to wait for all subcategory creations
+      const subcategoryPromises = productData.subCategories.map(
+        (subcategoryId: string) =>
+          axios
+            .post("/api/marketplace/product_subcategories/create", {
+              productId,
+              subcategoryId,
+            })
+            .catch((error) => {
+              // Log error but don't fail the entire operation
+              console.error(
+                `Error adding subcategory ${subcategoryId}:`,
+                error,
+              );
+              return null;
+            }),
+      );
+
+      promises.push(Promise.all(subcategoryPromises));
+    }
+
+    // Process related products
+    if (productData.relatedProducts && productData.relatedProducts.length > 0) {
+      // Use Promise.all to wait for all related product creations
+      const relatedProductPromises = productData.relatedProducts.map(
+        (relatedProductId: string) =>
+          axios
+            .post("/api/marketplace/related_products/create", {
+              productId,
+              relatedProductId,
+            })
+            .catch((error) => {
+              // Log error but don't fail the entire operation
+              console.error(
+                `Error adding related product ${relatedProductId}:`,
+                error,
+              );
+              return null;
+            }),
+      );
+
+      promises.push(Promise.all(relatedProductPromises));
+    }
+
+    // Process images - only upload if there are new images
+    if (productData.images && productData.images.length > 0) {
+      // Check if we're working with an existing product
+      const existingImages = await axios.get(
+        `/api/marketplace/product_images/${productId}`,
+      );
+      const hasExistingImages = existingImages.data?.images?.length > 0;
+
+      // Only upload images if this is a new product or if there are no existing images
+      if (!hasExistingImages) {
+        const formData = new FormData();
+        formData.append("productId", productId);
+
+        productData.images.forEach((image: File, index: number) => {
+          formData.append(`images`, image);
+        });
+
+        promises.push(
+          axios.post("/api/marketplace/product_images/create", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }),
+        );
+      }
+    }
 
     // Add SKU partner creation promises
     if (productData.skuPartners && productData.skuPartners.length > 0) {
@@ -276,21 +336,6 @@ export function useCreateProduct() {
             loyaltyPointsThresholdQty: partner.loyaltyPointsThresholdQty,
           }),
         ),
-      );
-    }
-
-    // Only add image upload promise if there are images
-    if (productData.images && productData.images.length > 0) {
-      const imageFormData = new FormData();
-      imageFormData.append("productId", productId);
-      productData.images.forEach((image) => {
-        imageFormData.append("images", image);
-      });
-
-      promises.push(
-        axios.post("/api/marketplace/image/create", imageFormData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        }),
       );
     }
 

@@ -102,10 +102,7 @@ const ReservationTableRow = ({
           "amountTTC",
           "amountBeforePromo",
           "amountAfterPromo",
-          "amountRefunded",
-          "amountCanceled",
           "amountOrdered",
-          "amountShipped",
         ].map((field) => {
           const value = reservation[field as keyof Reservation];
           return (
@@ -114,11 +111,6 @@ const ReservationTableRow = ({
             </td>
           );
         })}
-
-        <StatusBadge
-          value={reservation.amountShipped}
-          label={reservation.shippingMethod}
-        />
 
         {/* Status Columns */}
         <td className="px-6 py-4 text-sm text-gray-900">

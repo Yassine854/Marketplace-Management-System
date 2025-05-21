@@ -22,7 +22,6 @@ export async function GET(
       where: { id },
       include: {
         customer: true,
-        product: true,
         partner: true,
       },
     });

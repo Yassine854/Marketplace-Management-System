@@ -1,6 +1,6 @@
 import SourceTable from "../table/SourceTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/pagination";
+import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllSources } from "../hooks/useGetAllSources";
 import { useSourceActions } from "../hooks/useSourceActions";

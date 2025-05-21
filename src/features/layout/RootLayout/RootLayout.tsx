@@ -9,14 +9,14 @@ import { io } from "socket.io-client";
 const socket = io(process.env.NEXT_PUBLIC_WEBSOCKET_URL);
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const { setNotifications } = useGlobalStore();
-  useEffect(() => {
-    socket.on("connect", () => {
-      console.info("connected to socket");
-    });
-    socket.on("notification", (data: Notification) => {
-      setNotifications(data);
-    });
-  }, [setNotifications]);
+  // useEffect(() => {
+  //   socket.on("connect", () => {
+  //     console.info("connected to socket");
+  //   });
+  //   socket.on("notification", (data: Notification) => {
+  //     setNotifications(data);
+  //   });
+  // }, [setNotifications]);
   return (
     <AuthWrapper>
       <TanstackQueryProvider>
