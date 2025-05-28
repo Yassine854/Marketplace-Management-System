@@ -45,7 +45,6 @@ export async function POST(req: Request) {
         fromMobile: body.fromMobile || false,
         weight: body.weight,
         customerId: body.customerId,
-        agentId: body.agentId,
         partnerId: body.partnerId,
         orderId: body.orderId,
         paymentMethodId: body.paymentMethodId,

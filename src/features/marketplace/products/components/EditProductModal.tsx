@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Select from "react-select";
+import { TrashIcon } from "lucide-react";
 
 interface SkuPartner {
   id?: string;
@@ -14,11 +15,50 @@ interface ProductImage {
   url: string;
 }
 
+interface Brand {
+  id: string;
+  img: string;
+  name: string | null;
+  productId: string;
+}
+
 interface EditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   onEdit: (product: any) => Promise<void>;
-  product: any;
+  product: {
+    id: string;
+    name: string;
+    sku: string;
+    price: number;
+    special_price?: number;
+    barcode?: string;
+    pcb?: string;
+    weight?: number;
+    description?: string;
+    stock?: number;
+    promo: boolean;
+    minimumQte?: number;
+    maximumQte?: number;
+    sealable?: number;
+    alertQte?: number;
+    loyaltyPointsPerProduct?: number;
+    loyaltyPointsPerUnit?: number;
+    loyaltyPointsBonusQuantity?: number;
+    loyaltyPointsThresholdQty?: number;
+    supplierId?: string;
+    productTypeId?: string;
+    typePcbId?: string;
+    productStatusId?: string;
+    taxId?: string;
+    promotionId?: string;
+    activities: string[];
+    images: ProductImage[];
+    productSubCategories: any[];
+    relatedProducts: any[];
+    cost?: number;
+    brand?: Brand;
+  };
   suppliers: Array<{ id: string; companyName: string }>;
   productTypes: Array<{ id: string; type: string }>;
   typePcbs: Array<{ id: string; name: string }>;
@@ -68,6 +108,7 @@ const EditProductModal = ({
     barcode: "",
     sku: "",
     price: 0,
+    special_price: undefined as number | undefined,
     cost: undefined as number | undefined,
     stock: undefined as number | undefined,
     description: "",
@@ -99,6 +140,17 @@ const EditProductModal = ({
   const [existingImages, setExistingImages] = useState<ProductImage[]>([]);
   const [activeTab, setActiveTab] = useState("basic");
 
+  // Add brand state to your component
+  const [brandData, setBrandData] = useState<{
+    id?: string;
+    name: string;
+    img?: string;
+    brandImage: File | null;
+  }>({
+    name: "",
+    brandImage: null,
+  });
+
   useEffect(() => {
     if (product && isOpen) {
       setExistingImages(product.images || []);
@@ -106,28 +158,31 @@ const EditProductModal = ({
       setFormState({
         activities: product.activities || [],
         name: product.name,
-        barcode: product.barcode,
+        barcode: product.barcode || "",
         sku: product.sku,
         price: product.price,
-        cost: product.cost,
-        stock: product.stock,
+        special_price: product.special_price || undefined,
+        cost: product.cost || undefined,
+        stock: product.stock || undefined,
         description: product.description || "",
         pcb: product.pcb || "",
-        weight: product.weight,
-        minimumQte: product.minimumQte,
-        maximumQte: product.maximumQte,
-        sealable: product.sealable,
-        alertQte: product.alertQte,
-        loyaltyPointsPerProduct: product.loyaltyPointsPerProduct,
-        loyaltyPointsPerUnit: product.loyaltyPointsPerUnit,
-        loyaltyPointsBonusQuantity: product.loyaltyPointsBonusQuantity,
-        loyaltyPointsThresholdQty: product.loyaltyPointsThresholdQty,
-        supplierId: product.supplierId || null,
-        productTypeId: product.productTypeId || null,
-        typePcbId: product.typePcbId || null,
-        productStatusId: product.productStatusId || null,
-        taxId: product.taxId || null,
-        promotionId: product.promotionId || null,
+        weight: product.weight || undefined,
+        minimumQte: product.minimumQte || undefined,
+        maximumQte: product.maximumQte || undefined,
+        sealable: product.sealable || undefined,
+        alertQte: product.alertQte || undefined,
+        loyaltyPointsPerProduct: product.loyaltyPointsPerProduct || undefined,
+        loyaltyPointsPerUnit: product.loyaltyPointsPerUnit || undefined,
+        loyaltyPointsBonusQuantity:
+          product.loyaltyPointsBonusQuantity || undefined,
+        loyaltyPointsThresholdQty:
+          product.loyaltyPointsThresholdQty || undefined,
+        supplierId: product.supplierId || "",
+        productTypeId: product.productTypeId || "",
+        typePcbId: product.typePcbId || "",
+        productStatusId: product.productStatusId || "",
+        taxId: product.taxId || "",
+        promotionId: product.promotionId || "",
         subCategories:
           product.productSubCategories?.map((sc: any) => sc.subcategoryId) ||
           [],
@@ -149,6 +204,18 @@ const EditProductModal = ({
 
       setSkuPartners(processedSkuPartners);
       setActiveTab("basic");
+
+      // Set brand data from product.brand
+      if (product.brand) {
+        setBrandData({
+          id: product.brand.id,
+          name: product.brand.name || "",
+          img: product.brand.img,
+          brandImage: null,
+        });
+      } else {
+        setBrandData({ name: "", brandImage: null });
+      }
     }
   }, [product, isOpen, initialSkuPartners, partners]);
 
@@ -215,6 +282,33 @@ const EditProductModal = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       handleInputChange("images", Array.from(e.target.files));
+    }
+  };
+
+  const handleBrandNameChange = (value: string) => {
+    setBrandData((prev) => ({ ...prev, name: value }));
+  };
+
+  const handleBrandImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setBrandData((prev) => ({ ...prev, brandImage: e.target.files![0] }));
+    }
+  };
+
+  const handleDeleteBrand = async () => {
+    if (brandData.id) {
+      try {
+        const response = await fetch(`/api/marketplace/brand/${brandData.id}`, {
+          method: "DELETE",
+        });
+        if (response.ok) {
+          setBrandData({ name: "", brandImage: null });
+          toast.success("Brand deleted successfully");
+        }
+      } catch (error) {
+        console.error("Error deleting brand:", error);
+        toast.error("Failed to delete brand");
+      }
     }
   };
 
@@ -341,6 +435,54 @@ const EditProductModal = ({
         }
       }
 
+      // Process brand data
+      if (brandData.id) {
+        // Update existing brand
+        if (brandData.brandImage || brandData.name !== "") {
+          const brandFormData = new FormData();
+
+          if (brandData.brandImage) {
+            brandFormData.append("image", brandData.brandImage);
+          }
+
+          brandFormData.append("name", brandData.name);
+
+          try {
+            await fetch(`/api/marketplace/brand/${brandData.id}`, {
+              method: "PATCH",
+              body: brandFormData,
+            });
+          } catch (brandError) {
+            console.error("Error updating brand:", brandError);
+            toast.error("Failed to update brand information");
+            // Continue with product update even if brand update fails
+          }
+        }
+      } else if (brandData.brandImage || brandData.name !== "") {
+        // Create new brand if we have brand data but no ID
+        const brandFormData = new FormData();
+        brandFormData.append("productId", product.id);
+
+        if (brandData.brandImage) {
+          brandFormData.append("image", brandData.brandImage);
+        }
+
+        if (brandData.name) {
+          brandFormData.append("name", brandData.name);
+        }
+
+        try {
+          await fetch("/api/marketplace/brand/create", {
+            method: "POST",
+            body: brandFormData,
+          });
+        } catch (brandError) {
+          console.error("Error creating brand:", brandError);
+          toast.error("Failed to create brand information");
+          // Continue with product update even if brand creation fails
+        }
+      }
+
       const cleanedData = {
         ...formState,
         id: product?.id,
@@ -351,6 +493,9 @@ const EditProductModal = ({
         taxId: formState.taxId || null,
         promotionId: formState.promotionId || null,
         price: Number(formState.price),
+        special_price: formState.special_price
+          ? Number(formState.special_price)
+          : undefined,
         cost: formState.cost ? Number(formState.cost) : undefined,
         stock: formState.stock ? Number(formState.stock) : undefined,
         subCategories: formState.subCategories,
@@ -582,65 +727,69 @@ const EditProductModal = ({
         <div className="p-6">
           {/* Basic Information */}
           {activeTab === "basic" && (
-            <div className="space-y-4 pb-6">
-              <h3 className="text-xl font-semibold text-primary">
-                Basic Information
-              </h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Product Name *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Product Name"
-                    value={formState.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
-                    className="w-full rounded-lg border p-3"
-                  />
+            <>
+              <div className="space-y-4 pb-6">
+                <h3 className="text-xl font-semibold text-primary">
+                  Basic Information
+                </h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Product Name *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Product Name"
+                      value={formState.name}
+                      onChange={(e) =>
+                        handleInputChange("name", e.target.value)
+                      }
+                      className="w-full rounded-lg border p-3"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Bar Code
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Bar Code"
+                      value={formState.barcode}
+                      onChange={(e) =>
+                        handleInputChange("barcode", e.target.value)
+                      }
+                      className="w-full rounded-lg border p-3"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      SKU *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="SKU"
+                      value={formState.sku}
+                      onChange={(e) => handleInputChange("sku", e.target.value)}
+                      className="w-full rounded-lg border p-3"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Bar Code
+                    Description
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Bar Code"
-                    value={formState.barcode}
+                  <textarea
+                    placeholder="Description"
+                    value={formState.description}
                     onChange={(e) =>
-                      handleInputChange("barcode", e.target.value)
+                      handleInputChange("description", e.target.value)
                     }
                     className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    SKU *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="SKU"
-                    value={formState.sku}
-                    onChange={(e) => handleInputChange("sku", e.target.value)}
-                    className="w-full rounded-lg border p-3"
+                    rows={4}
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Description
-                </label>
-                <textarea
-                  placeholder="Description"
-                  value={formState.description}
-                  onChange={(e) =>
-                    handleInputChange("description", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
-                  rows={4}
-                />
-              </div>
-            </div>
+            </>
           )}
 
           {/* Specifications */}
@@ -742,7 +891,7 @@ const EditProductModal = ({
               <h3 className="text-xl font-semibold text-primary">
                 Pricing & Stock
               </h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Price *
@@ -752,6 +901,20 @@ const EditProductModal = ({
                     placeholder="Price *"
                     value={formState.price}
                     onChange={(e) => handleInputChange("price", e.target.value)}
+                    className="w-full rounded-lg border p-3"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Special Price
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Special Price"
+                    value={formState.special_price || ""}
+                    onChange={(e) =>
+                      handleInputChange("special_price", e.target.value)
+                    }
                     className="w-full rounded-lg border p-3"
                   />
                 </div>
@@ -1085,6 +1248,58 @@ const EditProductModal = ({
                       </option>
                     ))}
                   </select>
+                )}
+              </div>
+
+              {/* Brand Information */}
+              <div className="mt-6 border-t pt-6">
+                <h4 className="mb-3 text-lg font-medium text-gray-800">
+                  Brand Information
+                </h4>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Brand Name
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Brand Name"
+                      value={brandData.name}
+                      onChange={(e) => handleBrandNameChange(e.target.value)}
+                      className="w-full rounded-lg border p-3"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Brand Logo
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleBrandImageChange}
+                      className="w-full rounded-lg border p-3"
+                    />
+                  </div>
+                </div>
+
+                {/* Display existing brand image if available */}
+                {brandData.img && (
+                  <div className="mt-4">
+                    <div className="flex items-center">
+                      <img
+                        src={brandData.img}
+                        alt="Brand Logo"
+                        className="h-16 w-16 rounded border object-contain"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleDeleteBrand}
+                        className="ml-2 text-red-600 hover:text-red-800"
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

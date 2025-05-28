@@ -126,6 +126,7 @@ const CreateProductModal = ({
     barcode: "",
     sku: "",
     price: 0,
+    special_price: undefined as number | undefined,
     cost: undefined as number | undefined,
     stock: undefined as number | undefined,
     description: "",
@@ -154,6 +155,8 @@ const CreateProductModal = ({
       skuPartner: string;
     }>,
     activities: [] as string[],
+    brandName: "",
+    brandImage: null as File | null,
   });
 
   const [activeTab, setActiveTab] = useState("basic");
@@ -165,6 +168,7 @@ const CreateProductModal = ({
         barcode: "",
         sku: "",
         price: 0,
+        special_price: undefined,
         cost: undefined,
         stock: undefined,
         description: "",
@@ -190,6 +194,8 @@ const CreateProductModal = ({
         images: [],
         skuPartners: [],
         activities: [],
+        brandName: "",
+        brandImage: null,
       });
       setActiveTab("basic");
     }
@@ -232,6 +238,7 @@ const CreateProductModal = ({
           barcode: data["barcode"] || prev.barcode,
           sku: data["sku"] || prev.sku,
           price: Number(data["price"]) || prev.price,
+          special_price: Number(data["special_price"]) || prev.special_price,
           cost: Number(data["cost"]) || prev.cost,
           stock: Number(data["stock"]) || prev.stock,
           description: data["description"] || prev.description,
@@ -301,6 +308,15 @@ const CreateProductModal = ({
     return partners.filter((p) => !selectedPartnerIds.includes(p.id));
   };
 
+  const handleBrandImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormState((prev) => ({
+        ...prev,
+        brandImage: e.target.files![0],
+      }));
+    }
+  };
+
   const handleSubmit = async () => {
     if (!formState.name || !formState.sku || !formState.price) {
       toast.error("Please fill in required fields");
@@ -312,6 +328,9 @@ const CreateProductModal = ({
       const payload = {
         ...formState,
         price: Number(formState.price),
+        special_price: formState.special_price
+          ? Number(formState.special_price)
+          : undefined,
         cost: formState.cost ? Number(formState.cost) : undefined,
         stock: formState.stock ? Number(formState.stock) : undefined,
         weight: formState.weight ? Number(formState.weight) : undefined,
@@ -639,16 +658,30 @@ const CreateProductModal = ({
             <h3 className="text-xl font-semibold text-primary">
               Pricing & Stock
             </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Price *
+                  Price <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
-                  placeholder="Price *"
-                  value={formState.price}
+                  placeholder="Price"
+                  value={formState.price || ""}
                   onChange={(e) => handleInputChange("price", e.target.value)}
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Special Price
+                </label>
+                <input
+                  type="number"
+                  placeholder="Special Price"
+                  value={formState.special_price || ""}
+                  onChange={(e) =>
+                    handleInputChange("special_price", e.target.value)
+                  }
                   className="w-full rounded-lg border p-3"
                 />
               </div>
@@ -991,6 +1024,40 @@ const CreateProductModal = ({
                   </select>
                 </div>
               )}
+            </div>
+
+            {/* Brand Information */}
+            <div className="mt-6 border-t pt-6">
+              <h4 className="mb-3 text-lg font-medium text-gray-800">
+                Brand Information
+              </h4>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Brand Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Brand Name"
+                    value={formState.brandName}
+                    onChange={(e) =>
+                      handleInputChange("brandName", e.target.value)
+                    }
+                    className="w-full rounded-lg border p-3"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Brand Logo
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleBrandImageChange}
+                    className="w-full rounded-lg border p-3"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Images */}

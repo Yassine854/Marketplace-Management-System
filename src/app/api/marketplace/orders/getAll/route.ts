@@ -191,7 +191,6 @@ export async function GET(req: Request) {
         agent: true,
         reservation: {
           include: {
-            agent: true,
             partner: true,
             customer: true,
             paymentMethod: true,

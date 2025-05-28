@@ -7,6 +7,12 @@ import { Product } from "@/types/product";
 import { useProductActions } from "../hooks/useProductActions";
 import ShowProductModal from "../components/ShowProductModal";
 
+// Add interface at the top
+interface ProductImage {
+  id: string;
+  url: string;
+}
+
 const ProductPage = () => {
   const { products, isLoading, error, refetch } = useGetAllProducts();
   const {
@@ -224,7 +230,14 @@ const ProductPage = () => {
         <ShowProductModal
           isOpen={isShowModalOpen}
           onClose={() => setIsShowModalOpen(false)}
-          product={selectedProduct}
+          product={
+            selectedProduct && {
+              ...selectedProduct,
+              images: (selectedProduct.images as ProductImage[]) || [],
+              productSubCategories: selectedProduct.productSubCategories || [],
+              relatedProducts: selectedProduct.relatedProducts || [],
+            }
+          }
           suppliers={suppliers}
           productTypes={productTypes}
           typePcbs={typePcbs}

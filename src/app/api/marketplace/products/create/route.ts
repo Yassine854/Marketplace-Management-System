@@ -132,6 +132,7 @@ export async function POST(req: Request) {
         barcode: (formData.get("barcode") as string) || "", // Use empty string instead of null
         sku: sku,
         price: parseFloat(formData.get("price") as string),
+        special_price: parseFloat(formData.get("special_price") as string),
         cost: formData.get("cost")
           ? parseFloat(formData.get("cost") as string)
           : null,
@@ -186,6 +187,20 @@ export async function POST(req: Request) {
           .map(([_, value]) => value as string),
       },
     });
+
+    // Create notification for admin if product is added by a partner
+    if (partnerId) {
+      await prisma.notification.create({
+        data: {
+          title: "New Product Pending Approval",
+          message: `A new product "${newProduct.name}" has been added by partner "${user.username}" and is waiting for approval.`,
+          isRead: false,
+          link: "/marketplace/products/PendingProducts",
+          recipientType: "admin",
+          partnerId: null,
+        },
+      });
+    }
 
     // Return the product data immediately
     return NextResponse.json(

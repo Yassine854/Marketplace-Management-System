@@ -9,6 +9,11 @@ import Pagination from "@/features/shared/elements/Pagination/Pagination";
 import CreateProductModal from "../components/CreateProductModal";
 import EditProductModal from "../components/EditProductModal";
 
+interface ProductImage {
+  id: string;
+  url: string;
+}
+
 const ProductPage = () => {
   const { products, isLoading, error, refetch } = useGetAllProducts();
   const {
@@ -32,6 +37,9 @@ const ProductPage = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [skuPartners, setSkuPartners] = useState([]);
   const [sources, setSources] = useState([]); // Add sources state
+  const [partners, setPartners] = useState<Array<{ id: string; name: string }>>(
+    [],
+  );
 
   // Change your state initializations to:
   const [typePcbs, setTypePcbOptions] = useState<any[]>([]);
@@ -104,6 +112,7 @@ const ProductPage = () => {
           fetch("/api/marketplace/promotion/getAll"),
           fetch("/api/marketplace/sub_category/getAll"),
           fetch("/api/marketplace/products/getAll"),
+          fetch("/api/marketplace/partners/getAll"),
         ]);
 
         const [
@@ -115,6 +124,7 @@ const ProductPage = () => {
           promotions,
           subCategories,
           products,
+          partners,
         ] = await Promise.all(responses.map((res) => res.json()));
 
         setTypePcbOptions(typePcbs.typePcbs);
@@ -124,6 +134,7 @@ const ProductPage = () => {
         setTaxOptions(taxes.taxes);
         setPromotionOptions(promotions.promotions);
         setSubCategoryOptions(subCategories.subCategories);
+        setPartners(partners.partners);
       } catch (error) {}
     };
 
@@ -262,16 +273,13 @@ const ProductPage = () => {
             try {
               const result = await createProduct(productData);
               if (result) {
-                // Explicitly call refetch after product creation
                 refetch();
                 return result;
               }
               return null;
             } catch (error) {
-              // Pass the error up to the modal to handle
               throw error;
             } finally {
-              // Ensure refetch is called even if there's an error
               refetch();
             }
           }}
@@ -283,6 +291,7 @@ const ProductPage = () => {
           relatedProducts={products}
           taxes={taxes}
           promotions={promotions}
+          partners={partners}
         />
 
         <EditProductModal
@@ -293,7 +302,12 @@ const ProductPage = () => {
             refetch();
             setIsEditModalOpen(false);
           }}
-          product={selectedProduct}
+          product={{
+            ...selectedProduct!,
+            images: (selectedProduct?.images || []) as ProductImage[],
+            productSubCategories: selectedProduct?.productSubCategories || [],
+            relatedProducts: selectedProduct?.relatedProducts || [],
+          }}
           suppliers={suppliers}
           productTypes={productTypes}
           typePcbs={typePcbs}

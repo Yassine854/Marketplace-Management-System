@@ -36,6 +36,8 @@ interface CreateProductData {
     skuPartner: string;
   }>;
   activities?: string[];
+  brandName?: string;
+  brandImage?: File | null;
 }
 
 export function useCreateProduct() {
@@ -103,6 +105,26 @@ export function useCreateProduct() {
           }),
         ),
       ];
+
+      // Add brand creation if brand data is provided
+      if (productData.brandImage || productData.brandName) {
+        const brandFormData = new FormData();
+        brandFormData.append("productId", productId);
+
+        if (productData.brandImage) {
+          brandFormData.append("image", productData.brandImage);
+        }
+
+        if (productData.brandName) {
+          brandFormData.append("name", productData.brandName);
+        }
+
+        promises.push(
+          axios.post("/api/marketplace/brand/create", brandFormData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          }),
+        );
+      }
 
       // Add SKU partner creation promises
       if (productData.skuPartners && productData.skuPartners.length > 0) {

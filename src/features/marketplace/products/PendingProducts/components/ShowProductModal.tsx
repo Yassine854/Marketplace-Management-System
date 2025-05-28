@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Product } from "@/types/product";
 
 interface SkuPartner {
   id: string;
@@ -11,6 +10,45 @@ interface SkuPartner {
 interface ProductImage {
   id: string;
   url: string;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  barcode?: string;
+  sku: string;
+  price: number;
+  special_price?: number;
+  cost?: number;
+  stock?: number;
+  description?: string;
+  pcb?: string;
+  weight?: number;
+  minimumQte?: number;
+  maximumQte?: number;
+  sealable?: number;
+  alertQte?: number;
+  loyaltyPointsPerProduct?: number;
+  loyaltyPointsPerUnit?: number;
+  loyaltyPointsBonusQuantity?: number;
+  loyaltyPointsThresholdQty?: number;
+  supplierId?: string;
+  productTypeId?: string;
+  typePcbId?: string;
+  productStatusId?: string;
+  taxId?: string;
+  promotionId?: string;
+  promo: boolean;
+  activities: string[];
+  images: ProductImage[];
+  productSubCategories: any[];
+  relatedProducts: any[];
+  brand?: {
+    id: string;
+    img: string;
+    name: string | null;
+    productId: string;
+  };
 }
 
 interface ShowProductModalProps {
@@ -314,6 +352,17 @@ const ShowProductModal = ({
 
               <div className="form-group">
                 <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Special Price
+                </label>
+                <div className="w-full rounded-lg border bg-gray-50 p-2 text-gray-700">
+                  {product.special_price
+                    ? `${product.special_price.toFixed(2)} DT`
+                    : "N/A"}
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="mb-1 block text-sm font-medium text-gray-700">
                   Cost
                 </label>
                 <div className="w-full rounded-lg border bg-gray-50 p-2 text-gray-700">
@@ -494,6 +543,27 @@ const ShowProductModal = ({
                   ) : (
                     <span className="text-gray-500">No related products</span>
                   )}
+                </div>
+              </div>
+
+              {/* Brand Information - Simple Layout */}
+              <div className="col-span-full mt-6">
+                <div className="flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-4">
+                  {product.brand?.img && (
+                    <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200">
+                      <img
+                        src={product.brand.img}
+                        alt="Brand Logo"
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500">Brand</h4>
+                    <div className="text-base text-gray-900">
+                      {product.brand?.name || "Not specified"}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -79,6 +79,7 @@ export async function GET(
         favoriteProducts: true,
         relatedProducts: { include: { relatedProduct: true } },
         skuPartners: true,
+        brand: true,
       },
     });
 
@@ -103,7 +104,6 @@ export async function GET(
 }
 
 // 🟡 PATCH: Update a product by ID
-
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
@@ -141,10 +141,38 @@ export async function PATCH(
 
     // Special case for just accepting a product
     if (body.accepted === true && Object.keys(body).length === 1) {
+      // Get the product to check if it has a partner
+      const product = await prisma.product.findUnique({
+        where: { id },
+        select: { name: true, partnerId: true },
+      });
+
+      if (!product) {
+        return NextResponse.json(
+          { message: "Product not found" },
+          { status: 404 },
+        );
+      }
+
       const updatedProduct = await prisma.product.update({
         where: { id },
         data: { accepted: true },
       });
+
+      // If the product has a partnerId, send a notification to the partner
+      if (product.partnerId) {
+        // Create notification for the partner
+        await prisma.notification.create({
+          data: {
+            title: "Product Accepted",
+            message: `Your product "${product.name}" has been accepted and is now available in the marketplace.`,
+            isRead: false,
+            link: `/marketplace/partners/products/`,
+            recipientType: "partner",
+            partnerId: product.partnerId,
+          },
+        });
+      }
 
       return NextResponse.json(
         { message: "Product accepted", product: updatedProduct },
@@ -206,6 +234,9 @@ export async function PATCH(
     const numericFields = {
       price: Number(productData.price),
       cost: productData.cost ? Number(productData.cost) : undefined,
+      special_price: productData.special_price
+        ? Number(productData.special_price)
+        : undefined,
       stock: productData.stock ? Number(productData.stock) : undefined,
       weight: productData.weight ? Number(productData.weight) : undefined,
       minimumQte: productData.minimumQte

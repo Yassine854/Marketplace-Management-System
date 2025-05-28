@@ -8,6 +8,7 @@ interface CreateProductData {
   barcode: string;
   sku: string;
   price: number;
+  special_price?: number;
   cost?: number;
   stock?: number;
   description?: string;
@@ -34,13 +35,9 @@ interface CreateProductData {
   skuPartners?: Array<{
     partnerId: string;
     skuPartner: string;
-    stock: number;
-    price: number;
-    loyaltyPointsPerProduct?: number;
-    loyaltyPointsPerUnit?: number;
-    loyaltyPointsBonusQuantity?: number;
-    loyaltyPointsThresholdQty?: number;
   }>;
+  brandName?: string;
+  brandImage?: File | null;
 }
 
 export function useCreateProduct() {
@@ -97,7 +94,10 @@ export function useCreateProduct() {
       formData.append("barcode", productData.barcode || "");
       formData.append("sku", productData.sku);
       formData.append("price", productData.price.toString());
-
+      formData.append(
+        "special_price",
+        productData.special_price?.toString() || "",
+      );
       // Add optional fields only if they exist
       if (productData.cost !== undefined)
         formData.append("cost", productData.cost.toString());
@@ -315,6 +315,26 @@ export function useCreateProduct() {
       }
     }
 
+    // Add brand creation if brand data is provided
+    if (productData.brandImage || productData.brandName) {
+      const brandFormData = new FormData();
+      brandFormData.append("productId", productId);
+
+      if (productData.brandImage) {
+        brandFormData.append("image", productData.brandImage);
+      }
+
+      if (productData.brandName) {
+        brandFormData.append("name", productData.brandName);
+      }
+
+      promises.push(
+        axios.post("/api/marketplace/brand/create", brandFormData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        }),
+      );
+    }
+
     // Add SKU partner creation promises
     if (productData.skuPartners && productData.skuPartners.length > 0) {
       const validSkuPartners = productData.skuPartners.filter(
@@ -328,12 +348,6 @@ export function useCreateProduct() {
             partnerId: partner.partnerId,
             skuPartner: partner.skuPartner || productData.sku,
             skuProduct: productData.sku,
-            stock: partner.stock || 0,
-            price: partner.price || 0,
-            loyaltyPointsPerProduct: partner.loyaltyPointsPerProduct,
-            loyaltyPointsPerUnit: partner.loyaltyPointsPerUnit,
-            loyaltyPointsBonusQuantity: partner.loyaltyPointsBonusQuantity,
-            loyaltyPointsThresholdQty: partner.loyaltyPointsThresholdQty,
           }),
         ),
       );

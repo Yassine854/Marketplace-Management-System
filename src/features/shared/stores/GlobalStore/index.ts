@@ -15,9 +15,34 @@ export const useGlobalStore = create<any>(
           notifications: [],
         }),
 
-      setNotifications: (data: any) =>
+      setNotifications: (notifications: any[]) =>
+        set(() => ({
+          notifications,
+        })),
+      addNotification: (notification: any) =>
+        set((state: any) => {
+          // Check if notification already exists to avoid duplicates
+          const exists = state.notifications.some(
+            (n: any) => n.id === notification.id,
+          );
+          if (exists) return state;
+
+          return {
+            notifications: [notification, ...state.notifications],
+          };
+        }),
+      markNotificationAsRead: (notificationId: string) =>
         set((state: any) => ({
-          notifications: [data, ...state.notifications],
+          notifications: state.notifications.map((n: any) =>
+            n.id === notificationId ? { ...n, isRead: true } : n,
+          ),
+        })),
+      markAllNotificationsAsRead: () =>
+        set((state: any) => ({
+          notifications: state.notifications.map((n: any) => ({
+            ...n,
+            isRead: true,
+          })),
         })),
       clearNotifications: () =>
         set(() => ({
@@ -28,6 +53,12 @@ export const useGlobalStore = create<any>(
       setIsMultipleStoreAccessUser: (isMultipleStoreAccessUser: boolean) =>
         set({ isMultipleStoreAccessUser }),
       setIsNoEditUser: (isNoEditUser: boolean) => set({ isNoEditUser }),
+      updateNotification: (updatedNotification: any) =>
+        set((state: any) => ({
+          notifications: state.notifications.map((n: any) =>
+            n.id === updatedNotification.id ? updatedNotification : n,
+          ),
+        })),
     }),
     {
       name: "globalStore",

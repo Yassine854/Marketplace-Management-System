@@ -42,7 +42,44 @@ interface EditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   onEdit: (product: any) => Promise<void>;
-  product: any;
+  product: {
+    id: string;
+    name: string;
+    sku: string;
+    price: number;
+    special_price?: number;
+    barcode?: string;
+    pcb?: string;
+    weight?: number;
+    description?: string;
+    stock?: number;
+    promo: boolean;
+    minimumQte?: number;
+    maximumQte?: number;
+    sealable?: number;
+    alertQte?: number;
+    loyaltyPointsPerProduct?: number;
+    loyaltyPointsPerUnit?: number;
+    loyaltyPointsBonusQuantity?: number;
+    loyaltyPointsThresholdQty?: number;
+    supplierId?: string | null;
+    productTypeId?: string | null;
+    typePcbId?: string | null;
+    productStatusId?: string | null;
+    taxId?: string | null;
+    promotionId?: string | null;
+    activities: string[];
+    images: ProductImage[];
+    productSubCategories: any[];
+    relatedProducts: any[];
+    cost?: number;
+    brand?: {
+      id: string;
+      img: string;
+      name: string | null;
+      productId: string;
+    };
+  };
   suppliers: Array<{ id: string; companyName: string }>;
   productTypes: Array<{ id: string; type: string }>;
   typePcbs: Array<{ id: string; name: string }>;
@@ -196,9 +233,10 @@ const EditProductModal = ({
 
   const [formState, setFormState] = useState({
     name: "",
-    barcode: "",
+    barcode: "" as string | undefined,
     sku: "",
     price: 0,
+    special_price: undefined as number | undefined,
     cost: undefined as number | undefined,
     stock: undefined as number | undefined,
     description: "",
@@ -212,12 +250,12 @@ const EditProductModal = ({
     loyaltyPointsPerUnit: undefined as number | undefined,
     loyaltyPointsBonusQuantity: undefined as number | undefined,
     loyaltyPointsThresholdQty: undefined as number | undefined,
-    supplierId: "",
-    productTypeId: "",
-    typePcbId: "",
-    productStatusId: "",
-    taxId: "",
-    promotionId: "",
+    supplierId: "" as string | null,
+    productTypeId: "" as string | null,
+    typePcbId: "" as string | null,
+    productStatusId: "" as string | null,
+    taxId: "" as string | null,
+    promotionId: "" as string | null,
     subCategories: [] as string[],
     relatedProducts: [] as string[],
     promo: false,
@@ -246,6 +284,7 @@ const EditProductModal = ({
         barcode: product.barcode,
         sku: product.sku,
         price: product.price,
+        special_price: product.special_price,
         cost: product.cost,
         stock: product.stock,
         description: product.description || "",
@@ -735,7 +774,7 @@ const EditProductModal = ({
                   <input
                     type="text"
                     placeholder="Bar Code"
-                    value={formState.barcode}
+                    value={formState.barcode || ""}
                     disabled
                     className="w-full rounded-lg border bg-gray-100 p-3"
                   />
@@ -857,7 +896,7 @@ const EditProductModal = ({
               <h3 className="text-xl font-semibold text-primary">
                 Pricing & Stock
               </h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Price *
@@ -866,6 +905,19 @@ const EditProductModal = ({
                     type="number"
                     placeholder="Price *"
                     value={formState.price}
+                    onChange={(e) => handleInputChange("price", e.target.value)}
+                    disabled
+                    className="w-full rounded-lg border bg-gray-100 p-3"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Special Price
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Special Price"
+                    value={formState.special_price || ""}
                     disabled
                     className="w-full rounded-lg border bg-gray-100 p-3"
                   />
@@ -878,6 +930,7 @@ const EditProductModal = ({
                     type="number"
                     placeholder="Cost"
                     value={formState.cost || ""}
+                    onChange={(e) => handleInputChange("cost", e.target.value)}
                     disabled
                     className="w-full rounded-lg border bg-gray-100 p-3"
                   />
@@ -890,61 +943,91 @@ const EditProductModal = ({
                     type="number"
                     placeholder="Stock"
                     value={formState.stock || ""}
+                    onChange={(e) => handleInputChange("stock", e.target.value)}
                     disabled
                     className="w-full rounded-lg border bg-gray-100 p-3"
                   />
                 </div>
               </div>
 
-              {/* Loyalty points fields - disabled */}
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Loyalty Points Per Product
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Loyalty Points Per Product"
-                    value={formState.loyaltyPointsPerProduct || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Loyalty Points Per Unit
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Loyalty Points Per Unit"
-                    value={formState.loyaltyPointsPerUnit || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Loyalty Points Bonus Quantity
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Loyalty Points Bonus Quantity"
-                    value={formState.loyaltyPointsBonusQuantity || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Loyalty Points Threshold Quantity
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Loyalty Points Threshold Quantity"
-                    value={formState.loyaltyPointsThresholdQty || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
+              {/* Loyalty Program */}
+              <div className="pt-4">
+                <h4 className="mb-3 text-lg font-medium text-gray-800">
+                  Loyalty Program
+                </h4>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Points Per Product
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Points Per Product"
+                      value={formState.loyaltyPointsPerProduct || ""}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "loyaltyPointsPerProduct",
+                          e.target.value,
+                        )
+                      }
+                      disabled
+                      className="w-full rounded-lg border bg-gray-100 p-3"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Points Per Unit
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Points Per Unit"
+                      value={formState.loyaltyPointsPerUnit || ""}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "loyaltyPointsPerUnit",
+                          e.target.value,
+                        )
+                      }
+                      disabled
+                      className="w-full rounded-lg border bg-gray-100 p-3"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Bonus Quantity
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Bonus Quantity"
+                      value={formState.loyaltyPointsBonusQuantity || ""}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "loyaltyPointsBonusQuantity",
+                          e.target.value,
+                        )
+                      }
+                      disabled
+                      className="w-full rounded-lg border bg-gray-100 p-3"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Threshold Quantity
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Threshold Quantity"
+                      value={formState.loyaltyPointsThresholdQty || ""}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "loyaltyPointsThresholdQty",
+                          e.target.value,
+                        )
+                      }
+                      disabled
+                      className="w-full rounded-lg border bg-gray-100 p-3"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1027,7 +1110,7 @@ const EditProductModal = ({
                 </div>
               </div>
 
-              {/* Sub-categories - disabled */}
+              {/* Rest of the relationships tab content */}
               <div className="pt-4">
                 <h4 className="mb-3 text-lg font-medium text-gray-800">
                   Sub-categories
@@ -1112,6 +1195,40 @@ const EditProductModal = ({
                     ))}
                   </select>
                 )}
+              </div>
+
+              {/* Brand Information - Read Only */}
+              <div className="mt-6 rounded-lg border border-gray-200 p-4">
+                <h4 className="mb-4 text-lg font-medium text-gray-800">
+                  Brand Information
+                </h4>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Brand Name
+                    </label>
+                    <input
+                      type="text"
+                      value={product.brand?.name || ""}
+                      disabled
+                      className="w-full rounded-lg border bg-gray-100 p-3"
+                    />
+                  </div>
+                  {product.brand?.img && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Brand Logo
+                      </label>
+                      <div className="mt-2 h-24 w-24 overflow-hidden rounded-lg border">
+                        <img
+                          src={product.brand.img}
+                          alt="Brand Logo"
+                          className="h-full w-full object-contain"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

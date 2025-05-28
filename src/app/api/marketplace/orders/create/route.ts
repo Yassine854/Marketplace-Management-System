@@ -88,7 +88,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const stateName = body.isActive ? "Active" : "Inactive";
+    const stateName = body.isActive ? "Open" : "Inactive";
     const state = await prisma.state.findUnique({
       where: {
         name: stateName,
@@ -122,12 +122,12 @@ export async function POST(req: Request) {
         amountTTC: body.amountTTC,
         amountBeforePromo: body.amountBeforePromo,
         amountAfterPromo: body.amountAfterPromo,
-        amountRefunded: body.amountRefunded,
-        amountCanceled: body.amountCanceled,
-        amountOrdered: body.amountOrdered,
-        amountShipped: body.amountShipped,
+        amountRefunded: body.amountRefunded || null,
+        amountCanceled: body.amountCanceled || null,
+        amountOrdered: body.amountOrdered || null,
+        amountShipped: body.amountShipped || null,
         shippingMethod: body.shippingMethod,
-        loyaltyPtsValue: body.loyaltyPtsValue,
+        loyaltyPtsValue: body.loyaltyPtsValue || null,
         fromMobile: body.fromMobile,
         weight: body.weight,
         statusId: status.id,

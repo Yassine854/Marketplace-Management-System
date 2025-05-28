@@ -9,6 +9,11 @@ import { useCreateProduct } from "../hooks/useCreateProduct";
 import CreateProductModal from "../components/CreateProductModal";
 import EditProductModal from "../components/EditProductModal";
 
+interface ProductImage {
+  id: string;
+  url: string;
+}
+
 const ProductPage = () => {
   const { products, isLoading, error, refetch } = useGetAllProducts();
   const {
@@ -269,26 +274,33 @@ const ProductPage = () => {
           activities={[]}
         />
 
-        <EditProductModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onEdit={async (productData) => {
-            await editProduct(productData.id, productData);
-            refetch();
-            setIsEditModalOpen(false);
-          }}
-          product={selectedProduct}
-          suppliers={suppliers}
-          productTypes={productTypes}
-          typePcbs={typePcbs}
-          productStatuses={productStatuses}
-          subCategories={subCategories}
-          relatedProducts={products}
-          taxes={taxes}
-          promotions={promotions}
-          partners={partners}
-          skuPartners={skuPartners}
-        />
+        {selectedProduct && (
+          <EditProductModal
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            onEdit={async (productData) => {
+              await editProduct(productData.id, productData);
+              refetch();
+              setIsEditModalOpen(false);
+            }}
+            product={{
+              ...selectedProduct,
+              images: (selectedProduct.images as ProductImage[]) || [],
+              productSubCategories: selectedProduct.productSubCategories || [],
+              relatedProducts: selectedProduct.relatedProducts || [],
+            }}
+            suppliers={suppliers}
+            productTypes={productTypes}
+            typePcbs={typePcbs}
+            productStatuses={productStatuses}
+            subCategories={subCategories}
+            relatedProducts={products}
+            taxes={taxes}
+            promotions={promotions}
+            partners={partners}
+            skuPartners={skuPartners}
+          />
+        )}
       </div>
     </div>
   );

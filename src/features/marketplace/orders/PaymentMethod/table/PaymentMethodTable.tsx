@@ -55,9 +55,6 @@ export default function PaymentMethodTable({
           <thead className="border-b border-gray-100 bg-primary">
             <tr>
               <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
-                ID
-              </th>
-              <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
                 Name
               </th>
               <th className="px-6 py-4 text-left text-center text-xs font-semibold uppercase tracking-wider text-white">
@@ -111,9 +108,6 @@ export default function PaymentMethodTable({
                   key={item.id}
                   className="transition-colors duration-150 hover:bg-gray-50"
                 >
-                  <td className="break-words px-4 py-2 text-center text-sm text-gray-900">
-                    {item.id}
-                  </td>
                   <td className="break-words px-4 py-2 text-center text-sm text-gray-900">
                     {item.name}
                   </td>

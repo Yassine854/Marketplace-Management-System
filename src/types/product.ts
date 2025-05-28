@@ -4,6 +4,7 @@ export interface Product {
   name: string;
   sku: string;
   price: number;
+  special_price?: number;
   cost?: number;
   stock?: number;
   description?: string;
@@ -24,10 +25,16 @@ export interface Product {
   taxId?: string;
   promotionId?: string;
   partnerId?: string;
-  promo?: boolean;
+  promo: boolean;
   accepted?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  brand?: {
+    id: string;
+    img: string;
+    name: string | null;
+    productId: string;
+  };
   supplier?: {
     id: string;
     companyName: string;
@@ -44,5 +51,5 @@ export interface Product {
   productSubCategories?: any[];
   relatedProducts?: any[];
   images?: any[];
-  activities?: any[];
+  activities: string[];
 }

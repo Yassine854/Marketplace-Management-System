@@ -71,6 +71,7 @@ export async function GET(req: Request) {
         relatedProducts: { include: { relatedProduct: true } },
         skuPartners: true,
         partner: true,
+        brand: true,
       },
     });
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import Select from "react-select";
@@ -11,6 +11,7 @@ interface Product {
   barcode: string;
   sku: string;
   price: number;
+  special_price?: number;
   cost?: number;
   stock?: number;
   description?: string;
@@ -30,6 +31,9 @@ interface Product {
   productStatusId?: string;
   taxId?: string;
   promotionId?: string;
+  brand?: {
+    name: string | null;
+  };
   productSubCategories?: Array<{
     subcategoryId: string;
     subcategory: {
@@ -80,13 +84,9 @@ interface CreateProductModalProps {
     skuPartners?: Array<{
       partnerId: string;
       skuPartner: string;
-      stock: number;
-      price: number;
-      loyaltyPointsPerProduct?: number;
-      loyaltyPointsPerUnit?: number;
-      loyaltyPointsBonusQuantity?: number;
-      loyaltyPointsThresholdQty?: number;
     }>;
+    brandName: string;
+    brandImage: File | null;
   }) => Promise<any>;
   suppliers: Array<{ id: string; companyName: string }>;
   productTypes: Array<{ id: string; type: string }>;
@@ -96,6 +96,7 @@ interface CreateProductModalProps {
   relatedProducts: Array<{ id: string; name: string }>;
   taxes: Array<{ id: string; value: string }>;
   promotions: Array<{ id: string; promoPrice: string }>;
+  partners: Array<{ id: string; name: string }>;
 }
 
 const CreateProductModal = ({
@@ -110,12 +111,14 @@ const CreateProductModal = ({
   relatedProducts,
   taxes,
   promotions,
+  partners,
 }: CreateProductModalProps) => {
   const [formState, setFormState] = useState({
     name: "",
     barcode: "",
     sku: "",
     price: 0,
+    special_price: undefined as number | undefined,
     cost: undefined as number | undefined,
     stock: undefined as number | undefined,
     description: "",
@@ -151,6 +154,8 @@ const CreateProductModal = ({
       loyaltyPointsBonusQuantity?: number;
       loyaltyPointsThresholdQty?: number;
     }>,
+    brandName: "",
+    brandImage: null as File | null,
   });
 
   // Add this line to use the hook at the component level
@@ -181,6 +186,7 @@ const CreateProductModal = ({
         barcode: "",
         sku: "",
         price: 0,
+        special_price: undefined,
         cost: undefined,
         stock: undefined,
         description: "",
@@ -206,6 +212,8 @@ const CreateProductModal = ({
         images: [],
         partnerSku: "", // Single field for partner SKU
         stocks: [], // Empty array for stocks
+        brandName: "",
+        brandImage: null,
       });
       setActiveTab("basic");
       setSelectedProductId(null); // Reset selected product ID
@@ -426,6 +434,7 @@ const CreateProductModal = ({
       barcode: product.barcode || "",
       sku: product.sku,
       price: product.price,
+      special_price: product.special_price || undefined,
       cost: product.cost || 0,
       stock: product.stock || 0,
       description: product.description || "",
@@ -451,6 +460,8 @@ const CreateProductModal = ({
       images: [],
       partnerSku: "",
       stocks: [],
+      brandName: product.brand?.name || "",
+      brandImage: null,
     });
 
     // Clear search
@@ -458,6 +469,15 @@ const CreateProductModal = ({
     setSearchTerm("");
 
     toast.success(`Product "${product.name}" data loaded into form`);
+  };
+
+  const handleBrandImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormState((prev) => ({
+        ...prev,
+        brandImage: e.target.files![0],
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -526,8 +546,9 @@ const CreateProductModal = ({
               );
             }
           }
-        } catch (searchError) {
-          console.error("Error searching for product:", searchError);
+        } catch (error) {
+          console.error("Error searching for existing product:", error);
+          // Continue with product creation if search fails
         }
       }
 
@@ -537,6 +558,9 @@ const CreateProductModal = ({
         const payload = {
           ...formState,
           price: Number(formState.price),
+          special_price: formState.special_price
+            ? Number(formState.special_price)
+            : undefined,
           cost: formState.cost ? Number(formState.cost) : undefined,
           stock: formState.stock ? Number(formState.stock) : undefined,
           weight: formState.weight ? Number(formState.weight) : undefined,
@@ -560,14 +584,33 @@ const CreateProductModal = ({
           loyaltyPointsThresholdQty: formState.loyaltyPointsThresholdQty
             ? Number(formState.loyaltyPointsThresholdQty)
             : undefined,
-          subCategories: formState.subCategories,
-          relatedProducts: formState.relatedProducts,
-          promo: formState.promo,
-          images: formState.images,
+          // Convert empty strings to undefined for relational IDs
+          supplierId: formState.supplierId || undefined,
+          productTypeId: formState.productTypeId || undefined,
+          typePcbId: formState.typePcbId || undefined,
+          productStatusId: formState.productStatusId || undefined,
+          taxId: formState.taxId || undefined,
+          promotionId: formState.promotionId || undefined,
+          // Include brand information
+          brandName: formState.brandName || undefined,
+          brandImage: formState.brandImage || undefined,
         };
 
-        // Remove partnerSku and stocks from the payload as they're not part of the product creation
-        const { partnerSku, stocks, ...productPayload } = payload;
+        // Create skuPartners array from the partner SKU and stocks
+        const skuPartners = [];
+        if (formState.partnerSku) {
+          // Add the main partner SKU
+          skuPartners.push({
+            partnerId: "", // Will be filled by the backend
+            skuPartner: formState.partnerSku,
+          });
+        }
+
+        // Add the product payload
+        const productPayload = {
+          ...payload,
+          skuPartners,
+        };
 
         try {
           const productResponse = await createProduct(productPayload);
@@ -594,32 +637,33 @@ const CreateProductModal = ({
                 Array.isArray(retrySearch.data.products) &&
                 retrySearch.data.products.length > 0
               ) {
-                // Use the first product that matches the barcode
                 const existingProduct = retrySearch.data.products.find(
                   (p: any) => p.barcode === formState.barcode,
                 );
 
                 if (existingProduct) {
                   productId = existingProduct.id;
+                  toast(
+                    `Using existing product with barcode ${formState.barcode}. Creating SKU partner only.`,
+                  );
                 } else {
                   throw new Error(
-                    "Could not find product with matching barcode",
+                    "Product with this barcode exists but could not be found",
                   );
                 }
               } else {
-                throw new Error("Could not find product with matching barcode");
+                throw new Error(
+                  "Product with this barcode exists but could not be found",
+                );
               }
-            } catch (retryError) {
+            } catch (searchError) {
               console.error(
-                "Error finding product after barcode conflict:",
-                retryError,
+                "Error searching for existing product:",
+                searchError,
               );
-              throw new Error(
-                "Could not create product or find existing one with this barcode",
-              );
+              throw error; // Re-throw the original error
             }
           } else {
-            // If it's not a barcode conflict, rethrow the error
             throw error;
           }
         }
@@ -661,26 +705,10 @@ const CreateProductModal = ({
 
             await Promise.all(stockPromises.filter(Boolean));
           }
-        } catch (skuError: any) {
-          console.error("Error creating SKU partner or stocks:", skuError);
-
-          // Check for the specific conflict error
-          if (
-            skuError.response?.status === 409 &&
-            skuError.response?.data?.message ===
-              "This partner is already assigned to this product"
-          ) {
-            toast.error("This product is already assigned to this partner");
-            // Return early to prevent the success message below
-            setIsSubmitting(false);
-            return;
-          } else {
-            // Handle other errors
-            toast.error("Failed to create SKU partner or stocks");
-            // Return early to prevent the success message below
-            setIsSubmitting(false);
-            return;
-          }
+        } catch (error) {
+          console.error("Error creating SKU partner or stocks:", error);
+          toast.error("Failed to create SKU partner or stocks");
+          // Continue with the rest of the process even if SKU partner creation fails
         }
       }
 
@@ -1053,7 +1081,7 @@ const CreateProductModal = ({
             <h3 className="text-xl font-semibold text-primary">
               Pricing & Stock
             </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Price <span className="text-red-500">*</span>
@@ -1063,6 +1091,20 @@ const CreateProductModal = ({
                   placeholder="Price"
                   value={formState.price || ""}
                   onChange={(e) => handleInputChange("price", e.target.value)}
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Special Price
+                </label>
+                <input
+                  type="number"
+                  placeholder="Special Price"
+                  value={formState.special_price || ""}
+                  onChange={(e) =>
+                    handleInputChange("special_price", e.target.value)
+                  }
                   className="w-full rounded-lg border p-3"
                 />
               </div>
@@ -1387,6 +1429,40 @@ const CreateProductModal = ({
                 onChange={handleFileChange}
                 className="w-full rounded-lg border p-3"
               />
+            </div>
+
+            {/* Brand Information */}
+            <div className="mt-6 border-t pt-6">
+              <h4 className="mb-3 text-lg font-medium text-gray-800">
+                Brand Information
+              </h4>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Brand Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Brand Name"
+                    value={formState.brandName}
+                    onChange={(e) =>
+                      handleInputChange("brandName", e.target.value)
+                    }
+                    className="w-full rounded-lg border p-3"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Brand Logo
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleBrandImageChange}
+                    className="w-full rounded-lg border p-3"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )}

@@ -172,10 +172,10 @@ const Sidebar = ({
                         },
                       ]
                     : []),
-                  ...(hasPermission("Supplier")
+                  ...(hasPermission("Manufacturers")
                     ? [
                         {
-                          name: "Suppliers",
+                          name: "Manufacturers",
                           path: "/marketplace/products/manufacturer/all",
                         },
                       ]
@@ -183,28 +183,28 @@ const Sidebar = ({
                   ...(hasPermission("Tax")
                     ? [
                         {
-                          name: "Tax",
+                          name: "Taxes",
                           path: "/marketplace/products/taxe/all",
                         },
                       ]
                     : []),
-                  ...(hasPermission("Promotion")
-                    ? [
-                        {
-                          name: "Promotion",
-                          path: "/marketplace/products/promotion/all",
-                        },
-                      ]
-                    : []),
+                  // ...(hasPermission("Promotion")
+                  //   ? [
+                  //       {
+                  //         name: "Promotions",
+                  //         path: "/marketplace/products/promotion/all",
+                  //       },
+                  //     ]
+                  //   : []),
                   ...(hasPermission("Product Type")
                     ? [
                         {
-                          name: "Product Type",
+                          name: "Product Types",
                           path: "/marketplace/products/ProductTypes",
                         },
                       ]
                     : []),
-                  ...(hasPermission("Product Status")
+                  ...(hasPermission("Product Statuses")
                     ? [
                         {
                           name: "Product Status",
@@ -215,7 +215,7 @@ const Sidebar = ({
                   ...(hasPermission("Type PCB")
                     ? [
                         {
-                          name: "Type PCB",
+                          name: "Type PCBs",
                           path: "/marketplace/products/ProductPCBType",
                         },
                       ]
@@ -236,14 +236,6 @@ const Sidebar = ({
                 isActive={pathname?.includes("products")}
                 items={[
                   { name: "All", path: "/marketplace/partners/products" },
-                  ...(hasPermission("Category")
-                    ? [
-                        {
-                          name: "Categories",
-                          path: "/marketplace/products/categories",
-                        },
-                      ]
-                    : []),
                 ].filter(Boolean)}
               />
               <Divider />
@@ -257,7 +249,7 @@ const Sidebar = ({
                 icon={<IconDatabase />}
                 name=" Sources"
                 onClick={() => push("/marketplace/source")}
-                isActive={pathname?.includes("Sources")}
+                isActive={pathname?.includes("source")}
                 items={[{ name: "All Sources", path: "/marketplace/source" }]}
               />
               <Divider />
@@ -271,29 +263,21 @@ const Sidebar = ({
                 icon={<IconBuildingStore />}
                 name=" Partners"
                 onClick={() => push("/marketplace/partners")}
-                isActive={pathname?.includes("partners")}
+                isActive={
+                  pathname?.includes("partners") ||
+                  pathname?.includes("settings") ||
+                  pathname?.includes("type_partners")
+                }
                 items={[
                   { name: "All partners", path: "/marketplace/partners" },
+                  {
+                    name: "Partner Settings",
+                    path: "/marketplace/settings",
+                  },
                   {
                     name: "Partner Types",
                     path: "/marketplace/partners/type_partners",
                   },
-                ]}
-              />
-              <Divider />
-            </>
-          )}
-
-          {/* Admin Interface */}
-          {isAdmin && hasPermission("Settings") && (
-            <>
-              <SidebarSubMenu
-                icon={<IconSettings />}
-                name=" Settings"
-                onClick={() => push("/marketplace/settings")}
-                isActive={pathname?.includes("Settings")}
-                items={[
-                  { name: "All settings", path: "/marketplace/settings" },
                 ]}
               />
               <Divider />
@@ -367,7 +351,7 @@ const Sidebar = ({
             <>
               <SidebarSubMenu
                 icon={<IconCalendarEvent />}
-                name="Reservation"
+                name="Reservations"
                 onClick={() => push("/marketplace/reservation/all")}
                 isActive={pathname?.includes("reservation")}
                 items={[{ name: "All", path: "/marketplace/reservation/all" }]}
@@ -381,7 +365,7 @@ const Sidebar = ({
             <>
               <SidebarSubMenu
                 icon={<IconCalendarEvent />}
-                name="Reservation"
+                name="Reservations"
                 onClick={() => push("/marketplace/partners/reservations")}
                 isActive={pathname?.includes("reservation")}
                 items={[
@@ -397,15 +381,18 @@ const Sidebar = ({
             <>
               <SidebarSubMenu
                 icon={<IconBox />}
-                name=" Order"
+                name=" Orders"
                 onClick={() => push("/marketplace/orders2/all")}
-                isActive={pathname?.toLowerCase().includes("order")}
+                isActive={
+                  pathname?.toLowerCase().includes("order") ||
+                  pathname?.toLowerCase().includes("payment method")
+                }
                 items={[
                   { name: "All", path: "/marketplace/orders2/all" },
                   { name: "State", path: "/marketplace/order/state" },
                   { name: "Status", path: "/marketplace/order/status" },
                   {
-                    name: "payment method",
+                    name: "payment methods",
                     path: "/marketplace/PaymentMethod",
                   },
                 ]}
@@ -491,7 +478,7 @@ const Sidebar = ({
           {isAdmin && hasPermission("Banner") && (
             <>
               <SidebarButton
-                name="Banner"
+                name="Banners"
                 icon={<IconPhoto />}
                 onClick={() => push("/marketplace/banner")}
                 isActive={pathname?.includes("/marketplace/banner")}
@@ -504,7 +491,7 @@ const Sidebar = ({
           {isPartner && hasPermission("Delivery Agent") && (
             <>
               <SidebarButton
-                name="Delivery Agent"
+                name="Delivery Agents"
                 icon={<IconTruck />}
                 onClick={() => push("/marketplace/deliveryAgent")}
                 isActive={pathname?.includes("deliveryAgent")}
@@ -517,7 +504,7 @@ const Sidebar = ({
           {isAdmin && hasPermission("Customer") && (
             <>
               <SidebarButton
-                name="Customer"
+                name="Customers"
                 icon={<IconUser />}
                 onClick={() => push("/marketplace/customer")}
                 isActive={pathname?.includes("customer")}
@@ -533,7 +520,13 @@ const Sidebar = ({
                 icon={<IconShield />}
                 name="Access Control"
                 onClick={() => push("/access/users")}
-                isActive={pathname?.includes("access")}
+                isActive={
+                  pathname?.includes("access") ||
+                  pathname?.includes("users") ||
+                  pathname?.includes("roles") ||
+                  pathname?.includes("permissions") ||
+                  pathname?.includes("RBAC")
+                }
                 items={[
                   { name: "Kamioun Agents", path: "/access/users" },
                   { name: "Roles", path: "/marketplace/roles" },
