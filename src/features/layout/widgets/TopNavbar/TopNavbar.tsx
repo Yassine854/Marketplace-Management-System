@@ -41,7 +41,10 @@ const TopNav = ({
     >
       {/* Left Side */}
       <div className="flex items-center gap-3 lg:gap-4">
-        <button onClick={() => setSidebar(!sidebarIsOpen)}>
+        <button
+          onClick={() => setSidebar(!sidebarIsOpen)}
+          className="flex items-center justify-center p-2 focus:outline-none"
+        >
           <IconMenu2 />
         </button>
         {/* <form

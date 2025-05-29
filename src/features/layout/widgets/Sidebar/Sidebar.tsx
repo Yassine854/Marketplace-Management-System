@@ -112,14 +112,15 @@ const Sidebar = ({
     >
       <div className={`p-5`}>
         <div className="flex items-center justify-center">
-          {/* <Link href="/">
+          <Link href="/">
             <Image
               alt="logo"
               width={180}
               height={38}
               src="/images/Kamioun-logo-text.png"
+              priority
             />
-          </Link> */}
+          </Link>
           <button onClick={() => setSidebar(false)} className="xxl:hidden">
             <IconX />
           </button>
@@ -264,9 +265,9 @@ const Sidebar = ({
                 name=" Partners"
                 onClick={() => push("/marketplace/partners")}
                 isActive={
-                  pathname?.includes("partners") ||
-                  pathname?.includes("settings") ||
-                  pathname?.includes("type_partners")
+                  pathname === "/marketplace/partners" ||
+                  pathname === "/marketplace/settings" ||
+                  pathname === "/marketplace/partners/type_partners"
                 }
                 items={[
                   { name: "All partners", path: "/marketplace/partners" },
@@ -352,9 +353,9 @@ const Sidebar = ({
               <SidebarSubMenu
                 icon={<IconCalendarEvent />}
                 name="Reservations"
-                onClick={() => push("/marketplace/reservation/all")}
+                onClick={() => push("/marketplace/reservations")}
                 isActive={pathname?.includes("reservation")}
-                items={[{ name: "All", path: "/marketplace/reservation/all" }]}
+                items={[{ name: "All", path: "/marketplace/reservations" }]}
               />
               <Divider />
             </>

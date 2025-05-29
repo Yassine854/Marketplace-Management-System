@@ -137,7 +137,10 @@ const StatusPage = () => {
       <Divider />
       <div className="relative flex w-full flex-grow flex-col overflow-y-scroll bg-n10 px-3">
         <StatusTable
-          status={paginatedStatus}
+          status={paginatedStatus.map((status) => ({
+            ...status,
+            state: { name: "" },
+          }))}
           isLoading={isLoading}
           error={error}
           refetch={refetch}

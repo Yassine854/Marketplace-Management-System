@@ -1,9 +1,11 @@
 import { Server } from "socket.io";
 import { PrismaClient } from "@prisma/client";
+import { Server as HttpServer } from "http";
+import { Server as HttpsServer } from "https";
 
 const prisma = new PrismaClient();
 
-export function setupWebSocketServer(server) {
+export function setupWebSocketServer(server: HttpServer | HttpsServer) {
   const io = new Server(server, {
     cors: {
       origin: process.env.NEXT_PUBLIC_FRONTEND_URL || "*",
