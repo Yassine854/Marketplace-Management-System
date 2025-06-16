@@ -21,7 +21,6 @@ export async function GET(
       include: {
         reservation: true,
         product: true,
-        tax: true,
       },
     });
 

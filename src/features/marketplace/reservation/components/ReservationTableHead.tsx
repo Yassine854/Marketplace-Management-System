@@ -5,25 +5,17 @@ const ReservationTableHead = () => {
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           ID
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-          Amount Excl. Taxe
-        </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
+        <th className="px-8 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           Amount TTC
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-          Amount Before Promo
-        </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-          Amount After Promo
-        </th>
-
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           Amount Ordered
         </th>
-
         <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-white">
           Shipping Method
+        </th>
+        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
+          Shipping Amount
         </th>
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           State
@@ -40,12 +32,7 @@ const ReservationTableHead = () => {
         <th className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-white">
           Customer
         </th>
-        <th className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-white">
-          Agent
-        </th>
-        <th className="px-8 py-3 text-center text-xs font-medium uppercase tracking-wider text-white">
-          Partner
-        </th>
+
         <th className="px-8 py-3 text-center text-xs font-medium uppercase tracking-wider text-white">
           Payment Method
         </th>

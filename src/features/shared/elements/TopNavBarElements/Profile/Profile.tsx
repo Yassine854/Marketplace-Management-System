@@ -83,7 +83,7 @@ const Profile = () => {
 
   // Determine which image to show
   const profileImage =
-    isPartner && partnerLogo ? partnerLogo : "/images/etudiant.png";
+    isPartner && partnerLogo ? partnerLogo : "/images/logo.png";
 
   return (
     <div className="relative shrink-0" ref={ref}>

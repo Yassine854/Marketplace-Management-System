@@ -45,6 +45,7 @@ const OrderTableSkeleton = () => {
           <td className="px-6 py-4">
             <div className="h-4 w-20 rounded bg-gray-200"></div>
           </td>
+
           <td className="px-6 py-4">
             <div className="h-4 w-20 rounded bg-gray-200"></div>
           </td>
@@ -54,21 +55,7 @@ const OrderTableSkeleton = () => {
           <td className="px-6 py-4">
             <div className="h-4 w-20 rounded bg-gray-200"></div>
           </td>
-          <td className="px-6 py-4">
-            <div className="h-4 w-20 rounded bg-gray-200"></div>
-          </td>
-          <td className="px-6 py-4">
-            <div className="h-4 w-20 rounded bg-gray-200"></div>
-          </td>
-          <td className="px-6 py-4">
-            <div className="h-4 w-20 rounded bg-gray-200"></div>
-          </td>
-          <td className="px-6 py-4">
-            <div className="h-4 w-20 rounded bg-gray-200"></div>
-          </td>
-          <td className="px-6 py-4">
-            <div className="h-4 w-20 rounded bg-gray-200"></div>
-          </td>
+
           <td className="px-6 py-4">
             <div className="h-4 w-20 rounded bg-gray-200"></div>
           </td>

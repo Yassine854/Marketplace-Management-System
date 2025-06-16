@@ -25,7 +25,6 @@ export async function POST(req: Request) {
         sku: body.sku,
         orderId: body.orderId,
         productId: body.productId,
-        taxId: body.taxId,
       },
     });
 

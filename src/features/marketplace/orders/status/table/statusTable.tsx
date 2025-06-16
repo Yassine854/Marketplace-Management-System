@@ -7,7 +7,7 @@ interface Status {
   id: string;
   name: string;
   stateId: string;
-  state: {
+  state?: {
     name: string;
   };
 }
@@ -117,7 +117,7 @@ export default function StatusTable({
                     {item.name}
                   </td>
                   <td className="break-words px-4 py-2 text-center text-sm text-gray-900">
-                    {item.state.name}
+                    {item.state?.name}
                   </td>
                   <td className="px-4 py-2 text-center">
                     <button

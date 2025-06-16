@@ -16,7 +16,6 @@ export async function GET(req: Request) {
       include: {
         order: true,
         product: true,
-        tax: true,
       },
     });
 

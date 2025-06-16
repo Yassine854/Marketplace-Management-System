@@ -1,4 +1,4 @@
-const PromoTableSkeleton = () => {
+const ReservationTableSkeleton = () => {
   return (
     <>
       {[...Array(5)].map((_, i) => (
@@ -21,32 +21,15 @@ const PromoTableSkeleton = () => {
           <td className="px-6 py-4">
             <div className="h-4 w-20 rounded-full bg-gray-200"></div>
           </td>
-          <td className="px-6 py-4">
-            <div className="h-4 w-20 rounded-full bg-gray-200"></div>
-          </td>
-          <td className="px-6 py-4">
-            <div className="h-4 w-20 rounded-full bg-gray-200"></div>
-          </td>
-          <td className="px-6 py-4">
-            <div className="h-4 w-20 rounded-full bg-gray-200"></div>
-          </td>
-          <td className="px-6 py-4">
-            <div className="h-4 w-20 rounded-full bg-gray-200"></div>
-          </td>
-          <td className="px-6 py-4">
-            <div className="h-4 w-20 rounded-full bg-gray-200"></div>
-          </td>
-          <td className="px-6 py-4">
-            <div className="h-4 w-20 rounded-full bg-gray-200"></div>
-          </td>
-          <td className="px-6 py-4">
-            <div className="h-4 w-20 rounded-full bg-gray-200"></div>
-          </td>
+
           <td className="px-6 py-4">
             <div className="h-4 w-20 rounded-full bg-gray-200"></div>
           </td>
           <td className="px-6 py-4">
             <div className="h-4 w-24 rounded-full bg-gray-200"></div>
+          </td>
+          <td className="px-6 py-4">
+            <div className="h-4 w-20 rounded-full bg-gray-200"></div>
           </td>
           <td className="px-6 py-4">
             <div className="h-4 w-20 rounded-full bg-gray-200"></div>
@@ -67,6 +50,7 @@ const PromoTableSkeleton = () => {
             <div className="flex items-center space-x-3">
               <div className="h-5 w-5 rounded-full bg-gray-200"></div>
               <div className="h-5 w-5 rounded-full bg-gray-200"></div>
+              <div className="h-5 w-5 rounded-full bg-gray-200"></div>
             </div>
           </td>
         </tr>
@@ -75,4 +59,4 @@ const PromoTableSkeleton = () => {
   );
 };
 
-export default PromoTableSkeleton;
+export default ReservationTableSkeleton;

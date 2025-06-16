@@ -9,7 +9,6 @@ import {
   TruckIcon,
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import Modal from "../Modal/ModalReservation";
 import ModalOrderItems from "../Modal/ModalOrderItems";
 interface OrderTableRowProps {
   order: OrderWithRelations;
@@ -31,10 +30,9 @@ const OrderTableRow = ({
     <>
       <tr>
         <td className="px-6 py-4">{order.id}</td>
-        <td className="px-6 py-4">{order.amountExclTaxe}</td>
+
         <td className="px-6 py-4">{order.amountTTC}</td>
-        <td className="px-6 py-4">{order.amountBeforePromo}</td>
-        <td className="px-6 py-4">{order.amountAfterPromo}</td>
+
         <td className="px-6 py-4">{order.amountRefunded}</td>
         <td className="px-6 py-4">{order.amountCanceled}</td>
         <td className="px-6 py-4">{order.amountOrdered}</td>
@@ -100,40 +98,11 @@ const OrderTableRow = ({
             </div>
           )}
         </td>
-        <td className="whitespace-nowrap px-6 py-4">
-          {order.reservation ? (
-            <button
-              className="flex items-center justify-center gap-1 rounded bg-purple-50 px-4 py-2 text-purple-600 transition-colors hover:bg-purple-100 hover:underline"
-              onClick={() => setShowModal(true)}
-            >
-              View Reservation ({order.reservation.reservationItems.length})
-            </button>
-          ) : (
-            <span className="text-gray-500">No Reservation</span>
-          )}
-        </td>
-        <td className="whitespace-nowrap px-6 py-4">
-          {order.partner ? (
-            <div
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-1 text-blue-700"
-              title={`${order.partner.firstName} ${order.partner.lastName}`}
-            >
-              <UserIcon className="h-4 w-4 flex-shrink-0" />
-              <span className="max-w-[150px] truncate">
-                {order.partner.firstName} {order.partner.lastName}
-              </span>
-            </div>
-          ) : (
-            <div className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-1 text-gray-500">
-              <NoSymbolIcon className="h-4 w-4 flex-shrink-0" />
-              <span>N/A</span>
-            </div>
-          )}
-        </td>
+
         <td className="min-w-[200px] px-4 py-4">
           {order.orderItems.length > 0 ? (
             <button
-              className="flex w-full items-center justify-center gap-1 rounded bg-green-50 px-4 py-2 text-green-600 transition-colors hover:bg-green-100 hover:underline"
+              className="flex items-center justify-center gap-1 whitespace-nowrap rounded bg-pink-50 px-3 py-2 text-pink-600 transition-colors hover:bg-pink-100 hover:underline"
               onClick={() => setShowOrderItemsModal(true)}
             >
               View Order Items ({order.orderItems.length})
@@ -175,13 +144,6 @@ const OrderTableRow = ({
         </td>
       </tr>
 
-      {order.reservation && (
-        <Modal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          reservation={order.reservation}
-        />
-      )}
       {order.orderItems.length > 0 && (
         <ModalOrderItems
           isOpen={showOrderItemsModal}

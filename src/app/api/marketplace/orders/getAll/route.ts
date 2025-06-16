@@ -6,59 +6,55 @@ const prisma = new PrismaClient();
 
 export async function GET(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // const session = await auth();
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
-    let user = session.user as {
-      id: string;
-      roleId: string;
-      mRoleId: string;
-      username: string;
-      firstName: string;
-      lastName: string;
-      isActive: boolean;
-      userType?: string;
-    };
+    // let user = session.user as {
+    //   id: string;
+    //   roleId: string;
+    //   mRoleId: string;
+    //   username: string;
+    //   firstName: string;
+    //   lastName: string;
+    //   isActive: boolean;
+    // };
 
-    // Get user's role to check if they're KamiounAdminMaster
-    const userRole = await prisma.role.findUnique({
-      where: { id: user.mRoleId },
-    });
+    // // Get user's role to check if they're KamiounAdminMaster
+    // const userRole = await prisma.role.findUnique({
+    //   where: { id: user.mRoleId },
+    // });
 
-    // Allow access if user is KamiounAdminMaster
-    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+    // // Allow access if user is KamiounAdminMaster
+    // const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
 
-    // Check if user is a partner
-    const isPartner = user.userType === "partner";
+    // if (!isKamiounAdminMaster) {
+    //   if (!user.mRoleId) {
+    //     return NextResponse.json({ message: "No role found" }, { status: 403 });
+    //   }
 
-    if (!isKamiounAdminMaster) {
-      if (!user.mRoleId) {
-        return NextResponse.json({ message: "No role found" }, { status: 403 });
-      }
+    //   const rolePermissions = await prisma.rolePermission.findMany({
+    //     where: {
+    //       roleId: user.mRoleId,
+    //     },
+    //     include: {
+    //       permission: true,
+    //     },
+    //   });
 
-      const rolePermissions = await prisma.rolePermission.findMany({
-        where: {
-          roleId: user.mRoleId,
-        },
-        include: {
-          permission: true,
-        },
-      });
+    //   const canRead = rolePermissions.some(
+    //     (rp) =>
+    //       rp.permission?.resource === "Order" && rp.actions.includes("read"),
+    //   );
 
-      const canRead = rolePermissions.some(
-        (rp) =>
-          rp.permission?.resource === "Order" && rp.actions.includes("read"),
-      );
-
-      if (!canRead) {
-        return NextResponse.json(
-          { message: "Forbidden: missing 'read' permission for Order" },
-          { status: 403 },
-        );
-      }
-    }
+    //   if (!canRead) {
+    //     return NextResponse.json(
+    //       { message: "Forbidden: missing 'read' permission for Order" },
+    //       { status: 403 },
+    //     );
+    //   }
+    // }
 
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get("page") || "1", 10);
@@ -104,22 +100,13 @@ export async function GET(req: Request) {
       );
     }
 
-    // If user is a partner, set CurrentpartnerId to user.id
-    let CurrentpartnerId;
-    if (isPartner) {
-      CurrentpartnerId = user.id;
-    }
-
     const whereClause: any = {
       ...(searchById && { id: searchById }),
       ...(statusId && { statusId }),
       ...(stateId && { stateId }),
       ...(customerId && { customerId }),
       ...(agentId && { agentId: agentId === "none" ? null : agentId }),
-      // If user is a partner, filter by their ID, otherwise use the partnerId from query params
-      ...(isPartner
-        ? { partnerId: CurrentpartnerId }
-        : partnerId && { partnerId }),
+      ...(partnerId && { partnerId }),
       ...(paymentMethodId && { paymentMethodId }),
       ...(fromMobile && { fromMobile: fromMobile === "true" }),
       ...(isActive && { isActive: isActive === "true" }),
@@ -191,18 +178,17 @@ export async function GET(req: Request) {
         agent: true,
         reservation: {
           include: {
-            partner: true,
             customer: true,
             paymentMethod: true,
             reservationItems: {
               include: {
                 product: { select: { name: true } },
                 tax: { select: { value: true } },
+                partner: true,
               },
             },
           },
         },
-        partner: true,
         orderItems: true,
         loyaltyPoints: true,
         paymentMethod: true,

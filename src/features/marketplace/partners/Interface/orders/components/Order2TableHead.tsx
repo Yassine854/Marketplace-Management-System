@@ -5,18 +5,11 @@ const OrderTableHead = () => {
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           ID
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-          Amount Excl. Tax
-        </th>
+
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           Amount TTC
         </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-          Amount Before Promo
-        </th>
-        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-          Amount After Promo
-        </th>
+
         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
           Amount Refunded
         </th>
@@ -62,12 +55,7 @@ const OrderTableHead = () => {
         <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-white">
           Agent
         </th>
-        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-white">
-          Reservation
-        </th>
-        <th className="text-lcenter px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">
-          Partner
-        </th>
+
         <th className="px-8 py-4 text-center text-xs font-semibold uppercase tracking-wider text-white">
           Order Items
         </th>

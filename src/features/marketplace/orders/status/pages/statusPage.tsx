@@ -1,6 +1,6 @@
 import StatusTable from "../table/statusTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/Pagination";
+import Pagination from "../../../../shared/elements/Pagination/Pagination";
 import { useState, useEffect, useMemo } from "react";
 import { useGetAllStatus } from "../hooks/useGetAllStatus";
 import { Status } from "@/types/status";
@@ -80,7 +80,7 @@ const StatusPage = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xl font-bold capitalize">Status</p>
 
-          <div className="flex flex-wrap gap-2 sm:items-center sm:justify-end sm:justify-between">
+          <div className="flex flex-wrap gap-2 sm:items-center sm:justify-between">
             <div className="relative m-4 w-full sm:w-auto sm:min-w-[200px] sm:flex-1">
               <input
                 type="text"
@@ -137,10 +137,7 @@ const StatusPage = () => {
       <Divider />
       <div className="relative flex w-full flex-grow flex-col overflow-y-scroll bg-n10 px-3">
         <StatusTable
-          status={paginatedStatus.map((status) => ({
-            ...status,
-            state: { name: "" },
-          }))}
+          status={paginatedStatus}
           isLoading={isLoading}
           error={error}
           refetch={refetch}

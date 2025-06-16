@@ -35,22 +35,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, reservation }) => {
         </div>
 
         <div className="grid grid-cols-2 gap-3 text-xs text-gray-700">
-          <p>
-            <strong className="text-gray-900">Amount Excl. Tax:</strong>{" "}
-            {reservation.amountExclTaxe} DT
-          </p>
-          <p>
-            <strong className="text-gray-900">Incl. Tax:</strong>{" "}
-            {reservation.amountTTC} DT
-          </p>
-          <p>
-            <strong className="text-gray-900">Before Discount:</strong>{" "}
-            {reservation.amountBeforePromo} DT
-          </p>
-          <p>
-            <strong className="text-gray-900">After Discount:</strong>{" "}
-            {reservation.amountAfterPromo} DT
-          </p>
           <p className="flex items-center gap-1">
             <Truck className="h-4 w-4 text-gray-900" />{" "}
             <strong>Shipping:</strong> {reservation.shippingMethod}

@@ -77,7 +77,15 @@ export async function GET(
         images: true,
         productSubCategories: { include: { subcategory: true } },
         favoriteProducts: true,
-        relatedProducts: { include: { relatedProduct: true } },
+        relatedProducts: {
+          include: {
+            relatedProduct: {
+              include: {
+                images: true,
+              },
+            },
+          },
+        },
         skuPartners: true,
         brand: true,
       },

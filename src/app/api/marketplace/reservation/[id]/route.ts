@@ -41,7 +41,6 @@ export async function GET(
         where: { id },
         include: {
           customer: true,
-          partner: true,
           order: true,
           paymentMethod: true,
           reservationItems: true,
@@ -89,7 +88,6 @@ export async function GET(
       where: { id },
       include: {
         customer: true,
-        partner: true,
         order: true,
         paymentMethod: true,
         reservationItems: true,

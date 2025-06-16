@@ -9,55 +9,55 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // const session = await auth();
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
-    let user = session.user as {
-      id: string;
-      roleId: string;
-      mRoleId: string;
-      username: string;
-      firstName: string;
-      lastName: string;
-      isActive: boolean;
-    };
+    // let user = session.user as {
+    //   id: string;
+    //   roleId: string;
+    //   mRoleId: string;
+    //   username: string;
+    //   firstName: string;
+    //   lastName: string;
+    //   isActive: boolean;
+    // };
 
-    // Get user's role to check if they're KamiounAdminMaster
-    const userRole = await prisma.role.findUnique({
-      where: { id: user.mRoleId },
-    });
+    // // Get user's role to check if they're KamiounAdminMaster
+    // const userRole = await prisma.role.findUnique({
+    //   where: { id: user.mRoleId },
+    // });
 
-    // Allow access if user is KamiounAdminMaster
-    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+    // // Allow access if user is KamiounAdminMaster
+    // const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
 
-    if (!isKamiounAdminMaster) {
-      if (!user.mRoleId) {
-        return NextResponse.json({ message: "No role found" }, { status: 403 });
-      }
+    // if (!isKamiounAdminMaster) {
+    //   if (!user.mRoleId) {
+    //     return NextResponse.json({ message: "No role found" }, { status: 403 });
+    //   }
 
-      const rolePermissions = await prisma.rolePermission.findMany({
-        where: {
-          roleId: user.mRoleId,
-        },
-        include: {
-          permission: true,
-        },
-      });
+    //   const rolePermissions = await prisma.rolePermission.findMany({
+    //     where: {
+    //       roleId: user.mRoleId,
+    //     },
+    //     include: {
+    //       permission: true,
+    //     },
+    //   });
 
-      const canRead = rolePermissions.some(
-        (rp) =>
-          rp.permission?.resource === "Order" && rp.actions.includes("read"),
-      );
+    //   const canRead = rolePermissions.some(
+    //     (rp) =>
+    //       rp.permission?.resource === "Order" && rp.actions.includes("read"),
+    //   );
 
-      if (!canRead) {
-        return NextResponse.json(
-          { message: "Forbidden: missing 'read' permission for Order" },
-          { status: 403 },
-        );
-      }
-    }
+    //   if (!canRead) {
+    //     return NextResponse.json(
+    //       { message: "Forbidden: missing 'read' permission for Order" },
+    //       { status: 403 },
+    //     );
+    //   }
+    // }
 
     const { id } = params;
     const order = await prisma.order.findUnique({
@@ -68,8 +68,13 @@ export async function GET(
         customer: true,
         agent: true,
         reservation: true,
-        partner: true,
-        orderItems: true,
+        orderItems: {
+          include: {
+            product: true,
+            source: true,
+            partner: true,
+          },
+        },
         loyaltyPoints: true,
         paymentMethod: true,
       },
@@ -97,55 +102,55 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // const session = await auth();
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
-    let user = session.user as {
-      id: string;
-      roleId: string;
-      mRoleId: string;
-      username: string;
-      firstName: string;
-      lastName: string;
-      isActive: boolean;
-    };
+    // let user = session.user as {
+    //   id: string;
+    //   roleId: string;
+    //   mRoleId: string;
+    //   username: string;
+    //   firstName: string;
+    //   lastName: string;
+    //   isActive: boolean;
+    // };
 
-    // Get user's role to check if they're KamiounAdminMaster
-    const userRole = await prisma.role.findUnique({
-      where: { id: user.mRoleId },
-    });
+    // // Get user's role to check if they're KamiounAdminMaster
+    // const userRole = await prisma.role.findUnique({
+    //   where: { id: user.mRoleId },
+    // });
 
-    // Allow access if user is KamiounAdminMaster
-    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+    // // Allow access if user is KamiounAdminMaster
+    // const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
 
-    if (!isKamiounAdminMaster) {
-      if (!user.mRoleId) {
-        return NextResponse.json({ message: "No role found" }, { status: 403 });
-      }
+    // if (!isKamiounAdminMaster) {
+    //   if (!user.mRoleId) {
+    //     return NextResponse.json({ message: "No role found" }, { status: 403 });
+    //   }
 
-      const rolePermissions = await prisma.rolePermission.findMany({
-        where: {
-          roleId: user.mRoleId,
-        },
-        include: {
-          permission: true,
-        },
-      });
+    //   const rolePermissions = await prisma.rolePermission.findMany({
+    //     where: {
+    //       roleId: user.mRoleId,
+    //     },
+    //     include: {
+    //       permission: true,
+    //     },
+    //   });
 
-      const canUpdate = rolePermissions.some(
-        (rp) =>
-          rp.permission?.resource === "Order" && rp.actions.includes("update"),
-      );
+    //   const canUpdate = rolePermissions.some(
+    //     (rp) =>
+    //       rp.permission?.resource === "Order" && rp.actions.includes("update"),
+    //   );
 
-      if (!canUpdate) {
-        return NextResponse.json(
-          { message: "Forbidden: missing 'update' permission for Order" },
-          { status: 403 },
-        );
-      }
-    }
+    //   if (!canUpdate) {
+    //     return NextResponse.json(
+    //       { message: "Forbidden: missing 'update' permission for Order" },
+    //       { status: 403 },
+    //     );
+    //   }
+    // }
 
     const { id } = params;
     const body = await req.json();
@@ -154,40 +159,39 @@ export async function PATCH(
       id: _,
       createdAt,
       updatedAt,
-      mainOrderId,
-      statusId,
-      stateId,
-      customerId,
-      agentId,
-      partnerId,
-      paymentMethodId,
       reservation,
+      mainOrderId,
       loyaltyPoints,
-      ...data
+      ...updateData
     } = body;
 
-    if (body.status) {
-      data.status = { connect: { id: body.status.id } };
+    if (body.statusId) {
+      updateData.status = { connect: { id: body.statusId } };
+      delete updateData.statusId;
     }
-    if (body.state) {
-      data.state = { connect: { id: body.state.id } };
+    if (body.stateId) {
+      updateData.state = { connect: { id: body.stateId } };
+      delete updateData.stateId;
     }
-    if (body.customer) {
-      data.customer = { connect: { id: body.customer.id } };
+    if (body.customerId) {
+      updateData.customer = { connect: { id: body.customerId } };
+      delete updateData.customerId;
     }
-    if (body.agent) {
-      data.agent = { connect: { id: body.agent.id } };
+    if (body.agentId) {
+      updateData.agent = { connect: { id: body.agentId } };
+      delete updateData.agentId;
     }
-    if (body.partner) {
-      data.partner = { connect: { id: body.partner.id } };
+    if (body.partnerId) {
+      updateData.partner = { connect: { id: body.partnerId } };
+      delete updateData.partnerId;
     }
     if (body.paymentMethodId) {
-      data.paymentMethod = {
-        connect: { id: body.paymentMethodId },
-      };
+      updateData.paymentMethod = { connect: { id: body.paymentMethodId } };
+      delete updateData.paymentMethodId;
     }
+
     if (body.orderItems) {
-      data.orderItems = {
+      updateData.orderItems = {
         updateMany: body.orderItems.map((item: any) => ({
           where: { id: item.id },
           data: {
@@ -198,36 +202,17 @@ export async function PATCH(
             discountedPrice: item.discountedPrice,
             weight: item.weight,
             sku: item.sku,
+            sourceId: item.sourceId,
+            customerId: item.customerId,
+            partnerId: item.partnerId,
           },
         })),
       };
     }
 
-    // Add these conditions
-    if (body.stateId) {
-      data.state = { connect: { id: body.stateId } };
-    }
-    if (body.statusId) {
-      data.status = { connect: { id: body.statusId } };
-    }
-    if (body.agentId) {
-      data.agent = { connect: { id: body.agentId } };
-    }
-
     const updatedOrder = await prisma.order.update({
       where: { id },
-      data,
-      include: {
-        status: true,
-        state: true,
-        customer: true,
-        agent: true,
-        reservation: true,
-        partner: true,
-        orderItems: true,
-        loyaltyPoints: true,
-        paymentMethod: true,
-      },
+      data: updateData,
     });
 
     return NextResponse.json(
@@ -242,60 +227,61 @@ export async function PATCH(
     );
   }
 }
+
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // const session = await auth();
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
-    let user = session.user as {
-      id: string;
-      roleId: string;
-      mRoleId: string;
-      username: string;
-      firstName: string;
-      lastName: string;
-      isActive: boolean;
-    };
+    // let user = session.user as {
+    //   id: string;
+    //   roleId: string;
+    //   mRoleId: string;
+    //   username: string;
+    //   firstName: string;
+    //   lastName: string;
+    //   isActive: boolean;
+    // };
 
-    // Get user's role to check if they're KamiounAdminMaster
-    const userRole = await prisma.role.findUnique({
-      where: { id: user.mRoleId },
-    });
+    // // Get user's role to check if they're KamiounAdminMaster
+    // const userRole = await prisma.role.findUnique({
+    //   where: { id: user.mRoleId },
+    // });
 
-    // Allow access if user is KamiounAdminMaster
-    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+    // // Allow access if user is KamiounAdminMaster
+    // const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
 
-    if (!isKamiounAdminMaster) {
-      if (!user.mRoleId) {
-        return NextResponse.json({ message: "No role found" }, { status: 403 });
-      }
+    // if (!isKamiounAdminMaster) {
+    //   if (!user.mRoleId) {
+    //     return NextResponse.json({ message: "No role found" }, { status: 403 });
+    //   }
 
-      const rolePermissions = await prisma.rolePermission.findMany({
-        where: {
-          roleId: user.mRoleId,
-        },
-        include: {
-          permission: true,
-        },
-      });
+    //   const rolePermissions = await prisma.rolePermission.findMany({
+    //     where: {
+    //       roleId: user.mRoleId,
+    //     },
+    //     include: {
+    //       permission: true,
+    //     },
+    //   });
 
-      const canDelete = rolePermissions.some(
-        (rp) =>
-          rp.permission?.resource === "Order" && rp.actions.includes("delete"),
-      );
+    //   const canDelete = rolePermissions.some(
+    //     (rp) =>
+    //       rp.permission?.resource === "Order" && rp.actions.includes("delete"),
+    //   );
 
-      if (!canDelete) {
-        return NextResponse.json(
-          { message: "Forbidden: missing 'delete' permission for Order" },
-          { status: 403 },
-        );
-      }
-    }
+    //   if (!canDelete) {
+    //     return NextResponse.json(
+    //       { message: "Forbidden: missing 'delete' permission for Order" },
+    //       { status: 403 },
+    //     );
+    //   }
+    // }
 
     await prisma.orderItem.deleteMany({
       where: { orderId: params.id },

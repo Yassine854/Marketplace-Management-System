@@ -70,12 +70,34 @@ const ReservationTableRow = ({
 
   const handleSaveReservation = async (updatedReservation: Reservation) => {
     try {
+      const orderItems = updatedReservation.reservationItems.map((item) => ({
+        productId: item.productId,
+        qteOrdered: item.qteReserved,
+        discountedPrice: item.discountedPrice,
+        weight: item.weight,
+        sku: item.sku,
+        // Conserver les informations du partenaire, source et produit
+        partnerId: item.partnerId,
+        sourceId: item.sourceId,
+        product: {
+          // Inclure les détails du produit si nécessaire
+          id: item.productId,
+          name: item.productName,
+        },
+      }));
       const response = await fetch("/api/marketplace/orders/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...updatedReservation,
           reservationId: updatedReservation.id,
+          orderItems,
+          amountTTC: updatedReservation.amountTTC,
+          amountOrdered: updatedReservation.amountOrdered,
+          shippingAmount: updatedReservation.shippingAmount,
+          shippingMethod: updatedReservation.shippingMethod,
+          customerId: updatedReservation.customerId,
+          paymentMethodId: updatedReservation.paymentMethodId,
         }),
       });
 
@@ -97,13 +119,7 @@ const ReservationTableRow = ({
           #{reservation.id}
         </td>
 
-        {[
-          "amountExclTaxe",
-          "amountTTC",
-          "amountBeforePromo",
-          "amountAfterPromo",
-          "amountOrdered",
-        ].map((field) => {
+        {["amountTTC", "amountOrdered"].map((field) => {
           const value = reservation[field as keyof Reservation];
           return (
             <td key={field} className="px-6 py-4 text-sm text-gray-900">
@@ -111,6 +127,16 @@ const ReservationTableRow = ({
             </td>
           );
         })}
+
+        <StatusBadge
+          value={reservation.amountOrdered}
+          label={reservation.shippingMethod}
+        />
+        <td className="px-6 py-4 text-sm text-gray-900">
+          {isNumber(reservation.shippingAmount)
+            ? `${reservation.shippingAmount} DT`
+            : "N/A"}
+        </td>
 
         {/* Status Columns */}
         <td className="px-6 py-4 text-sm text-gray-900">
@@ -131,8 +157,6 @@ const ReservationTableRow = ({
 
         {/* User Info Columns */}
         <UserInfoCell user={reservation.customer} label="N/A" />
-        <UserInfoCell user={reservation.agent} label="N/A" />
-        <UserInfoCell user={reservation.partner} label="N/A" />
 
         {/* Payment Method */}
         <td className="min-w-[180px] whitespace-nowrap px-6 py-4">
@@ -155,7 +179,7 @@ const ReservationTableRow = ({
         {/* Items Button */}
         <td className="min-w-[200px] px-4 py-4">
           <button
-            className="flex w-full items-center justify-center gap-1 rounded bg-green-50 px-4 py-2 text-green-600 transition-colors hover:bg-green-100 hover:underline"
+            className="flex w-full items-center justify-center gap-1 rounded bg-pink-50 px-4 py-2 text-pink-600 transition-colors hover:bg-pink-100 hover:underline"
             onClick={() => setShowModal(true)}
           >
             View Items ({reservation.reservationItems.length})

@@ -65,8 +65,6 @@ export async function GET(
       where: { id },
       include: {
         products: true,
-        orderItems: true,
-        reservationItems: true,
       },
     });
 

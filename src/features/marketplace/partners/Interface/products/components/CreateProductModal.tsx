@@ -149,6 +149,7 @@ const CreateProductModal = ({
       minQty: number;
       maxQty: number;
       price: number;
+      special_price: number;
       loyaltyPointsPerProduct?: number;
       loyaltyPointsPerUnit?: number;
       loyaltyPointsBonusQuantity?: number;
@@ -348,6 +349,7 @@ const CreateProductModal = ({
           minQty: 0,
           maxQty: 0,
           price: 0,
+          special_price: 0,
         },
       ],
     }));
@@ -693,6 +695,7 @@ const CreateProductModal = ({
                 skuPartnerId,
                 sourceId: stock.sourceId,
                 stockQuantity: stock.stockQuantity,
+                special_price: stock.special_price,
                 minQty: stock.minQty,
                 maxQty: stock.maxQty,
                 price: parseFloat(stock.price.toString()), // Convert to float
@@ -1621,6 +1624,26 @@ const CreateProductModal = ({
                               handleStockChange(
                                 stockIndex,
                                 "price",
+                                e.target.value,
+                              )
+                            }
+                            className="w-full rounded-lg border p-3"
+                            min="0"
+                            step="0.01"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Special Price
+                          </label>
+                          <input
+                            type="number"
+                            value={stock.special_price || ""}
+                            onChange={(e) =>
+                              handleStockChange(
+                                stockIndex,
+                                "special_price",
                                 e.target.value,
                               )
                             }

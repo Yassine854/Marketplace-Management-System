@@ -27,24 +27,23 @@ const TopNav = ({
   const { layout } = useLayout();
   const { notifications } = useGlobalStore();
   const [newNotification, setNewNotification] = useState(false);
-
-  // This function will be passed to the Notification component
-  const updateNotificationIndicator = (hasUnread: boolean) => {
-    setNewNotification(hasUnread);
-  };
-
+  const [updated, setUpdated] = useState(notifications.length);
+  useEffect(() => {
+    if (notifications.length !== updated) {
+      setNewNotification(true);
+      setUpdated(notifications.length);
+    }
+  }, [notifications, updated]);
   return (
-    <div
-      className={`dark:bg-bg1 fixed left-0 right-0 top-0 z-40 flex h-[70px] items-center justify-between border-b bg-n0 px-4 dark:border-n500 md:px-6 lg:h-[80px] ${
-        layout === "horizontal" ? "lg:pl-6" : "lg:pl-[270px]"
-      }`}
+    <nav
+      className={`navbar-top z-20 px-4   duration-300 dark:border-b dark:border-n700 xxl:px-6 ${
+        sidebarIsOpen
+          ? "w-full xxl:w-[calc(100%-280px)] xxxl:w-[calc(100%-336px)] ltr:xxl:ml-[280px] ltr:xxxl:ml-[336px] rtl:xxl:mr-[280px] rtl:xxxl:mr-[336px]"
+          : "w-full"
+      }    fixed flex items-center justify-between gap-3 bg-n0 p-3 dark:bg-bg4`}
     >
-      {/* Left Side */}
-      <div className="flex items-center gap-3 lg:gap-4">
-        <button
-          onClick={() => setSidebar(!sidebarIsOpen)}
-          className="flex items-center justify-center p-2 focus:outline-none"
-        >
+      <div className="flex grow items-center md:gap-4 xxl:gap-6">
+        <button onClick={() => setSidebar(!sidebarIsOpen)}>
           <IconMenu2 />
         </button>
         {/* <form
@@ -61,22 +60,19 @@ const TopNav = ({
           </button>
         </form> */}
       </div>
-      {/* <StoreSelector /> */}
-      <div className="flex items-center gap-2 md:gap-3">
+      <StoreSelector />
+      <div className="flex items-center gap-3 sm:gap-4 xxl:gap-6">
         {/* <ModeSwitcher /> */}
         <div className="relative">
           {newNotification && (
             <div className="absolute right-0 h-3 w-3 rounded-full bg-red-600"></div>
           )}
-          <Notification
-            isWhite
-            setNewNotification={updateNotificationIndicator}
-          />
+          <Notification setNewNotification={setNewNotification} />
         </div>
         {/* <SwitchLanguage /> */}
         <Profile />
       </div>
-    </div>
+    </nav>
   );
 };
 

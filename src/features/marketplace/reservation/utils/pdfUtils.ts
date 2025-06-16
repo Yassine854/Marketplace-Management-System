@@ -13,10 +13,7 @@ export const downloadReservationPDF = (reservations: Reservation[]) => {
     const tableData = [
       [
         reservation.id,
-        reservation.amountExclTaxe,
         reservation.amountTTC,
-        reservation.amountBeforePromo,
-        reservation.amountAfterPromo,
         reservation.amountOrdered,
         reservation.shippingMethod,
         reservation.isActive ? "Active" : "Inactive",

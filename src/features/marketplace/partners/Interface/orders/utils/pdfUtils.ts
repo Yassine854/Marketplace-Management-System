@@ -12,10 +12,7 @@ export const downloadOrderPDF = (order: OrderWithRelations) => {
   const orderTableData = [
     [
       order.id ?? "N/A",
-      order.amountExclTaxe ?? 0,
       order.amountTTC ?? 0,
-      order.amountBeforePromo ?? 0,
-      order.amountAfterPromo ?? 0,
       order.amountRefunded ?? 0,
       order.amountCanceled ?? 0,
       order.amountOrdered ?? 0,
@@ -109,10 +106,7 @@ export const downloadOrderPDF = (order: OrderWithRelations) => {
     const reservationTableData = [
       [
         order.reservation.id,
-        order.reservation.amountExclTaxe,
         order.reservation.amountTTC,
-        order.reservation.amountBeforePromo,
-        order.reservation.amountAfterPromo,
         order.reservation.shippingMethod,
         `${order.reservation.customer?.firstName || ""} ${
           order.reservation.customer?.lastName || "N/A"

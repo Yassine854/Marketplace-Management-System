@@ -60,7 +60,6 @@ export async function GET(req: Request) {
 
     const statuses = await prisma.status.findMany({
       include: {
-        orders: true,
         state: true,
       },
     }); // Retrieve all statuses

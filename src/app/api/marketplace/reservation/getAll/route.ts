@@ -83,7 +83,6 @@ export async function GET(req: Request) {
       take: take,
       include: {
         customer: true,
-        partner: true,
         order: true,
         paymentMethod: true,
         reservationItems: {

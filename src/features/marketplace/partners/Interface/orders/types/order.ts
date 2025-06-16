@@ -12,6 +12,7 @@ import {
   ReservationItem,
   Product,
   Tax,
+  Source,
 } from "@prisma/client";
 
 export type OrderItemWithRelations = OrderItem & {
@@ -24,13 +25,15 @@ export type OrderItemWithRelations = OrderItem & {
   weight: number;
   sku: string;
   orderId: string;
+  product?: Product;
+  tax?: Tax;
+  source?: Source;
+  partner?: Partner;
+  customer?: Customers;
 };
 
 export type OrderWithRelations = PrismaOrder & {
-  amountExclTaxe: number;
   amountTTC: number;
-  amountBeforePromo: number;
-  amountAfterPromo: number;
   amountRefunded: number;
   amountCanceled: number;
   amountOrdered: number;
@@ -59,9 +62,10 @@ export type OrderWithRelations = PrismaOrder & {
       tax: Tax & {
         value: number;
       };
+      partner?: Partner | null;
     })[];
   };
-  partner?: Partner | null;
+
   orderItems: OrderItemWithRelations[];
   loyaltyPoints: LoyaltyPoints[];
   paymentMethod: OrderPayment | null;

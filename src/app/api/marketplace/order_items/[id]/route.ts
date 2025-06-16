@@ -21,7 +21,6 @@ export async function GET(
       include: {
         order: true,
         product: true,
-        tax: true,
       },
     });
 

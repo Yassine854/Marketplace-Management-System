@@ -22,7 +22,6 @@ export async function POST(req: Request) {
         sku: body.sku,
         reservationId: body.reservationId,
         productId: body.productId,
-        taxId: body.taxId,
       },
     });
 

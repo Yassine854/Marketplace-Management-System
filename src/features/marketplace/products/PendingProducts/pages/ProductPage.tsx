@@ -1,7 +1,6 @@
 import ProductTable from "../table/ProductTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "@/features/shared/elements/Pagination/Pagination";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useGetAllProducts } from "../hooks/useGetAllProducts";
 import { Product } from "@/types/product";
 import { useProductActions } from "../hooks/useProductActions";
@@ -23,11 +22,6 @@ const ProductPage = () => {
     error: actionError,
   } = useProductActions();
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortState, setSortState] = useState<"newest" | "oldest">("newest");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isShowModalOpen, setIsShowModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [skuPartners, setSkuPartners] = useState([]);
@@ -44,22 +38,26 @@ const ProductPage = () => {
     Array<{ id: string; username: string }>
   >([]);
 
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const searchContent =
-        `${product.id} ${product.name} ${product.barcode} ${product.sku}`.toLowerCase();
-      return searchContent.includes(searchTerm.toLowerCase());
-    });
-  }, [products, searchTerm]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [itemsPerPage]);
-
   const handleEdit = async (id: string, updatedProduct: Partial<Product>) => {
-    const result = await editProduct(id, updatedProduct);
+    try {
+      const result = await editProduct(id, updatedProduct);
+      if (result) {
+        refetch();
+      }
+    } catch (error) {
+      console.error("Error editing product:", error);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    const result = await deleteProduct(id);
+    if (result) {
+      refetch();
+    }
+  };
+
+  const handleAccept = async (id: string) => {
+    const result = await acceptProduct(id);
     if (result) {
       refetch();
     }
@@ -86,16 +84,6 @@ const ProductPage = () => {
 
   useEffect(() => {
     const fetchOptions = async () => {
-      const fetchSkuPartners = async () => {
-        if (selectedProduct) {
-          const response = await fetch(`/api/marketplace/sku_partner/getAll`);
-          const data = await response.json();
-          const productSkuPartners = data.skuPartners.filter(
-            (sp: any) => sp.productId === selectedProduct.id,
-          );
-          setSkuPartners(productSkuPartners);
-        }
-      };
       try {
         const responses = await Promise.all([
           fetch("/api/marketplace/type_pcb/getAll"),
@@ -129,32 +117,13 @@ const ProductPage = () => {
         setPromotionOptions(promotions.promotions);
         setSubCategoryOptions(subCategories.subCategories);
         setPartners(partners.partners);
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error fetching options:", error);
+      }
     };
 
     fetchOptions();
   }, []);
-
-  const handleDelete = async (id: string) => {
-    const result = await deleteProduct(id);
-    if (result) {
-      refetch();
-    }
-  };
-
-  const handleAccept = async (id: string) => {
-    const result = await acceptProduct(id);
-    if (result) {
-      refetch();
-    }
-  };
-
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedProducts = filteredProducts.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
 
   // Open the show modal with the selected product
   const openShowModal = (product: Product) => {
@@ -163,95 +132,93 @@ const ProductPage = () => {
   };
 
   return (
-    <div className="box-border flex h-screen w-full flex-col p-4 pt-24">
-      <div className="flex-shrink-0 bg-white p-4 shadow-md">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-xl font-bold capitalize">Products</h1>
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        padding: "16px",
+        paddingTop: "100px",
+        boxSizing: "border-box",
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          flexShrink: 0,
+          backgroundColor: "white",
+          padding: "16px",
+          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-xl font-bold capitalize text-gray-900">
+              Products
+            </h1>
+            <p className="text-sm text-gray-600">Manage your products</p>
+          </div>
 
-          <div className="flex flex-wrap gap-2 sm:items-center sm:justify-end">
-            <div className="relative m-4 w-full sm:w-auto sm:min-w-[200px] sm:flex-1">
-              <input
-                type="text"
-                placeholder="Search products..."
-                className="w-full rounded-lg border p-2 pl-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <span className="absolute inset-y-0 left-2 flex items-center">
-                🔍
-              </span>
-            </div>
+          <div className="flex items-center gap-3">
+            {/* Loading/Error Status */}
+            {isActionLoading && (
+              <div className="flex items-center gap-2 text-sm text-blue-600">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
+                <span>Processing...</span>
+              </div>
+            )}
 
-            <div className="flex items-center gap-2">
-              <label htmlFor="sort" className="whitespace-nowrap font-bold">
-                Sort by:
-              </label>
-              <select
-                id="sort"
-                className="rounded-lg border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={sortState}
-                onChange={(e) =>
-                  setSortState(e.target.value as "newest" | "oldest")
-                }
-              >
-                <option value="newest">Newest</option>
-                <option value="oldest">Oldest</option>
-              </select>
-            </div>
+            {actionError && (
+              <div className="rounded bg-red-50 px-3 py-1 text-sm text-red-700">
+                {actionError}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       <Divider />
 
-      <div className="relative flex w-full flex-grow flex-col overflow-y-auto bg-n10 px-3">
-        <ProductTable
-          products={paginatedProducts}
-          isLoading={isLoading}
-          error={error}
-          refetch={refetch}
-          onEdit={openShowModal}
-          onDelete={handleDelete}
-          onAccept={handleAccept}
-        />
+      {/* Main Content */}
+      <div className="flex-1 bg-gray-50 p-4">
+        <div className="rounded-lg bg-white p-4">
+          <ProductTable
+            products={products}
+            isLoading={isLoading}
+            error={error}
+            refetch={refetch}
+            onEdit={openShowModal}
+            onDelete={handleDelete}
+            onAccept={handleAccept}
+          />
+        </div>
       </div>
 
-      <Divider />
-
-      <div>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={setItemsPerPage}
-        />
-
-        <ShowProductModal
-          isOpen={isShowModalOpen}
-          onClose={() => setIsShowModalOpen(false)}
-          product={
-            selectedProduct && {
-              ...selectedProduct,
-              images: (selectedProduct.images as ProductImage[]) || [],
-              productSubCategories: selectedProduct.productSubCategories || [],
-              relatedProducts: selectedProduct.relatedProducts || [],
-            }
+      <ShowProductModal
+        isOpen={isShowModalOpen}
+        onClose={() => setIsShowModalOpen(false)}
+        product={
+          selectedProduct && {
+            ...selectedProduct,
+            images: (selectedProduct.images as ProductImage[]) || [],
+            productSubCategories: selectedProduct.productSubCategories || [],
+            relatedProducts: selectedProduct.relatedProducts || [],
           }
-          suppliers={suppliers}
-          productTypes={productTypes}
-          typePcbs={typePcbs}
-          productStatuses={productStatuses}
-          subCategories={subCategories}
-          relatedProducts={products}
-          taxes={taxes}
-          promotions={promotions}
-          partners={partners}
-          skuPartners={skuPartners.filter(
-            (sp: { productId: string }) => sp.productId === selectedProduct?.id,
-          )}
-        />
-      </div>
+        }
+        suppliers={suppliers}
+        productTypes={productTypes}
+        typePcbs={typePcbs}
+        productStatuses={productStatuses}
+        subCategories={subCategories}
+        relatedProducts={products}
+        taxes={taxes}
+        promotions={promotions}
+        partners={partners}
+        skuPartners={skuPartners.filter(
+          (sp: { productId: string }) => sp.productId === selectedProduct?.id,
+        )}
+      />
     </div>
   );
 };

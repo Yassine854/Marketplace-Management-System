@@ -6,55 +6,55 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // const session = await auth();
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
-    let user = session.user as {
-      id: string;
-      roleId: string;
-      mRoleId: string;
-      username: string;
-      firstName: string;
-      lastName: string;
-      isActive: boolean;
-    };
+    // let user = session.user as {
+    //   id: string;
+    //   roleId: string;
+    //   mRoleId: string;
+    //   username: string;
+    //   firstName: string;
+    //   lastName: string;
+    //   isActive: boolean;
+    // };
 
-    // Get user's role to check if they're KamiounAdminMaster
-    const userRole = await prisma.role.findUnique({
-      where: { id: user.mRoleId },
-    });
+    // // Get user's role to check if they're KamiounAdminMaster
+    // const userRole = await prisma.role.findUnique({
+    //   where: { id: user.mRoleId },
+    // });
 
-    // Allow access if user is KamiounAdminMaster
-    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+    // // Allow access if user is KamiounAdminMaster
+    // const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
 
-    if (!isKamiounAdminMaster) {
-      if (!user.mRoleId) {
-        return NextResponse.json({ message: "No role found" }, { status: 403 });
-      }
+    // if (!isKamiounAdminMaster) {
+    //   if (!user.mRoleId) {
+    //     return NextResponse.json({ message: "No role found" }, { status: 403 });
+    //   }
 
-      const rolePermissions = await prisma.rolePermission.findMany({
-        where: {
-          roleId: user.mRoleId,
-        },
-        include: {
-          permission: true,
-        },
-      });
+    //   const rolePermissions = await prisma.rolePermission.findMany({
+    //     where: {
+    //       roleId: user.mRoleId,
+    //     },
+    //     include: {
+    //       permission: true,
+    //     },
+    //   });
 
-      const canCreate = rolePermissions.some(
-        (rp) =>
-          rp.permission?.resource === "Order" && rp.actions.includes("create"),
-      );
+    //   const canCreate = rolePermissions.some(
+    //     (rp) =>
+    //       rp.permission?.resource === "Order" && rp.actions.includes("create"),
+    //   );
 
-      if (!canCreate) {
-        return NextResponse.json(
-          { message: "Forbidden: missing 'create' permission for Order" },
-          { status: 403 },
-        );
-      }
-    }
+    //   if (!canCreate) {
+    //     return NextResponse.json(
+    //       { message: "Forbidden: missing 'create' permission for Order" },
+    //       { status: 403 },
+    //     );
+    //   }
+    // }
 
     const body = await req.json();
 
@@ -88,7 +88,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const stateName = body.isActive ? "Open" : "Inactive";
+    const stateName = body.isActive ? "new" : "canceled";
     const state = await prisma.state.findUnique({
       where: {
         name: stateName,
@@ -104,39 +104,41 @@ export async function POST(req: Request) {
 
     let status = await prisma.status.findUnique({
       where: {
-        name: "opened",
+        name: "open",
       },
     });
 
     if (!status) {
       status = await prisma.status.create({
         data: {
-          name: "opened",
+          name: "open",
           stateId: state.id,
         },
       });
     }
     const newOrder = await prisma.order.create({
       data: {
-        amountExclTaxe: body.amountExclTaxe,
         amountTTC: body.amountTTC,
-        amountBeforePromo: body.amountBeforePromo,
-        amountAfterPromo: body.amountAfterPromo,
-        amountRefunded: body.amountRefunded || null,
-        amountCanceled: body.amountCanceled || null,
-        amountOrdered: body.amountOrdered || null,
-        amountShipped: body.amountShipped || null,
+        amountRefunded: body.amountRefunded || 0,
+        amountCanceled: body.amountCanceled || 0,
+        amountOrdered: body.amountOrdered,
+        amountShipped: body.amountShipped || 0,
         shippingMethod: body.shippingMethod,
-        loyaltyPtsValue: body.loyaltyPtsValue || null,
+        shippingAmount: body.shippingAmount,
+        loyaltyPtsValue: body.loyaltyPtsValue || 0,
         fromMobile: body.fromMobile,
         weight: body.weight,
-        statusId: status.id,
-        stateId: state.id,
-        customerId: body.customerId,
-        agentId: body.agentId,
-        reservationId: body.reservationId,
-        partnerId: body.partnerId,
-        paymentMethodId: body.paymentMethodId,
+        isActive: body.isActive,
+        status: { connect: { id: status.id } },
+        state: {
+          connect: { id: state.id },
+        },
+        paymentMethod: { connect: { id: body.paymentMethodId } },
+        customer: { connect: { id: body.customerId } },
+        agent: body.agentId ? { connect: { id: body.agentId } } : undefined,
+        reservation: body.reservationId
+          ? { connect: { id: body.reservationId } }
+          : undefined,
         orderItems: {
           create: reservation.reservationItems.map((item) => ({
             qteOrdered: item.qteReserved,
@@ -146,20 +148,25 @@ export async function POST(req: Request) {
             discountedPrice: item.discountedPrice,
             weight: item.weight,
             sku: item.sku,
-            taxId: item.taxId,
-            productId: item.productId,
+            product: { connect: { id: item.productId } },
+            source: item.sourceId
+              ? { connect: { id: item.sourceId } }
+              : undefined,
+            partner: item.partnerId
+              ? { connect: { id: item.partnerId } }
+              : undefined,
           })),
         },
       },
       include: {
-        orderItems: true,
+        orderItems: {
+          include: {
+            product: true,
+            source: true,
+            partner: true,
+          },
+        },
       },
-    });
-
-    await prisma.reservation.update({
-      where: { id: body.reservationId },
-
-      data: { orderId: newOrder.id },
     });
 
     return NextResponse.json(

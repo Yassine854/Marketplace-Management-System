@@ -127,6 +127,7 @@ const CustomerPage = () => {
         boxSizing: "border-box",
       }}
     >
+      {/* Header */}
       <div
         style={{
           flexShrink: 0,
@@ -135,108 +136,95 @@ const CustomerPage = () => {
           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-3xl font-bold capitalize text-primary">
-            Customers
-          </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-xl font-bold capitalize text-gray-900">
+              Customers
+            </h1>
+            <p className="text-sm text-gray-600">
+              Manage your customer information
+            </p>
+          </div>
 
-          <div className="flex flex-wrap gap-2 sm:items-center sm:justify-end sm:justify-between">
-            <div className="relative m-4 w-full sm:w-auto sm:min-w-[200px] sm:flex-1">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full rounded-lg border p-2 pl-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <span className="absolute inset-y-0 left-2 flex items-center">
-                🔍
-              </span>
-            </div>
+          <div className="flex items-center gap-3">
+            {/* Loading/Error Status */}
+            {(isActionLoading || isCreating) && (
+              <div className="flex items-center gap-2 text-sm text-blue-600">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
+                <span>Processing...</span>
+              </div>
+            )}
 
-            <label htmlFor="sort" className="mr-2 whitespace-nowrap font-bold">
-              Sort by:
-            </label>
-            <select
-              id="sort"
-              className="rounded-lg border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={sortState}
-              onChange={(e) =>
-                setSortState(e.target.value as "newest" | "oldest")
-              }
+            {(actionError || createError) && (
+              <div className="rounded bg-red-50 px-3 py-1 text-sm text-red-700">
+                {actionError || createError}
+              </div>
+            )}
+
+            {/* Add Button */}
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="btn flex items-center gap-2"
+              title="Add new customer"
             >
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-            </select>
-            <div className="flex h-16 w-56 items-center justify-center">
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="btn"
-                title="New Customer"
-                disabled={isCreating}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M12 5l0 14" />
-                  <path d="M5 12l14 0" />
-                </svg>
-                <span className="hidden md:inline">New Customer</span>
-              </button>
-            </div>
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12 5l0 14" />
+                <path d="M5 12l14 0" />
+              </svg>
+              <span className="hidden sm:inline">Add Customer</span>
+            </button>
           </div>
         </div>
       </div>
+
       <Divider />
-      <div className="relative flex w-full flex-grow flex-col overflow-y-scroll bg-n10 px-3">
-        <CustomerTable
-          customer={paginatedCustomers}
-          isLoading={isLoading || isActionLoading}
-          error={error || actionError}
-          refetch={refetch}
-          isSidebarOpen={false}
-          onEdit={(id: string) => {
-            const customer = customers.find((c) => c.id === id);
-            if (customer) openEditModal(customer);
-          }}
-          onDelete={handleDelete}
-        />
-      </div>
-      <Divider />
-      <div>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={setItemsPerPage}
-        />
-        <CreateCustomerModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onCreate={handleCreate}
-          isLoading={isCreating}
-          error={createError}
-        />
-        {isEditModalOpen && selectedCustomer && (
-          <EditCustomerModal
-            isOpen={isEditModalOpen}
-            onClose={() => setIsEditModalOpen(false)}
-            onEdit={handleEdit}
-            customer={selectedCustomer}
+
+      {/* Main Content */}
+      <div className="flex-1 bg-gray-50 p-4">
+        <div className="rounded-lg bg-white p-4">
+          <CustomerTable
+            customer={customers}
             isLoading={isLoading}
             error={error}
+            refetch={refetch}
+            onEdit={(id: string, customer: Customer) => {
+              const foundCustomer = customers.find((c) => c.id === id);
+              if (foundCustomer) openEditModal(foundCustomer);
+            }}
+            onDelete={handleDelete}
           />
-        )}
+        </div>
       </div>
+
+      {/* Modals */}
+      <CreateCustomerModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onCreate={handleCreate}
+        isLoading={isCreating}
+        error={createError}
+      />
+
+      {isEditModalOpen && selectedCustomer && (
+        <EditCustomerModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onEdit={handleEdit}
+          customer={selectedCustomer}
+          isLoading={isLoading}
+          error={error}
+        />
+      )}
     </div>
   );
 };

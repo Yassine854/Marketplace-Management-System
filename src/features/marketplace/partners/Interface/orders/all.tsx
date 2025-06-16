@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import OrderTable from "./components/Order2Table";
@@ -9,7 +8,14 @@ import EditOrderForm from "./components/EditOrderForm";
 import AdvancedFilter from "./components/AdvancedFilter";
 import { downloadOrderPDF } from "./utils/pdfUtils";
 import { OrderWithRelations } from "./types/order";
-import { Agent, OrderPayment, State, Status, Customers } from "@prisma/client";
+import {
+  Agent,
+  OrderPayment,
+  Partner,
+  State,
+  Status,
+  Customers,
+} from "@prisma/client";
 
 const OrderManagementPage = () => {
   const [orders, setOrders] = useState<OrderWithRelations[]>([]);
@@ -67,10 +73,9 @@ const OrderManagementPage = () => {
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [states, setStates] = useState<State[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<OrderPayment[]>([]);
   const [customers, setCustomers] = useState<Customers[]>([]);
-
-  const router = useRouter();
   const totalPages = Math.ceil(totalOrders / itemsPerPage);
 
   const loadFilterData = async () => {
@@ -90,6 +95,11 @@ const OrderManagementPage = () => {
           url: "/api/marketplace/agents/getAll",
           setter: setAgents,
           dataKey: "agents",
+        },
+        {
+          url: "/api/marketplace/partners/getAll",
+          setter: setPartners,
+          dataKey: "partners",
         },
         {
           url: "/api/marketplace/payment_method/getAll",
@@ -293,6 +303,7 @@ const OrderManagementPage = () => {
                 statuses={statuses}
                 states={states}
                 agents={agents}
+                partners={partners}
                 customers={customers}
                 paymentMethods={paymentMethods}
                 filters={filters}

@@ -152,6 +152,7 @@ model Product {
   favoriteProducts FavoriteProduct[]
   orderItems OrderItem[]
   reservationItems    ReservationItem[]
+  CartItem CartItem[]
   skuPartners SkuPartner[]
   partner     Partner?  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
@@ -337,13 +338,14 @@ model Partner {
 
   sources       Source[]
   favoritePartners FavoritePartner[]
-  orders   Order[]
-  reservations Reservation[]
   skuPartners SkuPartner[]
   settings Settings[]
   products Product[]
   agents Agent[]
   notifications Notification[]
+  CartItem CartItem[]
+  OrderItem OrderItem[]
+  ReservationItem ReservationItem[]
   @@map("partners")
 }
 
@@ -403,6 +405,9 @@ model Customers {
   orders            Order[]
   reservations      Reservation[]
   notifications     NotifyMe[]
+  ReservationItem ReservationItem[]
+  Cart Cart[]
+
   role            Role?     @relation(fields: [mRoleId], references: [id])
 
   @@map("customers")
@@ -442,7 +447,6 @@ model Tax {
   id       String    @id @default(auto()) @map("_id") @db.ObjectId
   value    Float     @unique
   products Product[]
-  orderItems OrderItem[]
   reservationItems    ReservationItem[]
   @@map("taxes")
 }
@@ -588,15 +592,13 @@ model Status {
 
 model Order {
   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
-  amountExclTaxe      Float
   amountTTC           Float
-  amountBeforePromo   Float
-  amountAfterPromo    Float
   amountRefunded      Float
   amountCanceled      Float
   amountOrdered       Float
   amountShipped       Float
   shippingMethod      String
+  shippingAmount      Float
   loyaltyPtsValue     Int      @default(0)
   fromMobile          Boolean  @default(false)
   weight              Float
@@ -617,15 +619,11 @@ model Order {
   agentId           String?  @db.ObjectId
   agent             Agent?   @relation(fields: [agentId], references: [id])
 
-  reservationId     String?  @db.ObjectId @unique
-  reservation       Reservation? @relation
+  reservationId     String?   @db.ObjectId @unique
+  reservation       Reservation? @relation(fields: [reservationId], references: [id])
 
   mainOrderId       String?   @db.ObjectId
   mainOrder         MainOrder? @relation(fields: [mainOrderId], references: [id])
-
-
-  partnerId         String   @db.ObjectId
-  partner           Partner   @relation(fields: [partnerId], references: [id])
   orderItems        OrderItem[]
   loyaltyPoints     LoyaltyPoints[]
   paymentMethodId   String       @db.ObjectId
@@ -643,8 +641,7 @@ model OrderItem {
   qteCanceled     Int      @default(0)
   discountedPrice Float
   weight          Float
-  sku             String   // Remove @unique constraint here
-  taxId           String?   @db.ObjectId
+  sku             String   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -652,14 +649,17 @@ model OrderItem {
   orderId         String   @db.ObjectId
   order           Order    @relation(fields: [orderId], references: [id])
 
-  sourceId             String?  @db.ObjectId
-  Source               Source?   @relation(fields: [sourceId], references: [id])
-
   productId       String   @db.ObjectId
   product         Product   @relation(fields: [productId], references: [id])
 
-  tax             Tax?      @relation(fields: [taxId], references: [id])
+  sourceId       String?   @db.ObjectId
+  partnerId      String?   @db.ObjectId
+  
+  source         Source?   @relation(fields: [sourceId], references: [id]) 
+  partner        Partner?  @relation(fields: [partnerId], references: [id])
 }
+
+
 
 
 model OrderPayment {
@@ -675,11 +675,9 @@ model OrderPayment {
 
 model Reservation {
   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
-  amountExclTaxe      Float
   amountTTC           Float
-  amountBeforePromo   Float
-  amountAfterPromo    Float
   amountOrdered       Float
+  shippingAmount      Float    @default(0)
   shippingMethod      String
   isActive            Boolean  @default(false)
   loyaltyPtsValue     Int      @default(0)
@@ -687,46 +685,79 @@ model Reservation {
   weight              Float
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
-
-  // Relationships
   customerId          String   @db.ObjectId
   customer            Customers @relation(fields: [customerId], references: [id])
-
-
-  partnerId           String   @db.ObjectId
-  partner             Partner  @relation(fields: [partnerId], references: [id])
-
-  orderId             String?  @db.ObjectId @unique
-  order               Order?   @relation(fields: [orderId], references: [id])
-
   reservationItems    ReservationItem[]
-
   paymentMethodId     String   @db.ObjectId
   paymentMethod       OrderPayment @relation(fields: [paymentMethodId], references: [id])
+
+  order               Order?  
 }
 
 
 model ReservationItem {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   qteReserved    Int
+  price          Float?
   discountedPrice Float
   weight         Float
-  sku            String    
+  sku            String   
   taxId          String?   @db.ObjectId
+  sourceId       String?   @db.ObjectId
+  customerId     String?   @db.ObjectId
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
-
   // Relationships
-  reservationId  String   @db.ObjectId
-  reservation    Reservation @relation(fields: [reservationId], references: [id])
-
-  sourceId             String?  @db.ObjectId
-  Source               Source?   @relation(fields: [sourceId], references: [id])
-
+  reservationId  String?   @db.ObjectId
+  reservation    Reservation? @relation(fields: [reservationId], references: [id])
   productId      String   @db.ObjectId
   product        Product @relation(fields: [productId], references: [id])
-  tax             Tax?      @relation(fields: [taxId], references: [id])
+  tax            Tax?      @relation(fields: [taxId], references: [id])
+  source         Source?   @relation(fields: [sourceId], references: [id]) 
+  Customer       Customers? @relation(fields:[customerId],references: [id])
+  partnerId      String?   @db.ObjectId
+  partner        Partner?  @relation(fields: [partnerId], references: [id])
 }
+model Cart {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  customer   Customers  @relation(fields: [customerId], references: [id])
+  customerId String    @unique @db.ObjectId
+  items      CartItem[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model CartItem {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  cart       Cart      @relation(fields: [cartId], references: [id])
+  cartId     String    @db.ObjectId
+  product    Product   @relation(fields: [productId], references: [id])
+  productId  String    @db.ObjectId
+  partner    Partner   @relation(fields: [partnerId], references: [id])
+  partnerId  String    @db.ObjectId
+  source     Source?   @relation(fields: [sourceId], references: [id])
+  sourceId   String?   @db.ObjectId
+  
+  quantity   Int       @default(1)
+  price      Float
+  weight     Float?
+  productName String
+  partnerName String
+  partnerMinimumAmount Float
+  sourceName  String?
+  stock       Int? 
+  image       String?
+  sku         String?
+  taxRate     Float?
+  minQty      Int?
+  maxQty      Int?
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([cartId, productId, partnerId, sourceId])
+}
+
 
 
 model LoyaltyPoints {
@@ -846,7 +877,9 @@ model Source {
   stock       Stock[]
 
   reservationItems    ReservationItem[]
-  orderItems          OrderItem[]
+  CartItem CartItem[]
+  OrderItem OrderItem[]
+
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -862,6 +895,7 @@ model Stock {
   minQty          Int
   maxQty          Int
   price           Float
+  special_price  Float?
   loyaltyPointsPerProduct       Int?
   loyaltyPointsPerUnit          Int?
   loyaltyPointsBonusQuantity    Int?
@@ -899,6 +933,7 @@ model Notification {
   
   @@map("notifications")
 }
+
 
 
 

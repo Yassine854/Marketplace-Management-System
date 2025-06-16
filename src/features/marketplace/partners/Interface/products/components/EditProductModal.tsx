@@ -10,6 +10,7 @@ interface Stock {
   minQty: number;
   maxQty: number;
   price: number;
+  special_price: number;
   loyaltyPointsPerProduct?: number;
   loyaltyPointsPerUnit?: number;
   loyaltyPointsBonusQuantity?: number;
@@ -189,6 +190,7 @@ const EditProductModal = ({
         minQty: 0,
         maxQty: 0,
         price: 0,
+        special_price: 0,
         loyaltyPointsPerProduct: undefined,
         loyaltyPointsPerUnit: undefined,
         loyaltyPointsBonusQuantity: undefined,
@@ -560,6 +562,7 @@ const EditProductModal = ({
                   minQty: Number(stock.minQty),
                   maxQty: Number(stock.maxQty),
                   price: Number(stock.price),
+                  special_price: Number(stock.special_price),
                   loyaltyPointsPerProduct: stock.loyaltyPointsPerProduct,
                   loyaltyPointsPerUnit: stock.loyaltyPointsPerUnit,
                   loyaltyPointsBonusQuantity: stock.loyaltyPointsBonusQuantity,
@@ -594,6 +597,7 @@ const EditProductModal = ({
                     skuPartnerId: skuPartnerId,
                     sourceId: stock.sourceId,
                     stockQuantity: Number(stock.stockQuantity),
+                    special_price: Number(stock.special_price),
                     minQty: Number(stock.minQty),
                     maxQty: Number(stock.maxQty),
                     price: Number(stock.price),
@@ -1324,6 +1328,26 @@ const EditProductModal = ({
                           value={stock.price}
                           onChange={(e) =>
                             handleStockChange(index, "price", e.target.value)
+                          }
+                          className="w-full rounded-lg border p-3"
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Special Price
+                        </label>
+                        <input
+                          type="number"
+                          value={stock.special_price}
+                          onChange={(e) =>
+                            handleStockChange(
+                              index,
+                              "special_price",
+                              e.target.value,
+                            )
                           }
                           className="w-full rounded-lg border p-3"
                           min="0"

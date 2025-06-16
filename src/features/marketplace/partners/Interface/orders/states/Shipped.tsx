@@ -9,7 +9,14 @@ import EditOrderForm from "../components/EditOrderForm";
 import AdvancedFilter from "../components/AdvancedFilter";
 import { downloadOrderPDF } from "../utils/pdfUtils";
 import { OrderWithRelations } from "../types/order";
-import { Agent, OrderPayment, State, Status, Customers } from "@prisma/client";
+import {
+  Agent,
+  OrderPayment,
+  State,
+  Status,
+  Customers,
+  Partner,
+} from "@prisma/client";
 
 // First, let's define a type for the filters
 interface OrderFilters {
@@ -17,6 +24,7 @@ interface OrderFilters {
   stateId: string;
   customerId: string;
   agentId: string;
+  partnerId: string;
   paymentMethodId: string;
   fromMobile: string;
   isActive: string;
@@ -63,12 +71,14 @@ const OrderManagementPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
   const [ShippedStateId, setShippedStateId] = useState<string | null>(null);
+  const [partners, setPartners] = useState<Partner[]>([]);
 
   const initialFilters: OrderFilters = {
     statusId: "",
     stateId: "",
     customerId: "",
     agentId: "",
+    partnerId: "",
     paymentMethodId: "",
     fromMobile: "",
     isActive: "",
@@ -156,7 +166,6 @@ const OrderManagementPage = () => {
           setter: setAgents,
           dataKey: "agents",
         },
-
         {
           url: "/api/marketplace/payment_method/getAll",
           setter: setPaymentMethods,
@@ -166,6 +175,11 @@ const OrderManagementPage = () => {
           url: "/api/marketplace/customers/getAll",
           setter: setCustomers,
           dataKey: "customers",
+        },
+        {
+          url: "/api/marketplace/partners/getAll",
+          setter: setPartners,
+          dataKey: "partners",
         },
       ];
 
@@ -378,13 +392,13 @@ const OrderManagementPage = () => {
             {showAdvancedFilter && (
               <AdvancedFilter
                 statuses={statuses}
-                states={states.filter((state) => state.id !== ShippedStateId)} // Hide Shipped state from filter options
+                states={states.filter((state) => state.id !== ShippedStateId)}
                 agents={agents}
                 customers={customers}
+                partners={partners}
                 paymentMethods={paymentMethods}
                 filters={filters}
                 onFilterChange={(newFilters: OrderFilters) => {
-                  // Ensure stateId is always the Shipped state
                   setFilters({
                     ...newFilters,
                     stateId: ShippedStateId || "",

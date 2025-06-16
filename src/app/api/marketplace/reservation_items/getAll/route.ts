@@ -16,7 +16,6 @@ export async function GET(req: Request) {
       include: {
         reservation: true,
         product: true,
-        tax: true,
       },
     });
 

@@ -66,6 +66,7 @@
     "@tabler/icons-react": "^2.47.0",
     "@tanstack/react-query": "^5.67.3",
     "@tanstack/react-query-devtools": "^4.36.1",
+    "@tanstack/react-table": "^8.21.3",
     "@types/date-fns": "^2.6.3",
     "@types/socket.io-client": "^3.0.0",
     "@uidotdev/usehooks": "^2.4.1",

@@ -109,6 +109,7 @@ export async function PATCH(
         minQty: body.minQty,
         maxQty: body.maxQty,
         price: body.price,
+        special_price: body.special_price,
         loyaltyPointsPerProduct: body.loyaltyPointsPerProduct,
         loyaltyPointsPerUnit: body.loyaltyPointsPerUnit,
         loyaltyPointsBonusQuantity: body.loyaltyPointsBonusQuantity,

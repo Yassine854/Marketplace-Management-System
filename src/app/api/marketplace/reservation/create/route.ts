@@ -7,10 +7,10 @@ const prisma = new PrismaClient();
 // 🟢 POST: Create a new reservation
 export async function POST(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // const session = await auth();
+    // if (!session?.user) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
     const body = await req.json();
 
@@ -34,10 +34,7 @@ export async function POST(req: Request) {
 
     const newReservation = await prisma.reservation.create({
       data: {
-        amountExclTaxe: body.amountExclTaxe,
         amountTTC: body.amountTTC,
-        amountBeforePromo: body.amountBeforePromo,
-        amountAfterPromo: body.amountAfterPromo,
         amountOrdered: body.amountOrdered,
         shippingMethod: body.shippingMethod,
         isActive: body.state || false,
@@ -45,8 +42,6 @@ export async function POST(req: Request) {
         fromMobile: body.fromMobile || false,
         weight: body.weight,
         customerId: body.customerId,
-        partnerId: body.partnerId,
-        orderId: body.orderId,
         paymentMethodId: body.paymentMethodId,
       },
     });

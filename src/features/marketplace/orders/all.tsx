@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import OrderTable from "./components/Order2Table";
@@ -77,8 +76,6 @@ const OrderManagementPage = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<OrderPayment[]>([]);
   const [customers, setCustomers] = useState<Customers[]>([]);
-
-  const router = useRouter();
   const totalPages = Math.ceil(totalOrders / itemsPerPage);
 
   const loadFilterData = async () => {

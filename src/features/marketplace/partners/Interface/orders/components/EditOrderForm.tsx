@@ -28,7 +28,9 @@ import {
   UserCircleIcon,
   IdentificationIcon,
   HandRaisedIcon,
+  ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
+import { toast } from "react-toastify";
 
 interface AmountField {
   label: string;
@@ -46,29 +48,25 @@ const EditOrderForm = ({
   onClose: () => void;
   onUpdate: (updatedOrder: OrderWithRelations) => void;
 }) => {
-  const [amountExclTaxe, setAmountExclTaxe] = useState(order.amountExclTaxe);
   const [amountTTC, setAmountTTC] = useState(order.amountTTC);
-  const [amountBeforePromo, setAmountBeforePromo] = useState(
-    order.amountBeforePromo,
-  );
-  const [amountAfterPromo, setAmountAfterPromo] = useState(
-    order.amountAfterPromo,
-  );
   const [amountRefunded, setAmountRefunded] = useState(order.amountRefunded);
   const [amountOrdered, setAmountOrdered] = useState(order.amountOrdered);
   const [amountShipped, setAmountShipped] = useState(order.amountShipped);
   const [amountCanceled, setAmountCanceled] = useState(order.amountCanceled);
+  const [shippingAmount, setShippingAmount] = useState(
+    order.shippingAmount || 0,
+  );
   const [loyaltyPtsValue, setLoyaltyPtsValue] = useState(order.loyaltyPtsValue);
   const [shippingMethod, setShippingMethod] = useState(
     order.shippingMethod || "",
   );
   const [weight, setWeight] = useState(order.weight || 0);
   const [fromMobile, setFromMobile] = useState(order.fromMobile || false);
+  const [isActive, setIsActive] = useState(order.isActive);
   const [stateId, setStateId] = useState(order.state?.id || "");
   const [statusId, setStatusId] = useState(order.status?.id || "");
   const [customerId, setCustomerId] = useState(order.customer?.id || "");
   const [agentId, setAgentId] = useState(order.agent?.id || "");
-  const [partnerId, setPartnerId] = useState(order.partner?.id || "");
   const [paymentMethodId, setPaymentMethodId] = useState(
     order.paymentMethod?.id || "",
   );
@@ -82,32 +80,13 @@ const EditOrderForm = ({
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [customers, setCustomers] = useState<Customers[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [partners, setPartners] = useState<Partner[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<OrderPayment[]>([]);
 
   const amountFields: AmountField[] = [
     {
-      label: "Amount Excl. Tax",
-      value: amountExclTaxe,
-      setter: setAmountExclTaxe,
-      icon: CurrencyDollarIcon,
-    },
-    {
       label: "Amount TTC",
       value: amountTTC,
       setter: setAmountTTC,
-      icon: CurrencyDollarIcon,
-    },
-    {
-      label: "Amount Before Promo",
-      value: amountBeforePromo,
-      setter: setAmountBeforePromo,
-      icon: CurrencyDollarIcon,
-    },
-    {
-      label: "Amount After Promo",
-      value: amountAfterPromo,
-      setter: setAmountAfterPromo,
       icon: CurrencyDollarIcon,
     },
     {
@@ -135,6 +114,12 @@ const EditOrderForm = ({
       icon: CurrencyDollarIcon,
     },
     {
+      label: "Shipping Amount",
+      value: shippingAmount,
+      setter: setShippingAmount,
+      icon: TruckIcon,
+    },
+    {
       label: "Loyalty Points Value",
       value: loyaltyPtsValue,
       setter: setLoyaltyPtsValue,
@@ -145,51 +130,88 @@ const EditOrderForm = ({
   useEffect(() => {
     const fetchOptions = async () => {
       try {
-        const [
-          stateData,
-          statusData,
-          customerData,
-          agentData,
-          paymentMethodData,
-        ] = await Promise.all([
-          fetch("/api/marketplace/state/getAll").then((res) => res.json()),
-          fetch("/api/marketplace/status/getAll").then((res) => res.json()),
-          fetch("/api/marketplace/customers/getAll").then((res) => res.json()),
-          fetch("/api/marketplace/agents/getAll").then((res) => res.json()),
-          fetch("/api/marketplace/payment_method/getAll").then((res) =>
-            res.json(),
-          ),
-        ]);
+        const endpoints = [
+          {
+            url: "/api/marketplace/state/getAll",
+            name: "states",
+            filterFn: (item: State) => item.id && item.name,
+          },
+          {
+            url: "/api/marketplace/status/getAll",
+            name: "statuses",
+            filterFn: (item: Status) => item.id && item.name,
+          },
+          {
+            url: "/api/marketplace/customers/getAll",
+            name: "customers",
+            filterFn: (item: Customers) =>
+              item.id && item.firstName && item.lastName,
+          },
+          {
+            url: "/api/marketplace/agents/getAll",
+            name: "agents",
+            filterFn: (item: Agent) =>
+              item.id && item.firstName && item.lastName,
+          },
+          {
+            url: "/api/marketplace/payment_method/getAll",
+            name: "paymentMethods",
+            filterFn: (item: OrderPayment) => item.id && item.name,
+            responseKey: "paymentMethods",
+          },
+        ];
 
-        const validPaymentMethods =
-          paymentMethodData?.orderPayments?.filter(
-            (method: OrderPayment) => method.id && method.name,
-          ) || [];
-        setPaymentMethods(validPaymentMethods);
+        const results = await Promise.allSettled(
+          endpoints.map((endpoint) =>
+            fetch(endpoint.url).then((res) => res.json()),
+          ),
+        );
 
-        setStates(
-          (stateData?.states || stateData).filter(
-            (state: State) => state.id && state.name,
-          ),
-        );
-        setStatuses(
-          (statusData?.statuses || statusData).filter(
-            (status: Status) => status.id && status.name,
-          ),
-        );
-        setCustomers(
-          (customerData?.customers || customerData).filter(
-            (customer: Customers) =>
-              customer.id && customer.firstName && customer.lastName,
-          ),
-        );
-        setAgents(
-          (agentData?.agents || agentData).filter(
-            (agent: Agent) => agent.id && agent.firstName && agent.lastName,
-          ),
-        );
+        results.forEach((result, index) => {
+          const endpoint = endpoints[index];
+
+          if (result.status === "fulfilled") {
+            try {
+              const responseData = result.value;
+              let dataArray =
+                responseData[endpoint.name] ||
+                responseData.data ||
+                responseData;
+              if (Array.isArray(dataArray)) {
+                const filteredData = dataArray.filter(endpoint.filterFn);
+
+                switch (endpoint.name) {
+                  case "states":
+                    setStates(filteredData);
+                    break;
+                  case "statuses":
+                    setStatuses(filteredData);
+                    break;
+                  case "customers":
+                    setCustomers(filteredData);
+                    break;
+                  case "agents":
+                    setAgents(filteredData);
+                    break;
+                  case "paymentMethods":
+                    setPaymentMethods(filteredData);
+                    break;
+                }
+              }
+            } catch (parseError) {
+              console.error(`Error processing ${endpoint.name}:`, parseError);
+            }
+          } else {
+            console.error(`Failed to fetch ${endpoint.name}:`, result.reason);
+          }
+        });
       } catch (error) {
-        setError("Failed to fetch data");
+        console.error("Error in fetchOptions:", error);
+        setError("Failed to load form data. Please try again.");
+        toast.error("Failed to load form options", {
+          position: "bottom-right",
+          autoClose: 5000,
+        });
       }
     };
 
@@ -198,22 +220,22 @@ const EditOrderForm = ({
 
   const validateAmounts = (): boolean => {
     const amounts = [
-      amountExclTaxe,
       amountTTC,
-      amountBeforePromo,
-      amountAfterPromo,
       amountRefunded,
       amountCanceled,
       amountOrdered,
       amountShipped,
+      shippingAmount,
       loyaltyPtsValue,
     ];
     return amounts.every((amount) => amount >= 0);
   };
+
   const handleUpdateOrderItems = (updatedItems: OrderItemWithRelations[]) => {
     setOrderItems(updatedItems);
     setShowOrderItemsModal(false);
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateAmounts()) {
@@ -223,60 +245,39 @@ const EditOrderForm = ({
 
     setIsLoading(true);
     try {
-      // Create a data object with the correct structure for Prisma
-      const orderData = {
-        amountExclTaxe,
+      const updatedOrder: OrderWithRelations = {
+        ...order,
         amountTTC,
-        amountBeforePromo,
-        amountAfterPromo,
         amountRefunded,
         amountOrdered,
         amountShipped,
         amountCanceled,
+        shippingAmount,
         loyaltyPtsValue,
         shippingMethod,
         weight,
         fromMobile,
-        // Use IDs directly instead of nested objects
-        status: statusId ? { id: statusId } : undefined,
-        state: stateId ? { id: stateId } : undefined,
-        customer: customerId ? { id: customerId } : undefined,
-        agent: agentId ? { id: agentId } : undefined,
-        partnerId,
+        isActive,
+        stateId,
+        statusId,
+        customerId,
+        agentId: agentId || null,
         paymentMethodId,
-        // Only include orderItems if they've been modified
-        orderItems: orderItems.map((item) => ({
-          id: item.id,
-          qteOrdered: item.qteOrdered,
-          qteRefunded: item.qteRefunded,
-          qteShipped: item.qteShipped,
-          qteCanceled: item.qteCanceled,
-          discountedPrice: item.discountedPrice,
-          weight: item.weight,
-          sku: item.sku,
-        })),
-        isActive: true,
+        orderItems,
         updatedAt: new Date(),
+        state: states.find((s) => s.id === stateId) || null,
+        status: statuses.find((s) => s.id === statusId) || null,
+        customer: customers.find((c) => c.id === customerId) || null,
+        agent: agents.find((a) => a.id === agentId) || null,
+        paymentMethod:
+          paymentMethods.find((p) => p.id === paymentMethodId) || null,
       };
 
-      const response = await fetch(`/api/marketplace/orders/${order.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update order");
-      }
-
-      const updatedOrder = await response.json();
-      onUpdate(updatedOrder.order);
+      onUpdate(updatedOrder);
       onClose();
     } catch (error) {
-      setError(`Error updating order: ${(error as Error).message}`);
+      setError("An error occurred while updating the order");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -334,6 +335,7 @@ const EditOrderForm = ({
                       if (numValue >= 0) setter(numValue);
                     }}
                     min="0"
+                    step={label.includes("Amount") ? "0.01" : "1"}
                     className="w-full rounded-lg border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />
                 </div>
@@ -441,6 +443,22 @@ const EditOrderForm = ({
                       type="checkbox"
                       checked={fromMobile}
                       onChange={(e) => setFromMobile(e.target.checked)}
+                      className="peer sr-only"
+                    />
+                    <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300"></div>
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <span className="flex items-center text-sm font-medium text-gray-700">
+                    <ShieldCheckIcon className="mr-1 h-4 w-4" />
+                    Active Order
+                  </span>
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      checked={isActive}
+                      onChange={(e) => setIsActive(e.target.checked)}
                       className="peer sr-only"
                     />
                     <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300"></div>

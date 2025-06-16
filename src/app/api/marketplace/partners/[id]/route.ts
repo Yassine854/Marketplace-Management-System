@@ -69,10 +69,10 @@ export async function GET(
       where: { id },
       include: {
         favoritePartners: true,
-        orders: true,
-        reservations: true,
         typePartner: true,
         role: true,
+        skuPartners: true,
+        OrderItem: true,
       },
     });
 

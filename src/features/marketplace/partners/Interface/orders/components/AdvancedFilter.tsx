@@ -1,9 +1,17 @@
-import { Status, State, Agent, OrderPayment, Customers } from "@prisma/client";
+import {
+  Status,
+  State,
+  Agent,
+  Partner,
+  OrderPayment,
+  Customers,
+} from "@prisma/client";
 
 interface AdvancedFilterProps {
   statuses: Status[];
   states: State[];
   agents: Agent[];
+  partners: Partner[];
   paymentMethods: OrderPayment[];
   customers: Customers[];
   filters: {
@@ -11,6 +19,7 @@ interface AdvancedFilterProps {
     stateId: string;
     customerId: string;
     agentId: string;
+    partnerId: string;
     paymentMethodId: string;
     fromMobile: string;
     isActive: string;
@@ -49,6 +58,7 @@ const AdvancedFilter = ({
   statuses,
   states,
   agents,
+  partners,
   customers,
   paymentMethods,
   filters,
@@ -381,6 +391,26 @@ const AdvancedFilter = ({
           </select>
         </div>
 
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+            Partner
+          </label>
+          <select
+            className="w-full rounded-lg border p-2"
+            value={filters.partnerId}
+            onChange={(e) =>
+              onFilterChange({ ...filters, partnerId: e.target.value })
+            }
+          >
+            <option value="">All Partners</option>
+            {Array.isArray(partners) &&
+              partners.map((partner) => (
+                <option key={partner.id} value={partner.id}>
+                  {partner.firstName} {partner.lastName}
+                </option>
+              ))}
+          </select>
+        </div>
         <div className="mb-4">
           <label className="mb-1 block text-sm font-medium text-gray-700">
             Customer

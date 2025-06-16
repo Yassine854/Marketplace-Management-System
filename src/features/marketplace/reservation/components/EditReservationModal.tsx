@@ -8,6 +8,7 @@ import {
   Percent,
   CheckCircle,
   Users,
+  DollarSign,
 } from "lucide-react";
 interface EditReservationModalProps {
   isOpen: boolean;
@@ -61,6 +62,13 @@ const ReservationItemCard = ({ item }: { item: ReservationItem }) => (
       </span>
     </div>
     <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+      <div className="flex items-center text-gray-600">
+        <DollarSign className="mr-2 h-4 w-4 text-indigo-500" />
+        <span>
+          <span className="font-medium">Price:</span>{" "}
+          {item.price.toFixed(3) || 0} DT
+        </span>
+      </div>
       <div className="flex items-center space-x-2 text-gray-600">
         <Tag className="h-4 w-4 text-blue-500" />
         <span>{item.discountedPrice} DT</span>
@@ -72,10 +80,6 @@ const ReservationItemCard = ({ item }: { item: ReservationItem }) => (
       <div className="flex items-center space-x-2 text-gray-600">
         <Scale className="h-4 w-4 text-blue-500" />
         <span>{item.weight}</span>
-      </div>
-      <div className="flex items-center space-x-2 text-gray-600">
-        <Percent className="h-4 w-4 text-blue-500" />
-        <span>Tax: {item.taxValue}%</span>
       </div>
     </div>
   </div>
@@ -180,18 +184,14 @@ const EditReservationModal = ({
                 <SectionHeader icon={Percent} title="Financial Information" />
                 <div className="space-y-4">
                   {[
-                    {
-                      label: "Amount Excl Taxe",
-                      value: editedReservation.amountExclTaxe,
-                    },
                     { label: "Amount TTC", value: editedReservation.amountTTC },
                     {
-                      label: "Amount Before Promo",
-                      value: editedReservation.amountBeforePromo,
+                      label: "Amount Ordered",
+                      value: editedReservation.amountOrdered,
                     },
                     {
-                      label: "Amount After Promo",
-                      value: editedReservation.amountAfterPromo,
+                      label: "Shipping Amount",
+                      value: editedReservation.shippingAmount,
                     },
                   ].map((field) => (
                     <ReadOnlyField
@@ -249,22 +249,7 @@ const EditReservationModal = ({
                       editedReservation.customer?.lastName || ""
                     }`}
                   />
-                  <ReadOnlyField
-                    label="Agent"
-                    value={
-                      editedReservation.agent
-                        ? `${editedReservation.agent.firstName} ${editedReservation.agent.lastName}`
-                        : "—"
-                    }
-                  />
-                  <ReadOnlyField
-                    label="Partner"
-                    value={
-                      editedReservation.partner
-                        ? `${editedReservation.partner.firstName} ${editedReservation.partner.lastName}`
-                        : "—"
-                    }
-                  />
+
                   <ReadOnlyField
                     label="Created At"
                     value={new Date(
@@ -277,25 +262,6 @@ const EditReservationModal = ({
                       editedReservation.updatedAt,
                     ).toLocaleDateString("fr-FR")}
                   />
-                </div>
-              </div>
-
-              {/* Transaction Details Section */}
-              <div className="rounded-xl bg-gray-50 p-6">
-                <SectionHeader icon={Tag} title="Transaction Details" />
-                <div className="space-y-4">
-                  {[
-                    {
-                      label: "Amount Ordered",
-                      value: editedReservation.amountOrdered,
-                    },
-                  ].map((field) => (
-                    <ReadOnlyField
-                      key={field.label}
-                      label={`${field.label} (DT)`}
-                      value={field.value}
-                    />
-                  ))}
                 </div>
               </div>
             </div>

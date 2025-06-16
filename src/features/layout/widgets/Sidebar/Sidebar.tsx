@@ -111,17 +111,21 @@ const Sidebar = ({
       ref={sidebarRef}
     >
       <div className={`p-5`}>
-        <div className="flex items-center justify-center">
-          <Link href="/">
+        <div className="flex items-center justify-between">
+          <div className="flex-1 text-center">
             <Image
-              alt="logo"
-              width={180}
-              height={38}
-              src="/images/Kamioun-logo-text.png"
+              src="/uploads/logo.png"
+              alt="Logo"
+              width={50}
+              height={5}
+              className="mx-auto h-auto"
               priority
             />
-          </Link>
-          <button onClick={() => setSidebar(false)} className="xxl:hidden">
+          </div>
+          <button
+            onClick={() => setSidebar(false)}
+            className="rounded-full p-2 transition-colors hover:bg-primary/10"
+          >
             <IconX />
           </button>
         </div>

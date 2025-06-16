@@ -56,6 +56,7 @@ export async function POST(req: Request) {
         minQty: body.minQty,
         maxQty: body.maxQty,
         price: body.price,
+        special_price: body.special_price || null,
         loyaltyPointsPerProduct: body.loyaltyPointsPerProduct || null,
         loyaltyPointsPerUnit: body.loyaltyPointsPerUnit || null,
         loyaltyPointsBonusQuantity: body.loyaltyPointsBonusQuantity || null,
