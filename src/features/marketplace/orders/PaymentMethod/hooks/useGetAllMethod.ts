@@ -1,24 +1,23 @@
 import { useState, useEffect } from "react";
 import { axios } from "@/libs/axios";
-import { Methods } from "@/types/Methods";
+import { State } from "@/types/state";
 
-export const useGetAllMethods = () => {
-  const [Methods, setMethod] = useState<Methods[]>([]);
+export const useGetAllStates = () => {
+  const [state, setState] = useState<State[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchMethod = async () => {
+  const fetchStates = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const { data } = await axios.servicesClient.get<{
-        orderPayments: Methods[];
-      }>("/api/marketplace/payment_method/getAll");
-
-      setMethod(data.orderPayments || []);
+      const { data } = await axios.servicesClient.get<{ states: State[] }>(
+        "/api/marketplace/state/getAll",
+      );
+      setState(data.states || []);
     } catch (err) {
-      let errorMessage = "Failed to fetch methods";
+      let errorMessage = "Failed to fetch states";
 
       if (err instanceof Error) {
         errorMessage = err.message;
@@ -29,20 +28,20 @@ export const useGetAllMethods = () => {
       }
 
       setError(errorMessage);
-      setMethod([]);
+      setState([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMethod();
+    fetchStates();
   }, []);
   return {
-    Methods,
+    state,
     isLoading,
     error,
-    refetch: fetchMethod,
-    isEmpty: !isLoading && !error && Methods.length === 0,
+    refetch: fetchStates,
+    isEmpty: !isLoading && !error && state.length === 0,
   };
 };

@@ -111,6 +111,35 @@ export async function POST(req: Request) {
       }
     }
 
+    // Validate required fields
+    const requiredFields = [
+      { key: "sku", label: "SKU" },
+      { key: "name", label: "Product Name" },
+      { key: "price", label: "Price" },
+      { key: "brandId", label: "Brand" },
+      { key: "supplierId", label: "Manufacturer" },
+    ];
+    const missingFields = requiredFields.filter(
+      (field) => !formData.get(field.key),
+    );
+    // Activities is an array
+    const activities = Array.from(formData.entries())
+      .filter(([key]) => key.startsWith("activities["))
+      .map(([_, value]) => value as string);
+    if (activities.length === 0) {
+      missingFields.push({ key: "activities", label: "Product Activity" });
+    }
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        {
+          message:
+            "Missing required fields: " +
+            missingFields.map((f) => f.label).join(", "),
+        },
+        { status: 400 },
+      );
+    }
+
     const timestamp = Date.now();
     const randomComponent = Math.floor(Math.random() * 1000000);
     const uniqueProductId = parseInt(`${timestamp}${randomComponent}`);
@@ -178,6 +207,7 @@ export async function POST(req: Request) {
           formData.get("promo") === "true" && formData.get("promotionId")
             ? (formData.get("promotionId") as string)
             : null,
+        brandId: (formData.get("brandId") as string) || null,
         accepted: accepted,
         partnerId: partnerId,
         hasPartner: hasPartner,
@@ -208,8 +238,45 @@ export async function POST(req: Request) {
       { status: 201 },
     );
   } catch (error) {
+    console.error("Error creating product:", error);
+
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes("Unique constraint")) {
+        return NextResponse.json(
+          { error: "A product with this SKU or barcode already exists" },
+          { status: 400 },
+        );
+      }
+      if (error.message.includes("Foreign key constraint")) {
+        return NextResponse.json(
+          {
+            error:
+              "Invalid reference to related entity (supplier, category, etc.)",
+          },
+          { status: 400 },
+        );
+      }
+      if (error.message.includes("Required")) {
+        return NextResponse.json(
+          { error: "Missing required fields. Please check your input." },
+          { status: 400 },
+        );
+      }
+    }
+
+    // Log the full error for debugging
+    console.error("Full error details:", {
+      name: error instanceof Error ? error.name : "Unknown",
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : "No stack trace",
+    });
+
     return NextResponse.json(
-      { error: "Failed to create product" },
+      {
+        error:
+          "Failed to create product. Please check your input and try again.",
+      },
       { status: 500 },
     );
   }

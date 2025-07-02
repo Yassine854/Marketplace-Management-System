@@ -19,7 +19,6 @@ interface Brand {
   id: string;
   img: string;
   name: string | null;
-  productId: string;
 }
 
 interface EditProductModalProps {
@@ -133,12 +132,15 @@ const EditProductModal = ({
     promo: false,
     images: [] as File[],
     activities: [] as string[],
+    brandId: "" as string,
   });
 
   const [skuPartners, setSkuPartners] = useState<SkuPartner[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [existingImages, setExistingImages] = useState<ProductImage[]>([]);
   const [activeTab, setActiveTab] = useState("basic");
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [isLoadingBrands, setIsLoadingBrands] = useState(false);
 
   // Add brand state to your component
   const [brandData, setBrandData] = useState<{
@@ -190,6 +192,7 @@ const EditProductModal = ({
           product.relatedProducts?.map((rp: any) => rp.relatedProductId) || [],
         promo: product.promo,
         images: [],
+        brandId: product.brand?.id || "",
       });
 
       // Process SKU partners - simplified version
@@ -225,6 +228,32 @@ const EditProductModal = ({
       setIsLoading(false); // Reset loading state when modal opens
     }
   }, [isOpen]);
+
+  // Fetch brands when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchBrands();
+    }
+  }, [isOpen]);
+
+  const fetchBrands = async () => {
+    setIsLoadingBrands(true);
+    try {
+      const response = await fetch("/api/marketplace/brand/getAll");
+      if (response.ok) {
+        const data = await response.json();
+        setBrands(data.brands || []);
+      } else {
+        console.error("Failed to fetch brands");
+        toast.error("Failed to load brands");
+      }
+    } catch (error) {
+      console.error("Error fetching brands:", error);
+      toast.error("Failed to load brands");
+    } finally {
+      setIsLoadingBrands(false);
+    }
+  };
 
   const handleImageUpload = async (files: File[]) => {
     const uploadPromises = Array.from(files).map(async (file) => {
@@ -415,8 +444,19 @@ const EditProductModal = ({
   };
 
   const handleSubmit = async () => {
-    if (!formState.name || !formState.sku || !formState.price) {
-      toast.error("Please fill in required fields");
+    const missingFields = [];
+    if (!formState.sku) missingFields.push("SKU");
+    if (!formState.name) missingFields.push("Product Name");
+    if (!formState.price) missingFields.push("Price");
+    if (!formState.supplierId) missingFields.push("Manufacturer");
+    if (!formState.brandId) missingFields.push("Brand");
+    if (!formState.activities || formState.activities.length === 0)
+      missingFields.push("Product Activity");
+    if (missingFields.length > 0) {
+      missingFields.forEach((field) =>
+        toast.error(`Please fill in required field: ${field}`),
+      );
+      setIsLoading(false);
       return;
     }
 
@@ -501,6 +541,7 @@ const EditProductModal = ({
         subCategories: formState.subCategories,
         relatedProducts: formState.relatedProducts,
         activities: formState.activities, // Include activities in the update
+        brandId: formState.brandId || null,
       };
 
       // Try to update the product
@@ -674,26 +715,6 @@ const EditProductModal = ({
           </button>
           <button
             className={`whitespace-nowrap px-4 py-3 text-sm font-medium ${
-              activeTab === "specs"
-                ? "border-b-2 border-blue-500 text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("specs")}
-          >
-            Specifications
-          </button>
-          <button
-            className={`whitespace-nowrap px-4 py-3 text-sm font-medium ${
-              activeTab === "pricing"
-                ? "border-b-2 border-blue-500 text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("pricing")}
-          >
-            Pricing & Stock
-          </button>
-          <button
-            className={`whitespace-nowrap px-4 py-3 text-sm font-medium ${
               activeTab === "relations"
                 ? "border-b-2 border-blue-500 text-blue-600"
                 : "text-gray-500 hover:text-gray-700"
@@ -727,312 +748,107 @@ const EditProductModal = ({
         <div className="p-6">
           {/* Basic Information */}
           {activeTab === "basic" && (
-            <>
-              <div className="space-y-4 pb-6">
-                <h3 className="text-xl font-semibold text-primary">
-                  Basic Information
-                </h3>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Product Name *
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Product Name"
-                      value={formState.name}
-                      onChange={(e) =>
-                        handleInputChange("name", e.target.value)
-                      }
-                      className="w-full rounded-lg border p-3"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Bar Code
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Bar Code"
-                      value={formState.barcode}
-                      onChange={(e) =>
-                        handleInputChange("barcode", e.target.value)
-                      }
-                      className="w-full rounded-lg border p-3"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      SKU *
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="SKU"
-                      value={formState.sku}
-                      onChange={(e) => handleInputChange("sku", e.target.value)}
-                      className="w-full rounded-lg border p-3"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Description
-                  </label>
-                  <textarea
-                    placeholder="Description"
-                    value={formState.description}
-                    onChange={(e) =>
-                      handleInputChange("description", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                    rows={4}
-                  />
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Specifications */}
-          {activeTab === "specs" && (
-            <div className="space-y-4 pt-6">
+            <div className="space-y-4 pb-6">
               <h3 className="text-xl font-semibold text-primary">
-                Specifications
-              </h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    PCB
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="PCB"
-                    value={formState.pcb}
-                    onChange={(e) => handleInputChange("pcb", e.target.value)}
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Weight
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Weight"
-                    value={formState.weight || ""}
-                    onChange={(e) =>
-                      handleInputChange("weight", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Minimum Quantity
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Minimum Quantity"
-                    value={formState.minimumQte || ""}
-                    onChange={(e) =>
-                      handleInputChange("minimumQte", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Maximum Quantity
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Maximum Quantity"
-                    value={formState.maximumQte || ""}
-                    onChange={(e) =>
-                      handleInputChange("maximumQte", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Sealable
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Sealable"
-                    value={formState.sealable || ""}
-                    onChange={(e) =>
-                      handleInputChange("sealable", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Alert Quantity
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Alert Quantity"
-                    value={formState.alertQte || ""}
-                    onChange={(e) =>
-                      handleInputChange("alertQte", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Pricing & Stock */}
-          {activeTab === "pricing" && (
-            <div className="space-y-4 pt-6">
-              <h3 className="text-xl font-semibold text-primary">
-                Pricing & Stock
+                Basic Information
               </h3>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Price *
+                    Bar Code
                   </label>
                   <input
-                    type="number"
-                    placeholder="Price *"
-                    value={formState.price}
-                    onChange={(e) => handleInputChange("price", e.target.value)}
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Special Price
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Special Price"
-                    value={formState.special_price || ""}
+                    type="text"
+                    placeholder="Bar Code"
+                    value={formState.barcode}
                     onChange={(e) =>
-                      handleInputChange("special_price", e.target.value)
+                      handleInputChange("barcode", e.target.value)
                     }
                     className="w-full rounded-lg border p-3"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Cost
+                    SKU <span className="text-red-500">*</span>
                   </label>
                   <input
-                    type="number"
-                    placeholder="Cost"
-                    value={formState.cost || ""}
-                    onChange={(e) => handleInputChange("cost", e.target.value)}
+                    type="text"
+                    placeholder="SKU"
+                    value={formState.sku}
+                    onChange={(e) => handleInputChange("sku", e.target.value)}
                     className="w-full rounded-lg border p-3"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Stock
+                    Product Name <span className="text-red-500">*</span>
                   </label>
                   <input
-                    type="number"
-                    placeholder="Stock"
-                    value={formState.stock || ""}
-                    onChange={(e) => handleInputChange("stock", e.target.value)}
+                    type="text"
+                    placeholder="Product Name"
+                    value={formState.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
                     className="w-full rounded-lg border p-3"
                   />
                 </div>
-              </div>
-
-              {/* Loyalty Program */}
-              <div className="pt-4">
-                <h4 className="mb-3 text-lg font-medium text-gray-800">
-                  Loyalty Program
-                </h4>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="flex items-end gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Points Per Product
+                      Price <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
-                      placeholder="Points Per Product"
-                      value={formState.loyaltyPointsPerProduct || ""}
+                      placeholder="Price"
+                      value={formState.price || ""}
                       onChange={(e) =>
-                        handleInputChange(
-                          "loyaltyPointsPerProduct",
-                          e.target.value,
-                        )
+                        handleInputChange("price", e.target.value)
                       }
-                      className="w-full rounded-lg border p-3"
+                      className="w-32 rounded-lg border p-3"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Points Per Unit
+                      Weight
                     </label>
                     <input
                       type="number"
-                      placeholder="Points Per Unit"
-                      value={formState.loyaltyPointsPerUnit || ""}
+                      placeholder="Weight"
+                      value={formState.weight || ""}
                       onChange={(e) =>
-                        handleInputChange(
-                          "loyaltyPointsPerUnit",
-                          e.target.value,
-                        )
+                        handleInputChange("weight", e.target.value)
                       }
-                      className="w-full rounded-lg border p-3"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Bonus Quantity
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Bonus Quantity"
-                      value={formState.loyaltyPointsBonusQuantity || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "loyaltyPointsBonusQuantity",
-                          e.target.value,
-                        )
-                      }
-                      className="w-full rounded-lg border p-3"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Threshold Quantity
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Threshold Quantity"
-                      value={formState.loyaltyPointsThresholdQty || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "loyaltyPointsThresholdQty",
-                          e.target.value,
-                        )
-                      }
-                      className="w-full rounded-lg border p-3"
+                      className="w-32 rounded-lg border p-3"
                     />
                   </div>
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Description
+                </label>
+                <textarea
+                  placeholder="Description"
+                  value={formState.description}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
+                  className="w-full rounded-lg border p-3"
+                  rows={4}
+                />
               </div>
             </div>
           )}
 
           {/* Relationships */}
           {activeTab === "relations" && (
-            <div className="space-y-4 pt-6">
+            <div className="pt-15 space-y-4">
               <h3 className="text-xl font-semibold text-primary">
                 Relationships
               </h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_160px_128px] items-end gap-x-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Manufacturer
+                    Manufacturer <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={formState.supplierId || ""}
@@ -1049,7 +865,6 @@ const EditProductModal = ({
                     ))}
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Product Type
@@ -1059,7 +874,7 @@ const EditProductModal = ({
                     onChange={(e) =>
                       handleInputChange("productTypeId", e.target.value)
                     }
-                    className="w-full rounded-lg border p-3"
+                    className="w-60 rounded-lg border p-3"
                   >
                     <option value="">Product Type</option>
                     {productTypes.map((type) => (
@@ -1069,7 +884,6 @@ const EditProductModal = ({
                     ))}
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     PCB Type
@@ -1089,7 +903,6 @@ const EditProductModal = ({
                     ))}
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Product Status
@@ -1099,7 +912,7 @@ const EditProductModal = ({
                     onChange={(e) =>
                       handleInputChange("productStatusId", e.target.value)
                     }
-                    className="w-full rounded-lg border p-3"
+                    className="w-40 rounded-lg border p-3"
                   >
                     <option value="">Product Status</option>
                     {productStatuses.map((status) => (
@@ -1109,7 +922,6 @@ const EditProductModal = ({
                     ))}
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Tax
@@ -1117,7 +929,7 @@ const EditProductModal = ({
                   <select
                     value={formState.taxId || ""}
                     onChange={(e) => handleInputChange("taxId", e.target.value)}
-                    className="w-full rounded-lg border p-3"
+                    className="w-32 rounded-lg border p-3"
                   >
                     <option value="">Select Tax</option>
                     {taxes.map((tax) => (
@@ -1128,8 +940,79 @@ const EditProductModal = ({
                   </select>
                 </div>
               </div>
-
-              {/* Sub-Categories & Related Products */}
+              <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Activities <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    isMulti
+                    name="activities"
+                    options={ACTIVITIES.map((activity) => ({
+                      value: activity,
+                      label: activity,
+                    }))}
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                    value={formState.activities.map((activity) => ({
+                      value: activity,
+                      label: activity,
+                    }))}
+                    onChange={(selected) => {
+                      handleInputChange(
+                        "activities",
+                        selected ? selected.map((option) => option.value) : [],
+                      );
+                    }}
+                    placeholder="Search and select activities..."
+                    noOptionsMessage={() => "No activities found"}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Select Brand <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    isClearable
+                    isLoading={isLoadingBrands}
+                    options={brands.map((brand) => ({
+                      value: brand.id,
+                      label: brand.name || "Unnamed Brand",
+                      img: brand.img,
+                    }))}
+                    value={
+                      brands
+                        .filter((brand) => brand.id === formState.brandId)
+                        .map((brand) => ({
+                          value: brand.id,
+                          label: brand.name || "Unnamed Brand",
+                          img: brand.img,
+                        }))[0] || null
+                    }
+                    onChange={(selected) => {
+                      handleInputChange("brandId", selected?.value || "");
+                    }}
+                    formatOptionLabel={(option: any) => (
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={option.img}
+                          alt={option.label}
+                          className="h-8 w-8 rounded object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              "https://via.placeholder.com/32x32?text=No+Image";
+                          }}
+                        />
+                        <span>{option.label}</span>
+                      </div>
+                    )}
+                    placeholder="Select a brand..."
+                    noOptionsMessage={() => "No brands found"}
+                    className="basic-single"
+                    classNamePrefix="select"
+                  />
+                </div>
+              </div>
               <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
@@ -1158,7 +1041,6 @@ const EditProductModal = ({
                     noOptionsMessage={() => "No subcategories found"}
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Related Products
@@ -1187,36 +1069,6 @@ const EditProductModal = ({
                   />
                 </div>
               </div>
-
-              {/* Activities multiselect */}
-              <div className="mb-4 mt-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Activities
-                </label>
-                <Select
-                  isMulti
-                  name="activities"
-                  options={ACTIVITIES.map((activity) => ({
-                    value: activity,
-                    label: activity,
-                  }))}
-                  className="basic-multi-select"
-                  classNamePrefix="select"
-                  value={formState.activities.map((activity) => ({
-                    value: activity,
-                    label: activity,
-                  }))}
-                  onChange={(selected) => {
-                    handleInputChange(
-                      "activities",
-                      selected ? selected.map((option) => option.value) : [],
-                    );
-                  }}
-                  placeholder="Search and select activities..."
-                  noOptionsMessage={() => "No activities found"}
-                />
-              </div>
-
               {/* Promotion */}
               <div className="pt-4">
                 <h4 className="mb-3 text-lg font-medium text-gray-800">
@@ -1233,81 +1085,13 @@ const EditProductModal = ({
                   />
                   <span>Promo Product</span>
                 </label>
-                {formState.promo && (
-                  <select
-                    value={formState.promotionId || ""}
-                    onChange={(e) =>
-                      handleInputChange("promotionId", e.target.value)
-                    }
-                    className="mt-2 w-full rounded-lg border p-3"
-                  >
-                    <option value="">Select Promotion</option>
-                    {promotions.map((promo) => (
-                      <option key={promo.id} value={promo.id}>
-                        {promo.promoPrice}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              {/* Brand Information */}
-              <div className="mt-6 border-t pt-6">
-                <h4 className="mb-3 text-lg font-medium text-gray-800">
-                  Brand Information
-                </h4>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Brand Name
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Brand Name"
-                      value={brandData.name}
-                      onChange={(e) => handleBrandNameChange(e.target.value)}
-                      className="w-full rounded-lg border p-3"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Brand Logo
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleBrandImageChange}
-                      className="w-full rounded-lg border p-3"
-                    />
-                  </div>
-                </div>
-
-                {/* Display existing brand image if available */}
-                {brandData.img && (
-                  <div className="mt-4">
-                    <div className="flex items-center">
-                      <img
-                        src={brandData.img}
-                        alt="Brand Logo"
-                        className="h-16 w-16 rounded border object-contain"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleDeleteBrand}
-                        className="ml-2 text-red-600 hover:text-red-800"
-                      >
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           )}
 
           {/* Partner SKUs */}
           {activeTab === "partners" && (
-            <div className="space-y-4 pt-6">
+            <div className="pt-15 space-y-4">
               <h3 className="text-xl font-semibold text-primary">
                 Partner SKUs
               </h3>
@@ -1321,9 +1105,21 @@ const EditProductModal = ({
                       <h4 className="font-medium">Partner SKU #{index + 1}</h4>
                       <button
                         onClick={() => removeSkuPartner(index)}
-                        className="text-red-500 hover:text-red-700"
+                        className="rounded-full p-1 text-red-500 hover:text-red-700 focus:outline-none"
+                        aria-label="Remove Partner SKU"
                       >
-                        Remove
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
                       </button>
                     </div>
 
@@ -1393,15 +1189,16 @@ const EditProductModal = ({
               {/* Existing images */}
               <div className="grid grid-cols-3 gap-4">
                 {existingImages.map((image) => (
-                  <div key={image.id} className="group relative">
+                  <div key={image.id} className="group relative h-20 w-20">
                     <img
                       src={image.url}
                       alt="Product"
-                      className="h-32 w-full rounded-lg object-cover"
+                      className="h-20 w-20 rounded-lg object-cover"
                     />
                     <button
                       onClick={() => handleDeleteImage(image.id)}
-                      className="absolute right-1 top-1 rounded-full bg-red-500 p-1 text-white transition-colors hover:bg-red-600"
+                      className="absolute right-1 top-1 z-10 rounded-full bg-red-500 p-1 text-white transition-colors hover:bg-red-600"
+                      aria-label="Delete image"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -1435,8 +1232,6 @@ const EditProductModal = ({
               </div>
             </div>
           )}
-
-          {/* Other form sections remain the same... */}
         </div>
 
         {/* Fixed footer with buttons */}

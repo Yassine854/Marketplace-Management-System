@@ -13,9 +13,10 @@ import { API_BASE_URL } from "../../../SupplierAnalytics/config";
 type FormData = z.infer<typeof FormSchema>;
 
 export const useLoginForm = () => {
-  const { navigateToDashboard } = useNavigation();
+  const { navigateToMarketplaceDashboard, navigateToPartnersDashboard } =
+    useNavigation();
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user: authUser } = useAuth();
 
   const {
     handleSubmit,
@@ -90,7 +91,15 @@ export const useLoginForm = () => {
     toast.success("Welcome To Kamioun Marketplace Managment System !", {
       duration: 3000,
     });
-    navigateToDashboard();
+    // Navigation based on user type/role
+    if (authUser?.roleId === "1") {
+      navigateToMarketplaceDashboard();
+    } else if (authUser?.userType === "partner") {
+      navigateToPartnersDashboard();
+    }
+    // else {
+    //   navigateToDashboard();
+    // }
   };
 
   return { handleSubmit: handleSubmit(onSubmit), register, errors, isLoading };

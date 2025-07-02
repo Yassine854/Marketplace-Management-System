@@ -15,9 +15,9 @@ export const useNavigation = () => {
     push("/login");
   };
 
-  const navigateToDashboard = () => {
-    push("/dashboard");
-  };
+  // const navigateToDashboard = () => {
+  //   push("/dashboard");
+  // };
 
   const navigateToAllSuppliersDashboard = () => {
     push("/suppliers");
@@ -47,11 +47,19 @@ export const useNavigation = () => {
     push("/milk-run");
   };
 
+  const navigateToMarketplaceDashboard = () => {
+    push("/marketplace/dashboard");
+  };
+
+  const navigateToPartnersDashboard = () => {
+    push("/marketplace/partners/dashboard");
+  };
+
   return {
     navigateBack,
     navigateToLogin,
     navigateToOrders,
-    navigateToDashboard,
+    // navigateToDashboard,
     navigateToAllSuppliersDashboard,
     navigateToSupplierDashboard,
     navigateToUsersTable,
@@ -60,5 +68,7 @@ export const useNavigation = () => {
     navigateToEditUserForm,
     navigateToManageMilkRun,
     navigateToCreateUserForm,
+    navigateToMarketplaceDashboard,
+    navigateToPartnersDashboard,
   };
 };

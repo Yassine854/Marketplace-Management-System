@@ -22,6 +22,11 @@ export async function GET(req: Request) {
       isActive: boolean;
     };
 
+    // Check if user has a role ID before proceeding
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
     // Get user's role to check if they're KamiounAdminMaster
     const userRole = await prisma.role.findUnique({
       where: { id: user.mRoleId },
@@ -31,10 +36,6 @@ export async function GET(req: Request) {
     const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
 
     if (!isKamiounAdminMaster) {
-      if (!user.mRoleId) {
-        return NextResponse.json({ message: "No role found" }, { status: 403 });
-      }
-
       const rolePermissions = await prisma.rolePermission.findMany({
         where: {
           roleId: user.mRoleId,

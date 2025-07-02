@@ -33,7 +33,6 @@ export interface Product {
     id: string;
     img: string;
     name: string | null;
-    productId: string;
   };
   supplier?: {
     id: string;
@@ -52,4 +51,5 @@ export interface Product {
   relatedProducts?: any[];
   images?: any[];
   activities: string[];
+  skuPartners?: any[];
 }

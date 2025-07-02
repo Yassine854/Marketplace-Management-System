@@ -1,12 +1,12 @@
 import StatusTable from "../table/statusTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import Pagination from "../../../../shared/elements/Pagination/Pagination";
-import { useState, useEffect, useMemo } from "react";
+import { useState } from "react";
 import { useGetAllStatus } from "../hooks/useGetAllStatus";
-import { Status } from "@/types/status";
 import { useStatusActions } from "../hooks/useStatusActions";
 import { useCreateStatus } from "../hooks/useCreateStatus";
 import CreateStatusModal from "../components/CreateStatusModal";
+import EditStatusModal from "../components/EditStatusModal";
+import { Status } from "@/types/status";
 
 const StatusPage = () => {
   const { status, isLoading, error, refetch } = useGetAllStatus();
@@ -21,27 +21,19 @@ const StatusPage = () => {
     isLoading: isCreating,
     error: createError,
   } = useCreateStatus();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortStatus, setSortStatus] = useState<"newest" | "oldest">("newest");
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
 
-  const filteredStatus = useMemo(() => {
-    return status.filter((status) => {
-      const searchContent =
-        `${status.id} ${status.name} ${status.stateId}`.toLowerCase();
-      return searchContent.includes(searchTerm.toLowerCase());
-    });
-  }, [status, searchTerm]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [itemsPerPage]);
   const handleEdit = async (id: string, updatedStatus: Status) => {
-    const result = await editStatus(id, updatedStatus);
-    if (result) {
-      refetch();
+    try {
+      const result = await editStatus(id, updatedStatus);
+      if (result) {
+        refetch();
+      }
+    } catch (error) {
+      // Optionally handle error
     }
   };
 
@@ -52,10 +44,10 @@ const StatusPage = () => {
     }
   };
 
-  const totalPages = Math.ceil(status.length / itemsPerPage);
-
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedStatus = status.slice(startIndex, startIndex + itemsPerPage);
+  const openEditModal = (status: Status) => {
+    setSelectedStatus(status);
+    setIsEditModalOpen(true);
+  };
 
   return (
     <div
@@ -69,6 +61,7 @@ const StatusPage = () => {
         boxSizing: "border-box",
       }}
     >
+      {/* Header */}
       <div
         style={{
           flexShrink: 0,
@@ -77,95 +70,95 @@ const StatusPage = () => {
           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xl font-bold capitalize">Status</p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-xl font-bold capitalize text-gray-900">
+              Status
+            </h1>
+            <p className="text-sm text-gray-600">Manage your order statuses</p>
+          </div>
 
-          <div className="flex flex-wrap gap-2 sm:items-center sm:justify-between">
-            <div className="relative m-4 w-full sm:w-auto sm:min-w-[200px] sm:flex-1">
-              <input
-                type="text"
-                placeholder="Rechercher..."
-                className="w-full rounded-lg border p-2 pl-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <span className="absolute inset-y-0 left-2 flex items-center">
-                🔍
-              </span>
-            </div>
+          <div className="flex items-center gap-3">
+            {/* Loading/Error Status */}
+            {(isActionLoading || isCreating) && (
+              <div className="flex items-center gap-2 text-sm text-blue-600">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
+                <span>Processing...</span>
+              </div>
+            )}
 
-            <label htmlFor="sort" className="mr-2 whitespace-nowrap font-bold">
-              Sort by:
-            </label>
-            <select
-              id="sort"
-              className="rounded-lg border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={sortStatus}
-              onChange={(e) =>
-                setSortStatus(e.target.value as "newest" | "oldest")
-              }
+            {(actionError || createError) && (
+              <div className="rounded bg-red-50 px-3 py-1 text-sm text-red-700">
+                {actionError || createError}
+              </div>
+            )}
+
+            {/* Add Button */}
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="btn flex items-center gap-2"
+              title="Add new status"
             >
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-            </select>
-            <div className="flex h-16 w-56  items-center justify-center  ">
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="btn"
-                title="New Status"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M12 5l0 14" />
-                  <path d="M5 12l14 0" />
-                </svg>
-                <span className="hidden md:inline">New Status</span>
-              </button>
-            </div>
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12 5l0 14" />
+                <path d="M5 12l14 0" />
+              </svg>
+              <span className="hidden sm:inline">Add Status</span>
+            </button>
           </div>
         </div>
       </div>
+
       <Divider />
-      <div className="relative flex w-full flex-grow flex-col overflow-y-scroll bg-n10 px-3">
-        <StatusTable
-          status={paginatedStatus}
-          isLoading={isLoading}
-          error={error}
-          refetch={refetch}
-          isSidebarOpen={false}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+
+      {/* Main Content */}
+      <div className="flex-1 bg-gray-50 p-4">
+        <div className="rounded-lg bg-white p-4">
+          <StatusTable
+            status={status}
+            isLoading={isLoading}
+            error={error}
+            refetch={refetch}
+            isSidebarOpen={false}
+            onEdit={(_id, updatedStatus) => openEditModal(updatedStatus)}
+            onDelete={handleDelete}
+          />
+        </div>
       </div>
-      <Divider />
-      <div>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={setItemsPerPage}
+
+      {/* Modals */}
+      <CreateStatusModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onCreate={(name, stateId) => {
+          createStatus(name, stateId, () => {
+            refetch();
+            setIsModalOpen(false);
+          });
+        }}
+      />
+
+      {isEditModalOpen && selectedStatus && (
+        <EditStatusModal
+          isOpen={isEditModalOpen}
+          status={selectedStatus}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={(updatedStatus) => {
+            handleEdit(updatedStatus.id, updatedStatus);
+            setIsEditModalOpen(false);
+          }}
         />
-        <CreateStatusModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onCreate={(name, stateId) =>
-            createStatus(name, stateId, () => {
-              refetch(); // Rafraîchir la liste des statuts après création
-              setIsModalOpen(false);
-            })
-          }
-        />
-      </div>
+      )}
     </div>
   );
 };

@@ -99,6 +99,22 @@ interface CreateProductModalProps {
   partners: Array<{ id: string; name: string }>;
 }
 
+const ACTIVITIES = [
+  "alimentation générale",
+  "fruits secs",
+  "superette",
+  "epics et salaisons",
+  "vente volailles et dérivés",
+  "patisserie",
+  "boulangerie",
+  "restaurant",
+  "société",
+  "vente legumes et fruits",
+  "vente produits de parfumerie",
+  "cce d'ecipes",
+  "autre",
+];
+
 const CreateProductModal = ({
   isOpen,
   onClose,
@@ -150,6 +166,7 @@ const CreateProductModal = ({
       maxQty: number;
       price: number;
       special_price: number;
+      sealable?: number;
       loyaltyPointsPerProduct?: number;
       loyaltyPointsPerUnit?: number;
       loyaltyPointsBonusQuantity?: number;
@@ -157,6 +174,8 @@ const CreateProductModal = ({
     }>,
     brandName: "",
     brandImage: null as File | null,
+    activities: [] as string[],
+    brandId: "" as string,
   });
 
   // Add this line to use the hook at the component level
@@ -166,8 +185,8 @@ const CreateProductModal = ({
 
   // Add state for sources
   const [partnerSources, setPartnerSources] = useState<
-    Record<string, Array<{ id: string; name: string }>>
-  >({});
+    Array<{ id: string; name: string }>
+  >([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Add these state variables
@@ -179,6 +198,36 @@ const CreateProductModal = ({
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null,
   );
+
+  // Add state for brands and loading
+  const [brands, setBrands] = useState<
+    Array<{ id: string; name: string | null; img: string }>
+  >([]);
+  const [isLoadingBrands, setIsLoadingBrands] = useState(false);
+
+  // Fetch brands when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchBrands();
+    }
+  }, [isOpen]);
+
+  const fetchBrands = async () => {
+    setIsLoadingBrands(true);
+    try {
+      const response = await axios.get("/api/marketplace/brand/getAll");
+      if (response.data && Array.isArray(response.data.brands)) {
+        setBrands(response.data.brands);
+      } else {
+        setBrands([]);
+      }
+    } catch (error) {
+      setBrands([]);
+      toast.error("Failed to load brands");
+    } finally {
+      setIsLoadingBrands(false);
+    }
+  };
 
   useEffect(() => {
     if (!isOpen) {
@@ -215,6 +264,8 @@ const CreateProductModal = ({
         stocks: [], // Empty array for stocks
         brandName: "",
         brandImage: null,
+        activities: [],
+        brandId: "",
       });
       setActiveTab("basic");
       setSelectedProductId(null); // Reset selected product ID
@@ -301,14 +352,18 @@ const CreateProductModal = ({
 
     // Special handling for price field to ensure it's a float
     if (field === "price") {
-      // Parse as float and handle empty values
       let floatValue = value === "" ? 0 : parseFloat(value);
-      // If parsing fails, default to 0
       if (isNaN(floatValue)) floatValue = 0;
-
       updatedStocks[stockIndex] = {
         ...updatedStocks[stockIndex],
         [field]: floatValue,
+      };
+    } else if (field === "stockQuantity") {
+      // When stockQuantity changes, also update sealable
+      updatedStocks[stockIndex] = {
+        ...updatedStocks[stockIndex],
+        stockQuantity: value,
+        sealable: value,
       };
     } else {
       updatedStocks[stockIndex] = {
@@ -331,12 +386,23 @@ const CreateProductModal = ({
       .map((stock) => stock.sourceId)
       .filter(Boolean); // Filter out empty strings or undefined
 
+    console.log("Selected source IDs:", selectedSourceIds);
+    console.log("All partner sources:", partnerSources);
+
     // Return only sources that haven't been selected yet
-    return Array.isArray(partnerSources)
+    const availableSources = Array.isArray(partnerSources)
       ? partnerSources.filter(
           (source) => !selectedSourceIds.includes(source.id),
         )
       : [];
+
+    console.log(
+      "Available sources for index",
+      currentIndex,
+      ":",
+      availableSources,
+    );
+    return availableSources;
   };
   const addStock = () => {
     setFormState((prev) => ({
@@ -350,6 +416,7 @@ const CreateProductModal = ({
           maxQty: 0,
           price: 0,
           special_price: 0,
+          sealable: 0,
         },
       ],
     }));
@@ -464,6 +531,8 @@ const CreateProductModal = ({
       stocks: [],
       brandName: product.brand?.name || "",
       brandImage: null,
+      activities: [],
+      brandId: "",
     });
 
     // Clear search
@@ -485,35 +554,61 @@ const CreateProductModal = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Different validation based on whether we're creating a new product or using an existing one
-    if (!selectedProductId) {
-      // Validations for creating a new product
-      if (!formState.name.trim()) {
-        toast.error("Product Name is required");
-        return;
-      }
+    // Required field validations
+    if (!formState.sku || !formState.sku.trim()) {
+      toast.error("SKU is required");
+      return;
+    }
+    if (!formState.name || !formState.name.trim()) {
+      toast.error("Product Name is required");
+      return;
+    }
+    if (!formState.price || formState.price <= 0) {
+      toast.error("Price is required and must be greater than zero");
+      return;
+    }
+    if (!formState.supplierId || !formState.supplierId.trim()) {
+      toast.error("Manufacturer is required");
+      return;
+    }
+    if (!formState.brandId) {
+      toast.error("Brand is required");
+      return;
+    }
+    if (!formState.activities || formState.activities.length === 0) {
+      toast.error("At least one Product Activity is required");
+      return;
+    }
+    if (!formState.stocks || formState.stocks.length === 0) {
+      toast.error("At least one stock entry is required");
+      return;
+    }
 
-      if (!formState.barcode.trim()) {
-        toast.error("Barcode is required");
-        return;
-      }
-
-      if (!formState.price || formState.price <= 0) {
-        toast.error("Price is required and must be greater than zero");
-        return;
-      }
-    } else {
-      // Validations for creating just a SKU partner
-      // No need to validate barcode here
-
-      // Validate that at least one stock entry has a source
-      if (
-        formState.stocks.length > 0 &&
-        !formState.stocks.some((stock) => stock.sourceId)
-      ) {
-        toast.error("At least one stock entry must have a source selected");
-        return;
-      }
+    // At least one stock entry must have all required fields filled
+    const hasValidStock = (formState.stocks || []).some(
+      (stock) =>
+        stock.sourceId &&
+        stock.sourceId.trim() &&
+        stock.price &&
+        Number(stock.price) > 0 &&
+        stock.special_price !== undefined &&
+        stock.special_price !== null &&
+        String(stock.special_price).trim() !== "" &&
+        stock.stockQuantity !== undefined &&
+        stock.stockQuantity !== null &&
+        String(stock.stockQuantity).trim() !== "" &&
+        stock.minQty !== undefined &&
+        stock.minQty !== null &&
+        String(stock.minQty).trim() !== "" &&
+        stock.maxQty !== undefined &&
+        stock.maxQty !== null &&
+        String(stock.maxQty).trim() !== "",
+    );
+    if (!hasValidStock) {
+      toast.error(
+        "At least one stock entry must have all fields filled: Source, Price, Special Price, Stock Qty, Min Qty, Max Qty",
+      );
+      return;
     }
 
     setIsSubmitting(true);
@@ -542,14 +637,47 @@ const CreateProductModal = ({
             );
 
             if (existingProduct) {
-              productId = existingProduct.id;
-              toast(
-                `Found existing product with barcode ${formState.barcode}. Creating SKU partner only.`,
+              toast.error(
+                `Barcode already exists. Please use a different barcode.`,
               );
+              setIsSubmitting(false);
+              return;
             }
           }
         } catch (error) {
           console.error("Error searching for existing product:", error);
+          // Continue with product creation if search fails
+        }
+      }
+
+      // If we don't have a selected product, check if one exists with this SKU
+      if (!productId && formState.sku) {
+        try {
+          // Search for product with this SKU
+          const searchResponse = await axios.get(
+            `/api/marketplace/products/search?query=${encodeURIComponent(
+              formState.sku,
+            )}`,
+          );
+
+          if (
+            searchResponse.data &&
+            Array.isArray(searchResponse.data.products) &&
+            searchResponse.data.products.length > 0
+          ) {
+            // Use the first product that matches the SKU
+            const existingProduct = searchResponse.data.products.find(
+              (p: any) => p.sku === formState.sku,
+            );
+
+            if (existingProduct) {
+              toast.error(`SKU already exists. Please use a different SKU.`);
+              setIsSubmitting(false);
+              return;
+            }
+          }
+        } catch (error) {
+          console.error("Error searching for existing product by SKU:", error);
           // Continue with product creation if search fails
         }
       }
@@ -596,17 +724,18 @@ const CreateProductModal = ({
           // Include brand information
           brandName: formState.brandName || undefined,
           brandImage: formState.brandImage || undefined,
+          brandId: formState.brandId,
+          activities: formState.activities,
         };
 
         // Create skuPartners array from the partner SKU and stocks
         const skuPartners = [];
-        if (formState.partnerSku) {
-          // Add the main partner SKU
-          skuPartners.push({
-            partnerId: "", // Will be filled by the backend
-            skuPartner: formState.partnerSku,
-          });
-        }
+        skuPartners.push({
+          partnerId: "", // Will be filled by the backend
+          skuPartner: formState.partnerSku
+            ? formState.partnerSku
+            : formState.sku,
+        });
 
         // Add the product payload
         const productPayload = {
@@ -622,6 +751,20 @@ const CreateProductModal = ({
             throw new Error("Failed to create product");
           }
         } catch (error: any) {
+          // If the error is due to barcode or SKU already existing, show toast and do not close modal
+          const errorMessage = error?.message || "";
+          if (errorMessage.includes("Barcode already exists")) {
+            toast.error(
+              "Barcode already exists. Please use a different barcode.",
+            );
+            setIsSubmitting(false);
+            return;
+          }
+          if (errorMessage.includes("SKU already exists")) {
+            toast.error("SKU already exists. Please use a different SKU.");
+            setIsSubmitting(false);
+            return;
+          }
           // If the error is due to barcode already existing, try to find the product again
           if (
             error.message &&
@@ -886,26 +1029,6 @@ const CreateProductModal = ({
           </button>
           <button
             className={`mr-4 pb-2 text-sm font-medium ${
-              activeTab === "specs"
-                ? "border-b-2 border-blue-500 text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("specs")}
-          >
-            Specifications
-          </button>
-          <button
-            className={`mr-4 pb-2 text-sm font-medium ${
-              activeTab === "pricing"
-                ? "border-b-2 border-blue-500 text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("pricing")}
-          >
-            Pricing & Stock
-          </button>
-          <button
-            className={`mr-4 pb-2 text-sm font-medium ${
               activeTab === "relations"
                 ? "border-b-2 border-blue-500 text-blue-600"
                 : "text-gray-500 hover:text-gray-700"
@@ -922,7 +1045,7 @@ const CreateProductModal = ({
             }`}
             onClick={() => setActiveTab("partners")}
           >
-            Partner SKUs
+            Stock Management
           </button>
         </div>
 
@@ -932,7 +1055,31 @@ const CreateProductModal = ({
             <h3 className="text-xl font-semibold text-primary">
               Basic Information
             </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Bar Code
+                </label>
+                <input
+                  type="text"
+                  placeholder="Bar Code"
+                  value={formState.barcode}
+                  onChange={(e) => handleInputChange("barcode", e.target.value)}
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  SKU <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="SKU"
+                  value={formState.sku}
+                  onChange={(e) => handleInputChange("sku", e.target.value)}
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Product Name <span className="text-red-500">*</span>
@@ -945,29 +1092,33 @@ const CreateProductModal = ({
                   className="w-full rounded-lg border p-3"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Bar Code <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Bar Code"
-                  value={formState.barcode}
-                  onChange={(e) => handleInputChange("barcode", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  SKU
-                </label>
-                <input
-                  type="text"
-                  placeholder="SKU"
-                  value={formState.sku}
-                  onChange={(e) => handleInputChange("sku", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
+              <div className="flex items-end gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Price <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Price"
+                    value={formState.price || ""}
+                    onChange={(e) => handleInputChange("price", e.target.value)}
+                    className="w-32 rounded-lg border p-3"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Weight
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Weight"
+                    value={formState.weight || ""}
+                    onChange={(e) =>
+                      handleInputChange("weight", e.target.value)
+                    }
+                    className="w-32 rounded-lg border p-3"
+                  />
+                </div>
               </div>
             </div>
             <div>
@@ -987,242 +1138,16 @@ const CreateProductModal = ({
           </div>
         )}
 
-        {/* Specifications */}
-        {activeTab === "specs" && (
-          <div className="space-y-4 pt-6">
-            <h3 className="text-xl font-semibold text-primary">
-              Specifications
-            </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  PCB
-                </label>
-                <input
-                  type="text"
-                  placeholder="PCB"
-                  value={formState.pcb}
-                  onChange={(e) => handleInputChange("pcb", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Weight
-                </label>
-                <input
-                  type="number"
-                  placeholder="Weight"
-                  value={formState.weight || ""}
-                  onChange={(e) => handleInputChange("weight", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Min Quantity
-                </label>
-                <input
-                  type="number"
-                  placeholder="Min Quantity"
-                  value={formState.minimumQte || ""}
-                  onChange={(e) =>
-                    handleInputChange("minimumQte", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Max Quantity
-                </label>
-                <input
-                  type="number"
-                  placeholder="Max Quantity"
-                  value={formState.maximumQte || ""}
-                  onChange={(e) =>
-                    handleInputChange("maximumQte", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Sealable
-                </label>
-                <input
-                  type="number"
-                  placeholder="Sealable"
-                  value={formState.sealable || ""}
-                  onChange={(e) =>
-                    handleInputChange("sealable", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Alert Quantity
-                </label>
-                <input
-                  type="number"
-                  placeholder="Alert Quantity"
-                  value={formState.alertQte || ""}
-                  onChange={(e) =>
-                    handleInputChange("alertQte", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Pricing & Stock */}
-        {activeTab === "pricing" && (
-          <div className="space-y-4 pt-6">
-            <h3 className="text-xl font-semibold text-primary">
-              Pricing & Stock
-            </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Price <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  placeholder="Price"
-                  value={formState.price || ""}
-                  onChange={(e) => handleInputChange("price", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Special Price
-                </label>
-                <input
-                  type="number"
-                  placeholder="Special Price"
-                  value={formState.special_price || ""}
-                  onChange={(e) =>
-                    handleInputChange("special_price", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Cost
-                </label>
-                <input
-                  type="number"
-                  placeholder="Cost"
-                  value={formState.cost || ""}
-                  onChange={(e) => handleInputChange("cost", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Stock
-                </label>
-                <input
-                  type="number"
-                  placeholder="Stock"
-                  value={formState.stock || ""}
-                  onChange={(e) => handleInputChange("stock", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-            </div>
-
-            {/* Loyalty Program */}
-            <div className="pt-4">
-              <h4 className="mb-3 text-lg font-medium text-gray-800">
-                Loyalty Program
-              </h4>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Points Per Product
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Points Per Product"
-                    value={formState.loyaltyPointsPerProduct || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "loyaltyPointsPerProduct",
-                        e.target.value,
-                      )
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Points Per Unit
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Points Per Unit"
-                    value={formState.loyaltyPointsPerUnit || ""}
-                    onChange={(e) =>
-                      handleInputChange("loyaltyPointsPerUnit", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Bonus Quantity
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Bonus Quantity"
-                    value={formState.loyaltyPointsBonusQuantity || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "loyaltyPointsBonusQuantity",
-                        e.target.value,
-                      )
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Threshold Quantity
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Threshold Quantity"
-                    value={formState.loyaltyPointsThresholdQty || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "loyaltyPointsThresholdQty",
-                        e.target.value,
-                      )
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Relationships */}
         {activeTab === "relations" && (
-          <div className="space-y-4 pt-6">
+          <div className="pt-15 space-y-4">
             <h3 className="text-xl font-semibold text-primary">
               Relationships
             </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_160px_128px] items-end gap-x-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Manufacturer
+                  Manufacturer <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={formState.supplierId}
@@ -1239,7 +1164,6 @@ const CreateProductModal = ({
                   ))}
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Product Type
@@ -1249,7 +1173,7 @@ const CreateProductModal = ({
                   onChange={(e) =>
                     handleInputChange("productTypeId", e.target.value)
                   }
-                  className="w-full rounded-lg border p-3"
+                  className="w-60 rounded-lg border p-3"
                 >
                   <option value="">Product Type</option>
                   {productTypes.map((type) => (
@@ -1259,7 +1183,6 @@ const CreateProductModal = ({
                   ))}
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   PCB Type
@@ -1279,7 +1202,6 @@ const CreateProductModal = ({
                   ))}
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Product Status
@@ -1289,7 +1211,7 @@ const CreateProductModal = ({
                   onChange={(e) =>
                     handleInputChange("productStatusId", e.target.value)
                   }
-                  className="w-full rounded-lg border p-3"
+                  className="w-40 rounded-lg border p-3"
                 >
                   <option value="">Product Status</option>
                   {productStatuses.map((status) => (
@@ -1299,7 +1221,6 @@ const CreateProductModal = ({
                   ))}
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Tax
@@ -1307,7 +1228,7 @@ const CreateProductModal = ({
                 <select
                   value={formState.taxId}
                   onChange={(e) => handleInputChange("taxId", e.target.value)}
-                  className="w-full rounded-lg border p-3"
+                  className="w-32 rounded-lg border p-3"
                 >
                   <option value="">Select Tax</option>
                   {taxes.map((tax) => (
@@ -1316,6 +1237,85 @@ const CreateProductModal = ({
                     </option>
                   ))}
                 </select>
+              </div>
+            </div>
+
+            {/* Activities and Brand fields */}
+            <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Activities <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  isMulti
+                  name="activities"
+                  options={ACTIVITIES.map((activity) => ({
+                    value: activity,
+                    label: activity,
+                  }))}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                  value={
+                    formState.activities?.map((activity) => ({
+                      value: activity,
+                      label: activity,
+                    })) || []
+                  }
+                  onChange={(selected) => {
+                    handleInputChange(
+                      "activities",
+                      selected ? selected.map((option) => option.value) : [],
+                    );
+                  }}
+                  placeholder="Search and select activities..."
+                  noOptionsMessage={() => "No activities found"}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Select Brand <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  isClearable
+                  isLoading={isLoadingBrands}
+                  options={
+                    brands?.map((brand) => ({
+                      value: brand.id,
+                      label: brand.name || "Unnamed Brand",
+                      img: brand.img,
+                    })) || []
+                  }
+                  value={
+                    brands
+                      ?.filter((brand) => brand.id === formState.brandId)
+                      .map((brand) => ({
+                        value: brand.id,
+                        label: brand.name || "Unnamed Brand",
+                        img: brand.img,
+                      }))[0] || null
+                  }
+                  onChange={(selected) => {
+                    handleInputChange("brandId", selected?.value || "");
+                  }}
+                  formatOptionLabel={(option) => (
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={option.img}
+                        alt={option.label}
+                        className="h-8 w-8 rounded object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "https://via.placeholder.com/32x32?text=No+Image";
+                        }}
+                      />
+                      <span>{option.label}</span>
+                    </div>
+                  )}
+                  placeholder="Select a brand..."
+                  noOptionsMessage={() => "No brands found"}
+                  className="basic-single"
+                  classNamePrefix="select"
+                />
               </div>
             </div>
 
@@ -1334,10 +1334,12 @@ const CreateProductModal = ({
                   }))}
                   className="basic-multi-select"
                   classNamePrefix="select"
-                  value={formState.subCategories.map((id) => {
-                    const cat = subCategories.find((c) => c.id === id);
-                    return { value: id, label: cat ? cat.name : id };
-                  })}
+                  value={
+                    formState.subCategories?.map((id) => {
+                      const cat = subCategories.find((c) => c.id === id);
+                      return { value: id, label: cat ? cat.name : id };
+                    }) || []
+                  }
                   onChange={(selected) => {
                     handleInputChange(
                       "subCategories",
@@ -1348,7 +1350,6 @@ const CreateProductModal = ({
                   noOptionsMessage={() => "No subcategories found"}
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Related Products
@@ -1362,10 +1363,12 @@ const CreateProductModal = ({
                   }))}
                   className="basic-multi-select"
                   classNamePrefix="select"
-                  value={formState.relatedProducts.map((id) => {
-                    const product = relatedProducts.find((p) => p.id === id);
-                    return { value: id, label: product ? product.name : id };
-                  })}
+                  value={
+                    formState.relatedProducts?.map((id) => {
+                      const product = relatedProducts.find((p) => p.id === id);
+                      return { value: id, label: product ? product.name : id };
+                    }) || []
+                  }
                   onChange={(selected) => {
                     handleInputChange(
                       "relatedProducts",
@@ -1398,28 +1401,6 @@ const CreateProductModal = ({
                   Promo Product
                 </label>
               </div>
-
-              {formState.promo && (
-                <div className="mt-3">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Select Promotion
-                  </label>
-                  <select
-                    value={formState.promotionId}
-                    onChange={(e) =>
-                      handleInputChange("promotionId", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  >
-                    <option value="">Select Promotion</option>
-                    {promotions.map((promo) => (
-                      <option key={promo.id} value={promo.id}>
-                        {promo.promoPrice}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
             </div>
 
             {/* Images */}
@@ -1433,332 +1414,175 @@ const CreateProductModal = ({
                 className="w-full rounded-lg border p-3"
               />
             </div>
-
-            {/* Brand Information */}
-            <div className="mt-6 border-t pt-6">
-              <h4 className="mb-3 text-lg font-medium text-gray-800">
-                Brand Information
-              </h4>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Brand Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Brand Name"
-                    value={formState.brandName}
-                    onChange={(e) =>
-                      handleInputChange("brandName", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Brand Logo
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleBrandImageChange}
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
         {/* Partner SKUs */}
         {activeTab === "partners" && (
-          <div className="space-y-4 pt-6 md:col-span-2">
-            <h3 className="text-xl font-semibold text-primary">Partner SKU</h3>
+          <div className="pt-15 space-y-4 md:col-span-2">
+            <h3 className="text-xl font-semibold text-primary">
+              Stock Management
+            </h3>
+            {/* Partner SKU field */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Your SKU
+              </label>
+              <input
+                type="text"
+                value={formState.partnerSku}
+                onChange={handlePartnerSkuChange}
+                className="w-full rounded-lg border p-3"
+                placeholder="Enter your SKU (optional)"
+              />
+            </div>
             <div className="space-y-4">
-              <div className="rounded-lg border border-gray-200 p-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Partner SKU
-                  </label>
-                  <input
-                    type="text"
-                    value={formState.partnerSku}
-                    onChange={handlePartnerSkuChange}
-                    className="w-full rounded-lg border p-3"
-                    placeholder="Partner's SKU code (leave empty to use product SKU)"
-                  />
-                </div>
-
-                {/* Stocks Section */}
-                <div className="mt-4">
-                  <div className="flex items-center justify-between">
-                    <h5 className="text-md font-medium text-gray-700">
-                      Stock Management
-                    </h5>
+              {formState.stocks.map((stock, index) => (
+                <div
+                  key={index}
+                  className="rounded-lg border border-gray-200 p-4"
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <h4 className="font-medium">Stock Entry #{index + 1}</h4>
                     <button
-                      type="button"
-                      onClick={addStock}
-                      className="rounded bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600"
+                      onClick={() => removeStock(index)}
+                      className="rounded-full p-1 text-red-500 hover:text-red-700 focus:outline-none"
+                      aria-label="Remove Stock Entry"
                     >
-                      Add Stock
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     </button>
                   </div>
-
-                  {formState.stocks.map((stock, stockIndex) => (
-                    <div
-                      key={stockIndex}
-                      className="relative mt-3 rounded-lg border border-gray-200 bg-white p-4"
-                    >
-                      <div className="absolute right-2 top-2">
-                        <button
-                          type="button"
-                          onClick={() => removeStock(stockIndex)}
-                          className="text-red-500 hover:text-red-700"
-                          aria-label="Remove stock"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Source
-                          </label>
-                          <select
-                            value={stock.sourceId}
-                            onChange={(e) =>
-                              handleStockChange(
-                                stockIndex,
-                                "sourceId",
-                                e.target.value,
-                              )
-                            }
-                            className="w-full rounded-lg border p-3"
-                          >
-                            <option value="">Select Source</option>
-                            {getAvailableSources(stockIndex).map((source) => (
-                              <option key={source.id} value={source.id}>
-                                {source.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Stock Quantity
-                          </label>
-                          <input
-                            type="number"
-                            value={stock.stockQuantity}
-                            onChange={(e) =>
-                              handleStockChange(
-                                stockIndex,
-                                "stockQuantity",
-                                Number(e.target.value),
-                              )
-                            }
-                            className="w-full rounded-lg border p-3"
-                            min="0"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Minimum Quantity
-                          </label>
-                          <input
-                            type="number"
-                            value={stock.minQty}
-                            onChange={(e) =>
-                              handleStockChange(
-                                stockIndex,
-                                "minQty",
-                                Number(e.target.value),
-                              )
-                            }
-                            className="w-full rounded-lg border p-3"
-                            min="0"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Maximum Quantity
-                          </label>
-                          <input
-                            type="number"
-                            value={stock.maxQty}
-                            onChange={(e) =>
-                              handleStockChange(
-                                stockIndex,
-                                "maxQty",
-                                Number(e.target.value),
-                              )
-                            }
-                            className="w-full rounded-lg border p-3"
-                            min="0"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Price
-                          </label>
-                          <input
-                            type="number"
-                            value={stock.price || ""}
-                            onChange={(e) =>
-                              handleStockChange(
-                                stockIndex,
-                                "price",
-                                e.target.value,
-                              )
-                            }
-                            className="w-full rounded-lg border p-3"
-                            min="0"
-                            step="0.01"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Special Price
-                          </label>
-                          <input
-                            type="number"
-                            value={stock.special_price || ""}
-                            onChange={(e) =>
-                              handleStockChange(
-                                stockIndex,
-                                "special_price",
-                                e.target.value,
-                              )
-                            }
-                            className="w-full rounded-lg border p-3"
-                            min="0"
-                            step="0.01"
-                          />
-                        </div>
-
-                        {/* Loyalty Points Fields */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Loyalty Points Per Product
-                          </label>
-                          <input
-                            type="number"
-                            value={stock.loyaltyPointsPerProduct || ""}
-                            onChange={(e) =>
-                              handleStockChange(
-                                stockIndex,
-                                "loyaltyPointsPerProduct",
-                                e.target.value
-                                  ? Number(e.target.value)
-                                  : undefined,
-                              )
-                            }
-                            className="w-full rounded-lg border p-3"
-                            min="0"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Loyalty Points Per Unit
-                          </label>
-                          <input
-                            type="number"
-                            value={stock.loyaltyPointsPerUnit || ""}
-                            onChange={(e) =>
-                              handleStockChange(
-                                stockIndex,
-                                "loyaltyPointsPerUnit",
-                                e.target.value
-                                  ? Number(e.target.value)
-                                  : undefined,
-                              )
-                            }
-                            className="w-full rounded-lg border p-3"
-                            min="0"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Loyalty Points Bonus Quantity
-                          </label>
-                          <input
-                            type="number"
-                            value={stock.loyaltyPointsBonusQuantity || ""}
-                            onChange={(e) =>
-                              handleStockChange(
-                                stockIndex,
-                                "loyaltyPointsBonusQuantity",
-                                e.target.value
-                                  ? Number(e.target.value)
-                                  : undefined,
-                              )
-                            }
-                            className="w-full rounded-lg border p-3"
-                            min="0"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Loyalty Points Threshold Quantity
-                          </label>
-                          <input
-                            type="number"
-                            value={stock.loyaltyPointsThresholdQty || ""}
-                            onChange={(e) =>
-                              handleStockChange(
-                                stockIndex,
-                                "loyaltyPointsThresholdQty",
-                                e.target.value
-                                  ? Number(e.target.value)
-                                  : undefined,
-                              )
-                            }
-                            className="w-full rounded-lg border p-3"
-                            min="0"
-                          />
-                        </div>
-                      </div>
+                  <div className="flex flex-col gap-4 md:flex-row md:items-end md:gap-4">
+                    <div className="min-w-[120px] flex-1">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Source
+                      </label>
+                      <select
+                        value={stock.sourceId}
+                        onChange={(e) =>
+                          handleStockChange(index, "sourceId", e.target.value)
+                        }
+                        className="w-full rounded-lg border p-3"
+                      >
+                        <option value="">Select Source</option>
+                        {getAvailableSources(index).map((source) => (
+                          <option key={source.id} value={source.id}>
+                            {source.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                  ))}
-
-                  {formState.stocks.length === 0 && (
-                    <div className="mt-4 w-full rounded-lg bg-gray-100 p-3 text-center text-sm text-gray-500">
-                      No stocks added. Click &quot;Add Stock&quot; to add stock
-                      information.
+                    <div className="min-w-[120px] flex-1">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Price
+                      </label>
+                      <input
+                        type="number"
+                        value={stock.price}
+                        onChange={(e) =>
+                          handleStockChange(index, "price", e.target.value)
+                        }
+                        className="w-full rounded-lg border p-3"
+                        placeholder="Price"
+                      />
                     </div>
-                  )}
-
-                  {formState.stocks.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={addStock}
-                      className="mt-4 w-full rounded-lg bg-gray-100 p-3 text-gray-700 hover:bg-gray-200"
-                    >
-                      + Add Stock for New Source
-                    </button>
-                  )}
+                    <div className="min-w-[100px] flex-1">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Special Price
+                      </label>
+                      <input
+                        type="number"
+                        value={stock.special_price}
+                        onChange={(e) =>
+                          handleStockChange(
+                            index,
+                            "special_price",
+                            e.target.value,
+                          )
+                        }
+                        className="w-full rounded-lg border p-3"
+                        placeholder="Special Price"
+                      />
+                    </div>
+                    <div className="w-24">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Stock Qty
+                      </label>
+                      <input
+                        type="number"
+                        value={stock.stockQuantity}
+                        onChange={(e) =>
+                          handleStockChange(
+                            index,
+                            "stockQuantity",
+                            e.target.value,
+                          )
+                        }
+                        className="w-full rounded-lg border p-3"
+                        placeholder="Stock Quantity"
+                      />
+                    </div>
+                    <div className="w-24">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Min Qty
+                      </label>
+                      <input
+                        type="number"
+                        value={stock.minQty}
+                        onChange={(e) =>
+                          handleStockChange(index, "minQty", e.target.value)
+                        }
+                        className="w-full rounded-lg border p-3"
+                        placeholder="Min Qty"
+                      />
+                    </div>
+                    <div className="w-24">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Max Qty
+                      </label>
+                      <input
+                        type="number"
+                        value={stock.maxQty}
+                        onChange={(e) =>
+                          handleStockChange(index, "maxQty", e.target.value)
+                        }
+                        className="w-full rounded-lg border p-3"
+                        placeholder="Max Qty"
+                      />
+                    </div>
+                    <div className="w-24">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Sealable
+                      </label>
+                      <input
+                        type="number"
+                        value={stock.sealable || 0}
+                        disabled
+                        className="w-full cursor-not-allowed rounded-lg border bg-gray-100 p-3 text-gray-500"
+                        placeholder="Sealable"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
+              <button
+                type="button"
+                onClick={addStock}
+                className="w-full rounded-lg bg-gray-100 p-3 text-gray-700 hover:bg-gray-200"
+              >
+                + Add Stock Entry
+              </button>
             </div>
           </div>
         )}

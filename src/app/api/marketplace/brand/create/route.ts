@@ -17,31 +17,11 @@ export async function POST(req: Request) {
 
     const formData = await req.formData();
     const imageFile = formData.get("image") as File | null;
-    const productId = formData.get("productId") as string | null;
     const name = formData.get("name") as string | null;
-
-    if (!productId) {
-      return NextResponse.json(
-        { error: "Product ID is required" },
-        { status: 400 },
-      );
-    }
 
     if (!imageFile) {
       return NextResponse.json(
         { error: "Brand image is required" },
-        { status: 400 },
-      );
-    }
-
-    // Check if product already has a brand (since productId is @unique in the Brand model)
-    const existingBrand = await prisma.brand.findFirst({
-      where: { productId },
-    });
-
-    if (existingBrand) {
-      return NextResponse.json(
-        { error: "This product already has a brand" },
         { status: 400 },
       );
     }
@@ -63,7 +43,6 @@ export async function POST(req: Request) {
       data: {
         img: imageUrl,
         name: name || null,
-        productId,
       },
     });
 

@@ -3,7 +3,6 @@ export interface Customer {
   firstName: string;
   lastName: string;
   governorate: string;
-  gender: string;
   email: string;
   telephone: string;
   address: string;

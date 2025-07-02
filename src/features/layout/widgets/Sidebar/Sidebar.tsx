@@ -134,14 +134,29 @@ const Sidebar = ({
         <div className="min-h-[70%] px-4 pb-24 xxl:px-6 xxxl:px-8">
           <Divider />
 
-          {/* Dashboard - everyone can see */}
-          <SidebarButton
-            onClick={() => push("/dashboard")}
-            name={"Dashboard"}
-            icon={<IconDashboard />}
-            isActive={pathname?.includes("dashboard")}
-          />
-          <Divider />
+          {/* Dashboard - show based on user type */}
+          {isAdmin && (
+            <>
+              <SidebarButton
+                onClick={() => push("/marketplace/dashboard")}
+                name={"Dashboard"}
+                icon={<IconDashboard />}
+                isActive={pathname === "/marketplace/dashboard"}
+              />
+              <Divider />
+            </>
+          )}
+          {isPartner && (
+            <>
+              <SidebarButton
+                onClick={() => push("/marketplace/partners/dashboard")}
+                name={"Dashboard"}
+                icon={<IconDashboard />}
+                isActive={pathname === "/marketplace/partners/dashboard"}
+              />
+              <Divider />
+            </>
+          )}
 
           {/* Suppliers Analytics */}
           {/* {hasPermission("Supplier Dashboard") && (
@@ -177,11 +192,19 @@ const Sidebar = ({
                         },
                       ]
                     : []),
+                  ...(hasPermission("Brand")
+                    ? [
+                        {
+                          name: "Brands",
+                          path: "/marketplace/products/brands",
+                        },
+                      ]
+                    : []),
                   ...(hasPermission("Manufacturers")
                     ? [
                         {
                           name: "Manufacturers",
-                          path: "/marketplace/products/manufacturer/all",
+                          path: "/marketplace/products/suppliers",
                         },
                       ]
                     : []),
@@ -189,7 +212,7 @@ const Sidebar = ({
                     ? [
                         {
                           name: "Taxes",
-                          path: "/marketplace/products/taxe/all",
+                          path: "/marketplace/products/tax",
                         },
                       ]
                     : []),
@@ -387,13 +410,13 @@ const Sidebar = ({
               <SidebarSubMenu
                 icon={<IconBox />}
                 name=" Orders"
-                onClick={() => push("/marketplace/orders2/all")}
+                onClick={() => push("/marketplace/order")}
                 isActive={
                   pathname?.toLowerCase().includes("order") ||
                   pathname?.toLowerCase().includes("payment method")
                 }
                 items={[
-                  { name: "All", path: "/marketplace/orders2/all" },
+                  { name: "All", path: "/marketplace/order" },
                   { name: "State", path: "/marketplace/order/state" },
                   { name: "Status", path: "/marketplace/order/status" },
                   {

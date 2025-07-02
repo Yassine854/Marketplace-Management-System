@@ -132,5 +132,52 @@ export function useProductActions() {
     }
   };
 
-  return { editProduct, deleteProduct, deleteSkuPartner, isLoading, error };
+  // Update SKU partner
+  const updateSkuPartner = async (
+    id: string,
+    payload: Partial<{
+      skuPartner: string;
+      productId?: string;
+      partnerId?: string;
+      skuProduct?: string;
+      stock?: any;
+    }>,
+  ) => {
+    setIsLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+    try {
+      const response = await axios.patch(
+        `/api/marketplace/sku_partner/${id}`,
+        payload,
+      );
+      if (response.status === 200) {
+        const successMsg = "SKU updated successfully!";
+        setSuccessMessage(successMsg);
+        toast.success(successMsg);
+        return response.data.skuPartner;
+      } else {
+        throw new Error("Failed to update SKU partner");
+      }
+    } catch (err: any) {
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Error updating SKU partner";
+      setError(errorMsg);
+      toast.error(errorMsg);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    editProduct,
+    deleteProduct,
+    deleteSkuPartner,
+    updateSkuPartner,
+    isLoading,
+    error,
+  };
 }

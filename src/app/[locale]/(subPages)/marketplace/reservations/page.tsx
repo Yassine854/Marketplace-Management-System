@@ -1,2 +1,2 @@
 "use client";
-export { default } from "@/features/marketplace/partners/Interface/reservations/all";
+export { default } from "@/features/marketplace/reservation/pages/ReservationPage";

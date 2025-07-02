@@ -73,10 +73,13 @@ const CustomerPage = () => {
       const result = await editCustomer(id, formData);
       if (result) {
         await refetch();
-        setIsEditModalOpen(false);
+        return true;
       }
+      return false;
     } catch (err) {
-      console.error("Error editing customer:", err);
+      // Do not close the modal on error
+      // Error will be shown via the error prop
+      return false;
     }
   };
 
@@ -96,10 +99,13 @@ const CustomerPage = () => {
       const result = await createCustomer(customerData);
       if (result) {
         refetch();
-        setIsModalOpen(false);
+        return true;
       }
+      return false;
     } catch (err) {
-      console.error("Error creating customer:", err);
+      // Do not close the modal on error
+      // Error will be shown via the error prop
+      return false;
     }
   };
 

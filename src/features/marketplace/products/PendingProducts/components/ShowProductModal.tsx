@@ -47,7 +47,6 @@ interface Product {
     id: string;
     img: string;
     name: string | null;
-    productId: string;
   };
 }
 

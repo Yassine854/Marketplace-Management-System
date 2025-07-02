@@ -6,15 +6,15 @@ import StoreSelector from "../StoreSelector/StoreSelector";
 import { useLayout } from "@/utils/LayoutContext";
 import { useGlobalStore } from "@/features/shared/stores/GlobalStore";
 
-export const layoutList = [
-  "All",
-  "Old Mghira",
-  "Sousse",
-  "Kamarket",
-  "Mnihla",
-  "Charguia",
-  "Mghira",
-];
+// export const layoutList = [
+//   "All",
+//   "Old Mghira",
+//   "Sousse",
+//   "Kamarket",
+//   "Mnihla",
+//   "Charguia",
+//   "Mghira",
+// ];
 //export const layoutList = ["All", "Tunis", "Sousse", "Kamarket" , "Mnihla", "Charguia"];
 
 const TopNav = ({
@@ -60,7 +60,7 @@ const TopNav = ({
           </button>
         </form> */}
       </div>
-      <StoreSelector />
+      {/* <StoreSelector /> */}
       <div className="flex items-center gap-3 sm:gap-4 xxl:gap-6">
         {/* <ModeSwitcher /> */}
         <div className="relative">

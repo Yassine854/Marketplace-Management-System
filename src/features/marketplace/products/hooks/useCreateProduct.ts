@@ -36,8 +36,7 @@ interface CreateProductData {
     skuPartner: string;
   }>;
   activities?: string[];
-  brandName?: string;
-  brandImage?: File | null;
+  brandId?: string;
 }
 
 export function useCreateProduct() {
@@ -76,9 +75,20 @@ export function useCreateProduct() {
         });
       }
 
+      // Add brandId to formData if provided
+      if (productData.brandId) {
+        formData.append("brandId", productData.brandId);
+      }
+
       if (productData.promo !== undefined) {
         formData.append("promo", productData.promo.toString());
       }
+
+      // Debug: Log what's being sent
+      console.log("FormData contents:");
+      Array.from(formData.entries()).forEach(([key, value]) => {
+        console.log(`${key}: ${value}`);
+      });
 
       const response = await axios.post(
         "/api/marketplace/products/create",
@@ -105,26 +115,6 @@ export function useCreateProduct() {
           }),
         ),
       ];
-
-      // Add brand creation if brand data is provided
-      if (productData.brandImage || productData.brandName) {
-        const brandFormData = new FormData();
-        brandFormData.append("productId", productId);
-
-        if (productData.brandImage) {
-          brandFormData.append("image", productData.brandImage);
-        }
-
-        if (productData.brandName) {
-          brandFormData.append("name", productData.brandName);
-        }
-
-        promises.push(
-          axios.post("/api/marketplace/brand/create", brandFormData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          }),
-        );
-      }
 
       // Add SKU partner creation promises
       if (productData.skuPartners && productData.skuPartners.length > 0) {
@@ -169,9 +159,10 @@ export function useCreateProduct() {
       return null;
     } catch (err: any) {
       const errorMessage =
-        err.response?.data?.message || "Error creating product";
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Error creating product";
       setError(errorMessage);
-
       throw new Error(errorMessage);
     } finally {
       setIsLoading(false);

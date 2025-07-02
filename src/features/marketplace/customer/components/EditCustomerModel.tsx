@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 interface EditCustomerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onEdit: (id: string, formData: FormData) => Promise<void>;
+  onEdit: (id: string, formData: FormData) => Promise<boolean>;
   customer: Customer | null;
   isLoading: boolean;
   error: string | null;
@@ -37,6 +37,22 @@ const TUNISIA_GOVERNORATES = [
   "Tozeur",
   "Tunis",
   "Zaghouan",
+];
+
+const ACTIVITIES = [
+  "alimentation générale",
+  "fruits secs",
+  "superette",
+  "epics et salaisons",
+  "vente volailles et dérivés",
+  "patisserie",
+  "boulangerie",
+  "restaurant",
+  "société",
+  "vente legumes et fruits",
+  "vente produits de parfumerie",
+  "cce d'ecipes",
+  "autre",
 ];
 
 const EditCustomerModal = ({
@@ -103,11 +119,15 @@ const EditCustomerModal = ({
       });
 
       if (form.id) {
-        await onEdit(form.id, formData);
-        onClose();
+        const result = await onEdit(form.id, formData);
+        if (result) {
+          onClose();
+        }
+        // If result is false, do not close the modal
       }
     } catch (err) {
-      console.error("Error updating customer:", err);
+      // Do not close the modal on error
+      // Error will be shown via the error prop
     }
   };
 
@@ -156,33 +176,33 @@ const EditCustomerModal = ({
                 Personal Information
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
-                <input
-                  name="firstName"
-                  placeholder="First Name"
-                  value={form?.firstName || ""}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border p-3"
-                  required
-                />
-                <input
-                  name="lastName"
-                  placeholder="Last Name"
-                  value={form?.lastName || ""}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border p-3"
-                  required
-                />
-                <select
-                  name="gender"
-                  value={form?.gender || ""}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border p-3"
-                  required
-                >
-                  <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    First Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="firstName"
+                    placeholder="First Name"
+                    value={form?.firstName || ""}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border p-3"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Last Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="lastName"
+                    placeholder="Last Name"
+                    value={form?.lastName || ""}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border p-3"
+                    required
+                  />
+                </div>
+
                 <input
                   name="email"
                   type="email"
@@ -260,44 +280,81 @@ const EditCustomerModal = ({
                 Business Information
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
-                <input
-                  name="socialName"
-                  placeholder="Social Name"
-                  value={form?.socialName || ""}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border p-3"
-                />
-                <input
-                  name="fiscalId"
-                  placeholder="Fiscal ID"
-                  value={form?.fiscalId || ""}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border p-3"
-                  required
-                />
-                <input
-                  name="businessType"
-                  placeholder="Business Type"
-                  value={form?.businessType || ""}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border p-3"
-                  required
-                />
-                <input
-                  name="activity1"
-                  placeholder="Primary Activity"
-                  value={form?.activity1 || ""}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border p-3"
-                  required
-                />
-                <input
-                  name="activity2"
-                  placeholder="Secondary Activity"
-                  value={form?.activity2 || ""}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border p-3"
-                />
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Social Name
+                  </label>
+                  <input
+                    name="socialName"
+                    placeholder="Social Name"
+                    value={form?.socialName || ""}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border p-3"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Fiscal ID
+                  </label>
+                  <input
+                    name="fiscalId"
+                    placeholder="Fiscal ID"
+                    value={form?.fiscalId || ""}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border p-3"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Business Type <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="businessType"
+                    placeholder="Business Type"
+                    value={form?.businessType || ""}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border p-3"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Primary Activity <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="activity1"
+                    value={form?.activity1 || ""}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border p-3"
+                    required
+                  >
+                    <option value="">Sélectionnez une activité</option>
+                    {ACTIVITIES.map((activity) => (
+                      <option key={activity} value={activity}>
+                        {activity}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Secondary Activity
+                  </label>
+                  <select
+                    name="activity2"
+                    value={form?.activity2 || ""}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border p-3"
+                  >
+                    <option value="">Sélectionnez une activité</option>
+                    {ACTIVITIES.map((activity) => (
+                      <option key={activity} value={activity}>
+                        {activity}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 

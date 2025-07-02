@@ -19,7 +19,6 @@ const intlMiddleware = createIntlMiddleware({
 
 const middleware = auth((req: any) => {
   const session = req?.auth;
-
   const isAdmin = session?.user?.roleId === "1";
 
   const isLoginPage = req.nextUrl.pathname.includes("/login");
@@ -29,11 +28,17 @@ const middleware = auth((req: any) => {
   }
 
   if (session && isLoginPage) {
-    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+    if (isAdmin) {
+      return NextResponse.redirect("/marketplace/dashboard");
+    } else if (session?.user?.userType === "partner") {
+      return NextResponse.redirect("/marketplace/partners/dashboard");
+    }
   }
 
   if (session && !isAdmin && adminRoutes.includes(req.nextUrl.pathname)) {
-    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+    if (session?.user?.userType === "partner") {
+      return NextResponse.redirect("/marketplace/partners/dashboard");
+    }
   }
 
   return intlMiddleware(req);

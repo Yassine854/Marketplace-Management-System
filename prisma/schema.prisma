@@ -110,7 +110,7 @@ model Product {
   promo                Boolean  @default(false)
   minimumQte           Int?
   maximumQte           Int?
-  sealable             Float?
+  sealable             Int?
   alertQte             Int?
   loyaltyPointsPerProduct       Float?
   loyaltyPointsPerUnit          Float?
@@ -133,8 +133,8 @@ model Product {
   promotionId          String?     @db.ObjectId
   partnerId            String?     @db.ObjectId
 
-  brand                Brand?
-
+  brand                Brand?  @relation(fields: [brandId], references: [id])
+  brandId               String?     @db.ObjectId
 
   activities           String[]   @default([]) @db.String // Array of activities that can be empty
   images               Image[]
@@ -379,8 +379,7 @@ model Customers {
   firstName    String
   lastName     String
   governorate  String
-  gender       String
-  email        String    @unique
+  email        String    
   telephone    String
   address      String
   password     String
@@ -475,10 +474,8 @@ model Image {
 model Brand {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   img        String
-  name    String?
-  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId  String   @unique @db.ObjectId
-
+  name       String?
+  products   Product[]
 
   @@map("brands")
 }
@@ -534,8 +531,8 @@ model SubCategory {
   name        String
   isActive    Boolean?  @default(true)
   image       String?
-  categoryId  String    @db.ObjectId
-  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  String?   @db.ObjectId
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   productSubCategories       ProductSubCategory[]
@@ -848,6 +845,9 @@ model Banner {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   url        String
   altText    String?
+  description String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
   @@map("banners")
 }
 
@@ -892,6 +892,7 @@ model Stock {
   sourceId        String   @db.ObjectId
 
   stockQuantity   Int
+  sealable        Int?
   minQty          Int
   maxQty          Int
   price           Float

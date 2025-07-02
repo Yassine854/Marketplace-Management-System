@@ -38,6 +38,8 @@ interface CreateProductData {
   }>;
   brandName?: string;
   brandImage?: File | null;
+  brandId?: string;
+  activities?: string[];
 }
 
 export function useCreateProduct() {
@@ -159,8 +161,32 @@ export function useCreateProduct() {
         formData.append(`relatedProducts[${index}]`, relatedProductId);
       });
 
-      // Add promo flag
       formData.append("promo", productData.promo.toString());
+
+      // Add brandId to formData if provided
+      if (productData.brandId) {
+        formData.append("brandId", productData.brandId);
+      }
+
+      // Add activities to formData as activities[0], activities[1], ...
+      if (productData.activities && productData.activities.length > 0) {
+        productData.activities.forEach((activity, idx) => {
+          formData.append(`activities[${idx}]`, activity);
+        });
+      }
+
+      console.log("Sending product data:", {
+        name: productData.name,
+        barcode: productData.barcode,
+        sku: productData.sku,
+        price: productData.price,
+      });
+
+      const formDataEntries: string[] = [];
+      formData.forEach((value, key) => {
+        formDataEntries.push(`${key}: ${value}`);
+      });
+      console.log(formDataEntries.join(", "));
 
       const response = await axios.post(
         "/api/marketplace/products/create",
@@ -187,12 +213,10 @@ export function useCreateProduct() {
 
       return null;
     } catch (err: any) {
-      // Check if the error is due to barcode already existing
       if (
         err.response?.status === 400 &&
         err.response?.data?.message === "Barcode already exists"
       ) {
-        // Try to find the existing product with this barcode
         try {
           const searchResponse = await axios.get(
             `/api/marketplace/products/search?query=${encodeURIComponent(
@@ -205,13 +229,11 @@ export function useCreateProduct() {
             Array.isArray(searchResponse.data.products) &&
             searchResponse.data.products.length > 0
           ) {
-            // Find the product with matching barcode
             const existingProduct = searchResponse.data.products.find(
               (p: any) => p.barcode === productData.barcode,
             );
 
             if (existingProduct) {
-              // Process related data for the existing product
               await processRelatedData(existingProduct.id, productData);
               onSuccess?.(existingProduct.id);
               return existingProduct;

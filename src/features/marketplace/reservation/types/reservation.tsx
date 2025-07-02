@@ -19,10 +19,21 @@ export interface ReservationItem {
     id: string;
     username: string;
   };
+  product?: {
+    id: string;
+    name: string;
+    // add other fields as needed
+  };
   sourceId?: string;
   source?: {
     id: string;
     name: string;
+    partner?: {
+      id: string;
+      username: string;
+      firstName?: string;
+      lastName?: string;
+    };
   };
 }
 export interface Partner {

@@ -151,6 +151,31 @@ export async function PATCH(
     const { id } = params;
     const formData = await req.formData();
 
+    // Validate required fields if present in update
+    const requiredFields = [
+      { key: "firstName", label: "First Name" },
+      { key: "lastName", label: "Last Name" },
+      { key: "businessType", label: "Business Type" },
+      { key: "activity1", label: "Primary Activity" },
+    ];
+    const missingFields = requiredFields.filter(({ key }) => {
+      if (formData.has(key)) {
+        const value = formData.get(key);
+        return !value || (typeof value === "string" && value.trim() === "");
+      }
+      return false;
+    });
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        {
+          error: `Missing required field(s): ${missingFields
+            .map((f) => f.label)
+            .join(", ")}`,
+        },
+        { status: 400 },
+      );
+    }
+
     const existingCustomer = await prisma.customers.findUnique({
       where: { id },
     });
@@ -219,9 +244,7 @@ export async function PATCH(
       telephone: (formData.get("telephone") as string) || undefined,
       address: (formData.get("address") as string) || undefined,
       governorate: (formData.get("governorate") as string) || undefined,
-      gender: formData.get("gender")
-        ? (formData.get("gender") as string).trim()
-        : undefined,
+
       socialName: (formData.get("socialName") as string) || undefined,
       fiscalId: (formData.get("fiscalId") as string) || undefined,
       businessType: (formData.get("businessType") as string) || undefined,
@@ -277,20 +300,20 @@ export async function PATCH(
     );
 
     // Check if email is being changed and if it already exists
-    if (updateData.email && updateData.email !== existingCustomer.email) {
-      const emailExists = await prisma.customers.findFirst({
-        where: {
-          email: updateData.email,
-          NOT: { id: existingCustomer.id },
-        },
-      });
-      if (emailExists) {
-        return NextResponse.json(
-          { error: "Email already exists" },
-          { status: 409 },
-        );
-      }
-    }
+    // if (updateData.email && updateData.email !== existingCustomer.email) {
+    //   const emailExists = await prisma.customers.findFirst({
+    //     where: {
+    //       email: updateData.email,
+    //       NOT: { id: existingCustomer.id },
+    //     },
+    //   });
+    //   if (emailExists) {
+    //     return NextResponse.json(
+    //       { error: "Email already exists" },
+    //       { status: 409 },
+    //     );
+    //   }
+    // }
 
     const updatedCustomer = await prisma.customers.update({
       where: { id },

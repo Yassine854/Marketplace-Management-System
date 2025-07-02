@@ -62,6 +62,28 @@ export async function POST(req: Request) {
 
     const formData = await req.formData();
 
+    // Validate required fields
+    const requiredFields = [
+      { key: "firstName", label: "First Name" },
+      { key: "lastName", label: "Last Name" },
+      { key: "businessType", label: "Business Type" },
+      { key: "activity1", label: "Primary Activity" },
+    ];
+    const missingFields = requiredFields.filter(({ key }) => {
+      const value = formData.get(key);
+      return !value || (typeof value === "string" && value.trim() === "");
+    });
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        {
+          error: `Missing required field(s): ${missingFields
+            .map((f) => f.label)
+            .join(", ")}`,
+        },
+        { status: 400 },
+      );
+    }
+
     const existingData = await prisma.customers.findFirst();
 
     if (!existingData) {
@@ -117,7 +139,6 @@ export async function POST(req: Request) {
       telephone: formData.get("telephone") as string,
       address: formData.get("address") as string,
       governorate: formData.get("governorate") as string,
-      gender: (formData.get("gender") as string).trim(),
       password: await hash(formData.get("password") as string, 10),
       socialName: (formData.get("socialName") as string) || null,
       fiscalId: formData.get("fiscalId") as string,
@@ -130,16 +151,16 @@ export async function POST(req: Request) {
       mRoleId: (formData.get("mRoleId") as string) || null,
     };
 
-    const existingCustomer = await prisma.customers.findFirst({
-      where: { email: customerData.email },
-    });
+    // const existingCustomer = await prisma.customers.findFirst({
+    //   where: { email: customerData.email },
+    // });
 
-    if (existingCustomer) {
-      return NextResponse.json(
-        { error: "Email already exists" },
-        { status: 409 },
-      );
-    }
+    // if (existingCustomer) {
+    //   return NextResponse.json(
+    //     { error: "Email already exists" },
+    //     { status: 409 },
+    //   );
+    // }
 
     const newCustomer = await prisma.customers.create({
       data: customerData,

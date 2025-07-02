@@ -1,296 +1,274 @@
 import { useState, useEffect } from "react";
-import { Reservation, ReservationItem } from "../types/reservation";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
-  X,
-  Package,
-  Scale,
-  Tag,
-  Percent,
-  CheckCircle,
-  Users,
-  DollarSign,
-} from "lucide-react";
+  Reservation,
+  ReservationItem,
+} from "@/features/marketplace/reservation/types/reservation";
+
 interface EditReservationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  reservation: Reservation;
-  onSave: (updatedReservation: Reservation) => Promise<void> | void;
+  onEdit: (reservationData: {
+    id: string;
+    isActive?: boolean;
+    shippingMethod?: string;
+    shippingAmount?: number;
+  }) => void;
+  initialData: Reservation | null;
 }
-
-const SectionHeader = ({
-  icon: Icon,
-  title,
-}: {
-  icon: React.ElementType;
-  title: string;
-}) => (
-  <h3 className="mb-6 flex items-center space-x-2 text-lg font-semibold text-gray-900">
-    <span className="rounded-lg bg-blue-100 p-2">
-      <Icon className="h-5 w-5 text-blue-600" />
-    </span>
-    <span>{title}</span>
-  </h3>
-);
-
-const ReadOnlyField = ({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) => (
-  <div>
-    <label className="mb-2 block text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <input
-      readOnly
-      value={value}
-      className="w-full rounded-lg border border-gray-200 bg-gray-100 px-4 py-2.5 shadow-sm"
-    />
-  </div>
-);
-
-const ReservationItemCard = ({ item }: { item: ReservationItem }) => (
-  <div className="rounded-lg border border-gray-100 bg-white p-4 transition-all hover:shadow-md">
-    <div className="flex items-center justify-between">
-      <h4 className="font-medium text-gray-900">
-        {item.productName || "Unknown Product"}
-      </h4>
-      <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800">
-        SKU: {item.sku}
-      </span>
-    </div>
-    <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-      <div className="flex items-center text-gray-600">
-        <DollarSign className="mr-2 h-4 w-4 text-indigo-500" />
-        <span>
-          <span className="font-medium">Price:</span>{" "}
-          {item.price.toFixed(3) || 0} DT
-        </span>
-      </div>
-      <div className="flex items-center space-x-2 text-gray-600">
-        <Tag className="h-4 w-4 text-blue-500" />
-        <span>{item.discountedPrice} DT</span>
-      </div>
-      <div className="flex items-center space-x-2 text-gray-600">
-        <Package className="h-4 w-4 text-blue-500" />
-        <span>Qty: {item.qteReserved}</span>
-      </div>
-      <div className="flex items-center space-x-2 text-gray-600">
-        <Scale className="h-4 w-4 text-blue-500" />
-        <span>{item.weight}</span>
-      </div>
-    </div>
-  </div>
-);
 
 const EditReservationModal = ({
   isOpen,
   onClose,
-  reservation,
-  onSave,
+  onEdit,
+  initialData,
 }: EditReservationModalProps) => {
-  const [editedReservation, setEditedReservation] = useState(reservation);
-  const [isSaving, setIsSaving] = useState(false);
-  const [showItems, setShowItems] = useState(false);
+  const [shippingMethod, setShippingMethod] = useState("");
+  const [shippingAmount, setShippingAmount] = useState(0);
+  const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
-    setEditedReservation(reservation);
-  }, [reservation]);
-
-  const handleStatusChange = (value: string) => {
-    setEditedReservation((prev) => ({ ...prev, isActive: value === "true" }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSaving(true);
-    try {
-      await onSave(editedReservation);
-      onClose();
-    } catch (error) {
-      console.error("Failed to save reservation:", error);
-    } finally {
-      setIsSaving(false);
+    if (initialData) {
+      setShippingMethod(initialData.shippingMethod || "");
+      setShippingAmount(initialData.shippingAmount || 0);
+      setIsActive(initialData.isActive || false);
     }
+  }, [initialData]);
+
+  const handleSubmit = () => {
+    if (!initialData) return;
+
+    const reservationData = {
+      id: initialData.id,
+      shippingMethod: shippingMethod.trim() || undefined,
+      shippingAmount: shippingAmount || undefined,
+      isActive,
+    };
+
+    onEdit(reservationData);
+    resetForm();
   };
 
-  if (!isOpen) return null;
+  const resetForm = () => {
+    setShippingMethod("");
+    setShippingAmount(0);
+    setIsActive(false);
+  };
+
+  if (!isOpen || !initialData) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 backdrop-blur-sm">
-      <div className="my-8 max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-xl bg-white shadow-2xl">
-        <form onSubmit={handleSubmit}>
-          {/* Modal Header */}
-          <div className="sticky top-0 z-10 border-b border-gray-100 bg-white px-8 py-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="rounded-lg bg-blue-100 p-2">
-                  <Package className="h-6 w-6 text-blue-600" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Edit Reservation
-                  </h2>
-                  <p className="mt-1 text-sm text-gray-500">
-                    ID: #{editedReservation.id}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-500"
-                aria-label="Close modal"
-                disabled={isSaving}
-              >
-                <X className="h-6 w-6" />
-              </button>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-4xl rounded-lg bg-white p-6 shadow-2xl transition-all duration-300 ease-in-out"
+        style={{ maxHeight: "90vh", overflowY: "auto" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+        >
+          <XMarkIcon className="h-6 w-6" />
+        </button>
+
+        <h2 className="mb-4 text-2xl font-bold text-gray-800">
+          Edit Reservation
+        </h2>
+
+        {/* Reservation Details */}
+        <div className="mb-6 rounded-lg border border-gray-200 p-4">
+          <h3 className="mb-3 text-lg font-semibold text-gray-700">
+            Reservation Information
+          </h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Reservation ID
+              </label>
+              <p className="mt-1 text-sm text-gray-900">{initialData.id}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Customer
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {initialData.customer?.firstName}{" "}
+                {initialData.customer?.lastName}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Total Amount (TTC)
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {initialData.amountTTC.toFixed(2)} TND
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Created Date
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {new Date(initialData.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Payment Method
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {initialData.paymentMethod?.name}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Weight
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {initialData.weight} kg
+              </p>
             </div>
           </div>
+        </div>
 
-          {/* Main Content */}
-          <div className="space-y-8 p-8">
-            <div className="flex justify-center">
-              <button
-                type="button"
-                onClick={() => setShowItems(!showItems)}
-                className="flex items-center space-x-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-blue-700 hover:shadow-md"
+        {/* Reservation Items */}
+        <div className="mb-6 rounded-lg border border-gray-200 p-4">
+          <h3 className="mb-3 text-lg font-semibold text-gray-700">
+            Reservation Items
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700">
+                    Product
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700">
+                    SKU
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700">
+                    Quantity
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700">
+                    Total
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700">
+                    Partner → Source
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700">
+                    Amount
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {initialData.reservationItems.map((item: ReservationItem) => (
+                  <tr key={item.id} className="hover:bg-gray-50">
+                    <td className="px-3 py-2 text-gray-900">
+                      {item.product?.name || "N/A"}
+                    </td>
+                    <td className="px-3 py-2 text-gray-600">{item.sku}</td>
+                    <td className="px-3 py-2 text-gray-900">
+                      {item.qteReserved}
+                    </td>
+                    <td className="px-3 py-2 text-gray-900">
+                      {item.discountedPrice.toFixed(2)} TND
+                    </td>
+
+                    <td className="px-3 py-2 text-gray-600">
+                      {/* Partner → Source Partner - Source Name */}
+                      {`${item.partner?.username || "N/A"} → ${
+                        item.source?.name || "N/A"
+                      }`}
+                    </td>
+                    <td className="px-3 py-2 text-gray-900">
+                      {(item.qteReserved * item.discountedPrice).toFixed(2)} TND
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Edit Form */}
+        <div className="mb-6 rounded-lg border border-gray-200 p-4">
+          <h3 className="mb-3 text-lg font-semibold text-gray-700">
+            Edit Reservation Settings
+          </h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label
+                htmlFor="shippingMethod"
+                className="block text-sm font-medium text-gray-700"
               >
-                <Package className="h-5 w-5" />
-                <span>
-                  {showItems
-                    ? "Hide Items"
-                    : `Show Items (${editedReservation.reservationItems.length})`}
+                Shipping Method
+              </label>
+              <input
+                id="shippingMethod"
+                type="text"
+                placeholder="Enter shipping method"
+                value={shippingMethod}
+                onChange={(e) => setShippingMethod(e.target.value)}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="shippingAmount"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Shipping Amount (TND)
+              </label>
+              <input
+                id="shippingAmount"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                value={shippingAmount}
+                onChange={(e) =>
+                  setShippingAmount(parseFloat(e.target.value) || 0)
+                }
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="ml-2 text-sm font-medium text-gray-700">
+                  Active Reservation
                 </span>
-              </button>
-            </div>
-
-            {showItems && (
-              <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                <SectionHeader icon={Tag} title="Reservation Items" />
-                <div className="grid gap-4 md:grid-cols-2">
-                  {editedReservation.reservationItems.map((item) => (
-                    <ReservationItemCard key={item.id} item={item} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-              {/* Financial Information Section */}
-              <div className="rounded-xl bg-gray-50 p-6">
-                <SectionHeader icon={Percent} title="Financial Information" />
-                <div className="space-y-4">
-                  {[
-                    { label: "Amount TTC", value: editedReservation.amountTTC },
-                    {
-                      label: "Amount Ordered",
-                      value: editedReservation.amountOrdered,
-                    },
-                    {
-                      label: "Shipping Amount",
-                      value: editedReservation.shippingAmount,
-                    },
-                  ].map((field) => (
-                    <ReadOnlyField
-                      key={field.label}
-                      label={`${field.label} (DT)`}
-                      value={field.value}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Status Information Section */}
-              <div className="rounded-xl bg-gray-50 p-6">
-                <SectionHeader icon={CheckCircle} title="Status Information" />
-                <div className="space-y-4">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                      State
-                    </label>
-                    <select
-                      value={String(editedReservation.isActive)}
-                      onChange={(e) => handleStatusChange(e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 shadow-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="true">Active</option>
-                      <option value="false">Inactive</option>
-                    </select>
-                  </div>
-                  <ReadOnlyField
-                    label="From Mobile"
-                    value={editedReservation.fromMobile ? "Yes" : "No"}
-                  />
-                  <ReadOnlyField
-                    label="Shipping Method"
-                    value={editedReservation.shippingMethod || ""}
-                  />
-                  <ReadOnlyField
-                    label="Loyalty Points Value"
-                    value={editedReservation.loyaltyPtsValue || 0}
-                  />
-                  <ReadOnlyField
-                    label="Weight"
-                    value={`${editedReservation.weight}`}
-                  />
-                </div>
-              </div>
-
-              {/* Additional Information Section */}
-              <div className="rounded-xl bg-gray-50 p-6">
-                <SectionHeader icon={Users} title="Additional Information" />
-                <div className="space-y-4">
-                  <ReadOnlyField
-                    label="Customer"
-                    value={`${editedReservation.customer?.firstName || ""} ${
-                      editedReservation.customer?.lastName || ""
-                    }`}
-                  />
-
-                  <ReadOnlyField
-                    label="Created At"
-                    value={new Date(
-                      editedReservation.createdAt,
-                    ).toLocaleDateString("fr-FR")}
-                  />
-                  <ReadOnlyField
-                    label="Updated At"
-                    value={new Date(
-                      editedReservation.updatedAt,
-                    ).toLocaleDateString("fr-FR")}
-                  />
-                </div>
-              </div>
+              </label>
+              <p className="mt-1 text-xs text-gray-500">
+                Active reservations can be processed and converted to orders
+              </p>
             </div>
           </div>
+        </div>
 
-          {/* Footer Actions */}
-          <div className="sticky bottom-0 border-t border-gray-100 bg-white px-8 py-6 shadow-sm">
-            <div className="flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={isSaving}
-                className="rounded-lg border border-gray-200 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:shadow-md"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md"
-              >
-                {isSaving && (
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                )}
-                <span>{isSaving ? "Saving..." : "Save Changes"}</span>
-              </button>
-            </div>
-          </div>
-        </form>
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="rounded-md bg-gray-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+          >
+            Save Changes
+          </button>
+        </div>
       </div>
     </div>
   );

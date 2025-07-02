@@ -8,43 +8,48 @@ export const useGetAllProducts = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
-  const userId = session?.user?.id;
+
+  // Get user info from session
+  const user = session?.user as
+    | {
+        id: string;
+        roleId?: string;
+        mRoleId?: string;
+        userType?: string;
+      }
+    | undefined;
+
+  const isPartner = user?.userType === "partner";
+  const partnerId = isPartner ? user.id : null;
 
   const fetchProducts = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // First get all SKU partners for this partner
-      const skuPartnersResponse = await axios.servicesClient.get(
-        "/api/marketplace/sku_partner/getAll",
-      );
-
-      // Filter SKU partners to only include those belonging to the current user
-      const userSkuPartners = skuPartnersResponse.data.skuPartners.filter(
-        (skuPartner: any) => skuPartner.partnerId === userId,
-      );
-
-      // Extract product IDs from the filtered SKU partners
-      const productIds = userSkuPartners.map(
-        (skuPartner: any) => skuPartner.productId,
-      );
-
-      // If no products are associated with this partner, return empty array
-      if (productIds.length === 0) {
-        setProducts([]);
-        return;
-      }
-
       // Get all products
       const { data } = await axios.servicesClient.get<{ products: Product[] }>(
         "/api/marketplace/products/getAll",
       );
 
-      // Filter products to only include those in the productIds array
-      const filteredProducts = data.products.filter((product) =>
-        productIds.includes(product.id),
-      );
+      // Filter products to include:
+      // 1. Products that have this partner's ID directly (partnerId)
+      // 2. Products that are linked through skuPartners relationship
+      const filteredProducts = data.products.filter((product) => {
+        // Direct relationship - product belongs to this partner
+        if (product.partnerId === partnerId) {
+          return true;
+        }
+
+        // Check if product has skuPartners and any of them belong to this partner
+        if (product.skuPartners && product.skuPartners.length > 0) {
+          return product.skuPartners.some(
+            (skuPartner: any) => skuPartner.partnerId === partnerId,
+          );
+        }
+
+        return false;
+      });
 
       setProducts(filteredProducts || []);
     } catch (err) {
@@ -66,10 +71,10 @@ export const useGetAllProducts = () => {
   };
 
   useEffect(() => {
-    if (userId) {
+    if (partnerId) {
       fetchProducts();
     }
-  }, [userId]);
+  }, [partnerId]);
 
   return {
     products,

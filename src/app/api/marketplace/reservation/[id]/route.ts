@@ -43,7 +43,17 @@ export async function GET(
           customer: true,
           order: true,
           paymentMethod: true,
-          reservationItems: true,
+          reservationItems: {
+            include: {
+              product: true,
+              partner: true,
+              source: {
+                include: {
+                  partner: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -90,7 +100,17 @@ export async function GET(
         customer: true,
         order: true,
         paymentMethod: true,
-        reservationItems: true,
+        reservationItems: {
+          include: {
+            product: true,
+            partner: true,
+            source: {
+              include: {
+                partner: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -172,9 +192,10 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
+    const { id: _id, ...updateData } = body;
     const updatedReservation = await prisma.reservation.update({
       where: { id },
-      data: body,
+      data: updateData,
     });
 
     return NextResponse.json(

@@ -189,7 +189,20 @@ export async function GET(req: Request) {
             },
           },
         },
-        orderItems: true,
+        orderItems: {
+          include: {
+            product: {
+              select: {
+                name: true,
+              },
+            },
+            source: {
+              include: {
+                partner: true,
+              },
+            },
+          },
+        },
         loyaltyPoints: true,
         paymentMethod: true,
       },

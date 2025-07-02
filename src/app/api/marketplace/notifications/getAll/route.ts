@@ -22,6 +22,11 @@ export async function GET() {
       isActive: boolean;
     };
 
+    // Check if user has a role ID before proceeding
+    if (!user.mRoleId) {
+      return NextResponse.json({ message: "No role found" }, { status: 403 });
+    }
+
     // Get user's role
     const userRole = await prisma.role.findUnique({
       where: { id: user.mRoleId },

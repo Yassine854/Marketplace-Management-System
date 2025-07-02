@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
+import {
+  isKamiounAdminMaster,
+  getRoleIdForPermissions,
+  UserSession,
+} from "../../../../../utils/auth/getUserRole";
 
 const prisma = new PrismaClient();
 
@@ -11,32 +16,22 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    let user = session.user as {
-      id: string;
-      roleId: string;
-      mRoleId: string;
-      username: string;
-      firstName: string;
-      lastName: string;
-      isActive: boolean;
-    };
+    let user = session.user as UserSession;
 
-    // Get user's role
-    const userRole = await prisma.role.findUnique({
-      where: { id: user.mRoleId },
-    });
+    // Check if user is KamiounAdminMaster
+    const isAdmin = await isKamiounAdminMaster(user);
 
-    // Allow access if user is KamiounAdminMaster
-    const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
+    if (!isAdmin) {
+      // For non-admin users, check role permissions
+      const roleIdToCheck = getRoleIdForPermissions(user);
 
-    if (!isKamiounAdminMaster) {
-      if (!user.mRoleId) {
+      if (!roleIdToCheck) {
         return NextResponse.json({ message: "No role found" }, { status: 403 });
       }
 
       const rolePermissions = await prisma.rolePermission.findMany({
         where: {
-          roleId: user.mRoleId,
+          roleId: roleIdToCheck,
         },
         include: {
           permission: true,

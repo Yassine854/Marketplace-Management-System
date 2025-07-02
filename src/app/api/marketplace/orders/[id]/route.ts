@@ -71,8 +71,11 @@ export async function GET(
         orderItems: {
           include: {
             product: true,
-            source: true,
-            partner: true,
+            source: {
+              include: {
+                partner: true,
+              },
+            },
           },
         },
         loyaltyPoints: true,

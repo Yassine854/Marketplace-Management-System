@@ -45,8 +45,11 @@ export default function CustomerTable({
 
   const columns = useMemo<ColumnDef<Customer, any>[]>(
     () => [
-      columnHelper.accessor("firstName", {
-        header: "First Name",
+      {
+        id: "fullName",
+        header: "Full Name",
+        accessorFn: (row) =>
+          `${row.firstName || ""} ${row.lastName || ""}`.trim(),
         cell: (info) => (
           <div className="max-w-xs">
             <span className="text-sm text-gray-900">
@@ -54,19 +57,8 @@ export default function CustomerTable({
             </span>
           </div>
         ),
-        size: 150,
-      }),
-      columnHelper.accessor("lastName", {
-        header: "Last Name",
-        cell: (info) => (
-          <div className="max-w-xs">
-            <span className="text-sm text-gray-900">
-              {info.getValue() || "-"}
-            </span>
-          </div>
-        ),
-        size: 150,
-      }),
+        size: 200,
+      },
       columnHelper.accessor("email", {
         header: "Email",
         cell: (info) => (
@@ -100,17 +92,7 @@ export default function CustomerTable({
         ),
         size: 200,
       }),
-      columnHelper.accessor("governorate", {
-        header: "Governorate",
-        cell: (info) => (
-          <div className="max-w-xs">
-            <span className="text-sm text-gray-900">
-              {info.getValue() || "-"}
-            </span>
-          </div>
-        ),
-        size: 150,
-      }),
+
       {
         id: "actions",
         header: "Actions",

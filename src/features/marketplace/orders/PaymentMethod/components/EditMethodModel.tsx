@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-interface EditMethodModalProps {
+interface EditStateModalProps {
   isOpen: boolean;
   onClose: () => void;
   onEdit: (id: string, name: string) => void;
@@ -8,7 +8,7 @@ interface EditMethodModalProps {
   initialName: string;
 }
 
-const EditMethodModal: React.FC<EditMethodModalProps> = ({
+const EditStateModal: React.FC<EditStateModalProps> = ({
   isOpen,
   onClose,
   onEdit,
@@ -31,7 +31,7 @@ const EditMethodModal: React.FC<EditMethodModalProps> = ({
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="w-96 rounded-lg bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-xl font-bold">Edit Payment Method</h2>
+        <h2 className="mb-4 text-xl font-bold">Edit State</h2>
         <input
           type="text"
           className="mb-4 w-full rounded border p-2"
@@ -54,4 +54,4 @@ const EditMethodModal: React.FC<EditMethodModalProps> = ({
   );
 };
 
-export default EditMethodModal;
+export default EditStateModal;

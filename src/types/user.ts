@@ -7,4 +7,5 @@ export type User = {
   status: string;
   roleId: string;
   mRoleId: string;
+  userType?: string;
 };

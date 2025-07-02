@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
+import { useProductActions } from "../hooks/useProductActions";
 
 // Add Stock interface
 interface Stock {
@@ -15,6 +16,7 @@ interface Stock {
   loyaltyPointsPerUnit?: number;
   loyaltyPointsBonusQuantity?: number;
   loyaltyPointsThresholdQty?: number;
+  sealable?: number;
   source?: {
     id: string;
     name: string;
@@ -177,11 +179,6 @@ const EditProductModal = ({
 
   // Add function to add a new stock
   const addStock = () => {
-    if (!partnerSkuPartner?.id) {
-      toast.error("You need to save your SKU first before adding stock");
-      return;
-    }
-
     setStocks([
       ...stocks,
       {
@@ -276,6 +273,8 @@ const EditProductModal = ({
   // const [partnerSkuPartner, setPartnerSkuPartner] = useState<SkuPartner | null>(null);
   // const [stocks, setStocks] = useState<Stock[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
+
+  const { updateSkuPartner } = useProductActions();
 
   useEffect(() => {
     if (product && isOpen) {
@@ -483,6 +482,38 @@ const EditProductModal = ({
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    // Required field validations for stock management
+    if (!stocks || stocks.length === 0) {
+      toast.error("At least one stock entry is required");
+      setIsLoading(false);
+      return;
+    }
+    const hasValidStock = (stocks || []).some(
+      (stock) =>
+        stock.sourceId &&
+        stock.sourceId.trim() &&
+        stock.price &&
+        Number(stock.price) > 0 &&
+        stock.special_price !== undefined &&
+        stock.special_price !== null &&
+        String(stock.special_price).trim() !== "" &&
+        stock.stockQuantity !== undefined &&
+        stock.stockQuantity !== null &&
+        String(stock.stockQuantity).trim() !== "" &&
+        stock.minQty !== undefined &&
+        stock.minQty !== null &&
+        String(stock.minQty).trim() !== "" &&
+        stock.maxQty !== undefined &&
+        stock.maxQty !== null &&
+        String(stock.maxQty).trim() !== "",
+    );
+    if (!hasValidStock) {
+      toast.error(
+        "At least one stock entry must have all fields filled: Source, Price, Special Price, Stock Qty, Min Qty, Max Qty",
+      );
+      setIsLoading(false);
+      return;
+    }
 
     try {
       // Only update the partner SKU and stocks
@@ -499,17 +530,25 @@ const EditProductModal = ({
             productId: product?.id,
           };
 
-          const response = await fetch("/api/marketplace/sku_partner", {
+          const response = await fetch("/api/marketplace/sku_partner/create", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
           });
 
           if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(
-              errorData.message || "Failed to create SKU partner",
-            );
+            let errorMessage = "Failed to create SKU partner";
+            try {
+              const errorData = await response.json();
+              errorMessage =
+                errorData.message || errorData.error || errorMessage;
+            } catch (jsonError) {
+              // If response is not JSON (e.g., HTML error page)
+              const textError = await response.text();
+              console.error("Non-JSON response:", textError);
+              errorMessage = `Server error: ${response.status} ${response.statusText}`;
+            }
+            throw new Error(errorMessage);
           }
 
           const data = await response.json();
@@ -539,10 +578,18 @@ const EditProductModal = ({
           );
 
           if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(
-              errorData.message || "Failed to update SKU partner",
-            );
+            let errorMessage = "Failed to update SKU partner";
+            try {
+              const errorData = await response.json();
+              errorMessage =
+                errorData.message || errorData.error || errorMessage;
+            } catch (jsonError) {
+              // If response is not JSON (e.g., HTML error page)
+              const textError = await response.text();
+              console.error("Non-JSON response:", textError);
+              errorMessage = `Server error: ${response.status} ${response.statusText}`;
+            }
+            throw new Error(errorMessage);
           }
         }
 
@@ -552,7 +599,7 @@ const EditProductModal = ({
           const newStocks = stocks.filter((stock) => !stock.id);
           for (const stock of newStocks) {
             try {
-              const response = await fetch("/api/marketplace/stock", {
+              const response = await fetch("/api/marketplace/stock/create", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -571,8 +618,18 @@ const EditProductModal = ({
               });
 
               if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Failed to create stock");
+                let errorMessage = "Failed to create stock";
+                try {
+                  const errorData = await response.json();
+                  errorMessage =
+                    errorData.message || errorData.error || errorMessage;
+                } catch (jsonError) {
+                  // If response is not JSON (e.g., HTML error page)
+                  const textError = await response.text();
+                  console.error("Non-JSON response:", textError);
+                  errorMessage = `Server error: ${response.status} ${response.statusText}`;
+                }
+                throw new Error(errorMessage);
               }
             } catch (stockError) {
               console.error("Error creating stock:", stockError);
@@ -611,12 +668,18 @@ const EditProductModal = ({
               );
 
               if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                  errorData.message ||
-                    errorData.error ||
-                    "Failed to update stock",
-                );
+                let errorMessage = "Failed to update stock";
+                try {
+                  const errorData = await response.json();
+                  errorMessage =
+                    errorData.message || errorData.error || errorMessage;
+                } catch (jsonError) {
+                  // If response is not JSON (e.g., HTML error page)
+                  const textError = await response.text();
+                  console.error("Non-JSON response:", textError);
+                  errorMessage = `Server error: ${response.status} ${response.statusText}`;
+                }
+                throw new Error(errorMessage);
               }
             } catch (stockError) {
               console.error("Error updating stock:", stockError);
@@ -697,27 +760,7 @@ const EditProductModal = ({
             }`}
             onClick={() => setActiveTab("basic")}
           >
-            Basic Info
-          </button>
-          <button
-            className={`whitespace-nowrap px-4 py-3 text-sm font-medium ${
-              activeTab === "specs"
-                ? "border-b-2 border-blue-500 text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("specs")}
-          >
-            Specifications
-          </button>
-          <button
-            className={`whitespace-nowrap px-4 py-3 text-sm font-medium ${
-              activeTab === "pricing"
-                ? "border-b-2 border-blue-500 text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("pricing")}
-          >
-            Pricing & Stock
+            Basic Information
           </button>
           <button
             className={`whitespace-nowrap px-4 py-3 text-sm font-medium ${
@@ -731,13 +774,13 @@ const EditProductModal = ({
           </button>
           <button
             className={`whitespace-nowrap px-4 py-3 text-sm font-medium ${
-              activeTab === "partners"
+              activeTab === "stock"
                 ? "border-b-2 border-blue-500 text-blue-600"
                 : "text-gray-500 hover:text-gray-700"
             }`}
-            onClick={() => setActiveTab("partners")}
+            onClick={() => setActiveTab("stock")}
           >
-            Partner SKUs
+            Stock Management
           </button>
           <button
             className={`whitespace-nowrap px-4 py-3 text-sm font-medium ${
@@ -754,496 +797,188 @@ const EditProductModal = ({
         <div className="p-6">
           {/* Basic Information */}
           {activeTab === "basic" && (
-            <div className="space-y-4 pb-6">
-              <h3 className="text-xl font-semibold text-primary">
+            <div className="pb-6">
+              <h3 className="mb-4 text-xl font-semibold text-primary">
                 Basic Information
               </h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Product Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Product Name"
-                    value={formState.name}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Bar Code
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Bar Code"
-                    value={formState.barcode || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    SKU
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="SKU"
-                    value={formState.sku}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Description
-                </label>
-                <textarea
-                  placeholder="Description"
-                  value={formState.description}
-                  disabled
-                  className="w-full rounded-lg border bg-gray-100 p-3"
-                  rows={4}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Specifications - ensure all fields are disabled */}
-          {activeTab === "specs" && (
-            <div className="space-y-4 pt-6">
-              <h3 className="text-xl font-semibold text-primary">
-                Specifications
-              </h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    PCB
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="PCB"
-                    value={formState.pcb || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Weight
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Weight"
-                    value={formState.weight || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Minimum Quantity
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Minimum Quantity"
-                    value={formState.minimumQte || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Maximum Quantity
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Maximum Quantity"
-                    value={formState.maximumQte || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Sealable
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Sealable"
-                    value={formState.sealable || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Alert Quantity
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Alert Quantity"
-                    value={formState.alertQte || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Pricing & Stock - all fields disabled */}
-          {activeTab === "pricing" && (
-            <div className="space-y-4 pt-6">
-              <h3 className="text-xl font-semibold text-primary">
-                Pricing & Stock
-              </h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Price *
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Price *"
-                    value={formState.price}
-                    onChange={(e) => handleInputChange("price", e.target.value)}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Special Price
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Special Price"
-                    value={formState.special_price || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Cost
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Cost"
-                    value={formState.cost || ""}
-                    onChange={(e) => handleInputChange("cost", e.target.value)}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Stock
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Stock"
-                    value={formState.stock || ""}
-                    onChange={(e) => handleInputChange("stock", e.target.value)}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  />
-                </div>
-              </div>
-
-              {/* Loyalty Program */}
-              <div className="pt-4">
-                <h4 className="mb-3 text-lg font-medium text-gray-800">
-                  Loyalty Program
-                </h4>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="rounded-xl border bg-gray-50 p-6 shadow-sm">
+                <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Points Per Product
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Points Per Product"
-                      value={formState.loyaltyPointsPerProduct || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "loyaltyPointsPerProduct",
-                          e.target.value,
-                        )
-                      }
-                      disabled
-                      className="w-full rounded-lg border bg-gray-100 p-3"
-                    />
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Bar Code
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {formState.barcode || "-"}
+                    </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Points Per Unit
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Points Per Unit"
-                      value={formState.loyaltyPointsPerUnit || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "loyaltyPointsPerUnit",
-                          e.target.value,
-                        )
-                      }
-                      disabled
-                      className="w-full rounded-lg border bg-gray-100 p-3"
-                    />
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      SKU
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {formState.sku || "-"}
+                    </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Bonus Quantity
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Bonus Quantity"
-                      value={formState.loyaltyPointsBonusQuantity || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "loyaltyPointsBonusQuantity",
-                          e.target.value,
-                        )
-                      }
-                      disabled
-                      className="w-full rounded-lg border bg-gray-100 p-3"
-                    />
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Product Name
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {formState.name || "-"}
+                    </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Threshold Quantity
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Threshold Quantity"
-                      value={formState.loyaltyPointsThresholdQty || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "loyaltyPointsThresholdQty",
-                          e.target.value,
-                        )
-                      }
-                      disabled
-                      className="w-full rounded-lg border bg-gray-100 p-3"
-                    />
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Price
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {formState.price ?? "-"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Weight
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {formState.weight ?? "-"}
+                    </div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Description
+                    </div>
+                    <div className="whitespace-pre-line text-lg font-medium text-gray-800">
+                      {formState.description || "-"}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Relationships - all fields disabled */}
+          {/* Relationships */}
           {activeTab === "relations" && (
-            <div className="space-y-4 pt-6">
-              <h3 className="text-xl font-semibold text-primary">
+            <div className="pt-15">
+              <h3 className="mb-4 text-xl font-semibold text-primary">
                 Relationships
               </h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Manufacturer
-                  </label>
-                  <select
-                    value={formState.supplierId || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  >
-                    <option value="">Select Manufacturer</option>
-                    {suppliers.map((supplier) => (
-                      <option key={supplier.id} value={supplier.id}>
-                        {supplier.companyName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Product Type
-                  </label>
-                  <select
-                    value={formState.productTypeId || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  >
-                    <option value="">Select Product Type</option>
-                    {productTypes.map((type) => (
-                      <option key={type.id} value={type.id}>
-                        {type.type}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    PCB Type
-                  </label>
-                  <select
-                    value={formState.typePcbId || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  >
-                    <option value="">Select PCB Type</option>
-                    {typePcbs.map((pcb) => (
-                      <option key={pcb.id} value={pcb.id}>
-                        {pcb.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Product Status
-                  </label>
-                  <select
-                    value={formState.productStatusId || ""}
-                    disabled
-                    className="w-full rounded-lg border bg-gray-100 p-3"
-                  >
-                    <option value="">Select Product Status</option>
-                    {productStatuses.map((status) => (
-                      <option key={status.id} value={status.id}>
-                        {status.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Rest of the relationships tab content */}
-              <div className="pt-4">
-                <h4 className="mb-3 text-lg font-medium text-gray-800">
-                  Sub-categories
-                </h4>
-                <select
-                  multiple
-                  value={formState.subCategories}
-                  disabled
-                  className="w-full rounded-lg border bg-gray-100 p-3"
-                  size={4}
-                >
-                  {subCategories.map((sc) => (
-                    <option key={sc.id} value={sc.id}>
-                      {sc.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Related Products - disabled */}
-              <div className="pt-4">
-                <h4 className="mb-3 text-lg font-medium text-gray-800">
-                  Related Products
-                </h4>
-                <select
-                  multiple
-                  value={formState.relatedProducts}
-                  disabled
-                  className="w-full rounded-lg border bg-gray-100 p-3"
-                  size={4}
-                >
-                  {relatedProducts.map((rp) => (
-                    <option key={rp.id} value={rp.id}>
-                      {rp.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Tax - disabled */}
-              <div className="pt-4">
-                <h4 className="mb-3 text-lg font-medium text-gray-800">Tax</h4>
-                <select
-                  value={formState.taxId || ""}
-                  disabled
-                  className="w-full rounded-lg border bg-gray-100 p-3"
-                >
-                  <option value="">Select Tax</option>
-                  {taxes.map((tax) => (
-                    <option key={tax.id} value={tax.id}>
-                      {tax.value}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Promotion - disabled */}
-              <div className="pt-4">
-                <h4 className="mb-3 text-lg font-medium text-gray-800">
-                  Promotion
-                </h4>
-                <label className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={formState.promo}
-                    disabled
-                    className="h-5 w-5 bg-gray-100"
-                  />
-                  <span>Promo Product</span>
-                </label>
-                {formState.promo && (
-                  <select
-                    value={formState.promotionId || ""}
-                    disabled
-                    className="mt-2 w-full rounded-lg border bg-gray-100 p-3"
-                  >
-                    <option value="">Select Promotion</option>
-                    {promotions.map((promo) => (
-                      <option key={promo.id} value={promo.id}>
-                        {promo.promoPrice}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              {/* Brand Information - Read Only */}
-              <div className="mt-6 rounded-lg border border-gray-200 p-4">
-                <h4 className="mb-4 text-lg font-medium text-gray-800">
-                  Brand Information
-                </h4>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="rounded-xl border bg-gray-50 p-6 shadow-sm">
+                <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Brand Name
-                    </label>
-                    <input
-                      type="text"
-                      value={product.brand?.name || ""}
-                      disabled
-                      className="w-full rounded-lg border bg-gray-100 p-3"
-                    />
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Manufacturer
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {suppliers.find((s) => s.id === formState.supplierId)
+                        ?.companyName || "-"}
+                    </div>
                   </div>
-                  {product.brand?.img && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Brand Logo
-                      </label>
-                      <div className="mt-2 h-24 w-24 overflow-hidden rounded-lg border">
+                  <div>
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Product Type
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {productTypes.find(
+                        (t) => t.id === formState.productTypeId,
+                      )?.type || "-"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      PCB Type
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {typePcbs.find((p) => p.id === formState.typePcbId)
+                        ?.name || "-"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Product Status
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {productStatuses.find(
+                        (s) => s.id === formState.productStatusId,
+                      )?.name || "-"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Tax
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {taxes.find((t) => t.id === formState.taxId)?.value ||
+                        "-"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Sub-Categories
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {formState.subCategories.length > 0
+                        ? formState.subCategories
+                            .map(
+                              (id) =>
+                                subCategories.find((sc) => sc.id === id)
+                                  ?.name || id,
+                            )
+                            .join(", ")
+                        : "-"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Related Products
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {formState.relatedProducts.length > 0
+                        ? formState.relatedProducts
+                            .map(
+                              (id) =>
+                                relatedProducts.find((rp) => rp.id === id)
+                                  ?.name || id,
+                            )
+                            .join(", ")
+                        : "-"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Promotion
+                    </div>
+                    <div className="text-lg font-medium text-gray-800">
+                      {formState.promo ? "Yes" : "No"}
+                    </div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
+                      Brand
+                    </div>
+                    <div className="mt-1 flex items-center gap-3">
+                      {product.brand?.img && (
                         <img
                           src={product.brand.img}
                           alt="Brand Logo"
-                          className="h-full w-full object-contain"
+                          className="h-10 w-10 rounded border object-cover"
                         />
-                      </div>
+                      )}
+                      <span className="text-lg font-medium text-gray-800">
+                        {product.brand?.name || "-"}
+                      </span>
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Partner SKUs */}
-          {activeTab === "partners" && isPartner && (
-            <div className="space-y-4 pt-6 md:col-span-2">
+          {/* Stock Management */}
+          {activeTab === "stock" && isPartner && (
+            <div className="pt-15 space-y-4 md:col-span-2">
               <h3 className="text-xl font-semibold text-primary">
-                Partner SKU
+                Stock Management
               </h3>
-
               <div className="space-y-6">
                 <div className="rounded-lg border border-gray-200 p-4">
                   <div>
@@ -1261,27 +996,36 @@ const EditProductModal = ({
                           skuPartner: e.target.value,
                         })
                       }
+                      onBlur={async (e) => {
+                        if (
+                          partnerSkuPartner?.id &&
+                          e.target.value !== partnerSkuPartner.skuPartner
+                        ) {
+                          try {
+                            await updateSkuPartner(partnerSkuPartner.id, {
+                              skuPartner: e.target.value,
+                            });
+                          } catch (err) {
+                            // toast handled in hook
+                          }
+                        }
+                      }}
                       className="w-full rounded-lg border p-3"
                       placeholder="Your SKU code"
                     />
                   </div>
                 </div>
-
-                <h3 className="mt-6 text-xl font-semibold text-primary">
-                  Stock Management
-                </h3>
-
                 {stocks.map((stock, index) => (
                   <div
                     key={index}
-                    className="relative rounded-lg border border-gray-200 p-4"
+                    className="rounded-lg border border-gray-200 p-4"
                   >
-                    <div className="absolute right-2 top-2">
+                    <div className="mb-3 flex items-center justify-between">
+                      <h4 className="font-medium">Stock Entry #{index + 1}</h4>
                       <button
-                        type="button"
                         onClick={() => removeStock(index)}
-                        className="text-red-500 hover:text-red-700"
-                        aria-label="Remove stock"
+                        className="rounded-full p-1 text-red-500 hover:text-red-700 focus:outline-none"
+                        aria-label="Remove Stock Entry"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -1297,9 +1041,8 @@ const EditProductModal = ({
                         </svg>
                       </button>
                     </div>
-
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <div>
+                    <div className="flex flex-col gap-4 md:flex-row md:items-end md:gap-4">
+                      <div className="min-w-[120px] flex-1">
                         <label className="block text-sm font-medium text-gray-700">
                           Source
                         </label>
@@ -1318,8 +1061,7 @@ const EditProductModal = ({
                           ))}
                         </select>
                       </div>
-
-                      <div>
+                      <div className="min-w-[120px] flex-1">
                         <label className="block text-sm font-medium text-gray-700">
                           Price
                         </label>
@@ -1330,12 +1072,10 @@ const EditProductModal = ({
                             handleStockChange(index, "price", e.target.value)
                           }
                           className="w-full rounded-lg border p-3"
-                          min="0"
-                          step="0.01"
+                          placeholder="Price"
                         />
                       </div>
-
-                      <div>
+                      <div className="min-w-[100px] flex-1">
                         <label className="block text-sm font-medium text-gray-700">
                           Special Price
                         </label>
@@ -1350,14 +1090,12 @@ const EditProductModal = ({
                             )
                           }
                           className="w-full rounded-lg border p-3"
-                          min="0"
-                          step="0.01"
+                          placeholder="Special Price"
                         />
                       </div>
-
-                      <div>
+                      <div className="w-24">
                         <label className="block text-sm font-medium text-gray-700">
-                          Stock Quantity
+                          Stock Qty
                         </label>
                         <input
                           type="number"
@@ -1370,13 +1108,12 @@ const EditProductModal = ({
                             )
                           }
                           className="w-full rounded-lg border p-3"
-                          min="0"
+                          placeholder="Stock Quantity"
                         />
                       </div>
-
-                      <div>
+                      <div className="w-24">
                         <label className="block text-sm font-medium text-gray-700">
-                          Minimum Quantity
+                          Min Qty
                         </label>
                         <input
                           type="number"
@@ -1385,13 +1122,12 @@ const EditProductModal = ({
                             handleStockChange(index, "minQty", e.target.value)
                           }
                           className="w-full rounded-lg border p-3"
-                          min="0"
+                          placeholder="Min Qty"
                         />
                       </div>
-
-                      <div>
+                      <div className="w-24">
                         <label className="block text-sm font-medium text-gray-700">
-                          Maximum Quantity
+                          Max Qty
                         </label>
                         <input
                           type="number"
@@ -1400,132 +1136,52 @@ const EditProductModal = ({
                             handleStockChange(index, "maxQty", e.target.value)
                           }
                           className="w-full rounded-lg border p-3"
-                          min="0"
+                          placeholder="Max Qty"
                         />
                       </div>
-
-                      {/* Loyalty Points Fields */}
-                      <div>
+                      <div className="w-24">
                         <label className="block text-sm font-medium text-gray-700">
-                          Loyalty Points Per Product
+                          Sealable
                         </label>
                         <input
                           type="number"
-                          value={stock.loyaltyPointsPerProduct || ""}
-                          onChange={(e) =>
-                            handleStockChange(
-                              index,
-                              "loyaltyPointsPerProduct",
-                              e.target.value
-                                ? Number(e.target.value)
-                                : undefined,
-                            )
-                          }
-                          className="w-full rounded-lg border p-3"
-                          min="0"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Loyalty Points Per Unit
-                        </label>
-                        <input
-                          type="number"
-                          value={stock.loyaltyPointsPerUnit || ""}
-                          onChange={(e) =>
-                            handleStockChange(
-                              index,
-                              "loyaltyPointsPerUnit",
-                              e.target.value
-                                ? Number(e.target.value)
-                                : undefined,
-                            )
-                          }
-                          className="w-full rounded-lg border p-3"
-                          min="0"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Loyalty Points Bonus Quantity
-                        </label>
-                        <input
-                          type="number"
-                          value={stock.loyaltyPointsBonusQuantity || ""}
-                          onChange={(e) =>
-                            handleStockChange(
-                              index,
-                              "loyaltyPointsBonusQuantity",
-                              e.target.value
-                                ? Number(e.target.value)
-                                : undefined,
-                            )
-                          }
-                          className="w-full rounded-lg border p-3"
-                          min="0"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Loyalty Points Threshold Quantity
-                        </label>
-                        <input
-                          type="number"
-                          value={stock.loyaltyPointsThresholdQty || ""}
-                          onChange={(e) =>
-                            handleStockChange(
-                              index,
-                              "loyaltyPointsThresholdQty",
-                              e.target.value
-                                ? Number(e.target.value)
-                                : undefined,
-                            )
-                          }
-                          className="w-full rounded-lg border p-3"
-                          min="0"
+                          value={stock.sealable || 0}
+                          disabled
+                          className="w-full cursor-not-allowed rounded-lg border bg-gray-100 p-3 text-gray-500"
+                          placeholder="Sealable"
                         />
                       </div>
                     </div>
                   </div>
                 ))}
-
                 <button
                   type="button"
                   onClick={addStock}
                   className="w-full rounded-lg bg-gray-100 p-3 text-gray-700 hover:bg-gray-200"
                 >
-                  + Add Stock for New Source
+                  + Add Stock Entry
                 </button>
               </div>
             </div>
           )}
 
-          {/* Images tab - disabled */}
+          {/* Images tab - smaller images */}
           {activeTab === "images" && (
-            <div className="space-y-4 pt-6">
+            <div className="pt-15 space-y-4">
               <h3 className="text-xl font-semibold text-primary">Images</h3>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+              <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-6">
                 {existingImages.map((image) => (
                   <div
                     key={image.id}
-                    className="relative aspect-square overflow-hidden rounded-lg border"
+                    className="relative aspect-square h-20 w-20 overflow-hidden rounded-lg border"
                   >
                     <img
                       src={image.url}
                       alt="Product"
                       className="h-full w-full object-cover"
                     />
-                    {/* Remove delete button */}
                   </div>
                 ))}
-              </div>
-              <div className="mt-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
-                <p className="text-gray-500">
-                  Image uploads are disabled in partner mode
-                </p>
               </div>
             </div>
           )}

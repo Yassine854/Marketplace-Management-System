@@ -51,7 +51,6 @@ export function useProductActions() {
         err.response?.data?.error ||
         "Error updating product";
       setError(errorMsg);
-
       throw err;
     } finally {
       setIsLoading(false);

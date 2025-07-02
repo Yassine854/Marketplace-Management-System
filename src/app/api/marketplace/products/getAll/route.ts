@@ -69,7 +69,11 @@ export async function GET(req: Request) {
         productSubCategories: { include: { subcategory: true } },
         favoriteProducts: true,
         relatedProducts: { include: { relatedProduct: true } },
-        skuPartners: true,
+        skuPartners: {
+          include: {
+            partner: true,
+          },
+        },
         partner: true,
         brand: true,
       },

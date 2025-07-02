@@ -52,6 +52,13 @@ export default function ProductTable({
         ),
         size: 120,
       }),
+      columnHelper.accessor("sku", {
+        header: "SKU",
+        cell: (info) => (
+          <span className="text-sm text-gray-900">{info.getValue()}</span>
+        ),
+        size: 120,
+      }),
       columnHelper.accessor("name", {
         header: "Name",
         cell: (info) => (
@@ -61,15 +68,9 @@ export default function ProductTable({
         ),
         size: 200,
       }),
-      columnHelper.accessor("sku", {
-        header: "SKU",
-        cell: (info) => (
-          <span className="text-sm text-gray-900">{info.getValue()}</span>
-        ),
-        size: 120,
-      }),
+
       columnHelper.accessor("price", {
-        header: "Price",
+        header: "Avg Price",
         cell: (info) => (
           <span className="text-sm text-gray-900">
             {info.getValue().toFixed(2)} DT
@@ -77,15 +78,7 @@ export default function ProductTable({
         ),
         size: 100,
       }),
-      columnHelper.accessor("stock", {
-        header: "Stock",
-        cell: (info) => (
-          <span className="text-sm text-gray-900">
-            {info.getValue() ?? "N/A"}
-          </span>
-        ),
-        size: 100,
-      }),
+
       columnHelper.accessor("supplier.companyName", {
         header: "Supplier",
         cell: (info) => (
@@ -95,17 +88,24 @@ export default function ProductTable({
         ),
         size: 150,
       }),
-      columnHelper.accessor("productStatus", {
+      columnHelper.accessor("productStatus.name", {
         header: "Status",
         cell: (info) => (
           <span
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              info.getValue()?.actif
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
+            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
+              info.row.original.productStatus?.actif
+                ? "bg-green-100 text-green-800 hover:bg-green-200"
+                : "bg-red-100 text-red-800 hover:bg-red-200"
             }`}
           >
-            {info.getValue()?.name || "N/A"}
+            <span
+              className={`mr-1.5 h-2 w-2 rounded-full ${
+                info.row.original.productStatus?.actif
+                  ? "bg-green-500"
+                  : "bg-red-500"
+              }`}
+            ></span>
+            {info.getValue() || "N/A"}
           </span>
         ),
         size: 100,

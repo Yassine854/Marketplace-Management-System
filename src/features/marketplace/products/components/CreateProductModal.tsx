@@ -2,6 +2,12 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Select from "react-select";
 
+interface Brand {
+  id: string;
+  img: string;
+  name: string | null;
+}
+
 interface Product {
   id: string;
   name: string;
@@ -126,7 +132,6 @@ const CreateProductModal = ({
     barcode: "",
     sku: "",
     price: 0,
-    special_price: undefined as number | undefined,
     cost: undefined as number | undefined,
     stock: undefined as number | undefined,
     description: "",
@@ -136,10 +141,6 @@ const CreateProductModal = ({
     maximumQte: undefined as number | undefined,
     sealable: undefined as number | undefined,
     alertQte: undefined as number | undefined,
-    loyaltyPointsPerProduct: undefined as number | undefined,
-    loyaltyPointsPerUnit: undefined as number | undefined,
-    loyaltyPointsBonusQuantity: undefined as number | undefined,
-    loyaltyPointsThresholdQty: undefined as number | undefined,
     supplierId: "",
     productTypeId: "",
     typePcbId: "",
@@ -155,11 +156,12 @@ const CreateProductModal = ({
       skuPartner: string;
     }>,
     activities: [] as string[],
-    brandName: "",
-    brandImage: null as File | null,
+    brandId: "" as string,
   });
 
   const [activeTab, setActiveTab] = useState("basic");
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [isLoadingBrands, setIsLoadingBrands] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -168,7 +170,6 @@ const CreateProductModal = ({
         barcode: "",
         sku: "",
         price: 0,
-        special_price: undefined,
         cost: undefined,
         stock: undefined,
         description: "",
@@ -178,10 +179,6 @@ const CreateProductModal = ({
         maximumQte: undefined,
         sealable: undefined,
         alertQte: undefined,
-        loyaltyPointsPerProduct: undefined,
-        loyaltyPointsPerUnit: undefined,
-        loyaltyPointsBonusQuantity: undefined,
-        loyaltyPointsThresholdQty: undefined,
         supplierId: "",
         productTypeId: "",
         typePcbId: "",
@@ -194,12 +191,37 @@ const CreateProductModal = ({
         images: [],
         skuPartners: [],
         activities: [],
-        brandName: "",
-        brandImage: null,
+        brandId: "",
       });
       setActiveTab("basic");
     }
   }, [isOpen]);
+
+  // Fetch brands when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchBrands();
+    }
+  }, [isOpen]);
+
+  const fetchBrands = async () => {
+    setIsLoadingBrands(true);
+    try {
+      const response = await fetch("/api/marketplace/brand/getAll");
+      if (response.ok) {
+        const data = await response.json();
+        setBrands(data.brands || []);
+      } else {
+        console.error("Failed to fetch brands");
+        toast.error("Failed to load brands");
+      }
+    } catch (error) {
+      console.error("Error fetching brands:", error);
+      toast.error("Failed to load brands");
+    } finally {
+      setIsLoadingBrands(false);
+    }
+  };
 
   const handleInputChange = (field: string, value: any) => {
     setFormState((prev) => ({
@@ -238,7 +260,6 @@ const CreateProductModal = ({
           barcode: data["barcode"] || prev.barcode,
           sku: data["sku"] || prev.sku,
           price: Number(data["price"]) || prev.price,
-          special_price: Number(data["special_price"]) || prev.special_price,
           cost: Number(data["cost"]) || prev.cost,
           stock: Number(data["stock"]) || prev.stock,
           description: data["description"] || prev.description,
@@ -248,17 +269,6 @@ const CreateProductModal = ({
           maximumQte: Number(data["maximumQte"]) || prev.maximumQte,
           sealable: Number(data["sealable"]) || prev.sealable,
           alertQte: Number(data["alertQte"]) || prev.alertQte,
-          loyaltyPointsPerProduct:
-            Number(data["loyaltyPointsPerProduct"]) ||
-            prev.loyaltyPointsPerProduct,
-          loyaltyPointsPerUnit:
-            Number(data["loyaltyPointsPerUnit"]) || prev.loyaltyPointsPerUnit,
-          loyaltyPointsBonusQuantity:
-            Number(data["loyaltyPointsBonusQuantity"]) ||
-            prev.loyaltyPointsBonusQuantity,
-          loyaltyPointsThresholdQty:
-            Number(data["loyaltyPointsThresholdQty"]) ||
-            prev.loyaltyPointsThresholdQty,
         }));
 
         toast.success("CSV data imported successfully");
@@ -287,8 +297,6 @@ const CreateProductModal = ({
         {
           partnerId: "",
           skuPartner: "",
-          stock: 0,
-          price: 0,
         },
       ],
     }));
@@ -308,15 +316,6 @@ const CreateProductModal = ({
     return partners.filter((p) => !selectedPartnerIds.includes(p.id));
   };
 
-  const handleBrandImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormState((prev) => ({
-        ...prev,
-        brandImage: e.target.files![0],
-      }));
-    }
-  };
-
   const handleSubmit = async () => {
     if (!formState.name || !formState.sku || !formState.price) {
       toast.error("Please fill in required fields");
@@ -324,13 +323,9 @@ const CreateProductModal = ({
     }
 
     try {
-      // Convert empty strings to undefined for relational fields
       const payload = {
         ...formState,
         price: Number(formState.price),
-        special_price: formState.special_price
-          ? Number(formState.special_price)
-          : undefined,
         cost: formState.cost ? Number(formState.cost) : undefined,
         stock: formState.stock ? Number(formState.stock) : undefined,
         weight: formState.weight ? Number(formState.weight) : undefined,
@@ -342,19 +337,6 @@ const CreateProductModal = ({
           : undefined,
         sealable: formState.sealable ? Number(formState.sealable) : undefined,
         alertQte: formState.alertQte ? Number(formState.alertQte) : undefined,
-        loyaltyPointsPerProduct: formState.loyaltyPointsPerProduct
-          ? Number(formState.loyaltyPointsPerProduct)
-          : undefined,
-        loyaltyPointsPerUnit: formState.loyaltyPointsPerUnit
-          ? Number(formState.loyaltyPointsPerUnit)
-          : undefined,
-        loyaltyPointsBonusQuantity: formState.loyaltyPointsBonusQuantity
-          ? Number(formState.loyaltyPointsBonusQuantity)
-          : undefined,
-        loyaltyPointsThresholdQty: formState.loyaltyPointsThresholdQty
-          ? Number(formState.loyaltyPointsThresholdQty)
-          : undefined,
-        // Convert empty strings to undefined for relational IDs
         supplierId: formState.supplierId || undefined,
         productTypeId: formState.productTypeId || undefined,
         typePcbId: formState.typePcbId || undefined,
@@ -364,6 +346,22 @@ const CreateProductModal = ({
         skuPartners:
           formState.skuPartners.length > 0 ? formState.skuPartners : undefined,
       };
+
+      const missingFields = [];
+      if (!formState.barcode) missingFields.push("Barcode");
+      if (!formState.sku) missingFields.push("SKU");
+      if (!formState.name) missingFields.push("Product Name");
+      if (!formState.price) missingFields.push("Price");
+      if (!formState.supplierId) missingFields.push("Manufacturer");
+      if (!formState.brandId) missingFields.push("Brand");
+      if (!formState.activities || formState.activities.length === 0)
+        missingFields.push("Product Activity");
+      if (missingFields.length > 0) {
+        missingFields.forEach((field) =>
+          toast.error(`Please fill in required field: ${field}`),
+        );
+        return;
+      }
 
       const result = await onCreate(payload);
       if (result) {
@@ -460,26 +458,6 @@ const CreateProductModal = ({
           </button>
           <button
             className={`mr-4 pb-2 text-sm font-medium ${
-              activeTab === "specs"
-                ? "border-b-2 border-blue-500 text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("specs")}
-          >
-            Specifications
-          </button>
-          <button
-            className={`mr-4 pb-2 text-sm font-medium ${
-              activeTab === "pricing"
-                ? "border-b-2 border-blue-500 text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("pricing")}
-          >
-            Pricing & Stock
-          </button>
-          <button
-            className={`mr-4 pb-2 text-sm font-medium ${
               activeTab === "relations"
                 ? "border-b-2 border-blue-500 text-blue-600"
                 : "text-gray-500 hover:text-gray-700"
@@ -506,19 +484,7 @@ const CreateProductModal = ({
             <h3 className="text-xl font-semibold text-primary">
               Basic Information
             </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Product Name *
-                </label>
-                <input
-                  type="text"
-                  placeholder="Product Name"
-                  value={formState.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Bar Code
@@ -533,7 +499,7 @@ const CreateProductModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  SKU *
+                  SKU <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -542,6 +508,46 @@ const CreateProductModal = ({
                   onChange={(e) => handleInputChange("sku", e.target.value)}
                   className="w-full rounded-lg border p-3"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Product Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Product Name"
+                  value={formState.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+              <div className="flex items-end gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Price <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Price"
+                    value={formState.price || ""}
+                    onChange={(e) => handleInputChange("price", e.target.value)}
+                    className="w-32 rounded-lg border p-3"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Weight
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Weight"
+                    value={formState.weight || ""}
+                    onChange={(e) =>
+                      handleInputChange("weight", e.target.value)
+                    }
+                    className="w-32 rounded-lg border p-3"
+                  />
+                </div>
               </div>
             </div>
             <div>
@@ -561,243 +567,16 @@ const CreateProductModal = ({
           </div>
         )}
 
-        {/* Specifications */}
-        {activeTab === "specs" && (
-          <div className="space-y-4 pt-6">
-            <h3 className="text-xl font-semibold text-primary">
-              Specifications
-            </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  PCB
-                </label>
-                <input
-                  type="text"
-                  placeholder="PCB"
-                  value={formState.pcb}
-                  onChange={(e) => handleInputChange("pcb", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Weight
-                </label>
-                <input
-                  type="number"
-                  placeholder="Weight"
-                  value={formState.weight || ""}
-                  onChange={(e) => handleInputChange("weight", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Min Quantity
-                </label>
-                <input
-                  type="number"
-                  placeholder="Min Quantity"
-                  value={formState.minimumQte || ""}
-                  onChange={(e) =>
-                    handleInputChange("minimumQte", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Max Quantity
-                </label>
-                <input
-                  type="number"
-                  placeholder="Max Quantity"
-                  value={formState.maximumQte || ""}
-                  onChange={(e) =>
-                    handleInputChange("maximumQte", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Sealable
-                </label>
-                <input
-                  type="number"
-                  placeholder="Sealable"
-                  value={formState.sealable || ""}
-                  onChange={(e) =>
-                    handleInputChange("sealable", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Alert Quantity
-                </label>
-                <input
-                  type="number"
-                  placeholder="Alert Quantity"
-                  value={formState.alertQte || ""}
-                  onChange={(e) =>
-                    handleInputChange("alertQte", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Pricing & Stock */}
-        {activeTab === "pricing" && (
-          <div className="space-y-4 pt-6">
-            <h3 className="text-xl font-semibold text-primary">
-              Pricing & Stock
-            </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Price <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  placeholder="Price"
-                  value={formState.price || ""}
-                  onChange={(e) => handleInputChange("price", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Special Price
-                </label>
-                <input
-                  type="number"
-                  placeholder="Special Price"
-                  value={formState.special_price || ""}
-                  onChange={(e) =>
-                    handleInputChange("special_price", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Cost
-                </label>
-                <input
-                  type="number"
-                  placeholder="Cost"
-                  value={formState.cost || ""}
-                  onChange={(e) => handleInputChange("cost", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Stock
-                </label>
-                <input
-                  type="number"
-                  placeholder="Stock"
-                  value={formState.stock || ""}
-                  onChange={(e) => handleInputChange("stock", e.target.value)}
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-            </div>
-
-            {/* Loyalty Program */}
-            <div className="pt-4">
-              <h4 className="mb-3 text-lg font-medium text-gray-800">
-                Loyalty Program
-              </h4>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Points Per Product
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Points Per Product"
-                    value={formState.loyaltyPointsPerProduct || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "loyaltyPointsPerProduct",
-                        e.target.value,
-                      )
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Points Per Unit
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Points Per Unit"
-                    value={formState.loyaltyPointsPerUnit || ""}
-                    onChange={(e) =>
-                      handleInputChange("loyaltyPointsPerUnit", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Bonus Quantity
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Bonus Quantity"
-                    value={formState.loyaltyPointsBonusQuantity || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "loyaltyPointsBonusQuantity",
-                        e.target.value,
-                      )
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Threshold Quantity
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Threshold Quantity"
-                    value={formState.loyaltyPointsThresholdQty || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "loyaltyPointsThresholdQty",
-                        e.target.value,
-                      )
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Relationships */}
         {activeTab === "relations" && (
-          <div className="space-y-4 pt-6">
+          <div className="pt-15 space-y-4">
             <h3 className="text-xl font-semibold text-primary">
               Relationships
             </h3>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_160px_128px] items-end gap-x-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Manufacturer
+                  Manufacturer <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={formState.supplierId}
@@ -814,7 +593,6 @@ const CreateProductModal = ({
                   ))}
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Product Type
@@ -824,7 +602,7 @@ const CreateProductModal = ({
                   onChange={(e) =>
                     handleInputChange("productTypeId", e.target.value)
                   }
-                  className="w-full rounded-lg border p-3"
+                  className="w-60 rounded-lg border p-3"
                 >
                   <option value="">Product Type</option>
                   {productTypes.map((type) => (
@@ -834,7 +612,6 @@ const CreateProductModal = ({
                   ))}
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   PCB Type
@@ -854,7 +631,6 @@ const CreateProductModal = ({
                   ))}
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Product Status
@@ -874,7 +650,6 @@ const CreateProductModal = ({
                   ))}
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Tax
@@ -891,6 +666,81 @@ const CreateProductModal = ({
                     </option>
                   ))}
                 </select>
+              </div>
+            </div>
+
+            {/* Activities and Brand fields */}
+            <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Activities <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  isMulti
+                  name="activities"
+                  options={ACTIVITIES.map((activity) => ({
+                    value: activity,
+                    label: activity,
+                  }))}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                  value={formState.activities.map((activity) => ({
+                    value: activity,
+                    label: activity,
+                  }))}
+                  onChange={(selected) => {
+                    handleInputChange(
+                      "activities",
+                      selected ? selected.map((option) => option.value) : [],
+                    );
+                  }}
+                  placeholder="Search and select activities..."
+                  noOptionsMessage={() => "No activities found"}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Select Brand <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  isClearable
+                  isLoading={isLoadingBrands}
+                  options={brands.map((brand) => ({
+                    value: brand.id,
+                    label: brand.name || "Unnamed Brand",
+                    img: brand.img,
+                  }))}
+                  value={
+                    brands
+                      .filter((brand) => brand.id === formState.brandId)
+                      .map((brand) => ({
+                        value: brand.id,
+                        label: brand.name || "Unnamed Brand",
+                        img: brand.img,
+                      }))[0] || null
+                  }
+                  onChange={(selected) => {
+                    handleInputChange("brandId", selected?.value || "");
+                  }}
+                  formatOptionLabel={(option: any) => (
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={option.img}
+                        alt={option.label}
+                        className="h-8 w-8 rounded object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "https://via.placeholder.com/32x32?text=No+Image";
+                        }}
+                      />
+                      <span>{option.label}</span>
+                    </div>
+                  )}
+                  placeholder="Select a brand..."
+                  noOptionsMessage={() => "No brands found"}
+                  className="basic-single"
+                  classNamePrefix="select"
+                />
               </div>
             </div>
 
@@ -953,35 +803,6 @@ const CreateProductModal = ({
               </div>
             </div>
 
-            {/* Activities multiselect */}
-            <div className="mb-4 mt-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Activities
-              </label>
-              <Select
-                isMulti
-                name="activities"
-                options={ACTIVITIES.map((activity) => ({
-                  value: activity,
-                  label: activity,
-                }))}
-                className="basic-multi-select"
-                classNamePrefix="select"
-                value={formState.activities.map((activity) => ({
-                  value: activity,
-                  label: activity,
-                }))}
-                onChange={(selected) => {
-                  handleInputChange(
-                    "activities",
-                    selected ? selected.map((option) => option.value) : [],
-                  );
-                }}
-                placeholder="Search and select activities..."
-                noOptionsMessage={() => "No activities found"}
-              />
-            </div>
-
             {/* Promotion */}
             <div className="pt-4">
               <h4 className="mb-3 text-lg font-medium text-gray-800">
@@ -1002,62 +823,6 @@ const CreateProductModal = ({
                   Promo Product
                 </label>
               </div>
-
-              {formState.promo && (
-                <div className="mt-3">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Select Promotion
-                  </label>
-                  <select
-                    value={formState.promotionId}
-                    onChange={(e) =>
-                      handleInputChange("promotionId", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  >
-                    <option value="">Select Promotion</option>
-                    {promotions.map((promo) => (
-                      <option key={promo.id} value={promo.id}>
-                        {promo.promoPrice}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
-
-            {/* Brand Information */}
-            <div className="mt-6 border-t pt-6">
-              <h4 className="mb-3 text-lg font-medium text-gray-800">
-                Brand Information
-              </h4>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Brand Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Brand Name"
-                    value={formState.brandName}
-                    onChange={(e) =>
-                      handleInputChange("brandName", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Brand Logo
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleBrandImageChange}
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-              </div>
             </div>
 
             {/* Images */}
@@ -1076,7 +841,7 @@ const CreateProductModal = ({
 
         {/* Partner SKUs */}
         {activeTab === "partners" && (
-          <div className="space-y-4 pt-6 md:col-span-2">
+          <div className="pt-15 space-y-4 md:col-span-2">
             <h3 className="text-xl font-semibold text-primary">Partner SKUs</h3>
             <div className="space-y-4">
               {formState.skuPartners.map((partner, index) => (
@@ -1088,9 +853,21 @@ const CreateProductModal = ({
                     <h4 className="font-medium">Partner SKU #{index + 1}</h4>
                     <button
                       onClick={() => removeSkuPartner(index)}
-                      className="text-red-500 hover:text-red-700"
+                      className="rounded-full p-1 text-red-500 hover:text-red-700 focus:outline-none"
+                      aria-label="Remove Partner SKU"
                     >
-                      Remove
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     </button>
                   </div>
 

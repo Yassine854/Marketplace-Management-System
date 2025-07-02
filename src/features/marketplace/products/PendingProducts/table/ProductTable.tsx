@@ -64,6 +64,15 @@ export default function ProductTable({
         ),
         size: 120,
       }),
+      columnHelper.accessor("sku", {
+        header: "SKU",
+        cell: (info) => (
+          <div className="max-w-xs">
+            <span className="text-sm text-gray-900">{info.getValue()}</span>
+          </div>
+        ),
+        size: 120,
+      }),
       columnHelper.accessor("name", {
         header: "Name",
         cell: (info) => (
@@ -84,17 +93,9 @@ export default function ProductTable({
         ),
         size: 120,
       }),
-      columnHelper.accessor("sku", {
-        header: "SKU",
-        cell: (info) => (
-          <div className="max-w-xs">
-            <span className="text-sm text-gray-900">{info.getValue()}</span>
-          </div>
-        ),
-        size: 120,
-      }),
+
       columnHelper.accessor("price", {
-        header: "Price",
+        header: "Avg Price",
         cell: (info) => (
           <div className="max-w-xs">
             <span className="text-sm text-gray-900">
@@ -104,17 +105,7 @@ export default function ProductTable({
         ),
         size: 100,
       }),
-      columnHelper.accessor("stock", {
-        header: "Stock",
-        cell: (info) => (
-          <div className="max-w-xs">
-            <span className="text-sm text-gray-900">
-              {info.getValue() ?? "N/A"}
-            </span>
-          </div>
-        ),
-        size: 100,
-      }),
+
       columnHelper.accessor("supplier.companyName", {
         header: "Supplier",
         cell: (info) => (
@@ -126,21 +117,7 @@ export default function ProductTable({
         ),
         size: 150,
       }),
-      columnHelper.accessor("productStatus", {
-        header: "Status",
-        cell: (info) => (
-          <div className="flex justify-center">
-            <span
-              className={`badge ${
-                info.getValue()?.actif ? "bg-success" : "bg-danger"
-              }`}
-            >
-              {info.getValue()?.name || "N/A"}
-            </span>
-          </div>
-        ),
-        size: 120,
-      }),
+
       {
         id: "actions",
         header: "Actions",
@@ -154,7 +131,22 @@ export default function ProductTable({
               <FaEye className="h-3.5 w-3.5" />
             </button>
             <button
-              onClick={() => onAccept(row.original.id)}
+              onClick={() => {
+                Swal.fire({
+                  title: "Are you sure?",
+                  text: "Do you want to accept this product?",
+                  icon: "question",
+                  showCancelButton: true,
+                  confirmButtonColor: "#3085d6",
+                  cancelButtonColor: "#d33",
+                  confirmButtonText: "Yes, accept it!",
+                  cancelButtonText: "Cancel",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    onAccept(row.original.id);
+                  }
+                });
+              }}
               className="rounded p-1.5 text-green-600 hover:bg-green-50"
               title="Accept product"
             >

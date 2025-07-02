@@ -47,7 +47,8 @@
     ".next/types/app/[locale]/(subPages)/access/user/page.tsx",
     "src/services/analytics/numberOfOrders/numberOfOrdersByMonthAnalytics",
     "src/services/analytics/numberOfOrders/numberOfOrdersByQuarterAnalytics",
-    "src/services/analytics/numberOfOrders/numberOfOrdersLifetimeAnalytics"
+    "src/services/analytics/numberOfOrders/numberOfOrdersLifetimeAnalytics",
+    "src/features/marketplace/brand/hooks/useCreateBrandts"
   ],
 
   "exclude": [
