@@ -609,7 +609,7 @@ const OrderPrintModal: React.FC<OrderPrintModalProps> = ({
                     const totalTVA =
                       order.order_total_ttc - order.order_total_ht || 0;
                     const deliveryFees = parseFloat(
-                      partner?.settings?.deliveryTypeAmount || "0",
+                      partner?.settings[0]?.deliveryTypeAmount || "0",
                     );
                     const finalTotalTTC = totalHT + totalTVA + deliveryFees;
 
