@@ -66,9 +66,9 @@ export async function GET(
     const { id } = params;
     const agent = await prisma.agent.findUnique({
       where: { id },
-      include: {
-        orders: true,
-      },
+      // include: {
+      //   orders: true,
+      // },
     });
 
     if (!agent) {

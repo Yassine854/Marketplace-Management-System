@@ -73,6 +73,7 @@ export async function GET(
         role: true,
         skuPartners: true,
         OrderItem: true,
+        settings: true,
       },
     });
 

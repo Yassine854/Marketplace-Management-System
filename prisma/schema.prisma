@@ -345,6 +345,7 @@ model Partner {
   notifications Notification[]
   CartItem CartItem[]
   OrderItem OrderItem[]
+  orderPartners VendorOrder[]
   ReservationItem ReservationItem[]
   @@map("partners")
 }
@@ -367,7 +368,8 @@ model Agent {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  orders   Order[]
+  OrderItem OrderItem[]
+  orderagents         OrderAgent[]
   role            Role?     @relation(fields: [mRoleId], references: [id])
   partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
@@ -573,6 +575,8 @@ model State {
   name      String   @unique
   statuses  Status[]
   orders   Order[]
+  OrderItem OrderItem[]
+  orderPartners     VendorOrder[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -583,6 +587,8 @@ model Status {
   stateId  String   @db.ObjectId
   state    State    @relation(fields: [stateId], references: [id])
   orders   Order[]
+  OrderItem OrderItem[]
+  orderPartners     VendorOrder[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -613,8 +619,6 @@ model Order {
   customerId          String   @db.ObjectId
   customer            Customers @relation(fields: [customerId], references: [id])
 
-  agentId           String?  @db.ObjectId
-  agent             Agent?   @relation(fields: [agentId], references: [id])
 
   reservationId     String?   @db.ObjectId @unique
   reservation       Reservation? @relation(fields: [reservationId], references: [id])
@@ -622,10 +626,10 @@ model Order {
   mainOrderId       String?   @db.ObjectId
   mainOrder         MainOrder? @relation(fields: [mainOrderId], references: [id])
   orderItems        OrderItem[]
+  orderPartners     VendorOrder[] 
   loyaltyPoints     LoyaltyPoints[]
   paymentMethodId   String       @db.ObjectId
   paymentMethod     OrderPayment @relation(fields: [paymentMethodId], references: [id])
-
 }
 
 
@@ -636,7 +640,7 @@ model OrderItem {
   qteRefunded     Int      @default(0)
   qteShipped      Int      @default(0)
   qteCanceled     Int      @default(0)
-  discountedPrice Float
+  discountedPrice Float?
   weight          Float
   sku             String   
   createdAt       DateTime @default(now())
@@ -654,7 +658,56 @@ model OrderItem {
   
   source         Source?   @relation(fields: [sourceId], references: [id]) 
   partner        Partner?  @relation(fields: [partnerId], references: [id])
+
+  stateId             String?  @db.ObjectId
+  state               State?    @relation(fields: [stateId], references: [id])
+
+  statusId            String?   @db.ObjectId
+  status              Status?   @relation(fields: [statusId], references: [id])
+  agentId             String?  @db.ObjectId
+  agent               Agent?   @relation(fields: [agentId], references: [id])
+
+
 }
+
+
+model VendorOrder {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderCode     String @unique
+  total         Float  @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relationships
+  statusId      String?   @db.ObjectId
+  status        Status?   @relation(fields: [statusId], references: [id])
+  stateId       String?   @db.ObjectId
+  state         State?    @relation(fields: [stateId], references: [id])
+  partnerId     String    @db.ObjectId
+  partner       Partner   @relation(fields: [partnerId], references: [id])
+  orderId       String    @db.ObjectId
+  order         Order    @relation(fields: [orderId], references: [id])
+  orderAgentId  String?   @db.ObjectId
+  orderAgent    OrderAgent? @relation(fields: [orderAgentId], references: [id])
+
+  itemsSnapshot Json? // <--- Add this line
+}
+
+
+model OrderAgent {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  agentId           String?  @db.ObjectId
+  agent             Agent?   @relation(fields: [agentId], references: [id])
+
+  orderPartners          VendorOrder[] 
+ 
+}
+
+
+
 
 
 
@@ -696,12 +749,14 @@ model ReservationItem {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   qteReserved    Int
   price          Float?
-  discountedPrice Float
+  discountedPrice Float?
   weight         Float
   sku            String   
   taxId          String?   @db.ObjectId
   sourceId       String?   @db.ObjectId
   customerId     String?   @db.ObjectId
+  deliveryDate    DateTime?
+
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   // Relationships
@@ -715,6 +770,7 @@ model ReservationItem {
   partnerId      String?   @db.ObjectId
   partner        Partner?  @relation(fields: [partnerId], references: [id])
 }
+
 model Cart {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
   customer   Customers  @relation(fields: [customerId], references: [id])

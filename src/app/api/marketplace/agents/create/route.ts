@@ -89,6 +89,7 @@ export async function POST(req: Request) {
         OR: [{ username: body.username }, { email: body.email }],
       },
     });
+    prisma;
 
     if (existingAgent) {
       return NextResponse.json(

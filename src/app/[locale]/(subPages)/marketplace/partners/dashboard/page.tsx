@@ -1,2 +1,2 @@
 "use client";
-export { default } from "@/features/marketplace//partners/Interface/dashboard/pages/Dashboard";
+export { default } from "@/features/marketplace/partners/Interface/dashboard/pages/Dashboard";

@@ -58,9 +58,15 @@ export async function PATCH(
     const { id } = params;
     const body = await req.json();
 
+    // Only allow updating stateId, statusId, qteOrdered
+    const updateData: any = {};
+    if (body.stateId !== undefined) updateData.stateId = body.stateId;
+    if (body.statusId !== undefined) updateData.statusId = body.statusId;
+    if (body.qteOrdered !== undefined) updateData.qteOrdered = body.qteOrdered;
+
     const updatedOrderItem = await prisma.orderItem.update({
       where: { id },
-      data: body,
+      data: updateData,
     });
 
     return NextResponse.json(

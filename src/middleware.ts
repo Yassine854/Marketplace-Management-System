@@ -29,15 +29,21 @@ const middleware = auth((req: any) => {
 
   if (session && isLoginPage) {
     if (isAdmin) {
-      return NextResponse.redirect("/marketplace/dashboard");
+      return NextResponse.redirect(
+        new URL("/marketplace/dashboard", req.nextUrl),
+      );
     } else if (session?.user?.userType === "partner") {
-      return NextResponse.redirect("/marketplace/partners/dashboard");
+      return NextResponse.redirect(
+        new URL("/marketplace/partners/dashboard", req.nextUrl),
+      );
     }
   }
 
   if (session && !isAdmin && adminRoutes.includes(req.nextUrl.pathname)) {
     if (session?.user?.userType === "partner") {
-      return NextResponse.redirect("/marketplace/partners/dashboard");
+      return NextResponse.redirect(
+        new URL("/marketplace/partners/dashboard", req.nextUrl),
+      );
     }
   }
 

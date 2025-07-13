@@ -1,2 +1,2 @@
 "use client";
-export { default } from "@/features/marketplace/partners/Interface/orders/states/Open";
+export { default } from "@/features/marketplace/partners/Interface/orders/statuses/open/pages/OrderPage";

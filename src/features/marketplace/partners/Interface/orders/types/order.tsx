@@ -15,6 +15,8 @@ export interface Customer {
   id: string;
   firstName?: string;
   lastName?: string;
+  telephone?: string;
+  address?: string;
 }
 
 export interface OrderPayment {
@@ -55,36 +57,32 @@ export interface OrderItem {
   sku: string;
   createdAt: string | Date;
   updatedAt: string | Date;
+  orderId?: string;
+  productId?: string;
+  sourceId?: string;
+  partnerId?: string;
+  stateId?: string;
+  statusId?: string;
+  agentId?: string | null;
   product?: Product;
+  state?: State;
+  status?: Status;
   source?: Source;
-  status: Status;
-  state: State;
 }
 
-export interface Order {
+export interface VendorOrder {
   id: string;
-  amountTTC: number;
-  amountRefunded: number;
-  amountCanceled: number;
-  amountOrdered: number;
-  amountShipped: number;
-  shippingMethod: string;
-  shippingAmount: number;
-  loyaltyPtsValue: number;
-  fromMobile: boolean;
-  weight: number;
+  orderCode: string;
+  total: number;
   createdAt: string | Date;
   updatedAt: string | Date;
-  statusId: string;
-  status?: Status;
-  isActive: boolean;
-  stateId: string;
-  state?: State;
-  customerId: string;
-  customer?: Customer;
-  agentId?: string;
-  agent?: Agent;
-  orderItems: OrderItem[];
-  paymentMethodId: string;
-  paymentMethod?: OrderPayment;
+  status?: Status | null;
+  state?: State | null;
+  partner: Partner;
+  order: {
+    id: string;
+    // Add more fields as needed from the related Order if you use them
+  };
+  orderAgent?: Agent | null;
+  itemsSnapshot?: any;
 }

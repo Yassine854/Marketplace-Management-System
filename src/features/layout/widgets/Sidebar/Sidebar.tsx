@@ -137,11 +137,18 @@ const Sidebar = ({
           {/* Dashboard - show based on user type */}
           {isAdmin && (
             <>
-              <SidebarButton
+              <SidebarSubMenu
                 onClick={() => push("/marketplace/dashboard")}
                 name={"Dashboard"}
                 icon={<IconDashboard />}
                 isActive={pathname === "/marketplace/dashboard"}
+                items={[
+                  { name: "All", path: "/marketplace/dashboard" },
+                  {
+                    name: "Client Segmentation",
+                    path: "/marketplace/dashboard/client-segments",
+                  },
+                ].filter(Boolean)}
               />
               <Divider />
             </>

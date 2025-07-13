@@ -175,7 +175,6 @@ export async function GET(req: Request) {
         status: true,
         state: true,
         customer: true,
-        agent: true,
         reservation: {
           include: {
             customer: true,

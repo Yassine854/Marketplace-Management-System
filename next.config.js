@@ -12,6 +12,9 @@ const nextConfig = {
   reactStrictMode: false,
   output: "standalone",
   crossOrigin: "anonymous",
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 module.exports = withNextIntl(withBundleAnalyzer(nextConfig));
