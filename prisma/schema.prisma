@@ -369,7 +369,7 @@ model Agent {
   updatedAt DateTime? @updatedAt
 
   OrderItem OrderItem[]
-  orderagents         OrderAgent[]
+  VendorOrders         AgentAssign[]
   role            Role?     @relation(fields: [mRoleId], references: [id])
   partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
@@ -687,14 +687,14 @@ model VendorOrder {
   partner       Partner   @relation(fields: [partnerId], references: [id])
   orderId       String    @db.ObjectId
   order         Order    @relation(fields: [orderId], references: [id])
-  orderAgentId  String?   @db.ObjectId
-  orderAgent    OrderAgent? @relation(fields: [orderAgentId], references: [id])
+  AgentAssignId String?   @db.ObjectId
+  orderAgent    AgentAssign? @relation(fields: [AgentAssignId], references: [id])
 
   itemsSnapshot Json? // <--- Add this line
 }
 
 
-model OrderAgent {
+model AgentAssign {
   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -702,7 +702,7 @@ model OrderAgent {
   agentId           String?  @db.ObjectId
   agent             Agent?   @relation(fields: [agentId], references: [id])
 
-  orderPartners          VendorOrder[] 
+  VendorOrders          VendorOrder[] 
  
 }
 

@@ -87,9 +87,13 @@ export default function OrderDataTable({
         orderIds: selectedOrderIds,
         newStatus: bulkAction,
       };
+      if (bulkAction === "unpaid") {
+        payload.newState = "complete";
+      }
       if (bulkAction === "canceled") {
         payload.newState = "canceled";
       }
+      // No state for valid
       await fetch("/api/marketplace/vendorOrder/bulkUpdateStatus", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -307,8 +311,9 @@ export default function OrderDataTable({
               disabled={bulkStatusLoading}
             >
               <option value="">Select action</option>
-              <option value="valid">Mark as Valid</option>
+              <option value="unpaid">Mark as Unpaid</option>
               <option value="canceled">Mark as Canceled</option>
+              <option value="valid">Mark as Valid</option>
             </select>
             <button
               onClick={handleBulkStatusChange}

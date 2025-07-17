@@ -87,8 +87,8 @@ export default function OrderDataTable({
         orderIds: selectedOrderIds,
         newStatus: bulkAction,
       };
-      if (bulkAction === "canceled") {
-        payload.newState = "canceled";
+      if (bulkAction === "closed") {
+        payload.newState = "closed";
       }
       await fetch("/api/marketplace/vendorOrder/bulkUpdateStatus", {
         method: "POST",
@@ -212,13 +212,6 @@ export default function OrderDataTable({
         cell: ({ row }) => (
           <div className="flex items-center justify-center gap-2">
             <button
-              onClick={() => onEdit(row.original)}
-              className="rounded p-1.5 text-blue-600 hover:bg-blue-50"
-              title="Edit Order"
-            >
-              <FaEdit className="h-3.5 w-3.5" />
-            </button>
-            <button
               onClick={() => handlePrint(row.original)}
               className="rounded p-1.5 text-green-600 hover:bg-green-50"
               title="Print purchase order"
@@ -253,7 +246,7 @@ export default function OrderDataTable({
         size: 120,
       },
     ],
-    [onEdit, onDelete, onToggleStatus, handlePrint], // Add handlePrint to the dependency array
+    [onDelete, onToggleStatus, handlePrint], // Add handlePrint to the dependency array
   );
 
   const table = useReactTable({
@@ -307,8 +300,7 @@ export default function OrderDataTable({
               disabled={bulkStatusLoading}
             >
               <option value="">Select action</option>
-              <option value="valid">Mark as Valid</option>
-              <option value="canceled">Mark as Canceled</option>
+              <option value="closed">Mark as Closed</option>
             </select>
             <button
               onClick={handleBulkStatusChange}

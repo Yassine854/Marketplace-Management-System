@@ -453,24 +453,24 @@ const Sidebar = ({
                     path: "/marketplace/partners/orders/ReadyToShip",
                   },
                   {
-                    name: "Shipped",
-                    path: "/marketplace/partners/orders/Shipped",
+                    name: "Unpaid",
+                    path: "/marketplace/partners/orders/Unpaid",
                   },
                   {
                     name: "Delivered",
                     path: "/marketplace/partners/orders/Delivered",
                   },
                   {
+                    name: "Archived",
+                    path: "/marketplace/partners/orders/Archived",
+                  },
+                  {
                     name: "Canceled",
                     path: "/marketplace/partners/orders/Canceled",
                   },
                   {
-                    name: "Unpaid",
-                    path: "/marketplace/partners/orders/Unpaid",
-                  },
-                  {
-                    name: "Archived",
-                    path: "/marketplace/partners/orders/Archived",
+                    name: "Closed",
+                    path: "/marketplace/partners/orders/Closed",
                   },
                 ]}
               />

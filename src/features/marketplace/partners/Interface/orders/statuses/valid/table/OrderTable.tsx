@@ -64,6 +64,8 @@ export default function OrderDataTable({
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
   const [bulkStatusLoading, setBulkStatusLoading] = useState(false);
   const [bulkAction, setBulkAction] = useState<string>("");
+  const [agents, setAgents] = useState<any[]>([]);
+  const [selectedAgentId, setSelectedAgentId] = useState<string>("");
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -79,8 +81,24 @@ export default function OrderDataTable({
     );
   };
 
+  // Fetch agents when bulkAction is 'shipped'
+  useEffect(() => {
+    if (bulkAction === "shipped") {
+      fetch("/api/marketplace/agents/getAll")
+        .then((res) => res.json())
+        .then((data) => {
+          setAgents(data.agents || []);
+        })
+        .catch(() => setAgents([]));
+    } else {
+      setAgents([]);
+      setSelectedAgentId("");
+    }
+  }, [bulkAction]);
+
   const handleBulkStatusChange = async () => {
     if (selectedOrderIds.length === 0 || !bulkAction) return;
+    if (bulkAction === "shipped" && !selectedAgentId) return;
     setBulkStatusLoading(true);
     try {
       let payload: any = {
@@ -90,6 +108,9 @@ export default function OrderDataTable({
       if (bulkAction === "canceled") {
         payload.newState = "canceled";
       }
+      if (bulkAction === "shipped") {
+        payload.agentId = selectedAgentId;
+      }
       await fetch("/api/marketplace/vendorOrder/bulkUpdateStatus", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -97,6 +118,7 @@ export default function OrderDataTable({
       });
       setSelectedOrderIds([]);
       setBulkAction("");
+      setSelectedAgentId("");
       refetch();
     } catch (e) {
       alert("Failed to update statuses");
@@ -307,12 +329,37 @@ export default function OrderDataTable({
               disabled={bulkStatusLoading}
             >
               <option value="">Select action</option>
-              <option value="valid">Mark as Valid</option>
               <option value="canceled">Mark as Canceled</option>
+              <option value="open">Mark as Open</option>
+              <option value="shipped">Mark as Shipped</option>
             </select>
+            {/* Agent select for shipped */}
+            {bulkAction === "shipped" && (
+              <select
+                value={selectedAgentId}
+                onChange={(e) => setSelectedAgentId(e.target.value)}
+                className="rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                disabled={bulkStatusLoading}
+              >
+                <option value="">Select agent</option>
+                {agents.map((agent) => (
+                  <option key={agent.id} value={agent.id}>
+                    {agent.firstName || ""}{" "}
+                    {agent.lastName ||
+                      agent.username ||
+                      agent.email ||
+                      agent.id}
+                  </option>
+                ))}
+              </select>
+            )}
             <button
               onClick={handleBulkStatusChange}
-              disabled={bulkStatusLoading || !bulkAction}
+              disabled={
+                bulkStatusLoading ||
+                !bulkAction ||
+                (bulkAction === "shipped" && !selectedAgentId)
+              }
               className="rounded bg-blue-500 px-3 py-1 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50"
             >
               {bulkStatusLoading ? "Updating..." : "Apply"}

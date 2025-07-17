@@ -103,7 +103,7 @@ const OrderPage = () => {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-xl font-bold capitalize text-gray-900">
-              Open Orders
+              Canceled Orders
             </h1>
             <p className="text-sm text-gray-600">Manage customer orders</p>
           </div>
@@ -132,7 +132,7 @@ const OrderPage = () => {
         <div className="rounded-lg bg-white p-4">
           <OrderDataTable
             orders={orders.filter(
-              (order) => order.status?.name?.toLowerCase() === "open",
+              (order) => order.status?.name?.toLowerCase() === "canceled",
             )}
             isLoading={isLoading}
             error={error}

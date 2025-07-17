@@ -60,51 +60,6 @@ export default function OrderDataTable({
   const { fetchVendorOrder, fetchPartner } = useOrderActions();
   const [partner, setPartner] = useState<any | null>(null);
 
-  // Multiselect state
-  const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
-  const [bulkStatusLoading, setBulkStatusLoading] = useState(false);
-  const [bulkAction, setBulkAction] = useState<string>("");
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedOrderIds(orders.map((order) => order.id));
-    } else {
-      setSelectedOrderIds([]);
-    }
-  };
-
-  const handleSelectRow = (id: string, checked: boolean) => {
-    setSelectedOrderIds((prev) =>
-      checked ? [...prev, id] : prev.filter((_id) => _id !== id),
-    );
-  };
-
-  const handleBulkStatusChange = async () => {
-    if (selectedOrderIds.length === 0 || !bulkAction) return;
-    setBulkStatusLoading(true);
-    try {
-      let payload: any = {
-        orderIds: selectedOrderIds,
-        newStatus: bulkAction,
-      };
-      if (bulkAction === "canceled") {
-        payload.newState = "canceled";
-      }
-      await fetch("/api/marketplace/vendorOrder/bulkUpdateStatus", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      setSelectedOrderIds([]);
-      setBulkAction("");
-      refetch();
-    } catch (e) {
-      alert("Failed to update statuses");
-    } finally {
-      setBulkStatusLoading(false);
-    }
-  };
-
   useEffect(() => {
     const getPartner = async () => {
       const partnerData = await fetchPartner();
@@ -124,28 +79,6 @@ export default function OrderDataTable({
 
   const columns = useMemo<ColumnDef<VendorOrder, any>[]>(
     () => [
-      {
-        id: "select",
-        header: () => (
-          <input
-            type="checkbox"
-            checked={
-              selectedOrderIds.length === orders.length && orders.length > 0
-            }
-            onChange={(e) => handleSelectAll(e.target.checked)}
-            aria-label="Select all orders"
-          />
-        ),
-        cell: ({ row }) => (
-          <input
-            type="checkbox"
-            checked={selectedOrderIds.includes(row.original.id)}
-            onChange={(e) => handleSelectRow(row.original.id, e.target.checked)}
-            aria-label={`Select order ${row.original.orderCode}`}
-          />
-        ),
-        size: 40,
-      },
       columnHelper.accessor("orderCode", {
         header: "Code",
         cell: (info) => (
@@ -212,13 +145,6 @@ export default function OrderDataTable({
         cell: ({ row }) => (
           <div className="flex items-center justify-center gap-2">
             <button
-              onClick={() => onEdit(row.original)}
-              className="rounded p-1.5 text-blue-600 hover:bg-blue-50"
-              title="Edit Order"
-            >
-              <FaEdit className="h-3.5 w-3.5" />
-            </button>
-            <button
               onClick={() => handlePrint(row.original)}
               className="rounded p-1.5 text-green-600 hover:bg-green-50"
               title="Print purchase order"
@@ -253,7 +179,7 @@ export default function OrderDataTable({
         size: 120,
       },
     ],
-    [onEdit, onDelete, onToggleStatus, handlePrint], // Add handlePrint to the dependency array
+    [onDelete, onToggleStatus, handlePrint], // Add handlePrint to the dependency array
   );
 
   const table = useReactTable({
@@ -294,31 +220,6 @@ export default function OrderDataTable({
         partner={partner}
       />
       <div className="w-full space-y-3">
-        {/* Bulk Actions */}
-        {selectedOrderIds.length > 0 && (
-          <div className="flex items-center gap-2 rounded border border-gray-200 bg-gray-50 p-2">
-            <span className="text-sm">
-              Bulk action for {selectedOrderIds.length} selected:
-            </span>
-            <select
-              value={bulkAction}
-              onChange={(e) => setBulkAction(e.target.value)}
-              className="rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              disabled={bulkStatusLoading}
-            >
-              <option value="">Select action</option>
-              <option value="valid">Mark as Valid</option>
-              <option value="canceled">Mark as Canceled</option>
-            </select>
-            <button
-              onClick={handleBulkStatusChange}
-              disabled={bulkStatusLoading || !bulkAction}
-              className="rounded bg-blue-500 px-3 py-1 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50"
-            >
-              {bulkStatusLoading ? "Updating..." : "Apply"}
-            </button>
-          </div>
-        )}
         {/* Search and Controls */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* Search */}
