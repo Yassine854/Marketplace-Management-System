@@ -21,13 +21,15 @@ const middleware = auth((req: any) => {
   const session = req?.auth;
   const isAdmin = session?.user?.roleId === "1";
 
-  const isLoginPage = req.nextUrl.pathname.includes("/login");
+  const isLoginOrSignupPage =
+    req.nextUrl.pathname.includes("/login") ||
+    req.nextUrl.pathname.includes("/signUp");
 
-  if (!session && !isLoginPage) {
+  if (!session && !isLoginOrSignupPage) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
   }
 
-  if (session && isLoginPage) {
+  if (session && isLoginOrSignupPage) {
     if (isAdmin) {
       return NextResponse.redirect(
         new URL("/marketplace/dashboard", req.nextUrl),

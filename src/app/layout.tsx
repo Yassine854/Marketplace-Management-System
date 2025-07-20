@@ -4,10 +4,10 @@ import ThemeProvider from "@/utils/ThemeProvider";
 import { NextUIProvider } from "@nextui-org/react";
 import { Next13NProgress } from "nextjs13-progress";
 import { LayoutProvider } from "@/utils/LayoutContext";
-
 import "@/public/styles/style.scss";
 import "@/public/styles/globals.css";
-
+import { getGB } from "@/libs/growthbook/growthbook";
+import GBProvider from "@/providers/GBProvider";
 type PageParamsType = {
   locale: string;
 };
@@ -32,6 +32,10 @@ export const metadata: Metadata = {
   },
 };
 
+const gb = getGB();
+gb.init();
+console.log(gb);
+
 const RootLayout = ({
   children,
   params: { locale },
@@ -49,7 +53,9 @@ const RootLayout = ({
             <NextUIProvider
             ///  locale="fr-FR"c
             >
-              {children}
+              <GBProvider payload={gb.getDecryptedPayload()}>
+                {children}
+              </GBProvider>
             </NextUIProvider>
           </LayoutProvider>
         </ThemeProvider>

@@ -1,6 +1,7 @@
 import { useMainLayout } from "./useMainLayout";
 import Sidebar from "@/features/layout/widgets/Sidebar";
 import TopNav from "@/features/layout/widgets/TopNavbar";
+import { usePathname } from "next/navigation";
 
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const {
@@ -11,21 +12,25 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
     navigateToOrders,
     setSidebarIsOpen,
   } = useMainLayout();
+  const pathname = usePathname();
+  const isSignUpPage = pathname?.endsWith("/signUp");
 
   return (
     <div className="h-screen w-screen">
       <TopNav setSidebar={setSidebarIsOpen} sidebarIsOpen={sidebarIsOpen} />
 
-      <Sidebar
-        isAdmin={isAdmin}
-        isNoEditUser={isNoEditUser}
-        sidebarIsOpen={sidebarIsOpen}
-        setSidebar={setSidebarIsOpen}
-        onOrderStatusClick={(status: any) => {
-          setStatus(status);
-          navigateToOrders();
-        }}
-      />
+      {!isSignUpPage && (
+        <Sidebar
+          isAdmin={isAdmin}
+          isNoEditUser={isNoEditUser}
+          sidebarIsOpen={sidebarIsOpen}
+          setSidebar={setSidebarIsOpen}
+          onOrderStatusClick={(status: any) => {
+            setStatus(status);
+            navigateToOrders();
+          }}
+        />
+      )}
       <div className="flex h-full flex-grow">
         <div
           className={`transition-all duration-300 ease-in-out ${

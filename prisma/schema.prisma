@@ -312,43 +312,43 @@ model TypePartner {
 }
 
 
-model Partner {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  username        String   @unique
-  firstName       String
-  lastName        String
-  email           String   @unique
-  telephone       String
-  address         String
-  password        String
-  isActive        Boolean  @default(true)
-  logo            String?
-  patent          String?
-  responsibleName String
-  position        String
-  coverageArea    String
-  minimumAmount   Float
-  typePartner     TypePartner @relation(fields: [typePartnerId], references: [id])
-  typePartnerId   String   @db.ObjectId
-  mRoleId          String?
-  role            Role?     @relation(fields: [mRoleId], references: [id])
+  model Partner {
+    id              String   @id @default(auto()) @map("_id") @db.ObjectId
+    username        String   @unique
+    firstName       String?
+    lastName        String?
+    email           String   @unique
+    telephone       String
+    address         String
+    password        String
+    isActive        Boolean  @default(true)
+    logo            String?
+    patent          String?
+    responsibleName String?
+    position        String?
+    coverageArea    String
+    minimumAmount   Float
+    typePartner     TypePartner? @relation(fields: [typePartnerId], references: [id])
+    typePartnerId   String?   @db.ObjectId
+    mRoleId          String?
+    role            Role?     @relation(fields: [mRoleId], references: [id])
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
 
-  sources       Source[]
-  favoritePartners FavoritePartner[]
-  skuPartners SkuPartner[]
-  settings Settings[]
-  products Product[]
-  agents Agent[]
-  notifications Notification[]
-  CartItem CartItem[]
-  OrderItem OrderItem[]
-  orderPartners VendorOrder[]
-  ReservationItem ReservationItem[]
-  @@map("partners")
-}
+    sources       Source[]
+    favoritePartners FavoritePartner[]
+    skuPartners SkuPartner[]
+    settings Settings[]
+    products Product[]
+    agents Agent[]
+    notifications Notification[]
+    CartItem CartItem[]
+    OrderItem OrderItem[]
+    orderPartners VendorOrder[]
+    ReservationItem ReservationItem[]
+    @@map("partners")
+  }
 
 
 
