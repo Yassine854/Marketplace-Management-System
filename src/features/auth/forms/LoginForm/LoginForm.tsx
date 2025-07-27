@@ -42,13 +42,18 @@ const LoginForm = () => {
             >
               {isLoading ? <Loading /> : "Login"}
             </button>
-            <button
-              type="button"
-              onClick={() => push("/signUp")}
-              className="btn mt-2 h-12 w-64 items-center justify-center rounded bg-secondary px-5 text-white shadow transition hover:bg-secondary/90"
-            >
-              Sign Up
-            </button>
+            <div className="mt-2 text-center text-sm text-gray-600">
+              New here?{" "}
+              <button
+                type="button"
+                onClick={() => push("/signUp")}
+                className="text-blue-600 underline hover:text-blue-800 focus:outline-none"
+                style={{ background: "none", border: "none", padding: 0 }}
+              >
+                Join as a partner
+              </button>
+              .
+            </div>
           </>
         )}
       </div>

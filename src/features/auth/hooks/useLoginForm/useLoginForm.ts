@@ -88,18 +88,17 @@ export const useLoginForm = () => {
       toast.error("Not Allowed to Login");
       return;
     }
-    toast.success("Welcome To Kamioun Marketplace Managment System !", {
-      duration: 3000,
-    });
-    // Navigation based on user type/role
-    if (authUser?.roleId === "1") {
-      navigateToMarketplaceDashboard();
-    } else if (authUser?.userType === "partner") {
-      navigateToPartnersDashboard();
+
+    if (res?.ok) {
+      toast.success("Welcome To Kamioun Marketplace Managment System !", {
+        duration: 3000,
+      });
+
+      // Instead of navigating immediately, let the root page handle redirection
+      // after the session is properly updated. We can force a page reload or
+      // navigate to the root page which will handle the proper redirection.
+      window.location.href = "/";
     }
-    // else {
-    //   navigateToDashboard();
-    // }
   };
 
   return { handleSubmit: handleSubmit(onSubmit), register, errors, isLoading };

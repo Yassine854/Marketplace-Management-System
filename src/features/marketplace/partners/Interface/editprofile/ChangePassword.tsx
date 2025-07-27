@@ -92,7 +92,7 @@ const ChangePassword = ({ partnerId }: ChangePasswordProps) => {
   };
 
   return (
-    <div className="box mb-6 p-6">
+    <div className="box mb-6 w-full p-6">
       <p className="mb-6 border-b border-dashed pb-4 font-medium">
         Change Password
       </p>
@@ -124,13 +124,17 @@ const ChangePassword = ({ partnerId }: ChangePasswordProps) => {
             onChange={(value) => handleChange("confirmPassword", value)}
           />
         </div>
-        <div className="col-span-2 flex gap-4">
-          <button type="submit" className="btn px-5" disabled={isLoading}>
+        <div className="col-span-2 flex flex-col gap-4 md:flex-row">
+          <button
+            type="submit"
+            className="btn w-full px-5 md:w-auto"
+            disabled={isLoading}
+          >
             {isLoading ? "Saving..." : "Save Changes"}
           </button>
           <button
             type="button"
-            className="btn-outline px-5"
+            className="btn-outline w-full px-5 md:w-auto"
             onClick={() => {
               setFormData({
                 oldPassword: "",

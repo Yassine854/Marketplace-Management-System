@@ -8,6 +8,7 @@ import "@/public/styles/style.scss";
 import "@/public/styles/globals.css";
 import { getGB } from "@/libs/growthbook/growthbook";
 import GBProvider from "@/providers/GBProvider";
+import { prismaClient } from "@/clients/prisma/prismaClient";
 type PageParamsType = {
   locale: string;
 };
@@ -32,17 +33,25 @@ export const metadata: Metadata = {
   },
 };
 
-const gb = getGB();
-gb.init();
-console.log(gb);
+// Fetch all partner IDs server-side
+async function getAllPartnerIds() {
+  const partners = await prismaClient.partner.findMany({
+    select: { id: true },
+  });
+  return partners.map((p) => p.id);
+}
 
-const RootLayout = ({
+export default async function RootLayout({
   children,
   params: { locale },
 }: {
   children: React.ReactNode;
   params: PageParamsType;
-}) => {
+}) {
+  const partnerIds = await getAllPartnerIds();
+  const attributes = { partnerIds: partnerIds.join(",") };
+  const gb = getGB({ attributes });
+  gb.init();
   return (
     <html suppressHydrationWarning lang={locale} className="!scroll-smooth">
       <meta name="robots" content="noindex,nofollow" />
@@ -50,10 +59,11 @@ const RootLayout = ({
         <ThemeProvider>
           <Next13NProgress color="#5D69F4" height={3} />
           <LayoutProvider>
-            <NextUIProvider
-            ///  locale="fr-FR"c
-            >
-              <GBProvider payload={gb.getDecryptedPayload()}>
+            <NextUIProvider>
+              <GBProvider
+                payload={gb.getDecryptedPayload()}
+                attributes={attributes}
+              >
                 {children}
               </GBProvider>
             </NextUIProvider>
@@ -62,6 +72,4 @@ const RootLayout = ({
       </body>
     </html>
   );
-};
-
-export default RootLayout;
+}

@@ -1,8 +1,9 @@
+"use client";
 import { useState, useEffect } from "react";
+import { useGrowthBook } from "@growthbook/growthbook-react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import Select from "react-select";
-import { useSearchBar } from "@/features/shared/inputs/SearchBar/useSearchBar";
 import { useCreateProduct } from "../hooks/useCreateProduct";
 
 interface Product {
@@ -129,6 +130,20 @@ const CreateProductModal = ({
   promotions,
   partners,
 }: CreateProductModalProps) => {
+  // AB Testing Setup
+  const gb = useGrowthBook();
+  const experiment = gb?.run({
+    key: "create-product-variant",
+    variations: [0, 1], // 0: original, 1: new variant
+  });
+  const variant = experiment?.value ?? 0;
+
+  // Experiment Tracking
+  const [interactionCount, setInteractionCount] = useState(0);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [visitedTabs, setVisitedTabs] = useState<string[]>([]);
+  const [timeSpent, setTimeSpent] = useState(0);
+
   const [formState, setFormState] = useState({
     name: "",
     barcode: "",
@@ -158,7 +173,7 @@ const CreateProductModal = ({
     relatedProducts: [] as string[],
     promo: false,
     images: [] as File[],
-    partnerSku: "", // Single field for partner SKU
+    partnerSku: "",
     stocks: [] as Array<{
       sourceId: string;
       stockQuantity: number;
@@ -175,42 +190,84 @@ const CreateProductModal = ({
     brandName: "",
     brandImage: null as File | null,
     activities: [] as string[],
-    brandId: "" as string,
+    brandId: "",
   });
 
-  // Add this line to use the hook at the component level
   const { createProduct } = useCreateProduct();
-
   const [activeTab, setActiveTab] = useState("basic");
-
-  // Add state for sources
   const [partnerSources, setPartnerSources] = useState<
     Array<{ id: string; name: string }>
   >([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Add these state variables
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Array<any>>([]);
   const [isSearching, setIsSearching] = useState(false);
-
-  // Add a state to store the selected product ID
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null,
   );
-
-  // Add state for brands and loading
   const [brands, setBrands] = useState<
     Array<{ id: string; name: string | null; img: string }>
   >([]);
   const [isLoadingBrands, setIsLoadingBrands] = useState(false);
 
-  // Fetch brands when modal opens
+  // Track time spent in modal
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isOpen) {
+      interval = setInterval(() => {
+        setTimeSpent((prev) => {
+          const newTime = prev + 1;
+          if (newTime === 5) logExperimentGoal("time_5s");
+          if (newTime === 15) logExperimentGoal("time_15s");
+          if (newTime === 30) logExperimentGoal("time_30s");
+          return newTime;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isOpen]);
+
+  // Log modal view when opened
   useEffect(() => {
     if (isOpen) {
+      logExperimentGoal("modal_viewed");
       fetchBrands();
     }
   }, [isOpen]);
+
+  // Track tab visits
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    if (!visitedTabs.includes(tab)) {
+      setVisitedTabs([...visitedTabs, tab]);
+      logExperimentGoal(`visited_${tab}_tab`);
+    }
+  };
+
+  // Track form interactions
+  const trackInteraction = () => {
+    setInteractionCount((prev) => {
+      const newCount = prev + 1;
+      if (newCount === 3) logExperimentGoal("meaningful_interaction");
+      return newCount;
+    });
+  };
+
+  const logExperimentGoal = async (goalName: string) => {
+    try {
+      await fetch("/api/marketplace/experimentLogs/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          experimentId: "create-product-variant",
+          variationId: variant,
+          goalName,
+        }),
+      });
+    } catch (error) {
+      console.error("Error logging experiment goal:", error);
+    }
+  };
 
   const fetchBrands = async () => {
     setIsLoadingBrands(true);
@@ -260,15 +317,15 @@ const CreateProductModal = ({
         relatedProducts: [],
         promo: false,
         images: [],
-        partnerSku: "", // Single field for partner SKU
-        stocks: [], // Empty array for stocks
+        partnerSku: "",
+        stocks: [],
         brandName: "",
         brandImage: null,
         activities: [],
         brandId: "",
       });
       setActiveTab("basic");
-      setSelectedProductId(null); // Reset selected product ID
+      setSelectedProductId(null);
     }
   }, [isOpen]);
 
@@ -277,6 +334,7 @@ const CreateProductModal = ({
       ...prev,
       [field]: value === "" ? undefined : value,
     }));
+    trackInteraction();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -302,7 +360,6 @@ const CreateProductModal = ({
           data[header] = dataLine[index] || "";
         });
 
-        // Update form state based on CSV data
         setFormState((prev) => ({
           ...prev,
           name: data["name"] || prev.name,
@@ -345,12 +402,11 @@ const CreateProductModal = ({
       ...prev,
       partnerSku: e.target.value,
     }));
+    trackInteraction();
   };
 
   const handleStockChange = (stockIndex: number, field: string, value: any) => {
     const updatedStocks = [...formState.stocks];
-
-    // Special handling for price field to ensure it's a float
     if (field === "price") {
       let floatValue = value === "" ? 0 : parseFloat(value);
       if (isNaN(floatValue)) floatValue = 0;
@@ -359,7 +415,6 @@ const CreateProductModal = ({
         [field]: floatValue,
       };
     } else if (field === "stockQuantity") {
-      // When stockQuantity changes, also update sealable
       updatedStocks[stockIndex] = {
         ...updatedStocks[stockIndex],
         stockQuantity: value,
@@ -376,34 +431,22 @@ const CreateProductModal = ({
       ...prev,
       stocks: updatedStocks,
     }));
+    trackInteraction();
   };
 
-  // Add a function to get available sources (not already selected)
   const getAvailableSources = (currentIndex: number) => {
-    // Get all source IDs that are already selected in other stocks
     const selectedSourceIds = formState.stocks
-      .filter((_, i) => i !== currentIndex) // Exclude current stock
+      .filter((_, i) => i !== currentIndex)
       .map((stock) => stock.sourceId)
-      .filter(Boolean); // Filter out empty strings or undefined
+      .filter(Boolean);
 
-    console.log("Selected source IDs:", selectedSourceIds);
-    console.log("All partner sources:", partnerSources);
-
-    // Return only sources that haven't been selected yet
-    const availableSources = Array.isArray(partnerSources)
+    return Array.isArray(partnerSources)
       ? partnerSources.filter(
           (source) => !selectedSourceIds.includes(source.id),
         )
       : [];
-
-    console.log(
-      "Available sources for index",
-      currentIndex,
-      ":",
-      availableSources,
-    );
-    return availableSources;
   };
+
   const addStock = () => {
     setFormState((prev) => ({
       ...prev,
@@ -420,19 +463,19 @@ const CreateProductModal = ({
         },
       ],
     }));
+    trackInteraction();
   };
 
   const removeStock = (stockIndex: number) => {
     const updatedStocks = [...formState.stocks];
     updatedStocks.splice(stockIndex, 1);
-
     setFormState((prev) => ({
       ...prev,
       stocks: updatedStocks,
     }));
+    trackInteraction();
   };
 
-  // Fetch sources when component mounts
   useEffect(() => {
     const fetchPartnerSources = async () => {
       try {
@@ -445,28 +488,20 @@ const CreateProductModal = ({
         toast.error("Failed to load sources");
       }
     };
-
     fetchPartnerSources();
   }, []);
 
-  // Simple function to search products by barcode or SKU
   const searchProducts = async () => {
-    if (!searchTerm.trim()) {
-      return;
-    }
-
+    if (!searchTerm.trim()) return;
     setIsSearching(true);
     try {
-      // Use the dedicated search endpoint
       const response = await axios.get(
         `/api/marketplace/products/search?query=${encodeURIComponent(
           searchTerm,
         )}`,
       );
-
       if (response.data && Array.isArray(response.data.products)) {
         if (response.data.products.length > 0) {
-          console.log("Search results:", response.data.products); // For debugging
           setSearchResults(response.data.products);
         } else {
           setSearchResults([]);
@@ -485,14 +520,8 @@ const CreateProductModal = ({
     }
   };
 
-  // Function to use a product's data in the form
   const selectProduct = (product: Product) => {
-    console.log("Selected product:", product);
-
-    // Store the selected product ID
     setSelectedProductId(product.id);
-
-    // Extract subcategory IDs and related product IDs
     const subCategoryIds =
       product.productSubCategories?.map((sc) => sc.subcategoryId) || [];
     const relatedProductIds =
@@ -534,11 +563,8 @@ const CreateProductModal = ({
       activities: [],
       brandId: "",
     });
-
-    // Clear search
     setSearchResults([]);
     setSearchTerm("");
-
     toast.success(`Product "${product.name}" data loaded into form`);
   };
 
@@ -553,8 +579,10 @@ const CreateProductModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setHasSubmitted(true);
+    logExperimentGoal("submission_started");
 
-    // Required field validations
+    // Validation checks...
     if (!formState.sku || !formState.sku.trim()) {
       toast.error("SKU is required");
       return;
@@ -584,7 +612,6 @@ const CreateProductModal = ({
       return;
     }
 
-    // At least one stock entry must have all required fields filled
     const hasValidStock = (formState.stocks || []).some(
       (stock) =>
         stock.sourceId &&
@@ -616,26 +643,21 @@ const CreateProductModal = ({
     try {
       let productId = selectedProductId;
 
-      // If we don't have a selected product, check if one exists with this barcode
       if (!productId && formState.barcode) {
         try {
-          // Search for product with this barcode
           const searchResponse = await axios.get(
             `/api/marketplace/products/search?query=${encodeURIComponent(
               formState.barcode,
             )}`,
           );
-
           if (
             searchResponse.data &&
             Array.isArray(searchResponse.data.products) &&
             searchResponse.data.products.length > 0
           ) {
-            // Use the first product that matches the barcode
             const existingProduct = searchResponse.data.products.find(
               (p: any) => p.barcode === formState.barcode,
             );
-
             if (existingProduct) {
               toast.error(
                 `Barcode already exists. Please use a different barcode.`,
@@ -646,30 +668,24 @@ const CreateProductModal = ({
           }
         } catch (error) {
           console.error("Error searching for existing product:", error);
-          // Continue with product creation if search fails
         }
       }
 
-      // If we don't have a selected product, check if one exists with this SKU
       if (!productId && formState.sku) {
         try {
-          // Search for product with this SKU
           const searchResponse = await axios.get(
             `/api/marketplace/products/search?query=${encodeURIComponent(
               formState.sku,
             )}`,
           );
-
           if (
             searchResponse.data &&
             Array.isArray(searchResponse.data.products) &&
             searchResponse.data.products.length > 0
           ) {
-            // Use the first product that matches the SKU
             const existingProduct = searchResponse.data.products.find(
               (p: any) => p.sku === formState.sku,
             );
-
             if (existingProduct) {
               toast.error(`SKU already exists. Please use a different SKU.`);
               setIsSubmitting(false);
@@ -678,13 +694,10 @@ const CreateProductModal = ({
           }
         } catch (error) {
           console.error("Error searching for existing product by SKU:", error);
-          // Continue with product creation if search fails
         }
       }
 
-      // Only create a new product if we don't have a product ID yet
       if (!productId) {
-        // Convert empty strings to undefined for relational fields
         const payload = {
           ...formState,
           price: Number(formState.price),
@@ -714,30 +727,26 @@ const CreateProductModal = ({
           loyaltyPointsThresholdQty: formState.loyaltyPointsThresholdQty
             ? Number(formState.loyaltyPointsThresholdQty)
             : undefined,
-          // Convert empty strings to undefined for relational IDs
           supplierId: formState.supplierId || undefined,
           productTypeId: formState.productTypeId || undefined,
           typePcbId: formState.typePcbId || undefined,
           productStatusId: formState.productStatusId || undefined,
           taxId: formState.taxId || undefined,
           promotionId: formState.promotionId || undefined,
-          // Include brand information
           brandName: formState.brandName || undefined,
           brandImage: formState.brandImage || undefined,
           brandId: formState.brandId,
           activities: formState.activities,
         };
 
-        // Create skuPartners array from the partner SKU and stocks
         const skuPartners = [];
         skuPartners.push({
-          partnerId: "", // Will be filled by the backend
+          partnerId: "",
           skuPartner: formState.partnerSku
             ? formState.partnerSku
             : formState.sku,
         });
 
-        // Add the product payload
         const productPayload = {
           ...payload,
           skuPartners,
@@ -751,7 +760,6 @@ const CreateProductModal = ({
             throw new Error("Failed to create product");
           }
         } catch (error: any) {
-          // If the error is due to barcode or SKU already existing, show toast and do not close modal
           const errorMessage = error?.message || "";
           if (errorMessage.includes("Barcode already exists")) {
             toast.error(
@@ -765,7 +773,6 @@ const CreateProductModal = ({
             setIsSubmitting(false);
             return;
           }
-          // If the error is due to barcode already existing, try to find the product again
           if (
             error.message &&
             error.message.includes("Barcode already exists")
@@ -776,7 +783,6 @@ const CreateProductModal = ({
                   formState.barcode,
                 )}`,
               );
-
               if (
                 retrySearch.data &&
                 Array.isArray(retrySearch.data.products) &&
@@ -785,7 +791,6 @@ const CreateProductModal = ({
                 const existingProduct = retrySearch.data.products.find(
                   (p: any) => p.barcode === formState.barcode,
                 );
-
                 if (existingProduct) {
                   productId = existingProduct.id;
                   toast(
@@ -806,7 +811,7 @@ const CreateProductModal = ({
                 "Error searching for existing product:",
                 searchError,
               );
-              throw error; // Re-throw the original error
+              throw error;
             }
           } else {
             throw error;
@@ -814,26 +819,20 @@ const CreateProductModal = ({
         }
       }
 
-      // Create SKU partner and stocks
       if (productId) {
         try {
-          // Create SKU partner - partnerId will be added in the route
           const skuPartnerResponse = await axios.post(
             "/api/marketplace/sku_partner/create",
             {
               productId,
-              skuPartner: formState.partnerSku || formState.sku, // Use product SKU if empty
+              skuPartner: formState.partnerSku || formState.sku,
               skuProduct: formState.sku,
             },
           );
-
           if (skuPartnerResponse.data && skuPartnerResponse.data.skuPartner) {
             const skuPartnerId = skuPartnerResponse.data.skuPartner.id;
-
-            // Create stocks for this SKU partner
             const stockPromises = formState.stocks.map((stock) => {
               if (!stock.sourceId) return Promise.resolve();
-
               return axios.post("/api/marketplace/stock/create", {
                 skuPartnerId,
                 sourceId: stock.sourceId,
@@ -841,39 +840,35 @@ const CreateProductModal = ({
                 special_price: stock.special_price,
                 minQty: stock.minQty,
                 maxQty: stock.maxQty,
-                price: parseFloat(stock.price.toString()), // Convert to float
+                price: parseFloat(stock.price.toString()),
                 loyaltyPointsPerProduct: stock.loyaltyPointsPerProduct,
                 loyaltyPointsPerUnit: stock.loyaltyPointsPerUnit,
                 loyaltyPointsBonusQuantity: stock.loyaltyPointsBonusQuantity,
                 loyaltyPointsThresholdQty: stock.loyaltyPointsThresholdQty,
               });
             });
-
             await Promise.all(stockPromises.filter(Boolean));
           }
         } catch (error) {
           console.error("Error creating SKU partner or stocks:", error);
           toast.error("Failed to create SKU partner or stocks");
-          // Continue with the rest of the process even if SKU partner creation fails
         }
       }
 
+      logExperimentGoal("product_created");
       toast.success(
         selectedProductId || productId !== null
           ? "SKU partner created successfully"
           : "Product created successfully",
       );
-
-      // Call the refetch function to update the product list
       onClose();
-
-      // Add a small delay before refetching to ensure the backend has processed everything
       setTimeout(() => {
         if (typeof onCreate === "function") {
           onCreate(formState);
         }
       }, 500);
     } catch (error) {
+      logExperimentGoal("submission_failed");
       console.error("Error creating product:", error);
       toast.error("Failed to create product");
     } finally {
@@ -883,11 +878,712 @@ const CreateProductModal = ({
 
   if (!isOpen) return null;
 
+  // Variant 1 - New vertical layout
+  if (variant === 1) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-lg bg-white shadow-xl">
+          <div className="sticky top-0 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold">Create New Product</h2>
+              <button
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6">
+            {/* Search and Import Section */}
+            <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block font-medium text-gray-700">
+                  Import from CSV
+                </label>
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleCsvUpload}
+                  className="w-full rounded-lg border p-2 text-sm"
+                />
+              </div>
+
+              <div className="flex items-end space-x-2">
+                <div className="flex-grow">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Search by Barcode or SKU
+                  </label>
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Enter barcode or SKU"
+                    className="w-full rounded-lg border p-2"
+                    onKeyDown={(e) => e.key === "Enter" && searchProducts()}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={searchProducts}
+                  disabled={isSearching}
+                  className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:bg-blue-300"
+                >
+                  {isSearching ? "Searching..." : "Search"}
+                </button>
+              </div>
+            </div>
+
+            {searchResults.length > 0 && (
+              <div className="mb-4 rounded-lg border p-3">
+                <h4 className="mb-2 font-medium">Found Products:</h4>
+                <ul className="divide-y">
+                  {searchResults.map((product) => (
+                    <li
+                      key={product.id}
+                      className="flex items-center justify-between py-2"
+                    >
+                      <div>
+                        <p className="font-medium">{product.name}</p>
+                        <p className="text-sm text-gray-500">
+                          Barcode: {product.barcode} | SKU: {product.sku} |
+                          Price: {product.price} Dt
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => selectProduct(product)}
+                        className="rounded bg-green-100 px-3 py-1 text-sm text-green-700 hover:bg-green-200"
+                      >
+                        Use
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {selectedProductId && (
+              <div className="mb-4 rounded-lg bg-blue-50 p-3 text-blue-700">
+                <div className="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="mr-2 h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="font-medium">
+                    Using existing product - only SKU partner and stocks will be
+                    created
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                  onClick={() => setSelectedProductId(null)}
+                >
+                  Clear selection and create new product instead
+                </button>
+              </div>
+            )}
+
+            {/* Basic Information Section */}
+            <div className="mb-8 rounded-lg border p-6">
+              <h3 className="mb-4 text-xl font-semibold">Basic Information</h3>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Bar Code
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Bar Code"
+                    value={formState.barcode}
+                    onChange={(e) =>
+                      handleInputChange("barcode", e.target.value)
+                    }
+                    className="w-full rounded-lg border p-3"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    SKU *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="SKU"
+                    value={formState.sku}
+                    onChange={(e) => handleInputChange("sku", e.target.value)}
+                    className="w-full rounded-lg border p-3"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Product Name *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Product Name"
+                    value={formState.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    className="w-full rounded-lg border p-3"
+                  />
+                </div>
+                <div className="flex items-end gap-4">
+                  <div className="flex-1">
+                    <label className="mb-1 block font-medium text-gray-700">
+                      Price *
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Price"
+                      value={formState.price || ""}
+                      onChange={(e) =>
+                        handleInputChange("price", e.target.value)
+                      }
+                      className="w-full rounded-lg border p-3"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="mb-1 block font-medium text-gray-700">
+                      Weight
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Weight"
+                      value={formState.weight || ""}
+                      onChange={(e) =>
+                        handleInputChange("weight", e.target.value)
+                      }
+                      className="w-full rounded-lg border p-3"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <label className="mb-1 block font-medium text-gray-700">
+                  Description
+                </label>
+                <textarea
+                  placeholder="Description"
+                  value={formState.description}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
+                  className="w-full rounded-lg border p-3"
+                  rows={4}
+                />
+              </div>
+            </div>
+
+            {/* Relationships Section */}
+            <div className="mb-8 rounded-lg border p-6">
+              <h3 className="mb-4 text-xl font-semibold">Relationships</h3>
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Manufacturer *
+                  </label>
+                  <select
+                    value={formState.supplierId}
+                    onChange={(e) =>
+                      handleInputChange("supplierId", e.target.value)
+                    }
+                    className="w-full rounded-lg border p-3"
+                  >
+                    <option value="">Select Manufacturer</option>
+                    {suppliers.map((supplier) => (
+                      <option key={supplier.id} value={supplier.id}>
+                        {supplier.companyName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Product Type
+                  </label>
+                  <select
+                    value={formState.productTypeId}
+                    onChange={(e) =>
+                      handleInputChange("productTypeId", e.target.value)
+                    }
+                    className="w-full rounded-lg border p-3"
+                  >
+                    <option value="">Product Type</option>
+                    {productTypes.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    PCB Type
+                  </label>
+                  <select
+                    value={formState.typePcbId}
+                    onChange={(e) =>
+                      handleInputChange("typePcbId", e.target.value)
+                    }
+                    className="w-full rounded-lg border p-3"
+                  >
+                    <option value="">PCB Type</option>
+                    {typePcbs.map((pcb) => (
+                      <option key={pcb.id} value={pcb.id}>
+                        {pcb.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Product Status
+                  </label>
+                  <select
+                    value={formState.productStatusId}
+                    onChange={(e) =>
+                      handleInputChange("productStatusId", e.target.value)
+                    }
+                    className="w-full rounded-lg border p-3"
+                  >
+                    <option value="">Product Status</option>
+                    {productStatuses.map((status) => (
+                      <option key={status.id} value={status.id}>
+                        {status.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Tax
+                  </label>
+                  <select
+                    value={formState.taxId}
+                    onChange={(e) => handleInputChange("taxId", e.target.value)}
+                    className="w-full rounded-lg border p-3"
+                  >
+                    <option value="">Select Tax</option>
+                    {taxes.map((tax) => (
+                      <option key={tax.id} value={tax.id}>
+                        {tax.value}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Promotion
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={formState.promo}
+                      onChange={(e) =>
+                        handleInputChange("promo", e.target.checked)
+                      }
+                      className="h-5 w-5"
+                      id="promo-checkbox"
+                    />
+                    <label
+                      htmlFor="promo-checkbox"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Promo Product
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <label className="mb-1 block font-medium text-gray-700">
+                  Activities *
+                </label>
+                <Select
+                  isMulti
+                  name="activities"
+                  options={ACTIVITIES.map((activity) => ({
+                    value: activity,
+                    label: activity,
+                  }))}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                  value={
+                    formState.activities?.map((activity) => ({
+                      value: activity,
+                      label: activity,
+                    })) || []
+                  }
+                  onChange={(selected) => {
+                    handleInputChange(
+                      "activities",
+                      selected ? selected.map((option) => option.value) : [],
+                    );
+                  }}
+                  placeholder="Search and select activities..."
+                  noOptionsMessage={() => "No activities found"}
+                />
+              </div>
+
+              <div className="mt-6">
+                <label className="mb-1 block font-medium text-gray-700">
+                  Brand *
+                </label>
+                <Select
+                  isClearable
+                  isLoading={isLoadingBrands}
+                  options={
+                    brands?.map((brand) => ({
+                      value: brand.id,
+                      label: brand.name || "Unnamed Brand",
+                      img: brand.img,
+                    })) || []
+                  }
+                  value={
+                    brands
+                      ?.filter((brand) => brand.id === formState.brandId)
+                      .map((brand) => ({
+                        value: brand.id,
+                        label: brand.name || "Unnamed Brand",
+                        img: brand.img,
+                      }))[0] || null
+                  }
+                  onChange={(selected) => {
+                    handleInputChange("brandId", selected?.value || "");
+                  }}
+                  formatOptionLabel={(option) => (
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={option.img}
+                        alt={option.label}
+                        className="h-8 w-8 rounded object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "https://via.placeholder.com/32x32?text=No+Image";
+                        }}
+                      />
+                      <span>{option.label}</span>
+                    </div>
+                  )}
+                  placeholder="Select a brand..."
+                  noOptionsMessage={() => "No brands found"}
+                  className="basic-single"
+                  classNamePrefix="select"
+                />
+              </div>
+
+              <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Sub-Categories
+                  </label>
+                  <Select
+                    isMulti
+                    name="subCategories"
+                    options={subCategories.map((cat) => ({
+                      value: cat.id,
+                      label: cat.name,
+                    }))}
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                    value={
+                      formState.subCategories?.map((id) => {
+                        const cat = subCategories.find((c) => c.id === id);
+                        return { value: id, label: cat ? cat.name : id };
+                      }) || []
+                    }
+                    onChange={(selected) => {
+                      handleInputChange(
+                        "subCategories",
+                        selected ? selected.map((option) => option.value) : [],
+                      );
+                    }}
+                    placeholder="Search and select subcategories..."
+                    noOptionsMessage={() => "No subcategories found"}
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Related Products
+                  </label>
+                  <Select
+                    isMulti
+                    name="relatedProducts"
+                    options={relatedProducts.map((product) => ({
+                      value: product.id,
+                      label: product.name,
+                    }))}
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                    value={
+                      formState.relatedProducts?.map((id) => {
+                        const product = relatedProducts.find(
+                          (p) => p.id === id,
+                        );
+                        return {
+                          value: id,
+                          label: product ? product.name : id,
+                        };
+                      }) || []
+                    }
+                    onChange={(selected) => {
+                      handleInputChange(
+                        "relatedProducts",
+                        selected ? selected.map((option) => option.value) : [],
+                      );
+                    }}
+                    placeholder="Search and select related products..."
+                    noOptionsMessage={() => "No related products found"}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <label className="mb-1 block font-medium text-gray-700">
+                  Images
+                </label>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+            </div>
+
+            {/* Stock Management Section */}
+            <div className="rounded-lg border p-6">
+              <h3 className="mb-4 text-xl font-semibold">Stock Management</h3>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  Your SKU
+                </label>
+                <input
+                  type="text"
+                  value={formState.partnerSku}
+                  onChange={handlePartnerSkuChange}
+                  className="w-full rounded-lg border p-3"
+                  placeholder="Enter your SKU (optional)"
+                />
+              </div>
+
+              <div className="space-y-4">
+                {formState.stocks.map((stock, index) => (
+                  <div
+                    key={index}
+                    className="rounded-lg border border-gray-200 p-4"
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <h4 className="font-medium">Stock Entry #{index + 1}</h4>
+                      <button
+                        onClick={() => removeStock(index)}
+                        className="rounded-full p-1 text-red-500 hover:text-red-700 focus:outline-none"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                          Source
+                        </label>
+                        <select
+                          value={stock.sourceId}
+                          onChange={(e) =>
+                            handleStockChange(index, "sourceId", e.target.value)
+                          }
+                          className="w-full rounded-lg border p-3"
+                        >
+                          <option value="">Select Source</option>
+                          {getAvailableSources(index).map((source) => (
+                            <option key={source.id} value={source.id}>
+                              {source.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                          Price
+                        </label>
+                        <input
+                          type="number"
+                          value={stock.price}
+                          onChange={(e) =>
+                            handleStockChange(index, "price", e.target.value)
+                          }
+                          className="w-full rounded-lg border p-3"
+                          placeholder="Price"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                          Special Price
+                        </label>
+                        <input
+                          type="number"
+                          value={stock.special_price}
+                          onChange={(e) =>
+                            handleStockChange(
+                              index,
+                              "special_price",
+                              e.target.value,
+                            )
+                          }
+                          className="w-full rounded-lg border p-3"
+                          placeholder="Special Price"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                          Stock Qty
+                        </label>
+                        <input
+                          type="number"
+                          value={stock.stockQuantity}
+                          onChange={(e) =>
+                            handleStockChange(
+                              index,
+                              "stockQuantity",
+                              e.target.value,
+                            )
+                          }
+                          className="w-full rounded-lg border p-3"
+                          placeholder="Stock Quantity"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                          Min Qty
+                        </label>
+                        <input
+                          type="number"
+                          value={stock.minQty}
+                          onChange={(e) =>
+                            handleStockChange(index, "minQty", e.target.value)
+                          }
+                          className="w-full rounded-lg border p-3"
+                          placeholder="Min Qty"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                          Max Qty
+                        </label>
+                        <input
+                          type="number"
+                          value={stock.maxQty}
+                          onChange={(e) =>
+                            handleStockChange(index, "maxQty", e.target.value)
+                          }
+                          className="w-full rounded-lg border p-3"
+                          placeholder="Max Qty"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                          Sealable
+                        </label>
+                        <input
+                          type="number"
+                          value={stock.sealable || 0}
+                          disabled
+                          className="w-full cursor-not-allowed rounded-lg border bg-gray-100 p-3 text-gray-500"
+                          placeholder="Sealable"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={addStock}
+                  className="w-full rounded-lg bg-gray-100 p-3 text-gray-700 hover:bg-gray-200"
+                >
+                  + Add Stock Entry
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Buttons */}
+            <div className="mt-8 flex justify-end space-x-3">
+              <button
+                onClick={onClose}
+                className="rounded-lg bg-gray-200 px-5 py-2 text-gray-800 hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Creating..." : "Create Product"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Variant 0 - Original layout
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4">
       <div
         className="max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
@@ -914,7 +1610,6 @@ const CreateProductModal = ({
           </button>
         </div>
 
-        {/* CSV Upload and Product Search */}
         <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -928,7 +1623,6 @@ const CreateProductModal = ({
             />
           </div>
 
-          {/* Simple Product Search */}
           <div className="mb-4 flex items-end space-x-2">
             <div className="flex-grow">
               <label className="block text-sm font-medium text-gray-700">
@@ -953,7 +1647,6 @@ const CreateProductModal = ({
             </button>
           </div>
 
-          {/* Search Results - Simple List */}
           {searchResults.length > 0 && (
             <div className="mb-4 rounded-lg border p-3">
               <h4 className="mb-2 font-medium">Found Products:</h4>
@@ -984,7 +1677,6 @@ const CreateProductModal = ({
           )}
         </div>
 
-        {/* Show indicator when using existing product */}
         {selectedProductId && (
           <div className="mb-4 rounded-lg bg-blue-50 p-3 text-blue-700">
             <div className="flex items-center">
@@ -1015,7 +1707,6 @@ const CreateProductModal = ({
           </div>
         )}
 
-        {/* Tabs */}
         <div className="mb-6 flex border-b">
           <button
             className={`mr-4 pb-2 text-sm font-medium ${
@@ -1049,7 +1740,6 @@ const CreateProductModal = ({
           </button>
         </div>
 
-        {/* Basic Information */}
         {activeTab === "basic" && (
           <div className="space-y-4 pb-6">
             <h3 className="text-xl font-semibold text-primary">
@@ -1057,7 +1747,7 @@ const CreateProductModal = ({
             </h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="mb-1 block font-medium text-gray-700">
                   Bar Code
                 </label>
                 <input
@@ -1069,8 +1759,8 @@ const CreateProductModal = ({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  SKU <span className="text-red-500">*</span>
+                <label className="mb-1 block font-medium text-gray-700">
+                  SKU *
                 </label>
                 <input
                   type="text"
@@ -1081,8 +1771,8 @@ const CreateProductModal = ({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Product Name <span className="text-red-500">*</span>
+                <label className="mb-1 block font-medium text-gray-700">
+                  Product Name *
                 </label>
                 <input
                   type="text"
@@ -1094,8 +1784,8 @@ const CreateProductModal = ({
               </div>
               <div className="flex items-end gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Price <span className="text-red-500">*</span>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Price *
                   </label>
                   <input
                     type="number"
@@ -1106,7 +1796,7 @@ const CreateProductModal = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="mb-1 block font-medium text-gray-700">
                     Weight
                   </label>
                   <input
@@ -1122,7 +1812,7 @@ const CreateProductModal = ({
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="mb-1 block font-medium text-gray-700">
                 Description
               </label>
               <textarea
@@ -1138,7 +1828,6 @@ const CreateProductModal = ({
           </div>
         )}
 
-        {/* Relationships */}
         {activeTab === "relations" && (
           <div className="pt-15 space-y-4">
             <h3 className="text-xl font-semibold text-primary">
@@ -1146,8 +1835,8 @@ const CreateProductModal = ({
             </h3>
             <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_160px_128px] items-end gap-x-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Manufacturer <span className="text-red-500">*</span>
+                <label className="mb-1 block font-medium text-gray-700">
+                  Manufacturer *
                 </label>
                 <select
                   value={formState.supplierId}
@@ -1165,7 +1854,7 @@ const CreateProductModal = ({
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="mb-1 block font-medium text-gray-700">
                   Product Type
                 </label>
                 <select
@@ -1184,7 +1873,7 @@ const CreateProductModal = ({
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="mb-1 block font-medium text-gray-700">
                   PCB Type
                 </label>
                 <select
@@ -1203,7 +1892,7 @@ const CreateProductModal = ({
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="mb-1 block font-medium text-gray-700">
                   Product Status
                 </label>
                 <select
@@ -1222,7 +1911,7 @@ const CreateProductModal = ({
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="mb-1 block font-medium text-gray-700">
                   Tax
                 </label>
                 <select
@@ -1240,11 +1929,10 @@ const CreateProductModal = ({
               </div>
             </div>
 
-            {/* Activities and Brand fields */}
             <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Activities <span className="text-red-500">*</span>
+                <label className="mb-1 block font-medium text-gray-700">
+                  Activities *
                 </label>
                 <Select
                   isMulti
@@ -1272,8 +1960,8 @@ const CreateProductModal = ({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Select Brand <span className="text-red-500">*</span>
+                <label className="mb-1 block font-medium text-gray-700">
+                  Select Brand *
                 </label>
                 <Select
                   isClearable
@@ -1319,10 +2007,9 @@ const CreateProductModal = ({
               </div>
             </div>
 
-            {/* Sub-Categories & Related Products */}
             <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="mb-1 block font-medium text-gray-700">
                   Sub-Categories
                 </label>
                 <Select
@@ -1351,7 +2038,7 @@ const CreateProductModal = ({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="mb-1 block font-medium text-gray-700">
                   Related Products
                 </label>
                 <Select
@@ -1381,7 +2068,6 @@ const CreateProductModal = ({
               </div>
             </div>
 
-            {/* Promotion */}
             <div className="pt-4">
               <h4 className="mb-3 text-lg font-medium text-gray-800">
                 Promotion
@@ -1403,7 +2089,6 @@ const CreateProductModal = ({
               </div>
             </div>
 
-            {/* Images */}
             <div className="pt-4">
               <h4 className="mb-3 text-lg font-medium text-gray-800">Images</h4>
               <input
@@ -1417,13 +2102,11 @@ const CreateProductModal = ({
           </div>
         )}
 
-        {/* Partner SKUs */}
         {activeTab === "partners" && (
           <div className="pt-15 space-y-4 md:col-span-2">
             <h3 className="text-xl font-semibold text-primary">
               Stock Management
             </h3>
-            {/* Partner SKU field */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700">
                 Your SKU
@@ -1587,7 +2270,6 @@ const CreateProductModal = ({
           </div>
         )}
 
-        {/* Buttons */}
         <div className="mt-8 flex justify-end gap-4">
           <button
             onClick={onClose}

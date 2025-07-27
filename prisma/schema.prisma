@@ -21,6 +21,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
+  experimentExposures ExperimentExposure[]
   notifications Notification[]
 }
 
@@ -332,6 +333,8 @@ model TypePartner {
     typePartnerId   String?   @db.ObjectId
     mRoleId          String?
     role            Role?     @relation(fields: [mRoleId], references: [id])
+
+    experimentExposures ExperimentExposure[]
 
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
@@ -647,8 +650,8 @@ model OrderItem {
   updatedAt       DateTime @updatedAt
 
   // Relationships
-  orderId         String   @db.ObjectId
-  order           Order    @relation(fields: [orderId], references: [id])
+  orderId         String?   @db.ObjectId
+  order           Order?    @relation(fields: [orderId], references: [id])
 
   productId       String   @db.ObjectId
   product         Product   @relation(fields: [productId], references: [id])
@@ -991,7 +994,20 @@ model Notification {
   @@map("notifications")
 }
 
+model ExperimentExposure {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  partnerId     String?  @db.ObjectId
+  adminId      String?   @db.ObjectId
 
+  partner       Partner?  @relation(fields: [partnerId], references: [id])
+  admin         User?  @relation(fields: [adminId], references: [id])
+
+  experimentId  String
+  variationId   Int
+  timestamp     DateTime @default(now())
+
+  @@map("experiment_exposures")
+}
 
 
 

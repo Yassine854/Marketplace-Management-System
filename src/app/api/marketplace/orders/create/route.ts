@@ -72,224 +72,308 @@ export async function POST(req: Request) {
       );
     }
 
-    const newOrder = await prisma.$transaction(async (tx) => {
-      const orderItemsData = await Promise.all(
-        reservation.reservationItems.map(async (item) => {
-          if (item.sourceId) {
-            const skuPartnerWhere: any = { productId: item.productId };
-            if (item.partnerId) skuPartnerWhere.partnerId = item.partnerId;
+    // Pre-calculate data outside transaction to reduce transaction time
+    const itemCalculations = new Map();
 
-            const stock = await tx.stock.findFirst({
-              where: {
-                skuPartner: skuPartnerWhere,
-                sourceId: item.sourceId,
-              },
-              include: {
-                skuPartner: true,
-              },
-            });
-            console.log("stock", stock);
-            if (!stock) {
-              throw {
-                type: "BUSINESS",
-                code: "STOCK_NOT_FOUND",
-                message: `Stock indisponible pour le produit '${
-                  item.product.name
-                }' (SKU: ${item.sku}) dans '${
-                  item.source?.name || "source inconnue"
-                }'.`,
-              };
-            }
-
-            if (stock.sealable == null || stock.sealable < item.qteReserved) {
-              throw {
-                type: "BUSINESS",
-                code: "STOCK_INSUFFICIENT",
-                message: `Stock insuffisant pour '${item.product.name}' (${
-                  item.sku
-                }) à '${item.source?.name}'. Disponible: ${
-                  stock.sealable ?? 0
-                }, Requis: ${item.qteReserved}.`,
-              };
-            }
-
-            await tx.stock.update({
-              where: { id: stock.id },
-              data: {
-                sealable: {
-                  decrement: item.qteReserved,
-                },
-              },
-            });
-          }
-
-          const itemData: any = {
-            qteOrdered: item.qteReserved,
-            qteRefunded: 0,
-            qteShipped: 0,
-            qteCanceled: 0,
-            weight: item.weight,
-            sku: item.sku,
-            product: { connect: { id: item.productId } },
-            source: item.sourceId
-              ? { connect: { id: item.sourceId } }
-              : undefined,
-            partner: item.partnerId
-              ? { connect: { id: item.partnerId } }
-              : undefined,
-          };
-          if (typeof item.discountedPrice === "number") {
-            itemData.discountedPrice = item.discountedPrice;
-          }
-          return itemData;
-        }),
-      );
-
-      const newOrder = await tx.order.create({
-        data: {
-          amountTTC: body.amountTTC,
-          amountRefunded: body.amountRefunded || 0,
-          amountCanceled: body.amountCanceled || 0,
-          amountOrdered: body.amountOrdered,
-          amountShipped: body.amountShipped || 0,
-          shippingMethod: body.shippingMethod,
-          shippingAmount: body.shippingAmount,
-          loyaltyPtsValue: body.loyaltyPtsValue || 0,
-          fromMobile: body.fromMobile,
-          weight: body.weight,
-          isActive: body.isActive,
-          status: { connect: { id: status?.id } },
-          state: { connect: { id: state.id } },
-          paymentMethod: { connect: { id: body.paymentMethodId } },
-          customer: { connect: { id: body.customerId } },
-          reservation: body.reservationId
-            ? { connect: { id: body.reservationId } }
-            : undefined,
-          orderItems: {
-            create: orderItemsData,
-          },
-        },
-        include: {
-          orderItems: true,
-        },
-      });
-
-      let vendorOrderPermission = await prisma.permission.findFirst({
-        where: { resource: "VendorOrder" },
-      });
-      if (!vendorOrderPermission) {
-        vendorOrderPermission = await prisma.permission.create({
-          data: { resource: "VendorOrder" },
-        });
-      }
-      // Find the KamiounPartnerMaster role
-      const partnerMasterRole = await prisma.role.findFirst({
-        where: { name: "KamiounPartnerMaster" },
-      });
-      if (partnerMasterRole && vendorOrderPermission) {
-        // Check if the role already has this permission
-        const existingRolePermission = await prisma.rolePermission.findFirst({
+    // Pre-fetch all needed data for calculations
+    for (const item of reservation.reservationItems) {
+      if (item.partnerId && item.sourceId) {
+        const skuPartner = await prisma.skuPartner.findFirst({
           where: {
-            roleId: partnerMasterRole.id,
-            permissionId: vendorOrderPermission.id,
+            productId: item.productId,
+            partnerId: item.partnerId,
+          },
+          select: { id: true },
+        });
+
+        if (skuPartner) {
+          const stock = await prisma.stock.findFirst({
+            where: {
+              skuPartnerId: skuPartner.id,
+              sourceId: item.sourceId,
+            },
+            select: { price: true, special_price: true },
+          });
+
+          const product = await prisma.product.findUnique({
+            where: { id: item.productId },
+            select: { tax: { select: { value: true } } },
+          });
+
+          if (stock && product) {
+            const price =
+              stock.special_price !== null && stock.special_price !== undefined
+                ? stock.special_price
+                : stock.price ?? 0;
+            const tva = product.tax?.value ?? 0;
+
+            itemCalculations.set(
+              `${item.productId}-${item.partnerId}-${item.sourceId}`,
+              {
+                price,
+                tva,
+                skuPartnerId: skuPartner.id,
+              },
+            );
+          }
+        }
+      }
+    }
+
+    const newOrder = await prisma.$transaction(
+      async (tx) => {
+        const orderItemsData = await Promise.all(
+          reservation.reservationItems.map(async (item) => {
+            if (item.sourceId) {
+              const skuPartnerWhere: any = { productId: item.productId };
+              if (item.partnerId) skuPartnerWhere.partnerId = item.partnerId;
+
+              const stock = await tx.stock.findFirst({
+                where: {
+                  skuPartner: skuPartnerWhere,
+                  sourceId: item.sourceId,
+                },
+                include: {
+                  skuPartner: true,
+                },
+              });
+              console.log("stock", stock);
+              if (!stock) {
+                throw {
+                  type: "BUSINESS",
+                  code: "STOCK_NOT_FOUND",
+                  message: `Stock indisponible pour le produit '${
+                    item.product.name
+                  }' (SKU: ${item.sku}) dans '${
+                    item.source?.name || "source inconnue"
+                  }'.`,
+                };
+              }
+
+              if (stock.sealable == null || stock.sealable < item.qteReserved) {
+                throw {
+                  type: "BUSINESS",
+                  code: "STOCK_INSUFFICIENT",
+                  message: `Stock insuffisant pour '${item.product.name}' (${
+                    item.sku
+                  }) à '${item.source?.name}'. Disponible: ${
+                    stock.sealable ?? 0
+                  }, Requis: ${item.qteReserved}.`,
+                };
+              }
+
+              await tx.stock.update({
+                where: { id: stock.id },
+                data: {
+                  sealable: {
+                    decrement: item.qteReserved,
+                  },
+                },
+              });
+            }
+
+            const itemData: any = {
+              qteOrdered: item.qteReserved,
+              qteRefunded: 0,
+              qteShipped: 0,
+              qteCanceled: 0,
+              weight: item.weight,
+              sku: item.sku,
+              product: { connect: { id: item.productId } },
+              source: item.sourceId
+                ? { connect: { id: item.sourceId } }
+                : undefined,
+              partner: item.partnerId
+                ? { connect: { id: item.partnerId } }
+                : undefined,
+            };
+            if (typeof item.discountedPrice === "number") {
+              itemData.discountedPrice = item.discountedPrice;
+            }
+            return itemData;
+          }),
+        );
+
+        const newOrder = await tx.order.create({
+          data: {
+            amountTTC: body.amountTTC,
+            amountRefunded: body.amountRefunded || 0,
+            amountCanceled: body.amountCanceled || 0,
+            amountOrdered: body.amountOrdered,
+            amountShipped: body.amountShipped || 0,
+            shippingMethod: body.shippingMethod,
+            shippingAmount: body.shippingAmount,
+            loyaltyPtsValue: body.loyaltyPtsValue || 0,
+            fromMobile: body.fromMobile,
+            weight: body.weight,
+            isActive: body.isActive,
+            status: { connect: { id: status?.id } },
+            state: { connect: { id: state.id } },
+            paymentMethod: { connect: { id: body.paymentMethodId } },
+            customer: { connect: { id: body.customerId } },
+            reservation: body.reservationId
+              ? { connect: { id: body.reservationId } }
+              : undefined,
+            orderItems: {
+              create: orderItemsData,
+            },
+          },
+          include: {
+            orderItems: true,
           },
         });
-        if (!existingRolePermission) {
-          // Assign the permission to the role with 'read' and 'write' actions
-          await prisma.rolePermission.create({
-            data: {
+
+        let vendorOrderPermission = await prisma.permission.findFirst({
+          where: { resource: "VendorOrder" },
+        });
+        if (!vendorOrderPermission) {
+          vendorOrderPermission = await prisma.permission.create({
+            data: { resource: "VendorOrder" },
+          });
+        }
+        // Find the KamiounPartnerMaster role
+        const partnerMasterRole = await prisma.role.findFirst({
+          where: { name: "KamiounPartnerMaster" },
+        });
+        if (partnerMasterRole && vendorOrderPermission) {
+          // Check if the role already has this permission
+          const existingRolePermission = await prisma.rolePermission.findFirst({
+            where: {
               roleId: partnerMasterRole.id,
               permissionId: vendorOrderPermission.id,
-              actions: ["read", "update", "delete"],
             },
           });
-        }
-      }
-
-      // Create OrderPartner for each unique partnerId in orderItems
-      const uniquePartnerIds = Array.from(
-        new Set(
-          newOrder.orderItems
-            .map((item) => item.partnerId)
-            .filter((id) => id !== null),
-        ),
-      );
-
-      console.log("uniquePartnerIds", uniquePartnerIds);
-
-      for (const partnerId of uniquePartnerIds) {
-        // Get orderItems for this partner
-        const partnerOrderItems = newOrder.orderItems.filter(
-          (item) => item.partnerId === partnerId,
-        );
-        // Generate a unique orderCode (e.g., orderId-partnerId)
-        const orderCode = `${newOrder.id}-${partnerId}`;
-        // Always fetch state and status for each partner
-        const orderPartnerState = await tx.state.findFirst({
-          where: { name: "new" },
-        });
-        const orderPartnerStatus = orderPartnerState
-          ? await tx.status.findFirst({
-              where: { name: "open", stateId: orderPartnerState.id },
-            })
-          : null;
-
-        console.log("partnerOrderItems", partnerOrderItems);
-        console.log("orderPartnerState", orderPartnerState);
-        console.log("orderPartnerStatus", orderPartnerStatus);
-        const itemsSnapshot = partnerOrderItems.map((item) => ({
-          id: item.id,
-          sku: item.sku,
-          qteOrdered: item.qteOrdered,
-          qteRefunded: item.qteRefunded,
-          qteShipped: item.qteShipped,
-          qteCanceled: item.qteCanceled,
-          weight: item.weight,
-          discountedPrice: item.discountedPrice,
-          productId: item.productId,
-          sourceId: item.sourceId,
-          partnerId: item.partnerId,
-        }));
-
-        // Generate next orderCode as CMD-<increment>
-        const lastOrderPartner = await tx.vendorOrder.findMany({
-          where: { orderCode: { startsWith: "CMD-" } },
-          orderBy: { createdAt: "desc" },
-          take: 1,
-        });
-        let nextOrderCode = "CMD-1";
-        if (lastOrderPartner.length > 0) {
-          const lastCode = lastOrderPartner[0].orderCode;
-          if (lastCode) {
-            const lastNumber = parseInt(lastCode.replace("CMD-", ""), 10);
-            nextOrderCode = `CMD-${lastNumber + 1}`;
+          if (!existingRolePermission) {
+            // Assign the permission to the role with 'read' and 'write' actions
+            await prisma.rolePermission.create({
+              data: {
+                roleId: partnerMasterRole.id,
+                permissionId: vendorOrderPermission.id,
+                actions: ["read", "update", "delete"],
+              },
+            });
           }
         }
 
-        try {
-          await tx.vendorOrder.create({
-            data: {
-              orderCode: nextOrderCode,
-              order: { connect: { id: newOrder.id } },
-              partner: { connect: { id: partnerId as string } },
-              state: orderPartnerState
-                ? { connect: { id: orderPartnerState.id } }
-                : undefined,
-              status: orderPartnerStatus
-                ? { connect: { id: orderPartnerStatus.id } }
-                : undefined,
-              itemsSnapshot,
-            },
-          });
-        } catch (e) {
-          console.error("Error creating OrderPartner:", e);
-          // Optionally, re-throw the error to be caught by the transaction
-          throw e;
-        }
-      }
+        // Create OrderPartner for each unique partnerId in orderItems
+        const uniquePartnerIds = Array.from(
+          new Set(
+            newOrder.orderItems
+              .map((item) => item.partnerId)
+              .filter((id) => id !== null),
+          ),
+        );
 
-      return newOrder;
-    });
+        console.log("uniquePartnerIds", uniquePartnerIds);
+
+        for (const partnerId of uniquePartnerIds) {
+          // Get orderItems for this partner
+          const partnerOrderItems = newOrder.orderItems.filter(
+            (item) => item.partnerId === partnerId,
+          );
+
+          // Calculate total for this vendor order using pre-calculated data
+          let totalHT = 0;
+          let totalTVA = 0;
+
+          // Calculate totals for each item using cached data
+          for (const item of partnerOrderItems) {
+            const calculationKey = `${item.productId}-${item.partnerId}-${item.sourceId}`;
+            const calculation = itemCalculations.get(calculationKey);
+
+            if (calculation) {
+              const itemTotalHT = item.qteOrdered * calculation.price;
+              const itemTotalTVA = itemTotalHT * (calculation.tva / 100);
+
+              totalHT += itemTotalHT;
+              totalTVA += itemTotalTVA;
+            }
+          }
+
+          // Get delivery fees from partner settings
+          const partner = await tx.partner.findUnique({
+            where: { id: partnerId as string },
+            include: { settings: true },
+          });
+
+          const deliveryFees = parseFloat(
+            partner?.settings[0]?.deliveryTypeAmount || "0",
+          );
+          const finalTotalTTC = totalHT + totalTVA + deliveryFees;
+
+          // Generate a unique orderCode (e.g., orderId-partnerId)
+          const orderCode = `${newOrder.id}-${partnerId}`;
+          // Always fetch state and status for each partner
+          const orderPartnerState = await tx.state.findFirst({
+            where: { name: "new" },
+          });
+          const orderPartnerStatus = orderPartnerState
+            ? await tx.status.findFirst({
+                where: { name: "open", stateId: orderPartnerState.id },
+              })
+            : null;
+
+          console.log("partnerOrderItems", partnerOrderItems);
+          console.log("orderPartnerState", orderPartnerState);
+          console.log("orderPartnerStatus", orderPartnerStatus);
+          const itemsSnapshot = partnerOrderItems.map((item) => ({
+            id: item.id,
+            sku: item.sku,
+            qteOrdered: item.qteOrdered,
+            qteRefunded: item.qteRefunded,
+            qteShipped: item.qteShipped,
+            qteCanceled: item.qteCanceled,
+            weight: item.weight,
+            discountedPrice: item.discountedPrice,
+            productId: item.productId,
+            sourceId: item.sourceId,
+            partnerId: item.partnerId,
+          }));
+
+          // Generate next orderCode as CMD-<increment>
+          const lastOrderPartner = await tx.vendorOrder.findMany({
+            where: { orderCode: { startsWith: "CMD-" } },
+            orderBy: { createdAt: "desc" },
+            take: 1,
+          });
+          let nextOrderCode = "CMD-1";
+          if (lastOrderPartner.length > 0) {
+            const lastCode = lastOrderPartner[0].orderCode;
+            if (lastCode) {
+              const lastNumber = parseInt(lastCode.replace("CMD-", ""), 10);
+              nextOrderCode = `CMD-${lastNumber + 1}`;
+            }
+          }
+
+          try {
+            await tx.vendorOrder.create({
+              data: {
+                orderCode: nextOrderCode,
+                total: finalTotalTTC,
+                order: { connect: { id: newOrder.id } },
+                partner: { connect: { id: partnerId as string } },
+                state: orderPartnerState
+                  ? { connect: { id: orderPartnerState.id } }
+                  : undefined,
+                status: orderPartnerStatus
+                  ? { connect: { id: orderPartnerStatus.id } }
+                  : undefined,
+                itemsSnapshot,
+              },
+            });
+          } catch (e) {
+            console.error("Error creating OrderPartner:", e);
+            // Optionally, re-throw the error to be caught by the transaction
+            throw e;
+          }
+        }
+
+        return newOrder;
+      },
+      {
+        timeout: 15000, // 15 seconds timeout
+      },
+    );
 
     return NextResponse.json(
       {

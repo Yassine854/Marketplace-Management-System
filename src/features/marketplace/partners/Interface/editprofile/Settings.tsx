@@ -153,7 +153,7 @@ const Settings = ({ settings, partnerId, onUpdate }: SettingsProps) => {
   console.log("Current schedules in render:", schedules);
 
   return (
-    <div className="box">
+    <div className="box w-full">
       <div className="mb-6 xxxl:mb-8">
         <h4 className="mb-4 text-xl font-semibold text-n700 dark:text-n0">
           Delivery Settings
@@ -264,7 +264,7 @@ const Settings = ({ settings, partnerId, onUpdate }: SettingsProps) => {
 
         {/* Schedules Section */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <label className="block font-medium text-n700 dark:text-n0">
               Business Hours
             </label>
@@ -272,7 +272,7 @@ const Settings = ({ settings, partnerId, onUpdate }: SettingsProps) => {
               <button
                 type="button"
                 onClick={handleAddSchedule}
-                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-n0 transition hover:bg-primary/90"
+                className="flex w-full items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-n0 transition hover:bg-primary/90 md:w-auto"
               >
                 <span>+</span>
                 <span>Add Schedule</span>
@@ -344,7 +344,7 @@ const Settings = ({ settings, partnerId, onUpdate }: SettingsProps) => {
                   <button
                     type="button"
                     onClick={() => handleRemoveSchedule(index)}
-                    className="text-sm font-medium text-secondary2 hover:text-secondary2/80"
+                    className="w-full text-sm font-medium text-secondary2 hover:text-secondary2/80 md:w-auto"
                   >
                     Remove
                   </button>
@@ -355,8 +355,12 @@ const Settings = ({ settings, partnerId, onUpdate }: SettingsProps) => {
         </div>
 
         {/* Form Buttons */}
-        <div className="flex justify-end gap-4 border-t border-n30 pt-6 dark:border-n600">
-          <button type="submit" disabled={isSubmitting} className="btn px-6">
+        <div className="flex flex-col justify-end gap-4 border-t border-n30 pt-6 dark:border-n600 md:flex-row">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="btn w-full px-6 md:w-auto"
+          >
             {isSubmitting ? "Updating..." : "Save Changes"}
           </button>
         </div>

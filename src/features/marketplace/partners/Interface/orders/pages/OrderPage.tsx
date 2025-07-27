@@ -17,7 +17,7 @@ const OrderPage = () => {
 
   const {
     editOrder,
-    deleteOrder,
+    // deleteOrder,
     toggleOrderStatus,
     isLoading: isActionLoading,
     error: actionError,
@@ -45,12 +45,12 @@ const OrderPage = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const result = await deleteOrder(id);
-    if (result) {
-      refetch();
-    }
-  };
+  // const handleDelete = async (id: string) => {
+  //   const result = await deleteOrder(id);
+  //   if (result) {
+  //     refetch();
+  //   }
+  // };
 
   const handleToggleStatus = async (id: string, isActive: boolean) => {
     try {
@@ -136,7 +136,7 @@ const OrderPage = () => {
             error={error}
             refetch={refetch}
             onEdit={openEditModal}
-            onDelete={handleDelete}
+            // onDelete={handleDelete}
             onToggleStatus={handleToggleStatus}
           />
         </div>

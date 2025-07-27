@@ -40,7 +40,7 @@ const MyAccount = ({ partnerData, onUpdate }: MyAccountProps) => {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6">
+    <div className="grid w-full grid-cols-1 gap-6">
       <div className="box p-6">
         <h3 className="mb-6 border-b border-dashed pb-4 text-lg font-medium">
           Account Information
@@ -89,11 +89,11 @@ const MyAccount = ({ partnerData, onUpdate }: MyAccountProps) => {
             />
           </div>
 
-          <div className="flex gap-4 pt-4">
-            <button type="submit" className="btn px-5">
+          <div className="flex flex-col gap-4 pt-4 md:flex-row">
+            <button type="submit" className="btn w-full px-5 md:w-auto">
               Save Changes
             </button>
-            <button type="button" className="btn-outline px-5">
+            <button type="button" className="btn-outline w-full px-5 md:w-auto">
               Cancel
             </button>
           </div>

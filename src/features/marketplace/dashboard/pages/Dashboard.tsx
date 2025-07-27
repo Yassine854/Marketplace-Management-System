@@ -1,8 +1,3 @@
-// import NumberOfOrdersChart from "../../charts/NumberOfOrdersChart";
-// import NumberOfUniqueCustomer from "../../widgets/NumberOfUniqueCustomer";
-// import GrossMerchandiseValueChart from "../../charts/GrossMerchandiseValueChart";
-// import Nbrcustomerchart from "../../charts/Nbrcustomerchart";
-
 import TotalOrderAmountChart from "../charts/TotalOrderAmountChart";
 import { useTotalOrderAmount } from "../hooks/useTotalOrderAmount";
 import PartnerStatusChart from "../charts/PartnerStatusChart";
@@ -70,8 +65,8 @@ const Dashboard = () => {
     isLoadingCustomers ||
     isLoadingProducts ||
     isLoadingCategories ||
-    isLoadingOrders ||
-    isLoadingManufacturers;
+    isLoadingOrders;
+  isLoadingManufacturers;
   const isError =
     isErrorAmount ||
     isErrorPartners ||
@@ -79,8 +74,8 @@ const Dashboard = () => {
     isErrorCustomers ||
     isErrorProducts ||
     isErrorCategories ||
-    isErrorOrders ||
-    isErrorManufacturers;
+    isErrorOrders;
+  isErrorManufacturers;
 
   return (
     <div className="mt-[4.8rem] w-full bg-n20 p-4">

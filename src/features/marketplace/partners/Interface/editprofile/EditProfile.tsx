@@ -17,6 +17,7 @@ import Settings from "./Settings";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/features/shared/hooks/useAuth";
 import axios from "axios";
+import { MainLayout } from "@/features/layout/MainLayout/MainLayout";
 
 const duration = 500;
 
@@ -252,15 +253,21 @@ const EditProfile = () => {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">Loading...</div>
+      <MainLayout>
+        <div className="flex h-full items-center justify-center pt-[64px]">
+          Loading...
+        </div>
+      </MainLayout>
     );
   }
 
   if (!partnerData) {
     return (
-      <div className="flex h-full items-center justify-center">
-        Partner profile not found
-      </div>
+      <MainLayout>
+        <div className="flex h-full items-center justify-center pt-[64px]">
+          Partner profile not found
+        </div>
+      </MainLayout>
     );
   }
 
@@ -311,48 +318,54 @@ const EditProfile = () => {
   ];
 
   return (
-    <div>
-      <div className="box mb-4 flex flex-wrap gap-3 md:gap-4 xxxl:mb-6 xxxl:gap-6">
-        {tabData.map(({ id, name, icon }) => (
-          <button
-            key={id}
-            onClick={() => setActiveTab(id)}
-            className={`flex items-center gap-3 rounded-2xl px-4 py-2 font-medium md:py-3 lg:px-6 ${
-              activeTab == id
-                ? "bg-primary text-n0"
-                : "bg-primary/5 text-n700 dark:bg-bg3 dark:text-n0"
-            }`}
-          >
-            <span className={`${id == activeTab ? "text-n0" : "text-primary"}`}>
-              {icon}
-            </span>
-            <span>{name}</span>
-          </button>
-        ))}
-      </div>
-      <div>
-        {tabData.map(({ id, content }) => (
-          <Transition
-            nodeRef={nodeRef}
-            in={activeTab == id}
-            timeout={duration}
-            key={id}
-          >
-            {(state) => (
-              <div
-                ref={nodeRef}
-                style={{
-                  ...defaultStyle,
-                  ...transitionStyles[state as keyof TransitionStyles],
-                }}
+    <MainLayout>
+      <div className="w-full px-0 pt-[64px]">
+        <div className="box mb-4 flex w-full flex-wrap gap-3 md:gap-4 xxxl:mb-6 xxxl:gap-6">
+          {tabData.map(({ id, name, icon }) => (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={`flex items-center gap-3 rounded-2xl px-4 py-2 font-medium md:py-3 lg:px-6 ${
+                activeTab == id
+                  ? "bg-primary text-n0"
+                  : "bg-primary/5 text-n700 dark:bg-bg3 dark:text-n0"
+              } ${id === 1 ? "ml-2 md:ml-4" : ""}`}
+              style={{ minWidth: 0 }}
+            >
+              <span
+                className={`${id == activeTab ? "text-n0" : "text-primary"}`}
               >
-                {activeTab == id && content}
-              </div>
-            )}
-          </Transition>
-        ))}
+                {icon}
+              </span>
+              <span>{name}</span>
+            </button>
+          ))}
+        </div>
+        <div className="w-full px-0">
+          {tabData.map(({ id, content }) => (
+            <Transition
+              nodeRef={nodeRef}
+              in={activeTab == id}
+              timeout={duration}
+              key={id}
+            >
+              {(state) => (
+                <div
+                  ref={nodeRef}
+                  style={{
+                    ...defaultStyle,
+                    ...transitionStyles[state as keyof TransitionStyles],
+                  }}
+                  className="w-full px-0"
+                >
+                  {activeTab == id && content}
+                </div>
+              )}
+            </Transition>
+          ))}
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { axios } from "@/libs/axios";
 import { VendorOrder } from "../hooks/useGetAllOrders";
 import { toast } from "react-hot-toast";
-import { useAuth } from "@/shared/hooks/useAuth";
+import { useAuth } from "@/features/shared/hooks/useAuth";
 
 export function useOrderActions() {
   const { user } = useAuth();
@@ -49,28 +49,28 @@ export function useOrderActions() {
     }
   };
 
-  const deleteOrder = async (id: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      if (!user?.id) throw new Error("No partnerId found in session");
-      const response = await axios.servicesClient.delete(
-        `/api/marketplace/vendorOrder/${id}`,
-      );
-      if (response.status === 200) {
-        toast.success("Order deleted successfully");
-        return response.data.message;
-      }
-    } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.message || "Failed to delete order";
-      setError(errorMessage);
-      toast.error(errorMessage);
-      console.error("Error deleting order:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // const deleteOrder = async (id: string) => {
+  //   setIsLoading(true);
+  //   setError(null);
+  //   try {
+  //     if (!user?.id) throw new Error("No partnerId found in session");
+  //     const response = await axios.servicesClient.delete(
+  //       `/api/marketplace/vendorOrder/${id}`,
+  //     );
+  //     if (response.status === 200) {
+  //       toast.success("Order deleted successfully");
+  //       return response.data.message;
+  //     }
+  //   } catch (err: any) {
+  //     const errorMessage =
+  //       err.response?.data?.message || "Failed to delete order";
+  //     setError(errorMessage);
+  //     toast.error(errorMessage);
+  //     console.error("Error deleting order:", err);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const toggleOrderStatus = async (id: string, isActive: boolean) => {
     setIsLoading(true);
@@ -146,7 +146,7 @@ export function useOrderActions() {
 
   return {
     editOrder,
-    deleteOrder,
+    // deleteOrder,
     toggleOrderStatus,
     fetchVendorOrder,
     fetchPartner,

@@ -17,7 +17,6 @@ const OrderPage = () => {
 
   const {
     editOrder,
-    deleteOrder,
     toggleOrderStatus,
     isLoading: isActionLoading,
     error: actionError,
@@ -42,13 +41,6 @@ const OrderPage = () => {
       alert(
         "Failed to update order. Please check your network connection and try again.",
       );
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    const result = await deleteOrder(id);
-    if (result) {
-      refetch();
     }
   };
 
@@ -138,7 +130,6 @@ const OrderPage = () => {
             error={error}
             refetch={refetch}
             onEdit={openEditModal}
-            onDelete={handleDelete}
             onToggleStatus={handleToggleStatus}
           />
         </div>

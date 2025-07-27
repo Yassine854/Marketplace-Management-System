@@ -34,7 +34,6 @@ interface OrderDataTableProps {
   error: string | null;
   refetch: () => Promise<void>;
   onEdit: (order: VendorOrder) => void;
-  onDelete: (id: string) => Promise<void>;
   onToggleStatus: (id: string, isActive: boolean) => Promise<void>;
 }
 
@@ -46,7 +45,6 @@ export default function OrderDataTable({
   error,
   refetch,
   onEdit,
-  onDelete,
   onToggleStatus,
 }: OrderDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -151,35 +149,13 @@ export default function OrderDataTable({
             >
               <FaPrint className="h-3.5 w-3.5" />
             </button>
-            <button
-              onClick={() => {
-                Swal.fire({
-                  title: "Are you sure?",
-                  text: "You won't be able to revert this!",
-                  icon: "warning",
-                  showCancelButton: true,
-                  confirmButtonColor: "#3085d6",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: "Yes, delete it!",
-                  cancelButtonText: "Cancel",
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    onDelete(row.original.id);
-                  }
-                });
-              }}
-              className="rounded p-1.5 text-red-600 hover:bg-red-50"
-              title="Delete Order"
-            >
-              <FaTrash className="h-3.5 w-3.5" />
-            </button>
           </div>
         ),
         enableSorting: false,
         size: 120,
       },
     ],
-    [onDelete, onToggleStatus, handlePrint], // Add handlePrint to the dependency array
+    [onToggleStatus, handlePrint], // Add handlePrint to the dependency array
   );
 
   const table = useReactTable({

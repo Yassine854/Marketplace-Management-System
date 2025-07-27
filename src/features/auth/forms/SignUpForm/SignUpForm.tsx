@@ -61,15 +61,29 @@ const SignUpForm = () => {
         isError={!!errors.password}
         errorMessage={errors.password?.message}
       />
-      <div className="mt-8 flex items-center justify-center gap-6 p-8">
+      <div className="mt-8 flex flex-col items-center justify-center gap-6 p-8">
         {isLoading && <Loading />}
         {!isLoading && (
-          <button
-            type="submit"
-            className="btn h-12 w-64 items-center justify-center rounded bg-primary px-5 text-white shadow transition hover:bg-primary/90"
-          >
-            Sign Up
-          </button>
+          <>
+            <button
+              type="submit"
+              className="btn h-12 w-64 items-center justify-center rounded bg-primary px-5 text-white shadow transition hover:bg-primary/90"
+            >
+              Sign Up
+            </button>
+            <div className="mt-2 text-center text-sm text-gray-600">
+              Already have an account?{" "}
+              <button
+                type="button"
+                onClick={() => window.location.assign("/login")}
+                className="text-blue-600 underline hover:text-blue-800 focus:outline-none"
+                style={{ background: "none", border: "none", padding: 0 }}
+              >
+                Log in here
+              </button>
+              .
+            </div>
+          </>
         )}
       </div>
     </form>

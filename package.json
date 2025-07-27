@@ -49,6 +49,7 @@
     "@heroui/react": "^2.7.5",
     "@hookform/resolvers": "^3.10.0",
     "@internationalized/date": "^3.7.0",
+    "@mongodb-js/charts-embed-dom": "^3.3.1",
     "@mui/base": "5.0.0-beta.40",
     "@mui/material": "^6.4.7",
     "@mui/system": "^5.16.14",
