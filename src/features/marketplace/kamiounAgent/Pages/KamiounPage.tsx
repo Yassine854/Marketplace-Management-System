@@ -1,68 +1,45 @@
-import PaymentMethodTable from "../table/PaymentMethodTable";
+import CustomerTable from "../table/KamiounTable";
 import Divider from "@/features/shared/elements/SidebarElements/Divider";
-import { useState } from "react";
-import CreateMethodModal, {
-  useGetAllMethods,
-} from "../components/CreateMethodModel";
-import { Methods } from "@/types/Methods";
-import { useMethodsActions } from "../hooks/useMethodActions";
-import EditMethodModal from "../components/EditMethodModel";
+import { useState, useMemo } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
+import { User } from "@/types/user";
+import { useGetAllKamiounAgents } from "../hooks/useGetAllKamiounAgents";
+import { useKamiounActions } from "../hooks/useKamiounActions";
+import { useCreateKamiounAgent } from "../hooks/useCreateKamioun";
+import CreateCustomerModal from "../components/CreateKamiounModel";
+import EditCustomerModal from "../components/EditKamiounModel";
 
-const PaymentMethodPage = () => {
-  const { Methods: methods, isLoading, error, refetch } = useGetAllMethods();
+const KamiounPage = () => {
+  const { users, isLoading, error, refetch } = useGetAllKamiounAgents();
   const {
-    editMethod,
-    deleteMethod,
+    editUser,
+    editUserStatus,
     isLoading: isActionLoading,
     error: actionError,
-  } = useMethodsActions();
+  } = useKamiounActions();
+  const {
+    createUser,
+    isLoading: isCreating,
+    error: createError,
+  } = useCreateKamiounAgent();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedMethod, setSelectedMethod] = useState<Methods | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
-  const [createError, setCreateError] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const handleEdit = async (updatedMethod: Methods) => {
-    try {
-      const result = await editMethod(updatedMethod.id, updatedMethod);
-      if (result) {
-        refetch();
-      }
-    } catch (error) {
-      // Optionally handle error
-    }
-  };
+  const filteredUsers = useMemo(() => {
+    let result = users.filter((u) => {
+      const searchContent =
+        `${u.username} ${u.firstName} ${u.lastName}`.toLowerCase();
+      return searchContent.includes("");
+    });
+    return result;
+  }, [users]);
 
-  const handleDelete = async (id: string) => {
-    const result = await deleteMethod(id);
-    if (result) {
-      refetch();
-    }
-  };
-
-  const openEditModal = (method: Methods) => {
-    setSelectedMethod(method);
+  const openEditModal = (user: User) => {
+    setSelectedUser(user);
     setIsEditModalOpen(true);
-  };
-
-  const handleCreate = async (name: string) => {
-    try {
-      setIsCreating(true);
-      setCreateError(null);
-      const response = await axios.post(
-        "/api/marketplace/payment_method/create",
-        { name },
-      );
-      if (response.status === 201 || response.status === 200) {
-        refetch();
-      }
-    } catch (err) {
-      setCreateError("Failed to create method");
-    } finally {
-      setIsCreating(false);
-    }
   };
 
   return (
@@ -77,7 +54,6 @@ const PaymentMethodPage = () => {
         boxSizing: "border-box",
       }}
     >
-      {/* Header */}
       <div
         style={{
           flexShrink: 0,
@@ -89,13 +65,12 @@ const PaymentMethodPage = () => {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-xl font-bold capitalize text-gray-900">
-              Payment Methods
+              Kamioun Agents
             </h1>
-            <p className="text-sm text-gray-600">Manage your payment methods</p>
+            <p className="text-sm text-gray-600">Manage agent accounts</p>
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Loading/Error Status */}
             {(isActionLoading || isCreating) && (
               <div className="flex items-center gap-2 text-sm text-blue-600">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
@@ -112,7 +87,7 @@ const PaymentMethodPage = () => {
             <button
               onClick={() => setIsModalOpen(true)}
               className="btn flex items-center gap-2"
-              title="Add new method"
+              title="Add new user"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -128,7 +103,7 @@ const PaymentMethodPage = () => {
                 <path d="M12 5l0 14" />
                 <path d="M5 12l14 0" />
               </svg>
-              <span className="hidden sm:inline">Add Method</span>
+              <span className="hidden sm:inline">Add Agent</span>
             </button>
           </div>
         </div>
@@ -136,46 +111,62 @@ const PaymentMethodPage = () => {
 
       <Divider />
 
-      {/* Main Content */}
       <div className="flex-1 bg-gray-50 p-4">
         <div className="rounded-lg bg-white p-4">
-          <PaymentMethodTable
-            methods={methods}
+          <CustomerTable
+            customer={users as any}
             isLoading={isLoading}
             error={error}
             refetch={refetch}
-            isSidebarOpen={false}
-            onEdit={openEditModal}
-            onDelete={handleDelete}
-            onAdd={() => setIsModalOpen(true)}
+            onEdit={(id: string, u: any) => {
+              const found = users.find((c) => c.id === id);
+              if (found) openEditModal(found);
+            }}
+            onDelete={async (id: string) => {
+              const user = users.find((u) => u.id === id);
+              if (!user) return;
+              try {
+                await axios.delete("/api/users/deleteUser", {
+                  data: { username: user.username },
+                });
+                toast.success("Agent deleted successfully");
+                await refetch();
+              } catch (err: any) {
+                const msg =
+                  err?.response?.data?.message || "Failed to delete user";
+                toast.error(msg);
+              }
+            }}
           />
         </div>
       </div>
 
-      {/* Create Modal */}
-      <CreateMethodModal
+      <CreateCustomerModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onCreate={(name) => {
-          handleCreate(name);
+        onClose={() => {
           setIsModalOpen(false);
+          refetch();
         }}
+        onCreate={async () => true}
+        isLoading={isCreating}
+        error={createError}
       />
-      {/* Edit Modal */}
-      {isEditModalOpen && selectedMethod && (
-        <EditMethodModal
+
+      {isEditModalOpen && selectedUser && (
+        <EditCustomerModal
           isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onEdit={(id, name) => {
-            handleEdit({ id, name });
+          onClose={() => {
             setIsEditModalOpen(false);
+            refetch();
           }}
-          id={selectedMethod.id}
-          initialName={selectedMethod.name}
+          onEdit={async () => true}
+          customer={selectedUser as any}
+          isLoading={isLoading}
+          error={error}
         />
       )}
     </div>
   );
 };
 
-export default PaymentMethodPage;
+export default KamiounPage;

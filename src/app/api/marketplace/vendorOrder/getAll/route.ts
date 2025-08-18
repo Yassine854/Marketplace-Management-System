@@ -60,8 +60,36 @@ export async function GET(req: Request) {
     }
 
     // Fetch all VendorOrders where partnerId is the logged-in user's id
-    const vendorOrders = await prisma.vendorOrder.findMany({
+    // First, get all VendorOrders for this partner
+    const allVendorOrders = await prisma.vendorOrder.findMany({
       where: { partnerId: user.id },
+      select: {
+        id: true,
+        orderId: true,
+      },
+    });
+
+    // Check which orders actually exist
+    const existingOrderIds = await prisma.order.findMany({
+      where: {
+        id: {
+          in: allVendorOrders.map((vo) => vo.orderId),
+        },
+      },
+      select: { id: true },
+    });
+
+    const validOrderIds = new Set(existingOrderIds.map((o) => o.id));
+    const validVendorOrderIds = allVendorOrders
+      .filter((vo) => validOrderIds.has(vo.orderId))
+      .map((vo) => vo.id);
+
+    // Now fetch only VendorOrders with valid order relationships
+    const vendorOrders = await prisma.vendorOrder.findMany({
+      where: {
+        id: { in: validVendorOrderIds },
+        partnerId: user.id,
+      },
       include: {
         status: true,
         state: true,

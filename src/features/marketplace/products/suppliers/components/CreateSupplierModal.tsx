@@ -32,6 +32,9 @@ const CreateSupplierModal = ({
   const [interactionCount, setInteractionCount] = useState(0);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [timeSpent, setTimeSpent] = useState(0);
+  const [activeTab, setActiveTab] = useState<
+    "supplier" | "contact" | "address"
+  >("supplier");
 
   const [form, setForm] = useState<Omit<Manufacturer, "id">>({
     manufacturerId: 0,
@@ -149,6 +152,7 @@ const CreateSupplierModal = ({
   if (!isOpen) return null;
 
   // Variant 1 - Enhanced layout with subtle improvements
+  // Variant 1 - Enhanced layout with navigation tabs
   if (variant === 1) {
     return (
       <motion.div
@@ -179,6 +183,44 @@ const CreateSupplierModal = ({
                 <X size={24} />
               </button>
             </div>
+
+            {/* Navigation Tabs */}
+            <div className="mt-6 flex border-b border-gray-200">
+              <button
+                type="button"
+                onClick={() => setActiveTab("supplier")}
+                className={`mr-8 py-2 font-medium ${
+                  activeTab === "supplier"
+                    ? "border-b-2 border-blue-600 text-blue-600"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Supplier Info
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("contact")}
+                className={`mr-8 py-2 font-medium ${
+                  activeTab === "contact"
+                    ? "border-b-2 border-blue-600 text-blue-600"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Contact
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("address")}
+                className={`py-2 font-medium ${
+                  activeTab === "address"
+                    ? "border-b-2 border-blue-600 text-blue-600"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Address
+              </button>
+            </div>
+
             {error && (
               <div className="mt-4 rounded-lg border border-red-100 bg-red-50 p-3 text-red-700">
                 {error}
@@ -193,171 +235,177 @@ const CreateSupplierModal = ({
               onSubmit={handleSubmit}
               className="space-y-6"
             >
-              {/* Supplier Information - Enhanced card */}
-              <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                <h3 className="mb-5 text-lg font-semibold text-gray-800">
-                  <span className="mr-2 text-blue-500">•</span>
-                  Supplier Information
-                </h3>
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-600">
-                      Manufacturer ID
-                    </label>
-                    <input
-                      name="manufacturerId"
-                      type="number"
-                      placeholder="Enter ID"
-                      value={form.manufacturerId || ""}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-600">
-                      Supplier Code <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      name="code"
-                      placeholder="Enter code"
-                      value={form.code}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                      required
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="mb-2 block text-sm font-medium text-gray-600">
-                      Company Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      name="companyName"
-                      placeholder="Enter company name"
-                      value={form.companyName}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                      required
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="mb-2 block text-sm font-medium text-gray-600">
-                      Contact Name
-                    </label>
-                    <input
-                      name="contactName"
-                      placeholder="Enter contact name"
-                      value={form.contactName}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
+              {/* Supplier Information - Only shown when active */}
+              {activeTab === "supplier" && (
+                <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+                  <h3 className="mb-5 text-lg font-semibold text-gray-800">
+                    <span className="mr-2 text-blue-500">•</span>
+                    Supplier Information
+                  </h3>
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-gray-600">
+                        Manufacturer ID
+                      </label>
+                      <input
+                        name="manufacturerId"
+                        type="number"
+                        placeholder="Enter ID"
+                        value={form.manufacturerId || ""}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-gray-600">
+                        Supplier Code <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        name="code"
+                        placeholder="Enter code"
+                        value={form.code}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                        required
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="mb-2 block text-sm font-medium text-gray-600">
+                        Company Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        name="companyName"
+                        placeholder="Enter company name"
+                        value={form.companyName}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                        required
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="mb-2 block text-sm font-medium text-gray-600">
+                        Contact Name
+                      </label>
+                      <input
+                        name="contactName"
+                        placeholder="Enter contact name"
+                        value={form.contactName}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
-              {/* Contact Information - Enhanced card */}
-              <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                <h3 className="mb-5 text-lg font-semibold text-gray-800">
-                  <span className="mr-2 text-blue-500">•</span>
-                  Contact Information
-                </h3>
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-600">
-                      Phone Number
-                    </label>
-                    <input
-                      name="phoneNumber"
-                      placeholder="Enter phone number"
-                      value={form.phoneNumber}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-600">
-                      Email
-                    </label>
-                    <input
-                      name="email"
-                      type="email"
-                      placeholder="Enter email"
-                      value={form.email}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
+              {/* Contact Information - Only shown when active */}
+              {activeTab === "contact" && (
+                <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+                  <h3 className="mb-5 text-lg font-semibold text-gray-800">
+                    <span className="mr-2 text-blue-500">•</span>
+                    Contact Information
+                  </h3>
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-gray-600">
+                        Phone Number
+                      </label>
+                      <input
+                        name="phoneNumber"
+                        placeholder="Enter phone number"
+                        value={form.phoneNumber}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-gray-600">
+                        Email
+                      </label>
+                      <input
+                        name="email"
+                        type="email"
+                        placeholder="Enter email"
+                        value={form.email}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
-              {/* Address Section - Enhanced card */}
-              <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                <h3 className="mb-5 text-lg font-semibold text-gray-800">
-                  <span className="mr-2 text-blue-500">•</span>
-                  Address Information
-                </h3>
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div className="md:col-span-2">
-                    <label className="mb-2 block text-sm font-medium text-gray-600">
-                      Address
-                    </label>
-                    <input
-                      name="address"
-                      placeholder="Enter address"
-                      value={form.address}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-600">
-                      Postal Code
-                    </label>
-                    <input
-                      name="postalCode"
-                      placeholder="Enter postal code"
-                      value={form.postalCode}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-600">
-                      City
-                    </label>
-                    <input
-                      name="city"
-                      placeholder="Enter city"
-                      value={form.city}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-600">
-                      Country
-                    </label>
-                    <input
-                      name="country"
-                      placeholder="Enter country"
-                      value={form.country}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-600">
-                      Capital
-                    </label>
-                    <input
-                      name="capital"
-                      placeholder="Enter capital"
-                      value={form.capital}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
+              {/* Address Section - Only shown when active */}
+              {activeTab === "address" && (
+                <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+                  <h3 className="mb-5 text-lg font-semibold text-gray-800">
+                    <span className="mr-2 text-blue-500">•</span>
+                    Address Information
+                  </h3>
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <div className="md:col-span-2">
+                      <label className="mb-2 block text-sm font-medium text-gray-600">
+                        Address
+                      </label>
+                      <input
+                        name="address"
+                        placeholder="Enter address"
+                        value={form.address}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-gray-600">
+                        Postal Code
+                      </label>
+                      <input
+                        name="postalCode"
+                        placeholder="Enter postal code"
+                        value={form.postalCode}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-gray-600">
+                        City
+                      </label>
+                      <input
+                        name="city"
+                        placeholder="Enter city"
+                        value={form.city}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-gray-600">
+                        Country
+                      </label>
+                      <input
+                        name="country"
+                        placeholder="Enter country"
+                        value={form.country}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-gray-600">
+                        Capital
+                      </label>
+                      <input
+                        name="capital"
+                        placeholder="Enter capital"
+                        value={form.capital}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </form>
           </div>
 

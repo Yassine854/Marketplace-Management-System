@@ -1,65 +1,103 @@
 import { useState, useEffect } from "react";
-import { Agent } from "@/types/agent";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import { roles } from "@/features/users/staticRoles";
 
-interface EditAgentModalProps {
+interface EditUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onEdit: (id: string, updatedAgent: Agent) => Promise<void>;
-  agent: Agent | null;
+  // Kept to maintain props compatibility even if unused by this implementation
+  onEdit: (id: string, formData: FormData) => Promise<boolean>;
+  customer: any; // original prop shape coming from KamiounPage; will read username/firstName/lastName if present
   isLoading: boolean;
   error: string | null;
 }
 
-const EditAgentModal = ({
+type EditUserForm = {
+  username: string;
+  firstName: string;
+  lastName: string;
+  roleId: string; // selected from roles list
+  password?: string; // optional, sent as newPassword
+};
+
+const EditCustomerModal = ({
   isOpen,
-  agent,
+  customer,
   onClose,
-  onEdit,
+  // onEdit,
   isLoading,
   error,
-}: EditAgentModalProps) => {
-  const [form, setForm] = useState<Partial<Agent> | null>(null);
+}: EditUserModalProps) => {
+  const [form, setForm] = useState<EditUserForm | null>(null);
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (agent) {
-      setForm({ ...agent, password: "" });
+    if (customer) {
+      setForm({
+        username: customer?.username || "",
+        firstName: customer?.firstName || "",
+        lastName: customer?.lastName || "",
+        roleId: customer?.roleId || "",
+        password: "",
+      });
       setPasswordConfirmation("");
     }
-  }, [agent]);
+  }, [customer]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev!, [name]: value }));
+    const { name, value } = e.target as HTMLInputElement;
+    setForm((prev) => ({ ...(prev as EditUserForm), [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLocalError(null);
 
-    if (!form?.firstName || !form.lastName || !form.email) {
-      alert("Please fill all required fields");
+    if (!form) return;
+
+    if (
+      !form.username.trim() ||
+      !form.firstName.trim() ||
+      !form.lastName.trim()
+    ) {
+      setLocalError("Please fill all required fields");
       return;
     }
 
     if (form.password && form.password !== passwordConfirmation) {
-      alert("Passwords don't match");
+      setLocalError("Password confirmation does not match");
       return;
     }
 
     try {
-      const dataToSend = form.password
-        ? form
-        : { ...form, password: undefined };
-      if (form.id) {
-        await onEdit(form.id, dataToSend as Agent);
-        onClose();
+      setSubmitting(true);
+      const payload: any = {
+        username: form.username,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        roleId: form.roleId || undefined,
+      };
+
+      if (form.password) {
+        payload.newPassword = form.password;
       }
-    } catch (err) {
-      console.error("Error updating agent:", err);
+
+      await axios.put("/api/users/editUser", payload);
+      toast.success("Agent updated successfully");
+      onClose();
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Failed to update user";
+      setLocalError(msg);
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -78,13 +116,13 @@ const EditAgentModal = ({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="relative my-8 w-full max-w-4xl rounded-2xl bg-white shadow-2xl"
+        className="relative my-8 w-full max-w-2xl rounded-2xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="sticky top-0 z-10 rounded-t-2xl bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-800">Edit Agent</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Edit User</h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
@@ -92,26 +130,35 @@ const EditAgentModal = ({
               <X size={24} />
             </button>
           </div>
-          {error && (
+          {(error || localError) && (
             <div className="mt-4 rounded-lg bg-red-100 p-3 text-red-700">
-              {error}
+              {localError || error}
             </div>
           )}
         </div>
 
-        {/* Content */}
+        {/* Form Content */}
         <div className="max-h-[calc(100vh-200px)] overflow-y-auto p-6">
-          <form
-            id="agentEditForm"
-            onSubmit={handleSubmit}
-            className="space-y-6"
-          >
-            {/* Personal Information */}
+          <form id="userForm" onSubmit={handleSubmit} className="space-y-6">
             <div className="rounded-lg bg-gray-50 p-6">
               <h3 className="mb-4 text-lg font-semibold text-gray-700">
-                Personal Information
+                User Information
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-1 block font-medium text-gray-700">
+                    Username
+                  </label>
+                  <input
+                    name="username"
+                    placeholder="Username"
+                    value={form?.username || ""}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border p-3"
+                    disabled
+                  />
+                </div>
+
                 <div>
                   <label className="mb-1 block font-medium text-gray-700">
                     First Name <span className="text-red-500">*</span>
@@ -122,9 +169,9 @@ const EditAgentModal = ({
                     value={form?.firstName || ""}
                     onChange={handleChange}
                     className="w-full rounded-xl border p-3"
-                    required
                   />
                 </div>
+
                 <div>
                   <label className="mb-1 block font-medium text-gray-700">
                     Last Name <span className="text-red-500">*</span>
@@ -135,104 +182,57 @@ const EditAgentModal = ({
                     value={form?.lastName || ""}
                     onChange={handleChange}
                     className="w-full rounded-xl border p-3"
-                    required
                   />
                 </div>
-                <div>
-                  <label className="mb-1 block font-medium text-gray-700">
-                    Email <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email Address"
-                    value={form?.email || ""}
-                    onChange={handleChange}
-                    className="w-full rounded-xl border p-3"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block font-medium text-gray-700">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    name="telephone"
-                    placeholder="Phone Number"
-                    value={form?.telephone || ""}
-                    onChange={handleChange}
-                    className="w-full rounded-xl border p-3"
-                  />
-                </div>
-              </div>
-            </div>
 
-            {/* Account Information */}
-            <div className="rounded-lg bg-gray-50 p-6">
-              <h3 className="mb-4 text-lg font-semibold text-gray-700">
-                Account Information
-              </h3>
-              <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <label className="mb-1 block font-medium text-gray-700">
-                    Username <span className="text-red-500">*</span>
+                    Agent Type
                   </label>
-                  <input
-                    name="username"
-                    placeholder="Username"
-                    value={form?.username || ""}
+                  <select
+                    name="roleId"
+                    value={(form?.roleId as string) || ""}
                     onChange={handleChange}
                     className="w-full rounded-xl border p-3"
-                    required
-                  />
+                  >
+                    <option value="">Select Agent Type</option>
+                    {roles.map((r) => (
+                      <option key={r.key} value={r.key}>
+                        {r.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div>
+
+                <div className="space-y-3">
                   <label className="mb-1 block font-medium text-gray-700">
-                    Address
+                    New Password
                   </label>
                   <input
-                    name="address"
-                    placeholder="Address"
-                    value={form?.address || ""}
-                    onChange={handleChange}
-                    className="w-full rounded-xl border p-3"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block font-medium text-gray-700">
-                    New Password (optional)
-                  </label>
-                  <input
-                    type="password"
                     name="password"
+                    type="password"
                     placeholder="New Password (optional)"
                     value={form?.password || ""}
                     onChange={handleChange}
                     className="w-full rounded-xl border p-3"
                   />
-                </div>
-                {form?.password && (
-                  <div>
-                    <label className="mb-1 block font-medium text-gray-700">
-                      Confirm Password
-                    </label>
+                  {form?.password && (
                     <input
-                      type="password"
                       name="passwordConfirmation"
+                      type="password"
                       placeholder="Confirm Password"
                       value={passwordConfirmation}
                       onChange={(e) => setPasswordConfirmation(e.target.value)}
                       className="w-full rounded-xl border p-3"
                     />
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </form>
         </div>
 
-        {/* Footer */}
+        {/* Footer - Sticky Bottom */}
         <div className="sticky bottom-0 rounded-b-2xl bg-white p-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
           <div className="flex justify-end gap-3">
             <button
@@ -244,11 +244,11 @@ const EditAgentModal = ({
             </button>
             <button
               type="submit"
-              form="agentEditForm"
-              disabled={isLoading}
+              form="userForm"
+              disabled={isLoading || submitting}
               className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700"
             >
-              {isLoading ? "Saving..." : "Save Changes"}
+              {isLoading || submitting ? "Updating..." : "Update User"}
             </button>
           </div>
         </div>
@@ -257,4 +257,4 @@ const EditAgentModal = ({
   );
 };
 
-export default EditAgentModal;
+export default EditCustomerModal;

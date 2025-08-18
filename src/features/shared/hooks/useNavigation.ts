@@ -32,7 +32,7 @@ export const useNavigation = () => {
   };
 
   const navigateToUsersTable = () => {
-    push("/access/users");
+    push("/access/admins");
   };
 
   const navigateToCreateUserForm = () => {

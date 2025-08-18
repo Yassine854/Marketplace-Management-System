@@ -48,6 +48,15 @@ export default function StateTable({
 
   const columns = useMemo<ColumnDef<State, any>[]>(
     () => [
+      columnHelper.accessor("id", {
+        header: "ID",
+        cell: (info) => (
+          <span className="font-mono text-xs text-gray-600">
+            {info.getValue().slice(0, 8)}...
+          </span>
+        ),
+        size: 100,
+      }),
       columnHelper.accessor("name", {
         header: "State Name",
         cell: (info) => (

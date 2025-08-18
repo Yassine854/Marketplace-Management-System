@@ -59,6 +59,15 @@ export default function SettingsTable({
 
   const columns = useMemo<ColumnDef<Setting, any>[]>(
     () => [
+      columnHelper.accessor("id", {
+        header: "ID",
+        cell: (info) => (
+          <span className="font-mono text-xs text-gray-600">
+            {info.getValue().slice(0, 8)}...
+          </span>
+        ),
+        size: 100,
+      }),
       columnHelper.accessor("partner.username", {
         header: "Partner",
         cell: (info) => (
@@ -92,15 +101,7 @@ export default function SettingsTable({
         ),
         size: 150,
       }),
-      columnHelper.accessor("id", {
-        header: "ID",
-        cell: (info) => (
-          <span className="font-mono text-xs text-gray-600">
-            {info.getValue().slice(0, 8)}...
-          </span>
-        ),
-        size: 100,
-      }),
+
       {
         id: "actions",
         header: "Actions",

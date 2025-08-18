@@ -48,6 +48,15 @@ export default function PaymentMethodTable({
 
   const columns = useMemo<ColumnDef<Methods, any>[]>(
     () => [
+      columnHelper.accessor("id", {
+        header: "ID",
+        cell: (info) => (
+          <span className="font-mono text-xs text-gray-600">
+            {info.getValue().slice(0, 8)}...
+          </span>
+        ),
+        size: 100,
+      }),
       columnHelper.accessor("name", {
         header: "Method Name",
         cell: (info) => (

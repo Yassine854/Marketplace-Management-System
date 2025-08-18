@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { motion } from "framer-motion";
+import { X } from "lucide-react";
 
 interface CreateBrandModalProps {
   isOpen: boolean;
@@ -16,7 +17,8 @@ const CreateBrandModal = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageError, setImageError] = useState("");
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!imageFile) {
       setImageError("Please select a brand logo image");
       return;
@@ -30,92 +32,116 @@ const CreateBrandModal = ({
       image: imageFile,
     };
     onCreate(brandData);
-    resetForm();
-  };
-
-  const resetForm = () => {
     setName("");
     setImageFile(null);
     setImageError("");
+    onClose();
   };
 
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
-      <div
-        className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-2xl transition-all duration-300 ease-in-out"
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="relative my-8 w-full max-w-2xl rounded-2xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-        >
-          <XMarkIcon className="h-6 w-6" />
-        </button>
-
-        <h2 className="mb-4 text-2xl font-bold text-gray-800">
-          Create New Brand
-        </h2>
-
-        <div className="mb-4">
-          <label
-            htmlFor="brandName"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Brand Name *
-          </label>
-          <input
-            id="brandName"
-            type="text"
-            placeholder="Enter brand name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-          />
+        {/* Header */}
+        <div className="sticky top-0 z-10 rounded-t-2xl bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-800">Create Brand</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <X size={24} />
+            </button>
+          </div>
         </div>
 
-        <div className="mb-4">
-          <label
-            htmlFor="brandImage"
-            className="block text-sm font-medium text-gray-700"
+        {/* Content */}
+        <div className="max-h-[calc(100vh-200px)] overflow-y-auto p-6">
+          <form
+            id="brandCreateForm"
+            onSubmit={handleSubmit}
+            className="space-y-6"
           >
-            Brand Logo *
-          </label>
-          <input
-            id="brandImage"
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              setImageFile(e.target.files?.[0] || null);
-              setImageError("");
-            }}
-            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-500 file:px-4 file:py-2 file:text-white file:hover:bg-blue-600"
-          />
-          {imageError && (
-            <p className="mt-1 text-sm text-red-500">{imageError}</p>
-          )}
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="md:col-span-2">
+                <label
+                  htmlFor="brandName"
+                  className="mb-1 block font-medium text-gray-700"
+                >
+                  Brand Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="brandName"
+                  type="text"
+                  placeholder="Enter brand name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-xl border p-3"
+                  required
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label
+                  htmlFor="brandImage"
+                  className="mb-1 block font-medium text-gray-700"
+                >
+                  Brand Logo <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="brandImage"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    setImageFile(e.target.files?.[0] || null);
+                    setImageError("");
+                  }}
+                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:text-white file:hover:bg-blue-700"
+                  required
+                />
+                {imageError && (
+                  <p className="mt-1 text-sm text-red-500">{imageError}</p>
+                )}
+              </div>
+            </div>
+          </form>
         </div>
 
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="rounded-md bg-gray-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-          >
-            Create
-          </button>
+        {/* Footer */}
+        <div className="sticky bottom-0 rounded-b-2xl bg-white p-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-xl bg-gray-200 px-6 py-2 text-gray-800 hover:bg-gray-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="brandCreateForm"
+              className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700"
+            >
+              Create Brand
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

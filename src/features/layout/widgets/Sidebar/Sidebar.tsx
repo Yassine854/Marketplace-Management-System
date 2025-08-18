@@ -137,18 +137,11 @@ const Sidebar = ({
           {/* Dashboard - show based on user type */}
           {isAdmin && (
             <>
-              <SidebarSubMenu
+              <SidebarButton
                 onClick={() => push("/marketplace/dashboard")}
                 name={"Dashboard"}
                 icon={<IconDashboard />}
                 isActive={pathname === "/marketplace/dashboard"}
-                items={[
-                  { name: "All", path: "/marketplace/dashboard" },
-                  {
-                    name: "Client Segmentation",
-                    path: "/marketplace/dashboard/client-segments",
-                  },
-                ].filter(Boolean)}
               />
               <Divider />
             </>
@@ -218,7 +211,7 @@ const Sidebar = ({
                   ...(hasPermission("Tax")
                     ? [
                         {
-                          name: "Taxes",
+                          name: "TVA",
                           path: "/marketplace/products/tax",
                         },
                       ]
@@ -264,14 +257,11 @@ const Sidebar = ({
           {/* Partner Interface */}
           {isPartner && hasPermission("Product") && (
             <>
-              <SidebarSubMenu
+              <SidebarButton
                 icon={<IconPackage />}
                 name="Products"
                 onClick={() => push("/marketplace/partners/products")}
                 isActive={pathname?.includes("products")}
-                items={[
-                  { name: "All", path: "/marketplace/partners/products" },
-                ].filter(Boolean)}
               />
               <Divider />
             </>
@@ -280,12 +270,11 @@ const Sidebar = ({
           {/* Partner Interface */}
           {isPartner && (
             <>
-              <SidebarSubMenu
+              <SidebarButton
                 icon={<IconDatabase />}
                 name=" Sources"
                 onClick={() => push("/marketplace/source")}
                 isActive={pathname?.includes("source")}
-                items={[{ name: "All Sources", path: "/marketplace/source" }]}
               />
               <Divider />
             </>
@@ -384,12 +373,11 @@ const Sidebar = ({
           {/* Admin Interface */}
           {isAdmin && hasPermission("Reservation") && (
             <>
-              <SidebarSubMenu
+              <SidebarButton
                 icon={<IconCalendarEvent />}
                 name="Reservations"
                 onClick={() => push("/marketplace/reservations")}
                 isActive={pathname?.includes("reservation")}
-                items={[{ name: "All", path: "/marketplace/reservations" }]}
               />
               <Divider />
             </>
@@ -398,14 +386,11 @@ const Sidebar = ({
           {/* Partner Interface */}
           {isPartner && hasPermission("Reservation") && (
             <>
-              <SidebarSubMenu
+              <SidebarButton
                 icon={<IconCalendarEvent />}
                 name="Reservations"
                 onClick={() => push("/marketplace/partners/reservations")}
                 isActive={pathname?.includes("reservation")}
-                items={[
-                  { name: "All", path: "/marketplace/partners/reservations" },
-                ]}
               />
               <Divider />
             </>
@@ -554,7 +539,7 @@ const Sidebar = ({
               <SidebarSubMenu
                 icon={<IconShield />}
                 name="Access Control"
-                onClick={() => push("/access/users")}
+                onClick={() => push("/access/admins")}
                 isActive={
                   pathname?.includes("access") ||
                   pathname?.includes("users") ||
@@ -563,7 +548,7 @@ const Sidebar = ({
                   pathname?.includes("RBAC")
                 }
                 items={[
-                  { name: "Kamioun Agents", path: "/access/users" },
+                  { name: "Kamioun Agents", path: "/access/admins" },
                   { name: "Roles", path: "/marketplace/roles" },
                   { name: "Permissions", path: "/marketplace/permissions" },
                   { name: "RBAC ", path: "/access/RBAC" },

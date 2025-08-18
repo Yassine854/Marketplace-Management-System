@@ -19,7 +19,7 @@ const useList = () => {
     {
       icon: <IconSettings size={18} />,
       url: isAdmin
-        ? "/access/users"
+        ? "/access/admins"
         : isPartner
         ? "/marketplace/partners/editProfile"
         : "/settings",

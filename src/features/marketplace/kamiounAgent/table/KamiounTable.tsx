@@ -10,32 +10,32 @@ import {
   ColumnDef,
   SortingState,
   ColumnFiltersState,
-  VisibilityState,
   PaginationState,
 } from "@tanstack/react-table";
-import { FaEdit, FaTrash, FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
-import { TypePartner } from "@/types/typePartner";
-import Swal from "sweetalert2";
+import { FaEdit, FaSort, FaSortUp, FaSortDown, FaTrash } from "react-icons/fa";
+import { User } from "@/types/user";
+import { roles } from "@/features/users/staticRoles";
 
-interface TypePartnerTableProps {
-  typePartners: TypePartner[];
+interface CustomerTableProps {
+  customer: User[];
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
-  onEdit: (typePartner: TypePartner) => void;
+  onEdit: (id: string, user: User) => void;
+  // kept for backward compatibility, not used anymore
   onDelete: (id: string) => Promise<void>;
 }
 
-const columnHelper = createColumnHelper<TypePartner>();
+const columnHelper = createColumnHelper<User>();
 
-export default function TypePartnerTable({
-  typePartners,
+export default function CustomerTable({
+  customer,
   isLoading,
   error,
   refetch,
   onEdit,
   onDelete,
-}: TypePartnerTableProps) {
+}: CustomerTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = useState<PaginationState>({
@@ -43,7 +43,7 @@ export default function TypePartnerTable({
     pageSize: 10,
   });
 
-  const columns = useMemo<ColumnDef<TypePartner, any>[]>(
+  const columns = useMemo<ColumnDef<User, any>[]>(
     () => [
       columnHelper.accessor("id", {
         header: "ID",
@@ -54,8 +54,22 @@ export default function TypePartnerTable({
         ),
         size: 100,
       }),
-      columnHelper.accessor("name", {
-        header: "Name",
+      columnHelper.accessor("username", {
+        header: "Username",
+        cell: (info) => (
+          <div className="max-w-xs">
+            <span className="text-sm text-gray-900">
+              {info.getValue() || "-"}
+            </span>
+          </div>
+        ),
+        size: 180,
+      }),
+      {
+        id: "fullName",
+        header: "Full Name",
+        accessorFn: (row) =>
+          `${row.firstName || ""} ${row.lastName || ""}`.trim(),
         cell: (info) => (
           <div className="max-w-xs">
             <span className="text-sm text-gray-900">
@@ -64,65 +78,72 @@ export default function TypePartnerTable({
           </div>
         ),
         size: 200,
-      }),
-
-      columnHelper.accessor("createdAt", {
-        header: "Created",
+      },
+      {
+        id: "agentType",
+        header: "Agent Type",
+        accessorFn: (row) => row.roleId,
         cell: (info) => {
-          const date = info.getValue();
+          const key = info.getValue() as string;
+          const role = roles.find((r) => r.key === key);
           return (
-            <span className="text-sm text-gray-600">
-              {date ? new Date(date).toLocaleDateString() : "-"}
-            </span>
+            <div className="max-w-xs">
+              <span className="text-sm text-gray-900">{role?.name || "-"}</span>
+            </div>
           );
         },
-        size: 120,
-      }),
+        size: 160,
+      },
       {
         id: "actions",
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center justify-center gap-2">
             <button
-              onClick={() => onEdit(row.original)}
+              onClick={() => onEdit(row.original.id, row.original)}
               className="rounded p-1.5 text-blue-600 hover:bg-blue-50"
-              title="Edit Type Partner"
+              title="Edit User"
             >
               <FaEdit className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={() => {
-                Swal.fire({
-                  title: "Are you sure?",
-                  text: "You won't be able to revert this!",
-                  icon: "warning",
-                  showCancelButton: true,
-                  confirmButtonColor: "#3085d6",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: "Yes, delete it!",
-                  cancelButtonText: "Cancel",
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    onDelete(row.original.id);
-                  }
+                // emit confirmation upstream via onDelete, table only handles UI
+                // Parent supplies the actual delete implementation
+                // Keep the confirmation here for UX
+                import("sweetalert2").then(({ default: Swal }) => {
+                  Swal.fire({
+                    title: "Are you sure?",
+                    text: "This will permanently delete the user.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "Cancel",
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      (onDelete as any)(row.original.id);
+                    }
+                  });
                 });
               }}
               className="rounded p-1.5 text-red-600 hover:bg-red-50"
-              title="Delete Type Partner"
+              title="Delete User"
             >
               <FaTrash className="h-3.5 w-3.5" />
             </button>
           </div>
         ),
         enableSorting: false,
-        size: 100,
+        size: 160,
       },
     ],
-    [onEdit, onDelete],
+    [onEdit],
   );
 
   const table = useReactTable({
-    data: typePartners,
+    data: customer,
     columns,
     state: {
       sorting,
@@ -143,9 +164,7 @@ export default function TypePartnerTable({
     return (
       <div className="flex h-48 items-center justify-center rounded-lg border border-red-200 bg-red-50">
         <div className="text-center">
-          <p className="font-medium text-red-800">
-            Error loading type partners
-          </p>
+          <p className="font-medium text-red-800">Error loading users</p>
           <p className="mt-1 text-sm text-red-600">{error}</p>
         </div>
       </div>
@@ -159,10 +178,12 @@ export default function TypePartnerTable({
         {/* Search */}
         <div className="relative max-w-sm flex-1">
           <input
-            placeholder="Search type partners..."
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            placeholder="Search users..."
+            value={
+              (table.getColumn("username")?.getFilterValue() as string) ?? ""
+            }
             onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
+              table.getColumn("username")?.setFilterValue(event.target.value)
             }
             className="w-full rounded-lg border border-gray-300 px-3 py-2 pl-9 pr-8 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
@@ -181,9 +202,9 @@ export default function TypePartnerTable({
               />
             </svg>
           </div>
-          {(table.getColumn("name")?.getFilterValue() as string) && (
+          {(table.getColumn("username")?.getFilterValue() as string) && (
             <button
-              onClick={() => table.getColumn("name")?.setFilterValue("")}
+              onClick={() => table.getColumn("username")?.setFilterValue("")}
               className="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600"
             >
               <svg
@@ -286,7 +307,7 @@ export default function TypePartnerTable({
                   >
                     <div className="text-gray-500">
                       <div className="mb-2 text-2xl">📂</div>
-                      <p className="font-medium">No type partners found</p>
+                      <p className="font-medium">No users found</p>
                       <p className="text-sm">Try adjusting your search</p>
                     </div>
                   </td>

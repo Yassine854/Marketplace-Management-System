@@ -47,6 +47,15 @@ export default function PartnerTable({
 
   const columns = useMemo<ColumnDef<Partner, any>[]>(
     () => [
+      columnHelper.accessor("id", {
+        header: "ID",
+        cell: (info) => (
+          <span className="font-mono text-xs text-gray-600">
+            {info.getValue().slice(0, 8)}...
+          </span>
+        ),
+        size: 100,
+      }),
       columnHelper.accessor("username", {
         header: "Username",
         cell: (info) => (

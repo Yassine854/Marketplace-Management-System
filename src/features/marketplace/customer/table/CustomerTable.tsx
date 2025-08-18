@@ -45,6 +45,15 @@ export default function CustomerTable({
 
   const columns = useMemo<ColumnDef<Customer, any>[]>(
     () => [
+      columnHelper.accessor("id", {
+        header: "ID",
+        cell: (info) => (
+          <span className="font-mono text-xs text-gray-600">
+            {info.getValue().slice(0, 8)}...
+          </span>
+        ),
+        size: 100,
+      }),
       {
         id: "fullName",
         header: "Full Name",

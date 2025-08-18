@@ -53,6 +53,28 @@ export default function CategoryTable({
 
   const columns = useMemo<ColumnDef<Category, any>[]>(
     () => [
+      columnHelper.accessor("image", {
+        header: "Image",
+        cell: (info) => (
+          <div className="flex justify-center">
+            {info.getValue() ? (
+              <img
+                src={info.getValue()}
+                alt={info.row.original.nameCategory}
+                className="h-12 w-12 rounded-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "https://via.placeholder.com/100x100?text=Error";
+                }}
+              />
+            ) : (
+              <div className="h-12 w-12 rounded-full bg-gray-200"></div>
+            )}
+          </div>
+        ),
+        enableSorting: false,
+        size: 100,
+      }),
       columnHelper.accessor("nameCategory", {
         header: "Name",
         cell: (info) => (
@@ -77,28 +99,7 @@ export default function CategoryTable({
         ),
         size: 120,
       }),
-      columnHelper.accessor("image", {
-        header: "Image",
-        cell: (info) => (
-          <div className="flex justify-center">
-            {info.getValue() ? (
-              <img
-                src={info.getValue()}
-                alt={info.row.original.nameCategory}
-                className="h-12 w-12 rounded-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "https://via.placeholder.com/100x100?text=Error";
-                }}
-              />
-            ) : (
-              <div className="h-12 w-12 rounded-full bg-gray-200"></div>
-            )}
-          </div>
-        ),
-        enableSorting: false,
-        size: 100,
-      }),
+
       columnHelper.accessor("createdAt", {
         header: "Created",
         cell: (info) => {

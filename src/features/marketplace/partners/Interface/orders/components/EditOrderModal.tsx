@@ -181,7 +181,13 @@ const EditOrderModal = ({
       ? (initialData.order.customer as Customer)
       : undefined;
 
-  // Variant 1 - New layout with vertical form and card sections
+  // Calculate total amount
+  const totalAmount = itemsWithAmount.reduce((sum, item) => {
+    const price = item.specialPrice ?? item.unitPrice ?? 0;
+    return sum + price * (item.qteOrdered || 1);
+  }, 0);
+
+  // Variant 1 - Modern split-layout design with blue theme
   if (variant === 1) {
     return (
       <AnimatePresence>
@@ -190,198 +196,444 @@ const EditOrderModal = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-blue-900 bg-opacity-40 backdrop-blur-sm"
             onClick={onClose}
+            style={{ backgroundColor: "rgba(24, 59, 124, 0.4)" }}
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="relative my-8 w-full max-w-4xl rounded-2xl bg-white shadow-2xl"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="absolute right-0 top-0 h-full w-full max-w-7xl bg-gradient-to-br from-slate-50 to-white shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-2xl bg-white p-6 shadow-sm">
-                <h2 className="text-2xl font-bold text-gray-800">
-                  Edit Order #{initialData.orderCode}
-                </h2>
-                <button
-                  onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <XMarkIcon className="h-6 w-6" />
-                </button>
+              {/* Modern Header with Blue Theme */}
+              <div
+                className="px-8 py-6"
+                style={{ backgroundColor: "rgb(24, 59, 124)" }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-white">
+                    <h1 className="text-3xl font-bold">Order Editor</h1>
+                    <p className="mt-1 text-blue-100">
+                      #{initialData.orderCode}
+                    </p>
+                  </div>
+                  <button
+                    onClick={onClose}
+                    className="rounded-full bg-white bg-opacity-20 p-2 text-white transition-all hover:scale-110 hover:bg-opacity-30"
+                  >
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
               </div>
 
-              <div className="max-h-[calc(100vh-200px)] space-y-6 overflow-y-auto p-6">
-                {/* Customer Card */}
-                <div className="rounded-lg border border-gray-200 p-6">
-                  <h3 className="mb-4 text-lg font-semibold">
-                    Customer Information
-                  </h3>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div>
-                      <p className="text-sm text-gray-500">Name</p>
-                      <p className="font-medium">
-                        {customer
-                          ? `${customer.firstName ?? ""} ${
-                              customer.lastName ?? ""
-                            }`
-                          : "N/A"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Contact</p>
-                      <p className="font-medium">
-                        {customer?.telephone ?? "N/A"}
-                      </p>
-                    </div>
-                    <div className="md:col-span-2">
-                      <p className="text-sm text-gray-500">Address</p>
-                      <p className="font-medium">
-                        {customer?.address ?? "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Status Card */}
-                <div className="rounded-lg border border-gray-200 p-6">
-                  <h3 className="mb-4 text-lg font-semibold">Order Status</h3>
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-700">
-                        State
-                      </label>
-                      <select
-                        value={stateId}
-                        onChange={(e) => handleStateChange(e.target.value)}
-                        className="w-full rounded-lg border border-gray-300 p-3"
-                      >
-                        <option value="">Select state</option>
-                        {states
-                          .filter(
-                            (state) =>
-                              state.id === stateId ||
-                              !orderContext ||
-                              orderContext
-                                .getState()
-                                .canTransitionTo(state.name),
-                          )
-                          .map((state) => (
-                            <option key={state.id} value={state.id}>
-                              {state.name}
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-700">
-                        Status
-                      </label>
-                      <select
-                        value={statusId}
-                        onChange={(e) => handleStatusChange(e.target.value)}
-                        className="w-full rounded-lg border border-gray-300 p-3"
-                        disabled={!stateId}
-                      >
-                        <option value="">Select status</option>
-                        {filteredStatuses.map((status) => (
-                          <option key={status.id} value={status.id}>
-                            {status.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Items Card */}
-                <div className="rounded-lg border border-gray-200 p-6">
-                  <h3 className="mb-4 text-lg font-semibold">Order Items</h3>
-                  <div className="space-y-4">
-                    {itemsWithAmount.map((item, idx) => {
-                      const price = item.specialPrice ?? item.unitPrice ?? 0;
-                      const amount = (item.qteOrdered || 1) * price;
-                      return (
-                        <div
-                          key={item.id || idx}
-                          className="rounded-lg border border-gray-200 p-4"
-                        >
-                          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                            <div>
-                              <p className="text-sm text-gray-500">Product</p>
-                              <p className="font-medium">
-                                {item.productName || item.sku}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">Source</p>
-                              <p className="font-medium">
-                                {item.sourceName || "N/A"}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">Price</p>
-                              <p className="font-medium">
-                                {price.toFixed(2)} TND
-                              </p>
-                            </div>
+              <div className="flex h-[calc(100vh-120px)]">
+                {/* Main Content Area */}
+                <div className="flex-1 overflow-y-auto p-8">
+                  <div className="space-y-8">
+                    {/* Customer Profile Card */}
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                      className="group relative overflow-hidden rounded-3xl bg-white p-8 shadow-lg ring-1 ring-blue-100 transition-all duration-300 hover:shadow-xl"
+                    >
+                      <div
+                        className="absolute -right-4 -top-4 h-24 w-24 rounded-full opacity-5 transition-opacity group-hover:opacity-10"
+                        style={{ backgroundColor: "rgb(24, 59, 124)" }}
+                      ></div>
+                      <div className="relative">
+                        <div className="mb-6 flex items-center gap-4">
+                          <div
+                            className="flex h-12 w-12 items-center justify-center rounded-full"
+                            style={{ backgroundColor: "rgb(24, 59, 124)" }}
+                          >
+                            <span className="text-lg font-bold text-white">
+                              {customer?.firstName?.charAt(0) || "N"}
+                            </span>
                           </div>
-                          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-                            <div>
-                              <label className="mb-1 block text-sm font-medium text-gray-700">
-                                Quantity
-                              </label>
-                              <input
-                                type="number"
-                                min={1}
-                                value={item.qteOrdered || 1}
-                                onChange={(e) =>
-                                  handleSnapshotChange(
-                                    idx,
-                                    "qteOrdered",
-                                    Number(e.target.value),
-                                  )
-                                }
-                                className="w-full rounded-lg border border-gray-300 p-2"
-                              />
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">Sealable</p>
-                              <p className="font-medium">
-                                {item.sealable ?? "N/A"}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">Amount</p>
-                              <p className="font-medium">
-                                {amount.toFixed(2)} TND
-                              </p>
+                          <div>
+                            <h3
+                              className="text-xl font-bold"
+                              style={{ color: "rgb(24, 59, 124)" }}
+                            >
+                              Customer Details
+                            </h3>
+                            <p className="text-blue-600">
+                              Order recipient information
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold uppercase tracking-wide text-blue-700">
+                              Full Name
+                            </label>
+                            <p
+                              className="text-lg font-medium"
+                              style={{ color: "rgb(24, 59, 124)" }}
+                            >
+                              {customer
+                                ? `${customer.firstName ?? ""} ${
+                                    customer.lastName ?? ""
+                                  }`.trim() || "N/A"
+                                : "N/A"}
+                            </p>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold uppercase tracking-wide text-blue-700">
+                              Phone
+                            </label>
+                            <p
+                              className="text-lg font-medium"
+                              style={{ color: "rgb(24, 59, 124)" }}
+                            >
+                              {customer?.telephone ?? "N/A"}
+                            </p>
+                          </div>
+                          <div className="space-y-2 md:col-span-1">
+                            <label className="text-sm font-semibold uppercase tracking-wide text-blue-700">
+                              Address
+                            </label>
+                            <p
+                              className="text-lg font-medium"
+                              style={{ color: "rgb(24, 59, 124)" }}
+                            >
+                              {customer?.address ?? "N/A"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Order Status Controls */}
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="grid grid-cols-1 gap-6 md:grid-cols-2"
+                    >
+                      {/* State Selection */}
+                      <div className="group relative overflow-hidden rounded-3xl bg-white p-8 shadow-lg ring-1 ring-blue-100 transition-all duration-300 hover:shadow-xl">
+                        <div
+                          className="absolute -right-4 -top-4 h-24 w-24 rounded-full opacity-5 transition-opacity group-hover:opacity-10"
+                          style={{ backgroundColor: "rgb(24, 59, 124)" }}
+                        ></div>
+                        <div className="relative">
+                          <div className="mb-4">
+                            <h3
+                              className="text-xl font-bold"
+                              style={{ color: "rgb(24, 59, 124)" }}
+                            >
+                              Order State
+                            </h3>
+                            <p className="text-blue-600">
+                              Current processing stage
+                            </p>
+                          </div>
+                          <select
+                            value={stateId}
+                            onChange={(e) => handleStateChange(e.target.value)}
+                            className="w-full rounded-2xl border-2 border-blue-200 bg-blue-50 px-4 py-4 text-lg font-medium transition-all focus:border-blue-700 focus:bg-white focus:ring-4 focus:ring-blue-500 focus:ring-opacity-20"
+                            style={
+                              {
+                                color: "rgb(24, 59, 124)",
+                              } as React.CSSProperties
+                            }
+                          >
+                            <option value="">Select state</option>
+                            {states
+                              .filter(
+                                (state) =>
+                                  state.id === stateId ||
+                                  !orderContext ||
+                                  orderContext
+                                    .getState()
+                                    .canTransitionTo(state.name),
+                              )
+                              .map((state) => (
+                                <option key={state.id} value={state.id}>
+                                  {state.name}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Status Selection */}
+                      <div className="group relative overflow-hidden rounded-3xl bg-white p-8 shadow-lg ring-1 ring-blue-100 transition-all duration-300 hover:shadow-xl">
+                        <div
+                          className="absolute -right-4 -top-4 h-24 w-24 rounded-full opacity-5 transition-opacity group-hover:opacity-10"
+                          style={{ backgroundColor: "rgb(24, 59, 124)" }}
+                        ></div>
+                        <div className="relative">
+                          <div className="mb-4">
+                            <h3
+                              className="text-xl font-bold"
+                              style={{ color: "rgb(24, 59, 124)" }}
+                            >
+                              Order Status
+                            </h3>
+                            <p className="text-blue-600">
+                              Detailed status information
+                            </p>
+                          </div>
+                          <select
+                            value={statusId}
+                            onChange={(e) => handleStatusChange(e.target.value)}
+                            className="w-full rounded-2xl border-2 border-blue-200 bg-blue-50 px-4 py-4 text-lg font-medium transition-all focus:border-blue-700 focus:bg-white focus:ring-4 focus:ring-blue-500 focus:ring-opacity-20 disabled:opacity-50"
+                            style={
+                              {
+                                color: "rgb(24, 59, 124)",
+                              } as React.CSSProperties
+                            }
+                            disabled={!stateId}
+                          >
+                            <option value="">Select status</option>
+                            {filteredStatuses.map((status) => (
+                              <option key={status.id} value={status.id}>
+                                {status.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Order Items */}
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                      className="space-y-6"
+                    >
+                      <div className="flex items-center gap-4">
+                        <h3
+                          className="text-2xl font-bold"
+                          style={{ color: "rgb(24, 59, 124)" }}
+                        >
+                          Order Items
+                        </h3>
+                        <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
+                          {itemsWithAmount.length} items
+                        </span>
+                      </div>
+
+                      <div className="grid gap-6">
+                        {itemsWithAmount.map((item, idx) => {
+                          const price =
+                            item.specialPrice ?? item.unitPrice ?? 0;
+                          const amount = (item.qteOrdered || 1) * price;
+                          return (
+                            <motion.div
+                              key={item.id || idx}
+                              initial={{ x: -20, opacity: 0 }}
+                              animate={{ x: 0, opacity: 1 }}
+                              transition={{ delay: 0.4 + idx * 0.1 }}
+                              className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-md ring-1 ring-blue-100 transition-all duration-300 hover:shadow-lg"
+                            >
+                              <div
+                                className="absolute right-0 top-0 h-full w-2 opacity-0 transition-opacity group-hover:opacity-100"
+                                style={{ backgroundColor: "rgb(24, 59, 124)" }}
+                              ></div>
+
+                              <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
+                                {/* Product Info */}
+                                <div className="lg:col-span-2">
+                                  <div className="flex items-start gap-4">
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-blue-200">
+                                      <span className="text-2xl font-bold text-blue-700">
+                                        {item.productName?.charAt(0) ||
+                                          item.sku?.charAt(0) ||
+                                          "P"}
+                                      </span>
+                                    </div>
+                                    <div className="flex-1">
+                                      <h4
+                                        className="text-lg font-bold"
+                                        style={{ color: "rgb(24, 59, 124)" }}
+                                      >
+                                        {item.productName || item.sku}
+                                      </h4>
+                                      <p className="text-blue-600">
+                                        {item.sourceName || "No source"}
+                                      </p>
+                                      <div className="mt-2 flex items-center gap-4 text-sm text-blue-700">
+                                        <span className="font-semibold">
+                                          {price.toFixed(2)} TND
+                                        </span>
+                                        <span>•</span>
+                                        <span>
+                                          Sealable: {item.sealable ?? "N/A"}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Quantity Control */}
+                                <div className="space-y-2">
+                                  <label className="text-sm font-semibold uppercase tracking-wide text-blue-700">
+                                    Quantity
+                                  </label>
+                                  <div className="relative">
+                                    <input
+                                      type="number"
+                                      min={1}
+                                      value={item.qteOrdered || 1}
+                                      onChange={(e) =>
+                                        handleSnapshotChange(
+                                          idx,
+                                          "qteOrdered",
+                                          Number(e.target.value),
+                                        )
+                                      }
+                                      className="w-full rounded-xl border-2 border-blue-200 bg-blue-50 px-4 py-3 text-center text-lg font-semibold transition-all focus:border-blue-700 focus:bg-white focus:ring-4 focus:ring-blue-500 focus:ring-opacity-20"
+                                      style={
+                                        {
+                                          color: "rgb(24, 59, 124)",
+                                        } as React.CSSProperties
+                                      }
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* Amount Display */}
+                                <div className="space-y-2">
+                                  <label className="text-sm font-semibold uppercase tracking-wide text-blue-700">
+                                    Total
+                                  </label>
+                                  <div className="rounded-xl bg-blue-100 px-4 py-3 text-center">
+                                    <span
+                                      className="text-2xl font-bold"
+                                      style={{ color: "rgb(24, 59, 124)" }}
+                                    >
+                                      {amount.toFixed(2)}
+                                    </span>
+                                    <span className="ml-1 text-blue-700">
+                                      TND
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    </motion.div>
+                  </div>
+                </div>
+
+                {/* Right Sidebar - Order Summary */}
+                <motion.div
+                  initial={{ x: 300, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{
+                    delay: 0.2,
+                    type: "spring",
+                    damping: 25,
+                    stiffness: 200,
+                  }}
+                  className="w-80 border-l border-blue-200 bg-gradient-to-b from-white to-blue-50 p-8"
+                >
+                  <div className="sticky top-0 space-y-8">
+                    {/* Order Summary */}
+                    <div className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-blue-100">
+                      <h3
+                        className="mb-4 text-xl font-bold"
+                        style={{ color: "rgb(24, 59, 124)" }}
+                      >
+                        Order Summary
+                      </h3>
+                      <div className="space-y-4">
+                        <div className="flex justify-between text-blue-700">
+                          <span>Items Count:</span>
+                          <span className="font-semibold">
+                            {itemsWithAmount.length}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-blue-700">
+                          <span>Created:</span>
+                          <span className="font-semibold">
+                            {new Date(
+                              initialData.createdAt,
+                            ).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="border-t border-blue-200 pt-4">
+                          <div className="flex items-center justify-between">
+                            <span
+                              className="text-lg font-bold"
+                              style={{ color: "rgb(24, 59, 124)" }}
+                            >
+                              Total Amount:
+                            </span>
+                            <div className="text-right">
+                              <span
+                                className="text-2xl font-bold"
+                                style={{ color: "rgb(24, 59, 124)" }}
+                              >
+                                {totalAmount.toFixed(2)}
+                              </span>
+                              <span className="ml-1 text-blue-700">TND</span>
                             </div>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
+                      </div>
+                    </div>
 
-              <div className="sticky bottom-0 flex justify-end gap-3 rounded-b-2xl bg-white p-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="rounded-lg border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  className="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
-                >
-                  Save Changes
-                </button>
+                    {/* Action Buttons */}
+                    <div className="space-y-4">
+                      <button
+                        onClick={handleSubmit}
+                        className="w-full rounded-2xl px-6 py-4 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                        style={
+                          {
+                            backgroundColor: "rgb(24, 59, 124)",
+                          } as React.CSSProperties
+                        }
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            "rgb(20, 50, 110)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            "rgb(24, 59, 124)";
+                        }}
+                      >
+                        Save Changes
+                      </button>
+                      <button
+                        onClick={onClose}
+                        className="w-full rounded-2xl border-2 bg-white px-6 py-4 text-lg font-semibold transition-all duration-300 hover:bg-blue-50"
+                        style={{
+                          borderColor: "rgb(24, 59, 124)",
+                          color: "rgb(24, 59, 124)",
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+
+                    {/* Progress Indicator */}
+                    {interactionCount > 0 && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="rounded-2xl border border-blue-200 bg-blue-50 p-4"
+                      >
+                        <div className="text-center">
+                          <span className="text-sm font-semibold text-blue-700">
+                            {interactionCount} changes made
+                          </span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                </motion.div>
               </div>
             </motion.div>
           </motion.div>
@@ -390,7 +642,7 @@ const EditOrderModal = ({
     );
   }
 
-  // Variant 0 - Original layout (your existing implementation)
+  // Variant 0 - Original layout (unchanged)
   return (
     <AnimatePresence>
       {isOpen && (
