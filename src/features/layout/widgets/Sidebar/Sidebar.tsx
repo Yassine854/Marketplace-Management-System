@@ -176,10 +176,20 @@ const Sidebar = ({
               <SidebarSubMenu
                 icon={<IconPackage />}
                 name="Products"
-                onClick={() => push("/marketplace/products")}
-                isActive={pathname?.includes("products")}
+                onClick={() => push("/marketplace/products/all")}
+                isActive={
+                  pathname === "/marketplace/products/all" ||
+                  pathname === "/marketplace/products/PendingProducts" ||
+                  pathname === "/marketplace/products/categories" ||
+                  pathname === "/marketplace/products/brands" ||
+                  pathname === "/marketplace/products/suppliers" ||
+                  pathname === "/marketplace/products/tax" ||
+                  pathname === "/marketplace/products/ProductTypes" ||
+                  pathname === "/marketplace/products/ProductStatus" ||
+                  pathname === "/marketplace/products/ProductPCBType"
+                }
                 items={[
-                  { name: "All", path: "/marketplace/products" },
+                  { name: "All", path: "/marketplace/products/all" },
                   {
                     name: "Pending",
                     path: "/marketplace/products/PendingProducts",
@@ -203,7 +213,7 @@ const Sidebar = ({
                   ...(hasPermission("Manufacturers")
                     ? [
                         {
-                          name: "Manufacturers",
+                          name: "Suppliers",
                           path: "/marketplace/products/suppliers",
                         },
                       ]
@@ -243,7 +253,7 @@ const Sidebar = ({
                   ...(hasPermission("Type PCB")
                     ? [
                         {
-                          name: "Type PCBs",
+                          name: "PCB Types",
                           path: "/marketplace/products/ProductPCBType",
                         },
                       ]
@@ -286,14 +296,14 @@ const Sidebar = ({
               <SidebarSubMenu
                 icon={<IconBuildingStore />}
                 name=" Partners"
-                onClick={() => push("/marketplace/partners")}
+                onClick={() => push("/marketplace/partners/all")}
                 isActive={
-                  pathname === "/marketplace/partners" ||
+                  pathname === "/marketplace/partners/all" ||
                   pathname === "/marketplace/settings" ||
                   pathname === "/marketplace/partners/type_partners"
                 }
                 items={[
-                  { name: "All partners", path: "/marketplace/partners" },
+                  { name: "All partners", path: "/marketplace/partners/all" },
                   {
                     name: "Partner Settings",
                     path: "/marketplace/settings",
@@ -402,13 +412,13 @@ const Sidebar = ({
               <SidebarSubMenu
                 icon={<IconBox />}
                 name=" Orders"
-                onClick={() => push("/marketplace/order")}
+                onClick={() => push("/marketplace/order/all")}
                 isActive={
                   pathname?.toLowerCase().includes("order") ||
                   pathname?.toLowerCase().includes("payment method")
                 }
                 items={[
-                  { name: "All", path: "/marketplace/order" },
+                  { name: "All", path: "/marketplace/order/all" },
                   { name: "State", path: "/marketplace/order/state" },
                   { name: "Status", path: "/marketplace/order/status" },
                   {
@@ -427,10 +437,20 @@ const Sidebar = ({
               <SidebarSubMenu
                 icon={<IconBox />}
                 name=" Orders"
-                onClick={() => push("/marketplace/partners/orders")}
-                isActive={pathname?.toLowerCase().includes("orders")}
+                onClick={() => push("/marketplace/partners/orders/all")}
+                isActive={
+                  pathname === "/marketplace/partners/orders/all" ||
+                  pathname === "/marketplace/partners/orders/Open" ||
+                  pathname === "/marketplace/partners/orders/Valid" ||
+                  pathname === "/marketplace/partners/orders/ReadyToShip" ||
+                  pathname === "/marketplace/partners/orders/Unpaid" ||
+                  pathname === "/marketplace/partners/orders/Delivered" ||
+                  pathname === "/marketplace/partners/orders/Archived" ||
+                  pathname === "/marketplace/partners/orders/Canceled" ||
+                  pathname === "/marketplace/partners/orders/Closed"
+                }
                 items={[
-                  { name: "All", path: "/marketplace/partners/orders" },
+                  { name: "All", path: "/marketplace/partners/orders/all" },
                   { name: "Open", path: "/marketplace/partners/orders/Open" },
                   { name: "Valid", path: "/marketplace/partners/orders/Valid" },
                   {

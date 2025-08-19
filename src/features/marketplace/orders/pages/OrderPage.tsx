@@ -52,8 +52,18 @@ const OrderPage = () => {
     }
   };
 
-  const openEditModal = (order: Order) => {
-    setSelectedOrder(order);
+  const openEditModal = async (order: Order) => {
+    try {
+      const res = await fetch(`/api/marketplace/orders/${order.id}`);
+      const data = await res.json();
+      if (res.ok && data?.order) {
+        setSelectedOrder(data.order as Order);
+      } else {
+        setSelectedOrder(order);
+      }
+    } catch {
+      setSelectedOrder(order);
+    }
     setIsEditModalOpen(true);
   };
 

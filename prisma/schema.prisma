@@ -608,6 +608,7 @@ model Order {
   loyaltyPtsValue     Int      @default(0)
   fromMobile          Boolean  @default(false)
   weight              Float
+  deliveryDate        DateTime?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
@@ -787,7 +788,7 @@ model CartItem {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
   cart       Cart      @relation(fields: [cartId], references: [id])
   cartId     String    @db.ObjectId
-  product    Product   @relation(fields: [productId], references: [id])
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId  String    @db.ObjectId
   partner    Partner   @relation(fields: [partnerId], references: [id])
   partnerId  String    @db.ObjectId

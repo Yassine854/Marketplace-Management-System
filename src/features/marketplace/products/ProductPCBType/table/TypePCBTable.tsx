@@ -47,6 +47,15 @@ export default function TypePcbTable({
 
   const columns = useMemo<ColumnDef<TypePcb, any>[]>(
     () => [
+      columnHelper.accessor("id", {
+        header: "ID",
+        cell: (info) => (
+          <span className="font-mono text-xs text-gray-600">
+            {info.getValue().slice(0, 8)}...
+          </span>
+        ),
+        size: 100,
+      }),
       columnHelper.accessor("name", {
         header: "Name",
         cell: (info) => (

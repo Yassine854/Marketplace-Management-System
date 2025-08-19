@@ -57,8 +57,18 @@ export interface OrderItem {
   updatedAt: string | Date;
   product?: Product;
   source?: Source;
-  status: Status;
-  state: State;
+  status?: Status;
+  state?: State;
+}
+
+export interface VendorOrderRef {
+  id: string;
+  orderCode: string;
+  state?: State | null;
+  status?: Status | null;
+  partner?: Partner | null;
+  itemsSnapshot?: any[];
+  createdAt?: string | Date;
 }
 
 export interface Order {
@@ -87,4 +97,5 @@ export interface Order {
   orderItems: OrderItem[];
   paymentMethodId: string;
   paymentMethod?: OrderPayment;
+  orderPartners?: VendorOrderRef[];
 }

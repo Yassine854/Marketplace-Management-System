@@ -93,21 +93,6 @@ export default function ReservationDataTable({
         ),
         size: 100,
       }),
-      columnHelper.accessor("isActive", {
-        header: "Status",
-        cell: (info) => (
-          <span
-            className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-              info.getValue()
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            }`}
-          >
-            {info.getValue() ? "Active" : "Inactive"}
-          </span>
-        ),
-        size: 100,
-      }),
       columnHelper.accessor("shippingMethod", {
         header: "Shipping",
         cell: (info) => (
@@ -141,38 +126,38 @@ export default function ReservationDataTable({
             >
               <FaEdit className="h-3.5 w-3.5" />
             </button>
-            <button
-              onClick={() => {
-                const newStatus = !row.original.isActive;
-                const statusText = newStatus ? "activate" : "deactivate";
-                Swal.fire({
-                  title: `Are you sure?`,
-                  text: `Do you want to ${statusText} this reservation?`,
-                  icon: "question",
-                  showCancelButton: true,
-                  confirmButtonColor: "#3085d6",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: `Yes, ${statusText} it!`,
-                  cancelButtonText: "Cancel",
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    onToggleStatus(row.original.id, newStatus);
-                  }
-                });
-              }}
-              className={`rounded p-1.5 ${
-                row.original.isActive
-                  ? "text-orange-600 hover:bg-orange-50"
-                  : "text-green-600 hover:bg-green-50"
-              }`}
-              title={row.original.isActive ? "Deactivate" : "Activate"}
-            >
-              {row.original.isActive ? (
-                <FaToggleOn className="h-4 w-4" />
-              ) : (
+            {!row.original.isActive && (
+              <button
+                onClick={() => {
+                  Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to activate this reservation?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, activate it!",
+                    cancelButtonText: "Cancel",
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      onToggleStatus(row.original.id, true);
+                    }
+                  });
+                }}
+                className="rounded p-1.5 text-green-600 hover:bg-green-50"
+                title="Activate"
+              >
                 <FaToggleOff className="h-4 w-4" />
-              )}
-            </button>
+              </button>
+            )}
+            {row.original.isActive && (
+              <div
+                className="rounded p-1.5 text-blue-600"
+                title="Active Reservation"
+              >
+                <FaToggleOn className="h-4 w-4" />
+              </div>
+            )}
             <button
               onClick={() => {
                 Swal.fire({

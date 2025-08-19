@@ -250,7 +250,7 @@ const ProductPage = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onCreate={async (productData) => {
-          await createProduct(productData);
+          // await createProduct(productData);
           refetch();
           setIsModalOpen(false);
         }}

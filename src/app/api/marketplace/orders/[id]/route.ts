@@ -77,6 +77,15 @@ export async function GET(
             },
           },
         },
+        // Include Vendor Orders (orderPartners) with their state, status, partner and agent assignment
+        orderPartners: {
+          include: {
+            status: true,
+            state: true,
+            partner: true,
+            orderAgent: true,
+          },
+        },
         loyaltyPoints: true,
         paymentMethod: true,
       },
@@ -86,8 +95,119 @@ export async function GET(
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
     }
 
+    // Enrich each VendorOrder (orderPartners) with pricing and totals similar to partner view
+    const enrichedPartners = await Promise.all(
+      (order.orderPartners ?? []).map(async (vo: any) => {
+        let enrichedItemsSnapshot: any[] = [];
+        let order_total_ht = 0;
+        let order_total_ttc = 0;
+
+        const snapshot: any[] = Array.isArray(vo.itemsSnapshot)
+          ? (vo.itemsSnapshot as any[])
+          : [];
+
+        if (snapshot.length > 0) {
+          const productIds = Array.from(
+            new Set(snapshot.map((i: any) => i.productId).filter(Boolean)),
+          );
+          const sourceIds = Array.from(
+            new Set(snapshot.map((i: any) => i.sourceId).filter(Boolean)),
+          );
+
+          const products = await prisma.product.findMany({
+            where: { id: { in: productIds } },
+            select: {
+              id: true,
+              name: true,
+              sku: true,
+              tax: { select: { value: true } },
+            },
+          });
+          const productMap = new Map(products.map((p: any) => [p.id, p]));
+
+          const sources = await prisma.source.findMany({
+            where: { id: { in: sourceIds } },
+            select: { id: true, name: true },
+          });
+          const sourceMap = new Map(sources.map((s: any) => [s.id, s]));
+
+          const skuPartners = await prisma.skuPartner.findMany({
+            where: {
+              productId: { in: productIds },
+              partnerId: vo.partnerId,
+            },
+            select: { id: true, productId: true },
+          });
+          const skuPartnerMap = new Map(
+            skuPartners.map((sp: any) => [sp.productId, sp]),
+          );
+
+          const skuPartnerIds = skuPartners.map((sp: any) => sp.id);
+          const stocks = await prisma.stock.findMany({
+            where: {
+              skuPartnerId: { in: skuPartnerIds },
+              sourceId: { in: sourceIds },
+            },
+            select: {
+              skuPartnerId: true,
+              sourceId: true,
+              price: true,
+              special_price: true,
+              sealable: true,
+            },
+          });
+          const stockMap = new Map(
+            stocks.map((s: any) => [`${s.skuPartnerId}-${s.sourceId}`, s]),
+          );
+
+          enrichedItemsSnapshot = snapshot.map((item: any) => {
+            const product = productMap.get(item.productId);
+            const source = sourceMap.get(item.sourceId);
+            const sp = skuPartnerMap.get(item.productId);
+            const stock = sp ? stockMap.get(`${sp.id}-${item.sourceId}`) : null;
+
+            const unitPrice = stock ? stock.special_price ?? stock.price : null;
+            const specialPrice = stock?.special_price ?? null;
+            const sealable = stock?.sealable ?? null;
+            const tva = product?.tax?.value ?? 0;
+            const qteOrdered = item.qteOrdered ?? 1;
+            const price = specialPrice ?? unitPrice ?? 0;
+            const total_ht = qteOrdered * price;
+            const total_ttc = tva
+              ? total_ht + total_ht * (tva / 100)
+              : total_ht;
+
+            order_total_ht += total_ht;
+            order_total_ttc += total_ttc;
+
+            return {
+              ...item,
+              productName: product?.name || "",
+              sku: product?.sku || item.sku || "",
+              sourceName: source?.name || "",
+              unitPrice,
+              specialPrice,
+              sealable,
+              tva,
+              total_ht,
+              total_ttc,
+            };
+          });
+        }
+
+        return {
+          ...vo,
+          itemsSnapshot: enrichedItemsSnapshot,
+          order_total_ht,
+          order_total_ttc,
+        };
+      }),
+    );
+
+    const responseOrder = { ...order, orderPartners: enrichedPartners };
+
     return NextResponse.json(
-      { message: "Order retrieved", order },
+      { message: "Order retrieved", order: responseOrder },
       { status: 200 },
     );
   } catch (error) {

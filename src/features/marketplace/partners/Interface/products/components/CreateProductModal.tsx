@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import Select from "react-select";
 import { useCreateProduct } from "../hooks/useCreateProduct";
+import Swal from "sweetalert2";
 
 interface Product {
   id: string;
@@ -577,10 +578,230 @@ const CreateProductModal = ({
     }
   };
 
+  // Add custom styles for the SweetAlert modal
+  const addCustomStyles = () => {
+    const style = document.createElement("style");
+    style.textContent = `
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 3px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #666;
+      }
+      .scrollable-content {
+        margin-right: -6px;
+        padding-right: 6px;
+      }
+      .sweetalert-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  };
+
+  const checkImageSimilarity = async (images: File[], productName: string) => {
+    const results = [];
+
+    for (const image of images) {
+      const formData = new FormData();
+      formData.append("file", image);
+      formData.append("text", productName);
+
+      try {
+        const response = await fetch("https://yassine854-ml.hf.space/predict", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+        results.push({
+          imageName: image.name,
+          similarity: (data.similarity_score * 100).toFixed(2),
+          isMatch: data.is_match,
+        });
+      } catch (error) {
+        console.error(`Error checking similarity for ${image.name}:`, error);
+        results.push({
+          imageName: image.name,
+          error: "Failed to check similarity",
+        });
+      }
+    }
+
+    return results;
+  };
+
+  const showSimilarityResults = async (results: Array<any>) => {
+    // Add custom styles and get cleanup function
+    const cleanupStyles = addCustomStyles();
+    const imageUrls = formState.images.reduce(
+      (acc: { [key: string]: string }, img: File) => {
+        acc[img.name] = URL.createObjectURL(img);
+        return acc;
+      },
+      {},
+    );
+
+    const resultsHtml = results
+      .map((result) => {
+        // Normalize similarity score to be between 0 and 100
+        const normalizedSimilarity = Math.max(
+          0,
+          Math.min(100, parseFloat(result.similarity)),
+        );
+        const color = result.error
+          ? "text-red-500"
+          : normalizedSimilarity >= 50
+          ? "text-green-500"
+          : "text-red-500";
+        const icon = result.error
+          ? "❌"
+          : normalizedSimilarity >= 50
+          ? "✅"
+          : "⚠️";
+
+        return `
+        <div class="mb-4 rounded-lg border p-3 shadow-sm transition-all hover:shadow-md">
+          <div class="flex items-start gap-3">
+            <div class="w-24 flex-shrink-0">
+              <img src="${imageUrls[result.imageName]}" 
+                   alt="${result.imageName}" 
+                   class="h-24 w-full rounded-lg object-cover shadow-sm"
+              />
+            </div>
+            <div class="flex-grow min-w-0">
+              <p class="mb-1 font-medium text-gray-800 truncate text-sm">${
+                result.imageName
+              }</p>
+              ${
+                result.error
+                  ? `<p class="flex items-center gap-2 text-red-500 text-sm">
+                  ${icon} ${result.error}
+                </p>`
+                  : `<div class="space-y-1">
+                  <div class="flex items-center gap-2">
+                    <span class="text-base">${icon}</span>
+                    <span class="${color} font-semibold text-sm">
+                      ${result.similarity}% Match
+                    </span>
+                  </div>
+                  <div class="h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+                    <div class="h-full ${
+                      normalizedSimilarity >= 50 ? "bg-green-500" : "bg-red-500"
+                    }" 
+                         style="width: ${normalizedSimilarity}%">
+                    </div>
+                  </div>
+                </div>`
+              }
+            </div>
+          </div>
+        </div>
+      `;
+      })
+      .join("");
+
+    const lowSimilarityExists = results.some(
+      (r) => !r.error && parseFloat(r.similarity) < 50,
+    );
+
+    const hasLowSimilarity = results.some(
+      (r) => !r.error && parseFloat(r.similarity) < 50,
+    );
+    const allError = results.every((r) => r.error);
+
+    const result = await Swal.fire({
+      title: "Image Fraud Detection",
+      html: `
+        <div class="mb-3">
+          <h3 class="mb-1 text-base font-medium text-gray-700">Checking images for "${
+            formState.name
+          }"</h3>
+        </div>
+        <div class="custom-scrollbar ${
+          results.length > 1 ? "max-h-[180px]" : ""
+        } overflow-y-auto px-2" 
+             style="scrollbar-width: thin;">
+          ${resultsHtml}
+        </div>
+        ${
+          hasLowSimilarity
+            ? `<div class="mt-3 rounded-lg bg-yellow-50 p-2 text-yellow-800">
+            <div class="flex items-center gap-2">
+              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+              <span class="text-sm font-medium">Some images have low similarity scores</span>
+            </div>
+          </div>`
+            : ""
+        }
+      `,
+      width: "550px",
+      padding: "1.25rem",
+      showCancelButton: true,
+      confirmButtonText:
+        hasLowSimilarity || allError
+          ? '<span class="flex items-center gap-2">Continue anyway <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></span>'
+          : '<span class="flex items-center gap-2">Continue <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></span>',
+      cancelButtonText:
+        '<span class="flex items-center gap-2"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg> Cancel</span>',
+      confirmButtonColor: hasLowSimilarity || allError ? "#F59E0B" : "#10B981",
+      cancelButtonColor: "#EF4444",
+      customClass: {
+        container: "sweetalert-container",
+        popup: "rounded-xl animate__animated animate__fadeIn animate__faster",
+        confirmButton: "rounded-lg text-sm px-5 py-2.5",
+        cancelButton: "rounded-lg text-sm px-5 py-2.5",
+        htmlContainer:
+          results.length > 1
+            ? "scrollable-content custom-scrollbar"
+            : "custom-scrollbar",
+      },
+      showClass: {
+        popup: "animate__animated animate__fadeIn animate__faster",
+      },
+      hideClass: {
+        popup: "animate__animated animate__fadeOut animate__faster",
+      },
+    });
+
+    // Cleanup object URLs and styles
+    Object.values(imageUrls).forEach((url) => URL.revokeObjectURL(url));
+    cleanupStyles();
+
+    return result.isConfirmed;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setHasSubmitted(true);
     logExperimentGoal("submission_started");
+
+    // Check if there are images to process
+    if (formState.images && formState.images.length > 0) {
+      const similarityResults = await checkImageSimilarity(
+        formState.images,
+        formState.name,
+      );
+      const shouldContinue = await showSimilarityResults(similarityResults);
+      if (!shouldContinue) {
+        return;
+      }
+    }
 
     // Validation checks...
     if (!formState.sku || !formState.sku.trim()) {
@@ -697,8 +918,37 @@ const CreateProductModal = ({
         }
       }
 
+      const handleImageUpload = async (files: File[], productId: string) => {
+        const uploadPromises = Array.from(files).map(async (file) => {
+          const formData = new FormData();
+          formData.append("images", file);
+          formData.append("productId", productId);
+
+          const response = await fetch("/api/marketplace/image/create", {
+            method: "POST",
+            body: formData,
+          });
+          onCreate(formState);
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Image upload error:", errorData);
+            throw new Error(errorData.error || "Failed to upload image");
+          }
+
+          const data = await response.json();
+          if (data.images && data.images.length > 0) {
+            return { id: data.id || "temp-id", url: data.images[0] };
+          } else {
+            throw new Error("No image URL returned from server");
+          }
+        });
+
+        return Promise.all(uploadPromises);
+      };
+
       if (!productId) {
-        const payload = {
+        // Prepare the complete product payload including all related data
+        const productPayload = {
           ...formState,
           price: Number(formState.price),
           special_price: formState.special_price
@@ -737,23 +987,61 @@ const CreateProductModal = ({
           brandImage: formState.brandImage || undefined,
           brandId: formState.brandId,
           activities: formState.activities,
-        };
-
-        const skuPartners = [];
-        skuPartners.push({
-          partnerId: "",
-          skuPartner: formState.partnerSku
-            ? formState.partnerSku
-            : formState.sku,
-        });
-
-        const productPayload = {
-          ...payload,
-          skuPartners,
+          // Include all the related data that needs to be processed
+          subCategories: formState.subCategories,
+          relatedProducts: formState.relatedProducts,
+          images: formState.images,
+          // Add SKU partners
+          skuPartners: [
+            {
+              partnerId: "",
+              skuPartner: formState.partnerSku || formState.sku,
+            },
+          ],
+          // Add stocks configuration for later processing
+          stocks: formState.stocks.map((stock) => ({
+            sourceId: stock.sourceId,
+            stockQuantity: Number(stock.stockQuantity),
+            minQty: Number(stock.minQty),
+            maxQty: Number(stock.maxQty),
+            price: Number(stock.price),
+            special_price: Number(stock.special_price),
+            sealable: Number(stock.sealable),
+            loyaltyPointsPerProduct: stock.loyaltyPointsPerProduct
+              ? Number(stock.loyaltyPointsPerProduct)
+              : undefined,
+            loyaltyPointsPerUnit: stock.loyaltyPointsPerUnit
+              ? Number(stock.loyaltyPointsPerUnit)
+              : undefined,
+            loyaltyPointsBonusQuantity: stock.loyaltyPointsBonusQuantity
+              ? Number(stock.loyaltyPointsBonusQuantity)
+              : undefined,
+            loyaltyPointsThresholdQty: stock.loyaltyPointsThresholdQty
+              ? Number(stock.loyaltyPointsThresholdQty)
+              : undefined,
+          })),
         };
 
         try {
-          const productResponse = await createProduct(productPayload);
+          // Create product first without images
+          const productResponse = await createProduct({
+            ...productPayload,
+            images: [], // Send empty array initially
+          });
+
+          // Then upload images if we have any
+          if (
+            productResponse &&
+            productResponse.id &&
+            formState.images.length > 0
+          ) {
+            try {
+              await handleImageUpload(formState.images, productResponse.id);
+            } catch (imageError) {
+              console.error("Error uploading images:", imageError);
+              toast.error("Product created but failed to upload some images");
+            }
+          }
           if (productResponse && productResponse.id) {
             productId = productResponse.id;
           } else {
@@ -862,11 +1150,11 @@ const CreateProductModal = ({
           : "Product created successfully",
       );
       onClose();
-      setTimeout(() => {
-        if (typeof onCreate === "function") {
-          onCreate(formState);
-        }
-      }, 500);
+      // setTimeout(() => {
+      //   if (typeof onCreate === "function") {
+      //     onCreate(formState);
+      //   }
+      // }, 500);
     } catch (error) {
       logExperimentGoal("submission_failed");
       console.error("Error creating product:", error);
@@ -1026,7 +1314,7 @@ const CreateProductModal = ({
                 </div>
                 <div>
                   <label className="mb-1 block font-medium text-gray-700">
-                    SKU *
+                    SKU <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -1038,7 +1326,7 @@ const CreateProductModal = ({
                 </div>
                 <div>
                   <label className="mb-1 block font-medium text-gray-700">
-                    Product Name *
+                    Product Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -1051,7 +1339,7 @@ const CreateProductModal = ({
                 <div className="flex items-end gap-4">
                   <div className="flex-1">
                     <label className="mb-1 block font-medium text-gray-700">
-                      Price *
+                      Price <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
@@ -1103,7 +1391,7 @@ const CreateProductModal = ({
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <div>
                   <label className="mb-1 block font-medium text-gray-700">
-                    Manufacturer *
+                    Manufacturer <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={formState.supplierId}
@@ -1227,7 +1515,7 @@ const CreateProductModal = ({
 
               <div className="mt-6">
                 <label className="mb-1 block font-medium text-gray-700">
-                  Activities *
+                  Activities <span className="text-red-500">*</span>
                 </label>
                 <Select
                   isMulti
@@ -1257,7 +1545,7 @@ const CreateProductModal = ({
 
               <div className="mt-6">
                 <label className="mb-1 block font-medium text-gray-700">
-                  Brand *
+                  Brand <span className="text-red-500">*</span>
                 </label>
                 <Select
                   isClearable
@@ -1760,7 +2048,7 @@ const CreateProductModal = ({
               </div>
               <div>
                 <label className="mb-1 block font-medium text-gray-700">
-                  SKU *
+                  SKU <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -1772,7 +2060,7 @@ const CreateProductModal = ({
               </div>
               <div>
                 <label className="mb-1 block font-medium text-gray-700">
-                  Product Name *
+                  Product Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -1785,7 +2073,7 @@ const CreateProductModal = ({
               <div className="flex items-end gap-4">
                 <div>
                   <label className="mb-1 block font-medium text-gray-700">
-                    Price *
+                    Price <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
@@ -1836,7 +2124,7 @@ const CreateProductModal = ({
             <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_160px_128px] items-end gap-x-6">
               <div>
                 <label className="mb-1 block font-medium text-gray-700">
-                  Manufacturer *
+                  Manufacturer <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={formState.supplierId}
@@ -1932,7 +2220,7 @@ const CreateProductModal = ({
             <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
               <div>
                 <label className="mb-1 block font-medium text-gray-700">
-                  Activities *
+                  Activities <span className="text-red-500">*</span>
                 </label>
                 <Select
                   isMulti
@@ -1961,7 +2249,7 @@ const CreateProductModal = ({
               </div>
               <div>
                 <label className="mb-1 block font-medium text-gray-700">
-                  Select Brand *
+                  Select Brand <span className="text-red-500">*</span>
                 </label>
                 <Select
                   isClearable

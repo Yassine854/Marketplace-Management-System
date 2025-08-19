@@ -41,14 +41,21 @@ const CreatePartnerModal = ({
     address: "",
     password: "",
     mRoleId: "",
-    logo: undefined as File | undefined, // Allow File or undefined
-    patent: undefined as File | undefined, // Allow File or undefined
+    logo: undefined as File | undefined,
+    patent: undefined as File | undefined,
     responsibleName: "",
     position: "",
     coverageArea: "",
     minimumAmount: 0,
     typePartnerId: "",
   });
+
+  const [activeTab, setActiveTab] = useState(0);
+  const tabLabels = [
+    "Partnership Details",
+    "Personal Information",
+    "Company Information",
+  ];
 
   if (!isOpen) return null;
 
@@ -95,7 +102,7 @@ const CreatePartnerModal = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-6xl rounded-2xl bg-white p-6 shadow-2xl"
+        className="w-full max-w-5xl rounded-2xl bg-white p-10 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
@@ -120,288 +127,295 @@ const CreatePartnerModal = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          {/* Partnership Details - Left column */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-primary">
-              Partnership Details
-            </h3>
+        {/* Tab Navigation */}
+        <div className="mb-6 flex border-b">
+          {tabLabels.map((label, idx) => (
+            <button
+              key={label}
+              className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors focus:outline-none ${
+                activeTab === idx
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-blue-600"
+              }`}
+              onClick={() => setActiveTab(idx)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
 
-            <div className="grid grid-cols-2 gap-2">
+        {/* Tab Content */}
+        <div>
+          {activeTab === 0 && (
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-primary">
+                Partnership Details
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Responsible <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.responsibleName}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        responsibleName: e.target.value,
+                      })
+                    }
+                    className="w-full rounded-lg border p-2 text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Position <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.position}
+                    onChange={(e) =>
+                      setFormData({ ...formData, position: e.target.value })
+                    }
+                    className="w-full rounded-lg border p-2 text-sm"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Coverage Area <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.coverageArea}
+                    onChange={(e) =>
+                      setFormData({ ...formData, coverageArea: e.target.value })
+                    }
+                    className="w-full rounded-lg border p-2 text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Min Amount <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.minimumAmount}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        minimumAmount: Number(e.target.value),
+                      })
+                    }
+                    className="w-full rounded-lg border p-2 text-sm"
+                    required
+                  />
+                </div>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Responsible *
+                  Partner Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.typePartnerId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, typePartnerId: e.target.value })
+                  }
+                  className="w-full rounded-lg border p-2 text-sm"
+                  required
+                >
+                  <option value="">Select Partner Type</option>
+                  {typePartners?.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Role <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.mRoleId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, mRoleId: e.target.value })
+                  }
+                  className="w-full rounded-lg border p-2 text-sm"
+                  required
+                >
+                  <option value="">Select Role</option>
+                  {roles?.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+          {activeTab === 1 && (
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-primary">
+                Personal Information
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    First Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.firstName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, firstName: e.target.value })
+                    }
+                    className="w-full rounded-lg border p-2 text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Last Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lastName: e.target.value })
+                    }
+                    className="w-full rounded-lg border p-2 text-sm"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Username <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  value={formData.responsibleName}
+                  value={formData.username}
+                  onChange={(e) =>
+                    setFormData({ ...formData, username: e.target.value })
+                  }
+                  className="w-full rounded-lg border p-2 text-sm"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className="w-full rounded-lg border p-2 text-sm"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Password <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  className="w-full rounded-lg border p-2 text-sm"
+                  required
+                />
+              </div>
+            </div>
+          )}
+          {activeTab === 2 && (
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-primary">
+                Company Information
+              </h3>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Telephone
+                </label>
+                <input
+                  type="text"
+                  value={formData.telephone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, telephone: e.target.value })
+                  }
+                  className="w-full rounded-lg border p-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) =>
+                    setFormData({ ...formData, address: e.target.value })
+                  }
+                  className="w-full rounded-lg border p-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Logo
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      responsibleName: e.target.value,
+                      logo: e.target.files ? e.target.files[0] : undefined,
                     })
                   }
                   className="w-full rounded-lg border p-2 text-sm"
-                  required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Position *
+                  Patent
                 </label>
                 <input
-                  type="text"
-                  value={formData.position}
-                  onChange={(e) =>
-                    setFormData({ ...formData, position: e.target.value })
-                  }
-                  className="w-full rounded-lg border p-2 text-sm"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Coverage Area *
-                </label>
-                <input
-                  type="text"
-                  value={formData.coverageArea}
-                  onChange={(e) =>
-                    setFormData({ ...formData, coverageArea: e.target.value })
-                  }
-                  className="w-full rounded-lg border p-2 text-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Min Amount *
-                </label>
-                <input
-                  type="number"
-                  value={formData.minimumAmount}
+                  type="file"
+                  accept="application/pdf"
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      minimumAmount: Number(e.target.value),
+                      patent: e.target.files ? e.target.files[0] : undefined,
                     })
                   }
                   className="w-full rounded-lg border p-2 text-sm"
-                  required
                 />
               </div>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Partner Type *
-              </label>
-              <select
-                value={formData.typePartnerId}
-                onChange={(e) =>
-                  setFormData({ ...formData, typePartnerId: e.target.value })
-                }
-                className="w-full rounded-lg border p-2 text-sm"
-                required
-              >
-                <option value="">Select Partner Type</option>
-                {typePartners?.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Role *
-              </label>
-              <select
-                value={formData.mRoleId}
-                onChange={(e) =>
-                  setFormData({ ...formData, mRoleId: e.target.value })
-                }
-                className="w-full rounded-lg border p-2 text-sm"
-                required
-              >
-                <option value="">Select Role</option>
-                {roles?.map((role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Personal Information - Middle column */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-primary">
-              Personal Information
-            </h3>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  First Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, firstName: e.target.value })
-                  }
-                  className="w-full rounded-lg border p-2 text-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Last Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, lastName: e.target.value })
-                  }
-                  className="w-full rounded-lg border p-2 text-sm"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Username *
-              </label>
-              <input
-                type="text"
-                value={formData.username}
-                onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
-                }
-                className="w-full rounded-lg border p-2 text-sm"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email *
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                className="w-full rounded-lg border p-2 text-sm"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Password *
-              </label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                className="w-full rounded-lg border p-2 text-sm"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Company Information - Right column */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-primary">
-              Company Information
-            </h3>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Telephone
-              </label>
-              <input
-                type="text"
-                value={formData.telephone}
-                onChange={(e) =>
-                  setFormData({ ...formData, telephone: e.target.value })
-                }
-                className="w-full rounded-lg border p-2 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Address
-              </label>
-              <input
-                type="text"
-                value={formData.address}
-                onChange={(e) =>
-                  setFormData({ ...formData, address: e.target.value })
-                }
-                className="w-full rounded-lg border p-2 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Logo
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    logo: e.target.files ? e.target.files[0] : undefined,
-                  })
-                }
-                className="w-full rounded-lg border p-2 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Patent
-              </label>
-              <input
-                type="file"
-                accept="application/pdf"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    patent: e.target.files ? e.target.files[0] : undefined,
-                  })
-                }
-                className="w-full rounded-lg border p-2 text-sm"
-              />
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Buttons */}
-        <div className="mt-6 flex justify-end gap-4">
+        <div className="mt-8 flex justify-end gap-4">
           <button
             onClick={onClose}
-            className="rounded-lg bg-gray-400 px-4 py-2 text-sm text-white hover:bg-gray-500"
+            className="rounded-lg bg-gray-400 px-6 py-3 text-base text-white hover:bg-gray-500"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+            className="rounded-lg bg-blue-600 px-6 py-3 text-base text-white hover:bg-blue-700"
           >
             Create Partner
           </button>

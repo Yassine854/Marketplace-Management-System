@@ -147,7 +147,6 @@ const PaymentMethodPage = () => {
             isSidebarOpen={false}
             onEdit={openEditModal}
             onDelete={handleDelete}
-            onAdd={() => setIsModalOpen(true)}
           />
         </div>
       </div>

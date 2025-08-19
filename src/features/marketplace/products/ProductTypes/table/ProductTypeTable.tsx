@@ -44,6 +44,15 @@ export default function ProductTypeTable({
 
   const columns = useMemo<ColumnDef<ProductType, any>[]>(
     () => [
+      columnHelper.accessor("id", {
+        header: "ID",
+        cell: (info) => (
+          <span className="font-mono text-xs text-gray-600">
+            {info.getValue().slice(0, 8)}...
+          </span>
+        ),
+        size: 100,
+      }),
       columnHelper.accessor("type", {
         header: "Type",
         cell: (info) => (

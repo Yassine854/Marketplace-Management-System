@@ -24,12 +24,20 @@ export async function POST(req: Request) {
       userType?: string;
     };
 
-    // Get user's role
+    // Validate partnerId (required field)
+    const partnerId = user.id;
+    if (!partnerId) {
+      return NextResponse.json(
+        { message: "Partner ID is required" },
+        { status: 400 },
+      );
+    }
+
+    // Check permissions (KamiounAdminMaster or has 'create' permission)
     const userRole = await prisma.role.findFirst({
       where: { id: user.mRoleId },
     });
 
-    // Allow access if user is KamiounAdminMaster
     const isKamiounAdminMaster = userRole?.name === "KamiounAdminMaster";
 
     if (!isKamiounAdminMaster) {
@@ -38,12 +46,8 @@ export async function POST(req: Request) {
       }
 
       const rolePermissions = await prisma.rolePermission.findMany({
-        where: {
-          roleId: user.mRoleId,
-        },
-        include: {
-          permission: true,
-        },
+        where: { roleId: user.mRoleId },
+        include: { permission: true },
       });
 
       const canCreate = rolePermissions.some(
@@ -65,31 +69,13 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    let partnerId;
-    if (user.userType === "partner") {
-      partnerId = user.id;
-    } else {
-      // For admin users, get the partnerId from the request body
-      partnerId = body.partnerId;
-
-      if (!partnerId) {
-        return NextResponse.json(
-          {
-            message:
-              "Invalid request: 'partnerId' is required for admin users.",
-          },
-          { status: 400 },
-        );
-      }
-    }
-
-    // Check if the agent already exists by username or email
+    // Check for existing agent (with partnerId included)
     const existingAgent = await prisma.agent.findFirst({
       where: {
+        partnerId,
         OR: [{ username: body.username }, { email: body.email }],
       },
     });
-    prisma;
 
     if (existingAgent) {
       return NextResponse.json(
@@ -98,29 +84,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if any data exist
-    const existingData = await prisma.agent.findFirst();
-
-    if (!existingData) {
-      const existingPermission = await prisma.permission.findFirst({
-        where: {
-          resource: "Delivery Agent",
-        },
-      });
-
-      if (!existingPermission) {
-        await prisma.permission.create({
-          data: {
-            resource: "Delivery Agent",
-          },
-        });
-      }
-    }
-
-    // Hash the password before storing it
+    // Hash password
     const hashedPassword = await hash(body.password, 10);
 
-    // Create the agent in the database
+    // Create the agent (with required partnerId)
     const newAgent = await prisma.agent.create({
       data: {
         username: body.username,
@@ -129,10 +96,10 @@ export async function POST(req: Request) {
         email: body.email,
         telephone: body.telephone,
         address: body.address,
-        password: hashedPassword, // Store hashed password
+        password: hashedPassword,
         mRoleId: body.mRoleId,
         isActive: body.isActive ?? true,
-        partnerId: partnerId,
+        partnerId: partnerId, // Required field
       },
     });
 

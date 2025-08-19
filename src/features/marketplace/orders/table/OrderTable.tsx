@@ -93,21 +93,6 @@ export default function OrderDataTable({
         ),
         size: 100,
       }),
-      columnHelper.accessor("isActive", {
-        header: "Status",
-        cell: (info) => (
-          <span
-            className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-              info.getValue()
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            }`}
-          >
-            {info.getValue() ? "Active" : "Inactive"}
-          </span>
-        ),
-        size: 100,
-      }),
       columnHelper.accessor("shippingMethod", {
         header: "Shipping",
         cell: (info) => (

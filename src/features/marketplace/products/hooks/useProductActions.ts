@@ -71,7 +71,7 @@ export function useProductActions() {
         return response.data.message;
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Error creating product");
+      toast.error(err.response?.data?.message || "Error deleting product");
       console.error("Error deleting product:", err);
     } finally {
       setIsLoading(false);

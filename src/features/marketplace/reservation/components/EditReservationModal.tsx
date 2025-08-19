@@ -23,14 +23,10 @@ const EditReservationModal = ({
   onEdit,
   initialData,
 }: EditReservationModalProps) => {
-  const [shippingMethod, setShippingMethod] = useState("");
-  const [shippingAmount, setShippingAmount] = useState(0);
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
     if (initialData) {
-      setShippingMethod(initialData.shippingMethod || "");
-      setShippingAmount(initialData.shippingAmount || 0);
       setIsActive(initialData.isActive || false);
     }
   }, [initialData]);
@@ -40,19 +36,10 @@ const EditReservationModal = ({
 
     const reservationData = {
       id: initialData.id,
-      shippingMethod: shippingMethod.trim() || undefined,
-      shippingAmount: shippingAmount || undefined,
       isActive,
     };
 
     onEdit(reservationData);
-    resetForm();
-  };
-
-  const resetForm = () => {
-    setShippingMethod("");
-    setShippingAmount(0);
-    setIsActive(false);
   };
 
   if (!isOpen || !initialData) return null;
@@ -131,6 +118,25 @@ const EditReservationModal = ({
                 {initialData.weight} kg
               </p>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Shipping Method
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {initialData.shippingMethod || "N/A"}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Shipping Amount (TND)
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {initialData.shippingAmount?.toFixed
+                  ? initialData.shippingAmount.toFixed(2)
+                  : initialData.shippingAmount}{" "}
+                TND
+              </p>
+            </div>
           </div>
         </div>
 
@@ -179,7 +185,7 @@ const EditReservationModal = ({
 
                     <td className="px-3 py-2 text-gray-600">
                       {/* Partner → Source Partner - Source Name */}
-                      {`${item.partner?.username || "N/A"} → ${
+                      {`${item.source?.partner?.username || "N/A"} → ${
                         item.source?.name || "N/A"
                       }`}
                     </td>
@@ -193,65 +199,38 @@ const EditReservationModal = ({
           </div>
         </div>
 
-        {/* Edit Form */}
+        {/* Reservation Status */}
         <div className="mb-6 rounded-lg border border-gray-200 p-4">
           <h3 className="mb-3 text-lg font-semibold text-gray-700">
-            Edit Reservation Settings
+            Reservation Status
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div>
-              <label
-                htmlFor="shippingMethod"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Shipping Method
-              </label>
+          <div>
+            <label className="flex items-center">
               <input
-                id="shippingMethod"
-                type="text"
-                placeholder="Enter shipping method"
-                value={shippingMethod}
-                onChange={(e) => setShippingMethod(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                type="checkbox"
+                checked={isActive}
+                onChange={(e) => {
+                  // Only allow changing if not already active
+                  if (!initialData?.isActive) {
+                    setIsActive(e.target.checked);
+                  }
+                }}
+                disabled={initialData?.isActive}
+                className={`h-4 w-4 rounded border-gray-300 ${
+                  initialData?.isActive
+                    ? "cursor-not-allowed opacity-60"
+                    : "text-blue-600 focus:ring-blue-500"
+                }`}
               />
-            </div>
-
-            <div>
-              <label
-                htmlFor="shippingAmount"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Shipping Amount (TND)
-              </label>
-              <input
-                id="shippingAmount"
-                type="number"
-                step="0.01"
-                placeholder="0.00"
-                value={shippingAmount}
-                onChange={(e) =>
-                  setShippingAmount(parseFloat(e.target.value) || 0)
-                }
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={isActive}
-                  onChange={(e) => setIsActive(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm font-medium text-gray-700">
-                  Active Reservation
-                </span>
-              </label>
-              <p className="mt-1 text-xs text-gray-500">
-                Active reservations can be processed and converted to orders
-              </p>
-            </div>
+              <span className="ml-2 text-sm font-medium text-gray-700">
+                Active Reservation
+              </span>
+            </label>
+            <p className="mt-1 text-xs text-gray-500">
+              {initialData?.isActive
+                ? "This reservation is active and cannot be deactivated"
+                : "Active reservations can be processed and converted to orders"}
+            </p>
           </div>
         </div>
 

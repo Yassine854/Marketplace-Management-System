@@ -22,7 +22,6 @@ export interface ReservationItem {
   product?: {
     id: string;
     name: string;
-    // add other fields as needed
   };
   sourceId?: string;
   source?: {

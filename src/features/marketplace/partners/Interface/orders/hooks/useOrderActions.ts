@@ -115,7 +115,7 @@ export function useOrderActions() {
       const errorMessage =
         err.response?.data?.message || "Failed to fetch vendor order";
       setError(errorMessage);
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
       console.error("Error fetching vendor order:", err);
     } finally {
       setIsLoading(false);
