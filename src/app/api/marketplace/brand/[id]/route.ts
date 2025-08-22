@@ -2,9 +2,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
-import { writeFile } from "fs/promises";
-import path from "path";
-import fs from "fs";
+import { supabase } from "@/libs/supabase/supabaseClient";
 
 const prisma = new PrismaClient();
 
@@ -80,33 +78,61 @@ export async function PATCH(
 
     // Handle image update if provided
     if (imageFile) {
-      // Save the new image
-      const brandsDir = path.join(process.cwd(), "public/uploads/brands");
-      await fs.promises.mkdir(brandsDir, { recursive: true });
+      // Validate image type
+      const validImageTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+      ];
 
-      const buffer = Buffer.from(await imageFile.arrayBuffer());
-      const fileName = `brand-${Date.now()}-${imageFile.name}`;
-      const uploadPath = path.join(brandsDir, fileName);
+      if (!validImageTypes.includes(imageFile.type)) {
+        return NextResponse.json(
+          { error: "Invalid image format" },
+          { status: 400 },
+        );
+      }
 
-      await writeFile(uploadPath, buffer);
-      updateData.img = `/uploads/brands/${fileName}`;
-
-      // Delete old image if it exists
-      if (existingBrand.img && existingBrand.img.startsWith("/uploads/")) {
+      // Delete old image from Supabase if it exists
+      if (existingBrand.img) {
+        const oldImagePath = existingBrand.img.split("/").slice(-2).join("/"); // Get "brands/filename.ext"
         try {
-          const oldImagePath = path.join(
-            process.cwd(),
-            "public",
-            existingBrand.img,
-          );
-          if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath);
-          }
+          await supabase.storage.from("marketplace").remove([oldImagePath]);
         } catch (error) {
-          console.error("Error deleting old brand image:", error);
-          // Continue with update even if deleting old file fails
+          console.error("Error deleting old image:", error);
         }
       }
+
+      // Upload new image to Supabase
+      const buffer = await imageFile.arrayBuffer();
+      const fileName = `brand-${Date.now()}-${imageFile.name.replace(
+        /\s+/g,
+        "-",
+      )}`;
+
+      const { data, error } = await supabase.storage
+        .from("marketplace")
+        .upload(`brands/${fileName}`, buffer, {
+          contentType: imageFile.type,
+          upsert: false,
+        });
+
+      if (error) {
+        console.error("Error uploading to Supabase:", error);
+        return NextResponse.json(
+          { error: "Failed to upload image" },
+          { status: 500 },
+        );
+      }
+
+      // Get the public URL for the uploaded file
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("marketplace")
+        .getPublicUrl(`brands/${fileName}`);
+
+      updateData.img = publicUrl;
     }
 
     // Update the brand
@@ -151,21 +177,21 @@ export async function DELETE(
       return NextResponse.json({ message: "Brand not found" }, { status: 404 });
     }
 
-    // Delete the image file if it exists
-    if (brand.img && brand.img.startsWith("/uploads/")) {
+    // Delete the image from Supabase if it exists
+    if (brand.img) {
       try {
-        const imagePath = path.join(process.cwd(), "public", brand.img);
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-        }
+        const imagePath = brand.img.split("/").slice(-2).join("/"); // Get "brands/filename.ext"
+        await supabase.storage.from("marketplace").remove([imagePath]);
       } catch (error) {
-        console.error("Error deleting brand image file:", error);
-        // Continue with deletion even if file deletion fails
+        console.error("Error deleting brand image from Supabase:", error);
+        // Continue with the deletion even if deleting the file fails
       }
     }
 
     // Delete the brand from database
-    await prisma.brand.delete({ where: { id } });
+    await prisma.brand.delete({
+      where: { id },
+    });
 
     return NextResponse.json(
       { message: "Brand deleted successfully" },

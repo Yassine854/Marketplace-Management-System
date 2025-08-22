@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
-import { writeFile } from "fs/promises";
-import path from "path";
-import fs from "fs";
+import { supabase } from "@/libs/supabase/supabaseClient";
 
 const prisma = new PrismaClient();
 
@@ -26,17 +24,33 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create brands directory if it doesn't exist
-    const brandsDir = path.join(process.cwd(), "public/uploads/brands");
-    await fs.promises.mkdir(brandsDir, { recursive: true });
+    // Upload the image to Supabase storage
+    const buffer = await imageFile.arrayBuffer();
+    const fileName = `brand-${Date.now()}-${imageFile.name.replace(
+      /\s+/g,
+      "-",
+    )}`;
 
-    // Save the image file
-    const buffer = Buffer.from(await imageFile.arrayBuffer());
-    const fileName = `brand-${Date.now()}-${imageFile.name}`;
-    const uploadPath = path.join(brandsDir, fileName);
+    const { data, error } = await supabase.storage
+      .from("marketplace")
+      .upload(`brands/${fileName}`, buffer, {
+        contentType: imageFile.type,
+      });
 
-    await writeFile(uploadPath, buffer);
-    const imageUrl = `/uploads/brands/${fileName}`;
+    if (error) {
+      console.error("Error uploading brand image:", error);
+      return NextResponse.json(
+        { error: "Failed to upload brand image" },
+        { status: 500 },
+      );
+    }
+
+    // Get the public URL for the uploaded file
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("marketplace").getPublicUrl(`brands/${fileName}`);
+
+    const imageUrl = publicUrl;
 
     // Create the brand in database
     const brand = await prisma.brand.create({
