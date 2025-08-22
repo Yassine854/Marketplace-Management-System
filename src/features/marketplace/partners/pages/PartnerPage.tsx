@@ -173,7 +173,9 @@ const PartnerPage = () => {
             partners={partners}
             isLoading={isLoading}
             error={error}
-            refetch={refetch}
+            refetch={async () => {
+              await refetch();
+            }}
             onEdit={openEditModal}
             onDelete={handleDelete}
             typePartners={typePartners}

@@ -3,6 +3,7 @@ import axios from "axios";
 import { Product } from "@/types/product";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
+import { mutate } from "swr";
 
 export function useProductActions() {
   const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +46,8 @@ export function useProductActions() {
         const successMsg = "Product updated successfully!";
         setSuccessMessage(successMsg);
         toast.success(successMsg);
+        // Revalidate the partner's products list
+        mutate(["partner-products", userId]);
         return true;
       }
       return false;

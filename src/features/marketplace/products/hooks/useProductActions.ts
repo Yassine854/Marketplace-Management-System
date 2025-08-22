@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { Product } from "@/types/product";
 import toast from "react-hot-toast";
+import { mutate } from "swr";
 
 export function useProductActions() {
   const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +43,8 @@ export function useProductActions() {
         const successMsg = "Product updated successfully!";
         setSuccessMessage(successMsg);
         toast.success(successMsg);
+        // Revalidate the products list after successful update
+        mutate("products");
         return true;
       }
       return false;
@@ -68,6 +71,8 @@ export function useProductActions() {
         const successMsg = "Product deleted successfully!";
         setSuccessMessage(successMsg);
         toast.success(successMsg);
+        // Revalidate the products list after successful deletion
+        mutate("products");
         return response.data.message;
       }
     } catch (err: any) {

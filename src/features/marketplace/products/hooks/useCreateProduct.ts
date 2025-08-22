@@ -2,6 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { mutate } from "swr";
 
 interface CreateProductData {
   name: string;
@@ -152,6 +153,8 @@ export function useCreateProduct() {
       await Promise.all(promises);
 
       if (response.status === 201 && response.data.product?.id) {
+        // Revalidate the products list after successful creation
+        mutate("products");
         onSuccess?.(response.data.product.id);
         return response.data.product;
       }

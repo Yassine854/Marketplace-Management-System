@@ -1,49 +1,30 @@
-import { useState, useEffect } from "react";
+import useSWR from "swr";
 import { axios } from "@/libs/axios";
 import { Partner } from "@/types/partner";
 
+const fetchPartners = async () => {
+  const { data } = await axios.servicesClient.get<{
+    partners: Partner[];
+  }>("/api/marketplace/partners/getAll");
+  return data.partners || [];
+};
+
 export const useGetAllPartners = () => {
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchPartners = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { data } = await axios.servicesClient.get<{
-        partners: Partner[];
-      }>("/api/marketplace/partners/getAll");
-
-      setPartners(data.partners || []);
-    } catch (err) {
-      let errorMessage = "Failed to fetch partners";
-
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      } else if (typeof err === "string") {
-        errorMessage = err;
-      } else {
-        errorMessage = "An unknown error occurred";
-      }
-
-      setError(errorMessage);
-      setPartners([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPartners();
-  }, []);
+  const {
+    data: partners = [],
+    error,
+    isLoading,
+    mutate,
+  } = useSWR<Partner[]>("partners", fetchPartners, {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+  });
 
   return {
     partners,
     isLoading,
-    error,
-    refetch: fetchPartners,
+    error: error ? error.message : null,
+    refetch: () => mutate(),
     isEmpty: !isLoading && !error && partners.length === 0,
   };
 };

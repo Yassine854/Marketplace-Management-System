@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
+import { headers } from "next/headers";
 
 const prisma = new PrismaClient();
+
+// Disable caching for this route
+export const dynamic = "force-dynamic";
 
 // 🟢 GET: Retrieve all products with related entities
 export async function GET(req: Request) {

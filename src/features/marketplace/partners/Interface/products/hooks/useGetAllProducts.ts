@@ -1,12 +1,9 @@
-import { useState, useEffect } from "react";
+import useSWR from "swr";
 import { axios } from "@/libs/axios";
 import { Product } from "@/types/product";
 import { useSession } from "next-auth/react";
 
 export const useGetAllProducts = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
 
   // Get user info from session
@@ -23,64 +20,47 @@ export const useGetAllProducts = () => {
   const partnerId = isPartner ? user.id : null;
 
   const fetchProducts = async () => {
-    setIsLoading(true);
-    setError(null);
+    if (!partnerId) return [];
 
-    try {
-      // Get all products
-      const { data } = await axios.servicesClient.get<{ products: Product[] }>(
-        "/api/marketplace/products/getAll",
-      );
+    const { data } = await axios.servicesClient.get<{ products: Product[] }>(
+      "/api/marketplace/products/getAll",
+    );
 
-      // Filter products to include:
-      // 1. Products that have this partner's ID directly (partnerId)
-      // 2. Products that are linked through skuPartners relationship
-      const filteredProducts = data.products.filter((product) => {
-        // Direct relationship - product belongs to this partner
-        if (product.partnerId === partnerId) {
-          return true;
-        }
+    // Filter products to include:
+    // 1. Products that have this partner's ID directly (partnerId)
+    // 2. Products that are linked through skuPartners relationship
+    return data.products.filter((product) => {
+      if (product.partnerId === partnerId) return true;
 
-        // Check if product has skuPartners and any of them belong to this partner
-        if (product.skuPartners && product.skuPartners.length > 0) {
-          return product.skuPartners.some(
-            (skuPartner: any) => skuPartner.partnerId === partnerId,
-          );
-        }
-
-        return false;
-      });
-
-      setProducts(filteredProducts || []);
-    } catch (err) {
-      let errorMessage = "Failed to fetch products";
-
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      } else if (typeof err === "string") {
-        errorMessage = err;
-      } else {
-        errorMessage = "An unknown error occurred";
+      if (product.skuPartners && product.skuPartners.length > 0) {
+        return product.skuPartners.some(
+          (skuPartner: any) => skuPartner.partnerId === partnerId,
+        );
       }
 
-      setError(errorMessage);
-      setProducts([]);
-    } finally {
-      setIsLoading(false);
-    }
+      return false;
+    });
   };
 
-  useEffect(() => {
-    if (partnerId) {
-      fetchProducts();
-    }
-  }, [partnerId]);
+  const {
+    data: products = [],
+    error,
+    isLoading,
+    mutate,
+  } = useSWR<Product[]>(
+    partnerId ? ["partner-products", partnerId] : null,
+    fetchProducts,
+    {
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+    },
+  );
 
   return {
     products,
     isLoading,
-    error,
-    refetch: fetchProducts,
+    error: error ? error.message : null,
+    refetch: () => mutate(),
     isEmpty: !isLoading && !error && products.length === 0,
   };
 };

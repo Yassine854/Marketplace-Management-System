@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth"; // Import authentication service
+import { headers } from "next/headers";
 
 const prisma = new PrismaClient();
+
+// Disable caching for this route
+export const dynamic = "force-dynamic";
 
 // 🟢 GET: Retrieve all partners with their related data
 export async function GET(req: Request) {

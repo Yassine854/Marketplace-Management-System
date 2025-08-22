@@ -2,7 +2,8 @@
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useGetAllProducts } from "../hooks/useGetAllProducts";
+import { mutate } from "swr";
+import { useSession } from "next-auth/react";
 
 interface CreateProductData {
   name: string;
@@ -46,7 +47,8 @@ interface CreateProductData {
 export function useCreateProduct() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { refetch } = useGetAllProducts();
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
 
   const createProduct = async (
     productData: CreateProductData,
@@ -202,7 +204,8 @@ export function useCreateProduct() {
 
       if (response.status == 200 || response.status == 201) {
         toast.success("Product created successfully!");
-        refetch();
+        // Revalidate the partner's products list
+        mutate(["partner-products", userId]);
       }
       const productId = response.data.product.id;
 

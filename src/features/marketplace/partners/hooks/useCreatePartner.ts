@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { mutate } from "swr";
 
 export function useCreatePartner() {
   const [isLoading, setIsLoading] = useState(false);
@@ -48,6 +49,8 @@ export function useCreatePartner() {
       formData.append("logo", partnerData.logo);
     }
     if (partnerData.patent) {
+      // Add import at the top of the file:
+      // import { mutate } from 'swr';
       formData.append("patent", partnerData.patent);
     }
 
@@ -63,6 +66,8 @@ export function useCreatePartner() {
       );
       if (response.status === 201) {
         toast.success("Partner created successfully");
+        // Revalidate the partners list
+        mutate("partners");
         onSuccess?.();
       }
     } catch (err: any) {
