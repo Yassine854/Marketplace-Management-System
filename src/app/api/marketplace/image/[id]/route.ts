@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
+import { supabase } from "@/libs/supabase/supabaseClient";
 
 const prisma = new PrismaClient();
 
@@ -53,15 +54,84 @@ export async function PATCH(
     }
 
     const { id } = params;
-    const body = await req.json();
+    const formData = await req.formData();
 
-    // Update the image by ID
+    // Get existing image
+    const existingImage = await prisma.image.findUnique({
+      where: { id },
+    });
+
+    if (!existingImage) {
+      return NextResponse.json({ error: "Image not found" }, { status: 404 });
+    }
+
+    let imageUrl = existingImage.url;
+    const newImageFile = formData.get("image") as File | null;
+
+    if (newImageFile) {
+      // Validate file type
+      const validMimeTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+      ];
+      if (!validMimeTypes.includes(newImageFile.type)) {
+        return NextResponse.json(
+          { error: "Invalid image file type" },
+          { status: 400 },
+        );
+      }
+
+      // Delete old image from Supabase if it exists
+      if (existingImage.url) {
+        const oldImagePath = existingImage.url.split("/").slice(-2).join("/");
+        await supabase.storage
+          .from("marketplace")
+          .remove([oldImagePath])
+          .catch((error) => console.error("Error deleting old image:", error));
+      }
+
+      // Upload new image
+      const buffer = await newImageFile.arrayBuffer();
+      const fileName = `${Date.now()}-${newImageFile.name.replace(
+        /\s+/g,
+        "-",
+      )}`;
+
+      const { data, error } = await supabase.storage
+        .from("marketplace")
+        .upload(`products/${fileName}`, buffer, {
+          contentType: newImageFile.type,
+          upsert: false,
+        });
+
+      if (error) {
+        console.error("Error uploading image:", error);
+        return NextResponse.json(
+          { error: "Failed to upload image" },
+          { status: 500 },
+        );
+      }
+
+      // Get the public URL for the uploaded file
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("marketplace")
+        .getPublicUrl(`products/${fileName}`);
+
+      imageUrl = publicUrl;
+    }
+
+    // Update the image in database
     const updatedImage = await prisma.image.update({
       where: { id },
       data: {
-        url: body.url,
-        altText: body.altText ?? null, // Alt text is optional
-        productId: body.productId,
+        url: imageUrl,
+        altText: (formData.get("altText") as string) ?? null,
+        productId:
+          (formData.get("productId") as string) || existingImage.productId,
       },
     });
 
@@ -92,7 +162,27 @@ export async function DELETE(
 
     const { id } = params;
 
-    // Delete the image by ID
+    // Get the image to delete
+    const image = await prisma.image.findUnique({
+      where: { id },
+    });
+
+    if (!image) {
+      return NextResponse.json({ message: "Image not found" }, { status: 404 });
+    }
+
+    // Delete the image from Supabase storage
+    if (image.url) {
+      const imagePath = image.url.split("/").slice(-2).join("/");
+      await supabase.storage
+        .from("marketplace")
+        .remove([imagePath])
+        .catch((error) =>
+          console.error("Error deleting image from storage:", error),
+        );
+    }
+
+    // Delete the image record from the database
     await prisma.image.delete({ where: { id } });
 
     return NextResponse.json(

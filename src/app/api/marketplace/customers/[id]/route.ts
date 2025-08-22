@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { auth } from "../../../../../services/auth";
-import { writeFile } from "fs/promises";
-import path from "path";
-import fs from "fs";
+import { supabase } from "@/libs/supabase/supabaseClient";
 
 const prisma = new PrismaClient();
 
@@ -203,23 +201,31 @@ export async function PATCH(
         throw new Error("Invalid file type");
       }
 
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+      const buffer = await file.arrayBuffer();
+      const fileName = `${prefix}-${Date.now()}-${file.name.replace(
+        /\s+/g,
+        "-",
+      )}`;
 
-      const filename = `${prefix}-${Date.now()}-${file.name}`;
-      const filepath = path.join(
-        process.cwd(),
-        "public",
-        "uploads",
-        "customers",
-        filename,
-      );
+      const { data, error } = await supabase.storage
+        .from("marketplace")
+        .upload(`customers/${prefix}/${fileName}`, buffer, {
+          contentType: file.type,
+        });
 
-      // Ensure directory exists
-      await fs.promises.mkdir(path.dirname(filepath), { recursive: true });
+      if (error) {
+        console.error(`Error uploading ${prefix} file:`, error);
+        throw new Error(`Failed to upload ${prefix} file`);
+      }
 
-      await writeFile(filepath, buffer);
-      return `/uploads/customers/${filename}`;
+      // Get the public URL for the uploaded file
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("marketplace")
+        .getPublicUrl(`customers/${prefix}/${fileName}`);
+
+      return publicUrl;
     };
 
     try {
@@ -263,28 +269,36 @@ export async function PATCH(
     if (cinPhotoUrl) {
       updateData.cinPhoto = cinPhotoUrl;
 
-      // Delete old cinPhoto if exists
+      // Delete old cinPhoto from Supabase if exists
       if (existingCustomer.cinPhoto) {
-        const oldPath = path.join(
-          process.cwd(),
-          "public",
-          existingCustomer.cinPhoto,
-        );
-        await fs.promises.unlink(oldPath).catch(() => {});
+        const oldPath = existingCustomer.cinPhoto
+          .split("/")
+          .slice(-2)
+          .join("/");
+        await supabase.storage
+          .from("marketplace")
+          .remove([oldPath])
+          .catch((error) =>
+            console.error("Error deleting old CIN photo:", error),
+          );
       }
     }
 
     if (patentPhotoUrl) {
       updateData.patentPhoto = patentPhotoUrl;
 
-      // Delete old patentPhoto if exists
+      // Delete old patentPhoto from Supabase if exists
       if (existingCustomer.patentPhoto) {
-        const oldPath = path.join(
-          process.cwd(),
-          "public",
-          existingCustomer.patentPhoto,
-        );
-        await fs.promises.unlink(oldPath).catch(() => {});
+        const oldPath = existingCustomer.patentPhoto
+          .split("/")
+          .slice(-2)
+          .join("/");
+        await supabase.storage
+          .from("marketplace")
+          .remove([oldPath])
+          .catch((error) =>
+            console.error("Error deleting old patent photo:", error),
+          );
       }
     }
 

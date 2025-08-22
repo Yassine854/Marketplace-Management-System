@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
-import * as path from "path";
-import * as fs from "fs";
-import { promises as fsPromises } from "fs";
-import { writeFile } from "fs/promises";
+import { supabase } from "@/libs/supabase/supabaseClient";
 
 const prisma = new PrismaClient();
 
@@ -190,39 +187,63 @@ export async function PATCH(
         );
       }
 
-      // Create uploads directory if it doesn't exist
-      const uploadsDir = path.join(process.cwd(), "public/uploads/banners");
-      await fs.promises.mkdir(uploadsDir, { recursive: true });
+      // Delete old image from Supabase if it exists
+      if (existingBanner.url) {
+        const oldImagePath = existingBanner.url.split("/").slice(-2).join("/"); // Get "banners/filename.ext"
+        try {
+          await supabase.storage.from("marketplace").remove([oldImagePath]);
+        } catch (error) {
+          console.error("Error deleting old image:", error);
+        }
+      }
 
-      // Save the image file
-      const buffer = Buffer.from(await imageFile.arrayBuffer());
+      // Upload new image to Supabase
+      const buffer = await imageFile.arrayBuffer();
       const fileName = `banner-${Date.now()}-${imageFile.name.replace(
         /\s+/g,
         "-",
       )}`;
-      const filePath = path.join(uploadsDir, fileName);
-      await writeFile(filePath, buffer);
 
-      // Create the URL for the image
-      const imageUrl = `/uploads/banners/${fileName}`;
-      updateData.url = imageUrl;
+      const { data, error } = await supabase.storage
+        .from("marketplace")
+        .upload(`banners/${fileName}`, buffer, {
+          contentType: imageFile.type,
+          upsert: false,
+        });
+
+      if (error) {
+        console.error("Error uploading to Supabase:", error);
+        return NextResponse.json(
+          { error: "Failed to upload image" },
+          { status: 500 },
+        );
+      }
+
+      // Get the public URL for the uploaded file
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("marketplace")
+        .getPublicUrl(`banners/${fileName}`);
+
+      updateData.url = publicUrl;
 
       // Delete the old image file if it exists and is in our uploads directory
-      if (existingBanner.url && existingBanner.url.startsWith("/uploads/")) {
-        try {
-          const oldFilePath = path.join(
-            process.cwd(),
-            "public",
-            existingBanner.url,
-          );
-          if (fs.existsSync(oldFilePath)) {
-            fs.unlinkSync(oldFilePath);
-          }
-        } catch (error) {
-          console.error("Error deleting old banner image:", error);
-          // Continue with the update even if deleting the old file fails
-        }
-      }
+      // if (existingBanner.url && existingBanner.url.startsWith("/uploads/")) {
+      //   try {
+      //     const oldFilePath = path.join(
+      //       process.cwd(),
+      //       "public",
+      //       existingBanner.url,
+      //     );
+      //     if (fs.existsSync(oldFilePath)) {
+      //       fs.unlinkSync(oldFilePath);
+      //     }
+      //   } catch (error) {
+      //     console.error("Error deleting old banner image:", error);
+      //     // Continue with the update even if deleting the old file fails
+      //   }
+      // }
     }
 
     // Update the banner
@@ -314,15 +335,13 @@ export async function DELETE(
       );
     }
 
-    // Delete the image file if it exists and is in our uploads directory
-    if (banner.url && banner.url.startsWith("/uploads/")) {
+    // Delete the image from Supabase if it exists
+    if (banner.url) {
       try {
-        const filePath = path.join(process.cwd(), "public", banner.url);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
+        const imagePath = banner.url.split("/").slice(-2).join("/"); // Get "banners/filename.ext"
+        await supabase.storage.from("marketplace").remove([imagePath]);
       } catch (error) {
-        console.error("Error deleting banner image:", error);
+        console.error("Error deleting banner image from Supabase:", error);
         // Continue with the deletion even if deleting the file fails
       }
     }

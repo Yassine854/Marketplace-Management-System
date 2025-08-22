@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
-import { writeFile } from "fs/promises";
-import path from "path";
+import { supabase } from "@/libs/supabase/supabaseClient";
 
 const prisma = new PrismaClient();
 
@@ -107,12 +106,31 @@ export async function POST(req: Request) {
         );
       }
 
-      const buffer = Buffer.from(await imageFile.arrayBuffer());
+      const buffer = await imageFile.arrayBuffer();
       const fileName = `${Date.now()}-${imageFile.name}`;
-      const filePath = path.join(process.cwd(), "public/uploads", fileName);
 
-      await writeFile(filePath, buffer);
-      imageUrl = `/uploads/${fileName}`;
+      const { data, error } = await supabase.storage
+        .from("marketplace")
+        .upload(`subcategories/${fileName}`, buffer, {
+          contentType: imageFile.type,
+        });
+
+      if (error) {
+        console.error("Error uploading to Supabase:", error);
+        return NextResponse.json(
+          { error: "Failed to upload image" },
+          { status: 500 },
+        );
+      }
+
+      // Get the public URL for the uploaded file
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("marketplace")
+        .getPublicUrl(`subcategories/${fileName}`);
+
+      imageUrl = publicUrl;
     }
 
     // Create new subcategory in Prisma

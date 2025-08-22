@@ -2,8 +2,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
-import { writeFile, unlink } from "fs/promises";
-import path from "path";
+import { supabase } from "@/libs/supabase/supabaseClient";
 
 const prisma = new PrismaClient();
 
@@ -190,27 +189,46 @@ export async function PATCH(
         );
       }
 
-      // Delete old image if exists
+      // Delete old image from Supabase if exists
       if (existingSubcategory.image) {
-        const oldImagePath = path.join(
-          process.cwd(),
-          "public",
-          existingSubcategory.image,
-        );
+        const oldImagePath = existingSubcategory.image
+          .split("/")
+          .slice(-2)
+          .join("/"); // Get "subcategories/filename.ext"
         try {
-          await unlink(oldImagePath);
+          await supabase.storage.from("marketplace").remove([oldImagePath]);
         } catch (error) {
           console.error("Error deleting old image:", error);
         }
       }
 
-      // Save new image
-      const buffer = Buffer.from(await imageFile.arrayBuffer());
+      // Upload new image to Supabase
+      const buffer = await imageFile.arrayBuffer();
       const fileName = `${Date.now()}-${imageFile.name}`;
-      const filePath = path.join(process.cwd(), "public/uploads", fileName);
 
-      await writeFile(filePath, buffer);
-      imageUrl = `/uploads/${fileName}`;
+      const { data, error } = await supabase.storage
+        .from("marketplace")
+        .upload(`subcategories/${fileName}`, buffer, {
+          contentType: imageFile.type,
+          upsert: false,
+        });
+
+      if (error) {
+        console.error("Error uploading to Supabase:", error);
+        return NextResponse.json(
+          { error: "Failed to upload image" },
+          { status: 500 },
+        );
+      }
+
+      // Get the public URL for the uploaded file
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("marketplace")
+        .getPublicUrl(`subcategories/${fileName}`);
+
+      imageUrl = publicUrl;
     }
 
     // Update subcategory
@@ -294,11 +312,11 @@ export async function DELETE(
       );
     }
 
-    // Delete associated image
+    // Delete associated image from Supabase
     if (subcategory.image) {
-      const imagePath = path.join(process.cwd(), "public", subcategory.image);
+      const imagePath = subcategory.image.split("/").slice(-2).join("/"); // Get "subcategories/filename.ext"
       try {
-        await unlink(imagePath);
+        await supabase.storage.from("marketplace").remove([imagePath]);
       } catch (error) {
         console.error("Error deleting image:", error);
       }

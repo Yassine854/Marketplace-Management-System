@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
-import path from "path";
-import fs from "fs";
-import { writeFile } from "fs/promises";
+import { supabase } from "@/libs/supabase/supabaseClient";
 
 const prisma = new PrismaClient();
 
@@ -105,21 +103,35 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), "public/uploads/banners");
-    await fs.promises.mkdir(uploadsDir, { recursive: true });
-
-    // Save the image file
-    const buffer = Buffer.from(await imageFile.arrayBuffer());
+    // Upload the image to Supabase storage
+    const buffer = await imageFile.arrayBuffer();
     const fileName = `banner-${Date.now()}-${imageFile.name.replace(
       /\s+/g,
       "-",
     )}`;
-    const filePath = path.join(uploadsDir, fileName);
-    await writeFile(filePath, buffer);
 
-    // Create the URL for the image
-    const imageUrl = `/uploads/banners/${fileName}`;
+    const { data, error } = await supabase.storage
+      .from("marketplace")
+      .upload(`banners/${fileName}`, buffer, {
+        contentType: imageFile.type,
+      });
+
+    if (error) {
+      console.error("Error uploading to Supabase:", error);
+      return NextResponse.json(
+        { error: "Failed to upload image" },
+        { status: 500 },
+      );
+    }
+
+    // Get the public URL for the uploaded file
+    const {
+      data: { publicUrl },
+    } = supabase.storage
+      .from("marketplace")
+      .getPublicUrl(`banners/${fileName}`);
+
+    const imageUrl = publicUrl;
 
     // Create the banner in the database
     const newBanner = await prisma.banner.create({

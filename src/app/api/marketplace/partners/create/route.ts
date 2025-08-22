@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { auth } from "../../../../../services/auth";
-import { writeFile } from "fs/promises";
-import path from "path";
-import fs from "fs";
+import { supabase } from "@/libs/supabase/supabaseClient";
 
 const prisma = new PrismaClient();
 
@@ -148,18 +146,31 @@ export async function POST(req: Request) {
           throw new Error(`Invalid file type for ${folder}`);
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const fileName = `${folder}-${Date.now()}-${file.name}`;
-        const uploadPath = path.join(
-          process.cwd(),
-          "public/uploads/partners",
-          folder,
-          fileName,
-        );
+        const buffer = await file.arrayBuffer();
+        const fileName = `${folder}-${Date.now()}-${file.name.replace(
+          /\s+/g,
+          "-",
+        )}`;
 
-        await fs.promises.mkdir(path.dirname(uploadPath), { recursive: true });
-        await writeFile(uploadPath, buffer);
-        return `/uploads/partners/${folder}/${fileName}`;
+        const { data, error } = await supabase.storage
+          .from("marketplace")
+          .upload(`partners/${folder}/${fileName}`, buffer, {
+            contentType: file.type,
+          });
+
+        if (error) {
+          console.error(`Error uploading ${folder} file:`, error);
+          throw new Error(`Failed to upload ${folder} file`);
+        }
+
+        // Get the public URL for the uploaded file
+        const {
+          data: { publicUrl },
+        } = supabase.storage
+          .from("marketplace")
+          .getPublicUrl(`partners/${folder}/${fileName}`);
+
+        return publicUrl;
       } catch (error) {
         console.error(`File upload error (${folder}):`, error);
         throw new Error(`Failed to upload ${folder} file`);

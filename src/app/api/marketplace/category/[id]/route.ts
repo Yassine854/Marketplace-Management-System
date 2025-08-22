@@ -2,8 +2,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../../services/auth";
-import { writeFile, unlink } from "fs/promises"; // For file operations
-import path from "path";
+import { supabase } from "@/libs/supabase/supabaseClient";
 
 const prisma = new PrismaClient();
 
@@ -157,13 +156,48 @@ export async function PATCH(
     let imageUrl: string | undefined;
 
     if (imageFile) {
-      // Save the new image
-      const buffer = Buffer.from(await imageFile.arrayBuffer());
-      const fileName = `${Date.now()}-${imageFile.name}`;
-      const filePath = path.join(process.cwd(), "public/uploads", fileName);
+      // Get the existing category to delete its old image if it exists
+      const existingCategory = await prisma.category.findUnique({
+        where: { id },
+        select: { image: true },
+      });
 
-      await writeFile(filePath, buffer);
-      imageUrl = `/uploads/${fileName}`; // Public URL for the new image
+      // If there's an existing image, delete it from Supabase
+      if (existingCategory?.image) {
+        const oldImagePath = existingCategory.image
+          .split("/")
+          .slice(-2)
+          .join("/"); // Get "categories/filename.ext"
+        await supabase.storage.from("marketplace").remove([oldImagePath]);
+      }
+
+      // Upload the new image
+      const buffer = await imageFile.arrayBuffer();
+      const fileName = `${Date.now()}-${imageFile.name}`;
+
+      const { data, error } = await supabase.storage
+        .from("marketplace")
+        .upload(`categories/${fileName}`, buffer, {
+          contentType: imageFile.type,
+          upsert: false,
+        });
+
+      if (error) {
+        console.error("Error uploading to Supabase:", error);
+        return NextResponse.json(
+          { error: "Failed to upload image" },
+          { status: 500 },
+        );
+      }
+
+      // Get the public URL for the uploaded file
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("marketplace")
+        .getPublicUrl(`categories/${fileName}`);
+
+      imageUrl = publicUrl;
     }
 
     // Update category with the new name and image URL

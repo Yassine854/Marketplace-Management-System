@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { auth } from "../../../../../services/auth";
-import { writeFile } from "fs/promises";
-import path from "path";
+import { supabase } from "@/libs/supabase/supabaseClient";
 
 const prisma = new PrismaClient();
 
@@ -110,26 +109,65 @@ export async function POST(req: Request) {
     let patentPhotoUrl = null;
 
     if (cinPhotoFile) {
-      const bytes = await cinPhotoFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+      const buffer = await cinPhotoFile.arrayBuffer();
+      const fileName = `${Date.now()}-${cinPhotoFile.name.replace(
+        /\s+/g,
+        "-",
+      )}`;
 
-      // Create unique filename
-      const filename = `${Date.now()}-${cinPhotoFile.name}`;
-      const filepath = path.join(process.cwd(), "public", "uploads", filename);
+      const { data, error } = await supabase.storage
+        .from("marketplace")
+        .upload(`customers/cin/${fileName}`, buffer, {
+          contentType: cinPhotoFile.type,
+        });
 
-      await writeFile(filepath, buffer);
-      cinPhotoUrl = `/uploads/${filename}`;
+      if (error) {
+        console.error("Error uploading CIN photo:", error);
+        return NextResponse.json(
+          { error: "Failed to upload CIN photo" },
+          { status: 500 },
+        );
+      }
+
+      // Get the public URL for the uploaded file
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("marketplace")
+        .getPublicUrl(`customers/cin/${fileName}`);
+
+      cinPhotoUrl = publicUrl;
     }
 
     if (patentPhotoFile) {
-      const bytes = await patentPhotoFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+      const buffer = await patentPhotoFile.arrayBuffer();
+      const fileName = `${Date.now()}-${patentPhotoFile.name.replace(
+        /\s+/g,
+        "-",
+      )}`;
 
-      const filename = `${Date.now()}-${patentPhotoFile.name}`;
-      const filepath = path.join(process.cwd(), "public", "uploads", filename);
+      const { data, error } = await supabase.storage
+        .from("marketplace")
+        .upload(`customers/patent/${fileName}`, buffer, {
+          contentType: patentPhotoFile.type,
+        });
 
-      await writeFile(filepath, buffer);
-      patentPhotoUrl = `/uploads/${filename}`;
+      if (error) {
+        console.error("Error uploading patent photo:", error);
+        return NextResponse.json(
+          { error: "Failed to upload patent photo" },
+          { status: 500 },
+        );
+      }
+
+      // Get the public URL for the uploaded file
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("marketplace")
+        .getPublicUrl(`customers/patent/${fileName}`);
+
+      patentPhotoUrl = publicUrl;
     }
 
     const customerData = {

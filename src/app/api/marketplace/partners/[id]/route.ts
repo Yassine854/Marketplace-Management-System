@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs"; // For password hashing
-import { auth } from "../../../../../services/auth"; // Import authentication service
-import { writeFile, unlink } from "fs/promises";
-import path from "path";
-import fs from "fs";
+import { hash } from "bcryptjs";
+import { auth } from "../../../../../services/auth";
+import { supabase } from "@/libs/supabase/supabaseClient";
 const prisma = new PrismaClient();
 
 // 🟢 GET: Retrieve a partner by ID
@@ -231,8 +229,11 @@ export async function PATCH(
 
     if (removeLogo) {
       if (logoUrl) {
-        const oldLogoPath = path.join(process.cwd(), "public", logoUrl);
-        await unlink(oldLogoPath).catch(console.error);
+        const oldLogoPath = logoUrl.split("/").slice(-2).join("/");
+        await supabase.storage
+          .from("marketplace")
+          .remove([oldLogoPath])
+          .catch((error) => console.error("Error deleting old logo:", error));
         logoUrl = null;
       }
     }
@@ -246,24 +247,44 @@ export async function PATCH(
         );
       }
 
-      // Delete old logo
+      // Delete old logo from Supabase if exists
       if (logoUrl) {
-        const oldLogoPath = path.join(process.cwd(), "public", logoUrl);
-        await unlink(oldLogoPath).catch(console.error);
+        const oldLogoPath = logoUrl.split("/").slice(-2).join("/");
+        await supabase.storage
+          .from("marketplace")
+          .remove([oldLogoPath])
+          .catch((error) => console.error("Error deleting old logo:", error));
       }
 
-      // Upload new logo
-      const buffer = Buffer.from(await newLogoFile.arrayBuffer());
-      const fileName = `logo-${Date.now()}-${newLogoFile.name}`;
-      const uploadPath = path.join(
-        process.cwd(),
-        "public/uploads/partners/logos",
-        fileName,
-      );
+      // Upload new logo to Supabase
+      const buffer = await newLogoFile.arrayBuffer();
+      const fileName = `logo-${Date.now()}-${newLogoFile.name.replace(
+        /\s+/g,
+        "-",
+      )}`;
 
-      await fs.promises.mkdir(path.dirname(uploadPath), { recursive: true });
-      await writeFile(uploadPath, buffer);
-      logoUrl = `/uploads/partners/logos/${fileName}`;
+      const { data, error } = await supabase.storage
+        .from("marketplace")
+        .upload(`partners/logos/${fileName}`, buffer, {
+          contentType: newLogoFile.type,
+        });
+
+      if (error) {
+        console.error("Error uploading logo:", error);
+        return NextResponse.json(
+          { error: "Failed to upload logo" },
+          { status: 500 },
+        );
+      }
+
+      // Get the public URL for the uploaded file
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("marketplace")
+        .getPublicUrl(`partners/logos/${fileName}`);
+
+      logoUrl = publicUrl;
     }
 
     // Process patent
@@ -272,8 +293,11 @@ export async function PATCH(
 
     if (removePatent) {
       if (patentUrl) {
-        const oldPatentPath = path.join(process.cwd(), "public", patentUrl);
-        await unlink(oldPatentPath).catch(console.error);
+        const oldPatentPath = patentUrl.split("/").slice(-2).join("/");
+        await supabase.storage
+          .from("marketplace")
+          .remove([oldPatentPath])
+          .catch((error) => console.error("Error deleting old patent:", error));
         patentUrl = null;
       }
     }
@@ -287,24 +311,44 @@ export async function PATCH(
         );
       }
 
-      // Delete old patent
+      // Delete old patent from Supabase if exists
       if (patentUrl) {
-        const oldPatentPath = path.join(process.cwd(), "public", patentUrl);
-        await unlink(oldPatentPath).catch(console.error);
+        const oldPatentPath = patentUrl.split("/").slice(-2).join("/");
+        await supabase.storage
+          .from("marketplace")
+          .remove([oldPatentPath])
+          .catch((error) => console.error("Error deleting old patent:", error));
       }
 
-      // Upload new patent
-      const buffer = Buffer.from(await newPatentFile.arrayBuffer());
-      const fileName = `patent-${Date.now()}-${newPatentFile.name}`;
-      const uploadPath = path.join(
-        process.cwd(),
-        "public/uploads/partners/patents",
-        fileName,
-      );
+      // Upload new patent to Supabase
+      const buffer = await newPatentFile.arrayBuffer();
+      const fileName = `patent-${Date.now()}-${newPatentFile.name.replace(
+        /\s+/g,
+        "-",
+      )}`;
 
-      await fs.promises.mkdir(path.dirname(uploadPath), { recursive: true });
-      await writeFile(uploadPath, buffer);
-      patentUrl = `/uploads/partners/patents/${fileName}`;
+      const { data, error } = await supabase.storage
+        .from("marketplace")
+        .upload(`partners/patents/${fileName}`, buffer, {
+          contentType: newPatentFile.type,
+        });
+
+      if (error) {
+        console.error("Error uploading patent:", error);
+        return NextResponse.json(
+          { error: "Failed to upload patent" },
+          { status: 500 },
+        );
+      }
+
+      // Get the public URL for the uploaded file
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("marketplace")
+        .getPublicUrl(`partners/patents/${fileName}`);
+
+      patentUrl = publicUrl;
     }
 
     // Add file URLs to update data
